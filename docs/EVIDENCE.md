@@ -221,3 +221,37 @@ An entry at `tentative` confidence must also have a matching line in
 - **Confidence:** proven for the header; the body layout is **not** established — two
   fixed-stride hypotheses (112-byte materials, 192-byte objects) passed a length check
   and were then refuted by a field-level check, 541 and 18,259 failures respectively.
+- **Superseded in part by E-0018:** the body layout is now established, and the reason
+  the fixed strides failed is that `.O3D` has no fixed-offset records at all. The header
+  facts stand, but "byte 28 varies over 41 values" is explained by E-0018, not meaningful.
+
+### E-0017 — `.O3D` is a sequential stream, not a record array
+- **Binary/file:** `x3d.dll`
+- **Evidence:** `X3d_Load_Sdk_o3d` at `0x10001302` reads a 32-byte signature, `strcmp`s it
+  against `(c) 1998 4X Tech. 0.95 (O)` and `(c) 1998 4X Tech. 1.00 (O)`, sets the global
+  `DAT_1002d224` to 0 or 1, then calls `FUN_10011450` (materials) and `FUN_10012920`
+  (objects), the latter calling `FUN_10011ea0` per object. Every read goes through one of
+  four cursor primitives, each of which advances a shared offset:
+  `FUN_1000ba90` (u32, +4), `FUN_1000baf0` (u8, +1), `FUN_1000bb20` (f32, +4),
+  `FUN_1000bb50` (n bytes, +n). Decompiler output in `notes/decomp/`.
+- **Method:** `tools/ghidra_scripts/decompile_one.py`, one function at a time.
+- **Confidence:** proven
+- **Consequence:** the signature field is 32 bytes, not the 27 of E-0016; bytes 27-31 lie
+  *inside* it, past the NUL, and are uninitialised writer memory. That is why byte 28
+  takes 41 values and why every fixed-stride reading of the body failed.
+
+### E-0018 — The `.O3D` spec parses 100% of the corpus, consuming every byte
+- **Binary/file:** `Original Game Files/Data/**/*.O3D`, `docs/formats/o3d.ksy`
+- **Evidence:** `python tools/parsers/o3d.py` reports 596/596 files parsed with the cursor
+  landing exactly on end-of-file and no out-of-range vertex or material index. Totals:
+  2,133 materials, 13,950 objects, 130,797 faces, 140,129 vertices, 14,700,676 bytes —
+  matching the 14.0 M `.O3D` figure in E-0008. All 596 are version 0.95.
+  5,613 objects set the shared-geometry flag; 5,193 objects hold zero vertices of their
+  own yet carry faces, and **every one of those 5,193 names a parent** whose vertex array
+  its faces index — no exceptions, so the validator resolves indices up the parent chain.
+- **Method:** parser written from the loader (E-0017), never from corpus guesswork; its
+  `--selftest` also asserts that a trailing byte, a truncated file, an unknown signature
+  and an out-of-range index are each rejected.
+- **Confidence:** proven for version 0.95. The 1.00 LOD block in `FUN_10012920` is
+  described in the `.ksy` but unimplemented and unexercised — no 1.00 file exists in the
+  corpus, and the parser raises rather than guessing.

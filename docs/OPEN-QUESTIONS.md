@@ -126,8 +126,21 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   112-byte-stride material array is 0-309.
 - **Blocks:** the `.O3D` spec, hence 596 files / 14.0 M of the corpus, hence any Phase 3
   work on scene geometry.
-- **Status:** open — next step is `X3d_Load_Sdk_o3d` in `x3d.dll`, reached from
-  `U99.cpp` `0x00464ead` in `MissionD.exe`.
+- **Status:** RESOLVED (see E-0017, E-0018). `X3d_Load_Sdk_o3d` at `x3d.dll` `0x10001302`
+  showed the file is a sequential stream with no fixed-offset records, which is why both
+  stride hypotheses failed. `docs/formats/o3d.ksy` plus `tools/parsers/o3d.py` now parse
+  596/596 files consuming every byte. Two fields remain opaque and are named `unknown`
+  rather than guessed: five u32 per material, and one u32 per object.
+
+### Q-0012 — Does the 1.00 `.O3D` LOD block ever occur?
+- **Context:** `FUN_10012920` reads a per-object LOD block — u32 count, then that many
+  full object records each followed by an f32 switch distance — but only when
+  `DAT_1002d224` is set, which happens only for the `1.00` signature. All 596 corpus
+  files are 0.95 (E-0018), and LOD geometry ships as separate `*LOD.O3D` files instead.
+- **What we checked:** the loader and the whole corpus. No trace exists.
+- **Blocks:** nothing today. `tools/parsers/o3d.py` raises on a 1.00 file rather than
+  guessing, so a stray one would be loud rather than silently mis-parsed.
+- **Status:** open
 
 ### Q-0011 — `.O3D` files reference `.TGA` textures, but the corpus has no `.TGA` files
 - **Context:** 1,476 NUL-terminated strings in the `.O3D` bodies end in `.TGA` and none
