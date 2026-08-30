@@ -86,3 +86,31 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   applies to `.DMF`/`.FRA`/`.BIN` too: `tools/inventory.py` groups on a fixed 4 bytes, so
   a distinct-magic count above 1 is a prompt to look, not a verdict.
 - **Status:** RESOLVED (see E-0008)
+
+### Q-0008 — Is `U99.cpp` a developer test scene, and is there any scene-jump mechanism?
+- **Context:** `D:\MissionD\Source\U99.cpp` appears only in `MissionD.exe`. Its one
+  attributed function, `0x00464ead` (line 248, 793 bytes), calls `X3d_Load_Sdk_o3d`,
+  `X3d_Camera_Get_Position`, `X3d_Scene_All_Light_Include_Object`, `X3d_Object_Release`
+  and `X3d_Animation_Release` — load a model, place a camera, light it — with no gameplay
+  imports. The shipped units are `U00`-`U04`.
+- **What we checked:** the string diff (no developer-only string names a scene or a jump
+  command; `U##` data-path strings are 252 in `MissionD.exe` vs 250 in `MissionMonet.exe`,
+  near-identical), the import diff (the ten developer-only `x3d.dll` imports are all
+  lighting/camera/animation-enumeration, E-0014), and the function map. No traces exist
+  yet, and `0x00464ead` has not been decompiled.
+- **Blocks:** nothing immediately. It matters for Phase 1 scenario selection: a working
+  scene-jump in the developer build would make trace capture far cheaper than playing
+  through the game.
+- **Status:** open
+
+### Q-0009 — Two source strings in `MissionMonet.exe` are referenced from outside any function
+- **Context:** `D:\MissionD\Source\U00.cpp` and `D:\MissionD\Source\file.cpp` both have
+  references, but `getFunctionContaining` returns nothing for those addresses, so neither
+  contributes to `notes/function-map.csv`. Every other referenced source string in both
+  EXEs lands inside a defined function.
+- **What we checked:** the scan output in `notes/_assert_scan/MissionMonet.exe.json` —
+  zero strings have zero xrefs, and the two files appear in `strings` but not in `single`.
+- **Blocks:** two source files' worth of attribution, and it hints that Ghidra's
+  auto-analysis missed a function boundary in the shipping build. Worth resolving before
+  anyone trusts the 1,476 function count as complete.
+- **Status:** open

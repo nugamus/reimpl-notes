@@ -109,3 +109,87 @@ An entry at `tentative` confidence must also have a matching line in
   re-read of the per-extension magic tables it emitted.
 - **Confidence:** proven for the counts; the "one container" readings of `.BMP` and
   `.DMF` are strong, not proven — no loader has been decompiled yet.
+
+### E-0009 — Assert sites push the line number immediately before the `__FILE__` pointer
+- **Binary/file:** `MissionMonet.exe`
+- **Evidence:** three sites referencing `D:\MissionD\Source\XScene.cpp` (string at
+  `0x00441788`): `0x0041a9c6` `PUSH 0x46` / `0x0041a9c8` `PUSH 0x441788` / `0x0041a9cd`
+  `PUSH 0x3ed` / `CALL 0x0042a200`; likewise `0x0041ad64` (`PUSH 0x7c`, line 124) and
+  `0x0041bcbc` (`PUSH 0x261`, line 609). All 166 assert sites across the two EXEs match
+  this shape — `tools/ghidra_scripts/assert_namer.py` records a null line when it does
+  not match, and produced none.
+- **Method:** `get_assembly_context` over the string's xrefs, then the full scan.
+- **Confidence:** proven
+
+### E-0010 — 119 functions attributed to 31 distinct source files across the two EXEs
+- **Binary/file:** `MissionMonet.exe`, `MissionD.exe`
+- **Evidence:** `notes/function-map.csv`, `notes/module-map.md`. `MissionMonet.exe` 44 of
+  1476 functions (3.0%), 20 source files, 20,001 bytes; `MissionD.exe` 75 of 3055 (2.5%),
+  31 source files, 41,131 bytes. `notes/function-map-multi.csv` is empty: no function
+  references more than one source path. The original tree had at least `Source\`,
+  `Source\FrameWork Sources\`, `Source\Sound\` and `Source\Tools\`.
+- **Method:** `tools/ghidra_scripts/assert_namer.py` run headless through
+  `python -m pyghidra.ghidra_launch ... AnalyzeHeadless -process <binary> -noanalysis`.
+  The stock `analyzeHeadless.bat` cannot run Python scripts — "Ghidra was not started
+  with PyGhidra" — so the PyGhidra launcher is required for every script run.
+- **Confidence:** proven for the attribution; the *absence* of a source file proves only
+  that no assert names it, not that its code is absent.
+
+### E-0011 — `x3d.dll`, `h3d.dll` and `x3dsdk.dll` contain no source-path strings
+- **Binary/file:** `x3d.dll`, `h3d.dll`, `x3dsdk.dll`
+- **Evidence:** the same scan reports `0 source-path strings, 0 single-file functions,
+  0 multi-file functions` for all three. Consistent with release builds from a different
+  vendor (4X Technologies).
+- **Method:** `assert_namer.py`, identical invocation.
+- **Confidence:** proven
+- **Consequence:** assert-based attribution yields nothing for the 1,077 functions in
+  those three DLLs. Their semantics must come from export names, Phase 1 traces and
+  decompilation.
+
+### E-0012 — The developer build is a strict superset; the shipping build has nothing unique
+- **Binary/file:** `MissionD.exe` vs `MissionMonet.exe`
+- **Evidence:** three independent diffs, none showing a shipping-only item.
+  *Source paths:* 22 shared, 9 only in `MissionD.exe` (`Tools\CaptureWnd.cpp`, `U99.cpp`,
+  `LKeyState.cpp`, `LMouseState.cpp`, `Sound\XSndStream.cpp`, `Sound\XTimer.cpp`,
+  `Sound\XWaveFile.cpp`, `LArray.cpp`, `XAction.cpp`), 0 only in `MissionMonet.exe`.
+  *Imports:* 67 symbols only in `MissionD.exe`, including three DLLs the shipping build
+  does not link — `dinput.dll` (`DirectInputCreateA`), `comdlg32.dll`
+  (`GetOpenFileNameA`, `GetSaveFileNameA`) and `ole32.dll` — plus `gdi32.dll` `BitBlt` /
+  `CreateCompatibleBitmap` / `GetDIBits` and `kernel32.dll` `GetLogicalDriveStringsA`.
+  0 imports only in `MissionMonet.exe`. *Strings:* 1,002 only in `MissionD.exe`
+  (`Begin capture`, `Stop capture`, `D:/Capture/`, `*********SET_CRT_DEBUG_FIELD*`,
+  `D:\MissionD\Debug\MissionD.pdb`), 363 only in `MissionMonet.exe`.
+  Anchors: `LKeyState.cpp` at `0x00458911` line 41, `LMouseState.cpp` at `0x0045bde8`
+  line 52, `CaptureWnd.cpp` at `0x00428d11` line 132 and `0x00428f03` line 183.
+- **Method:** set diffs over `notes/_assert_scan/*.json`, `pefile`
+  `DIRECTORY_ENTRY_IMPORT`, and a `[\x20-\x7e]{5,}` string sweep of both PEs.
+- **Confidence:** proven for the import and string diffs; the source-path diff is strong
+  only as positive evidence — `XAction.cpp` is surely present in both builds.
+
+### E-0013 — `MessageToUser` shipped enabled; only the CRT debug layer was compiled out
+- **Binary/file:** `MissionMonet.exe`, `MissionD.exe`
+- **Evidence:** the `MessageToUser` sink at `0x0042a200` in `MissionMonet.exe` is reached
+  from 5 attributed functions totalling 3,073 bytes, and all 22 source-path strings in
+  the shipping build have at least one reference (zero orphans). Conversely
+  `msvcrtd.dll!_CrtSetDbgFlag` and `msvcrtd.dll!_CrtDbgReport` are imported by
+  `MissionD.exe` only, though both builds link `MSVCRTD.DLL` (E-0002).
+- **Method:** xref counts from the `assert_namer.py` scan; `pefile` import diff.
+- **Confidence:** proven
+
+### E-0014 — The two EXEs import 80 distinct `x3d.dll` exports, not 87
+- **Binary/file:** `MissionMonet.exe`, `MissionD.exe`, `x3d.dll`, `h3d.dll`
+- **Evidence:** `notes/import-map.md`. `MissionMonet.exe` imports 70 `x3d.dll` symbols,
+  `MissionD.exe` 80; the union is 80 and the intersection 70, so the shipping build's set
+  is a subset. Both import 7 from `h3d.dll`, 5 from `AviPlay.dll`, 1 from `4xvideo.dll`.
+  The 87 of E-0003 is `MissionD.exe`'s 80 `x3d.dll` plus 7 `h3d.dll` imports. The ten
+  developer-only `x3d.dll` imports are all lighting, camera and animation enumeration:
+  `X3d_Scene_Create_Light`, `X3d_Scene_Create_Spot_Light`, `X3d_Light_Set_Color`,
+  `X3d_Light_Set_Multiplier`, `X3d_Light_Set_Name`, `X3d_Light_Include_Scene_All_Object`,
+  `X3d_Camera_Release`, `X3d_Camera_Set_Target`, `X3d_Scene_Find_First_Animation`,
+  `X3d_Scene_Find_Next_Animation`.
+- **Method:** `tools/ghidra_scripts/import_map.py`, which walks each external function's
+  entry and thunk addresses and takes the containing function of every reference, then
+  joins those addresses against `notes/function-map.csv`.
+- **Confidence:** proven
+- **Consequence:** does not change E-0003's conclusion. The Phase 1 proxy `.def` still
+  needs all 278 `x3d.dll` exports.

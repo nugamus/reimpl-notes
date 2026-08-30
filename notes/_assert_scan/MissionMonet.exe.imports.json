@@ -1,0 +1,1044 @@
+{
+  "program": "MissionMonet.exe",
+  "imports": [
+    {
+      "library": "4xvideo.dll",
+      "name": "Video4x_Init",
+      "thunks": [
+        "EXTERNAL:000000e5"
+      ],
+      "callers": [
+        "00418290"
+      ]
+    },
+    {
+      "library": "aviplay.dll",
+      "name": "AviClose",
+      "thunks": [
+        "EXTERNAL:000000e8",
+        "0043694c"
+      ],
+      "callers": [
+        "00408460",
+        "00417030"
+      ]
+    },
+    {
+      "library": "aviplay.dll",
+      "name": "AviGetStatus",
+      "thunks": [
+        "EXTERNAL:000000e7",
+        "00436952"
+      ],
+      "callers": [
+        "00408460",
+        "00417030"
+      ]
+    },
+    {
+      "library": "aviplay.dll",
+      "name": "AviOpenFile",
+      "thunks": [
+        "EXTERNAL:000000ea",
+        "00436964"
+      ],
+      "callers": [
+        "00408460",
+        "00417030"
+      ]
+    },
+    {
+      "library": "aviplay.dll",
+      "name": "AviPlayMovie",
+      "thunks": [
+        "EXTERNAL:000000e6",
+        "00436958"
+      ],
+      "callers": [
+        "00408460",
+        "00417030"
+      ]
+    },
+    {
+      "library": "aviplay.dll",
+      "name": "AviSetWindow",
+      "thunks": [
+        "EXTERNAL:000000e9",
+        "0043695e"
+      ],
+      "callers": [
+        "00408460",
+        "00417030"
+      ]
+    },
+    {
+      "library": "h3d.dll",
+      "name": "H3d_D3DDriver_Set_Render_State",
+      "thunks": [
+        "EXTERNAL:000000e1",
+        "0043692e"
+      ],
+      "callers": [
+        "004174a0",
+        "00418350",
+        "00418410"
+      ]
+    },
+    {
+      "library": "h3d.dll",
+      "name": "H3d_Destroy",
+      "thunks": [
+        "EXTERNAL:000000e4",
+        "00436934"
+      ],
+      "callers": [
+        "00418250"
+      ]
+    },
+    {
+      "library": "h3d.dll",
+      "name": "H3d_Init_Io",
+      "thunks": [
+        "EXTERNAL:000000e0",
+        "0043693a"
+      ],
+      "callers": [
+        "00418290"
+      ]
+    },
+    {
+      "library": "h3d.dll",
+      "name": "H3d_Lock_BackBuffer",
+      "thunks": [
+        "EXTERNAL:000000df",
+        "00436946"
+      ],
+      "callers": [
+        "0041b130"
+      ]
+    },
+    {
+      "library": "h3d.dll",
+      "name": "H3d_Show_BackBuffer",
+      "thunks": [
+        "EXTERNAL:000000e3",
+        "00436922"
+      ],
+      "callers": [
+        "004144b0",
+        "00414540",
+        "00416b40",
+        "00416f40",
+        "00416fc0",
+        "0041b130"
+      ]
+    },
+    {
+      "library": "h3d.dll",
+      "name": "H3d_Unlock_BackBuffer",
+      "thunks": [
+        "EXTERNAL:000000de",
+        "00436940"
+      ],
+      "callers": [
+        "0041b130"
+      ]
+    },
+    {
+      "library": "h3d.dll",
+      "name": "H3d_WindowProc",
+      "thunks": [
+        "EXTERNAL:000000e2",
+        "00436928"
+      ],
+      "callers": []
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Animation_Release",
+      "thunks": [
+        "EXTERNAL:000000b0"
+      ],
+      "callers": [
+        "00405b60",
+        "0040c490",
+        "0040d8a0",
+        "0041fcf0"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Camera_Get_Polar",
+      "thunks": [
+        "EXTERNAL:000000ce"
+      ],
+      "callers": [
+        "00405670",
+        "00405e90",
+        "00406250",
+        "00407ed0",
+        "00408260",
+        "004086a0",
+        "00408b60",
+        "00408c80",
+        "00408eb0",
+        "00409330",
+        "004095a0",
+        "0040f7e0",
+        "0040fc40",
+        "0040fea0",
+        "00410060",
+        "004106f0",
+        "00410870"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Camera_Get_Position",
+      "thunks": [
+        "EXTERNAL:000000cc"
+      ],
+      "callers": [
+        "00405670",
+        "00405b60",
+        "00405e90",
+        "00406120",
+        "00406250",
+        "00407ed0",
+        "00408260",
+        "004086a0",
+        "00408b60",
+        "00408c80",
+        "00408eb0",
+        "00409330",
+        "004095a0",
+        "0040f560",
+        "0040f660",
+        "0040f7e0",
+        "0040fa60",
+        "0040fc40",
+        "0040fea0",
+        "00410060",
+        "004103c0",
+        "004106f0",
+        "00410870",
+        "0041c690"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Camera_Set_Fov",
+      "thunks": [
+        "EXTERNAL:000000ab"
+      ],
+      "callers": [
+        "00418560"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Camera_Set_Polar",
+      "thunks": [
+        "EXTERNAL:00000094"
+      ],
+      "callers": [
+        "00418560"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Camera_Set_Position",
+      "thunks": [
+        "EXTERNAL:00000098"
+      ],
+      "callers": [
+        "004194f0",
+        "00419520"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Camera_Set_Type",
+      "thunks": [
+        "EXTERNAL:000000aa"
+      ],
+      "callers": [
+        "00418560"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Face_Get_Collision_Normal",
+      "thunks": [
+        "EXTERNAL:000000b2"
+      ],
+      "callers": [
+        "0041a050"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Get_Last_Error",
+      "thunks": [
+        "EXTERNAL:000000b8"
+      ],
+      "callers": [
+        "00406a80",
+        "00420ca0"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Init_Kernel",
+      "thunks": [
+        "EXTERNAL:000000a5"
+      ],
+      "callers": [
+        "00418350"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Init_Mathlib",
+      "thunks": [
+        "EXTERNAL:000000b3"
+      ],
+      "callers": [
+        "00418290"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Init_Ptr",
+      "thunks": [
+        "EXTERNAL:000000a2"
+      ],
+      "callers": [
+        "00417750"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Init_Vtbl",
+      "thunks": [
+        "EXTERNAL:000000a4"
+      ],
+      "callers": [
+        "00417750"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Light_Set_Global_Position",
+      "thunks": [
+        "EXTERNAL:000000c8"
+      ],
+      "callers": [
+        "00420a10"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Line_Face_Collision",
+      "thunks": [
+        "EXTERNAL:000000a0"
+      ],
+      "callers": [
+        "00415f40",
+        "00419e60",
+        "0041a270",
+        "0041a3f0"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Load_Sdk_a3d",
+      "thunks": [
+        "EXTERNAL:00000093"
+      ],
+      "callers": [
+        "00406a80",
+        "00412210",
+        "0041c170",
+        "0041fda0",
+        "004217b0"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Load_Sdk_c3d",
+      "thunks": [
+        "EXTERNAL:000000c6"
+      ],
+      "callers": [
+        "0041f840"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Load_Sdk_l3d",
+      "thunks": [
+        "EXTERNAL:000000c5"
+      ],
+      "callers": [
+        "0041f7c0"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Load_Sdk_o3d",
+      "thunks": [
+        "EXTERNAL:00000092"
+      ],
+      "callers": [
+        "00406a80",
+        "0040d8a0",
+        "0041f3f0",
+        "0041f620",
+        "0041fb30",
+        "00420ca0"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Load_Sdk_s3d",
+      "thunks": [
+        "EXTERNAL:000000c2"
+      ],
+      "callers": [
+        "0041f370",
+        "0041fb30"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Map_Create",
+      "thunks": [
+        "EXTERNAL:00000099"
+      ],
+      "callers": [
+        "0040d630"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Map_Init",
+      "thunks": [
+        "EXTERNAL:00000097"
+      ],
+      "callers": [
+        "0040d630"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Material_Update",
+      "thunks": [
+        "EXTERNAL:00000095"
+      ],
+      "callers": [
+        "0040d630"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Object_Add_Lod",
+      "thunks": [
+        "EXTERNAL:000000c3"
+      ],
+      "callers": [
+        "0041f620"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Object_Animate_Spline",
+      "thunks": [
+        "EXTERNAL:000000c7"
+      ],
+      "callers": [
+        "0041fe90"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Object_Animate_Transition",
+      "thunks": [
+        "EXTERNAL:00000091"
+      ],
+      "callers": [
+        "00406f90"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Object_Check_Line_Collision",
+      "thunks": [
+        "EXTERNAL:000000b1"
+      ],
+      "callers": [
+        "00419e60"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Object_Check_Sphere_Collision",
+      "thunks": [
+        "EXTERNAL:000000db"
+      ],
+      "callers": [
+        "0041a050"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Object_Find_First_Face",
+      "thunks": [
+        "EXTERNAL:0000009f"
+      ],
+      "callers": [
+        "00415f40",
+        "00419e60",
+        "0041a050",
+        "0041a270",
+        "0041a3f0"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Object_Find_Next_Face",
+      "thunks": [
+        "EXTERNAL:0000009e"
+      ],
+      "callers": [
+        "00415f40",
+        "00419e60",
+        "0041a050",
+        "0041a270",
+        "0041a3f0"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Object_Get_Global_Matrice",
+      "thunks": [
+        "EXTERNAL:000000c9"
+      ],
+      "callers": [
+        "00420b40"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Object_Get_Global_Position",
+      "thunks": [
+        "EXTERNAL:000000d6"
+      ],
+      "callers": [
+        "00401a40",
+        "00405580",
+        "00406120",
+        "00406250",
+        "00407b80",
+        "0040b630",
+        "0040c490",
+        "0040cdf0",
+        "0040d0b0",
+        "0040d4e0",
+        "0040d720",
+        "0040e030",
+        "00410ea0",
+        "00419bc0",
+        "0041c690",
+        "0041ce20",
+        "0041ced0",
+        "0041cf80",
+        "0041d020",
+        "0041d0c0",
+        "0041d160",
+        "0041e500",
+        "00420b40",
+        "00420ca0",
+        "004215f0"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Object_Get_Local_Matrice",
+      "thunks": [
+        "EXTERNAL:000000d0"
+      ],
+      "callers": [
+        "00405580",
+        "00420b40",
+        "00420ca0",
+        "00420e00"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Object_Get_Local_Position",
+      "thunks": [
+        "EXTERNAL:000000cd"
+      ],
+      "callers": [
+        "00405670",
+        "00405e90",
+        "00406250",
+        "00407b80",
+        "00407ed0",
+        "0040f560",
+        "0040f660",
+        "0040f7e0",
+        "0040fa60",
+        "0040fc40",
+        "00410060",
+        "004103c0",
+        "004106f0",
+        "00410870"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Object_Hide",
+      "thunks": [
+        "EXTERNAL:000000d8"
+      ],
+      "callers": [
+        "00406250",
+        "00406a80",
+        "00407b80",
+        "00408060",
+        "00408460",
+        "004085f0",
+        "004086a0",
+        "0040f7e0",
+        "0040fa60",
+        "0040fea0",
+        "0041f3f0"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Object_Release",
+      "thunks": [
+        "EXTERNAL:000000af"
+      ],
+      "callers": [
+        "00405b60",
+        "00406e80",
+        "0040c490",
+        "0040d8a0"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Object_Set_Camera_Type",
+      "thunks": [
+        "EXTERNAL:000000d9"
+      ],
+      "callers": [
+        "0041b010"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Object_Set_Global_Position",
+      "thunks": [
+        "EXTERNAL:000000b4"
+      ],
+      "callers": [
+        "00405580"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Object_Set_Local_Matrice",
+      "thunks": [
+        "EXTERNAL:000000d3"
+      ],
+      "callers": [
+        "00405580",
+        "00420e00"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Object_Set_Local_Position",
+      "thunks": [
+        "EXTERNAL:000000bf"
+      ],
+      "callers": [
+        "0041ce20",
+        "0041ced0",
+        "0041cf80",
+        "0041d020",
+        "0041d0c0",
+        "0041d160"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Object_Set_Render_State",
+      "thunks": [
+        "EXTERNAL:000000bd"
+      ],
+      "callers": [
+        "0041b3d0"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Object_Unhide",
+      "thunks": [
+        "EXTERNAL:000000d5"
+      ],
+      "callers": [
+        "00402670",
+        "00403d70",
+        "00406120",
+        "00406250",
+        "00407b80",
+        "00407ed0",
+        "00408260",
+        "00408460",
+        "004086a0",
+        "00408eb0",
+        "00409030",
+        "00409180",
+        "0040f7e0",
+        "0040fa60",
+        "00410020",
+        "00410060",
+        "00410850"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Print",
+      "thunks": [
+        "EXTERNAL:000000be"
+      ],
+      "callers": [
+        "0041c690"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Release_Kernel",
+      "thunks": [
+        "EXTERNAL:000000a3"
+      ],
+      "callers": [
+        "00418250"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Render",
+      "thunks": [
+        "EXTERNAL:000000b9"
+      ],
+      "callers": [
+        "0041b130"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Scene_Add_Map",
+      "thunks": [
+        "EXTERNAL:00000096"
+      ],
+      "callers": [
+        "0040d630"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Scene_All_Light_Include_Object",
+      "thunks": [
+        "EXTERNAL:000000a1"
+      ],
+      "callers": [
+        "0040d8a0",
+        "0041f620",
+        "00420ca0"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Scene_All_Light_Include_Scene_All_Object",
+      "thunks": [
+        "EXTERNAL:000000c4"
+      ],
+      "callers": [
+        "0041f7c0"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Scene_Create",
+      "thunks": [
+        "EXTERNAL:000000b5"
+      ],
+      "callers": [
+        "0041a970"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Scene_Create_Camera",
+      "thunks": [
+        "EXTERNAL:000000dd"
+      ],
+      "callers": [
+        "00418930"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Scene_Find_First_Camera",
+      "thunks": [
+        "EXTERNAL:000000dc"
+      ],
+      "callers": [
+        "00418930"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Scene_Find_First_Light",
+      "thunks": [
+        "EXTERNAL:000000bc"
+      ],
+      "callers": [
+        "0041b330"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Scene_Find_First_Material",
+      "thunks": [
+        "EXTERNAL:000000c1"
+      ],
+      "callers": [
+        "0041ed30"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Scene_Find_First_Object",
+      "thunks": [
+        "EXTERNAL:0000009c"
+      ],
+      "callers": [
+        "0040fa60",
+        "00415f40",
+        "00419e60",
+        "0041a050",
+        "0041a270",
+        "0041a3f0",
+        "0041b010",
+        "0041b3d0",
+        "0041b440"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Scene_Find_Next_Light",
+      "thunks": [
+        "EXTERNAL:000000bb"
+      ],
+      "callers": [
+        "0041b330"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Scene_Find_Next_Material",
+      "thunks": [
+        "EXTERNAL:000000c0"
+      ],
+      "callers": [
+        "0041ed30"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Scene_Find_Next_Object",
+      "thunks": [
+        "EXTERNAL:0000009b"
+      ],
+      "callers": [
+        "0040fa60",
+        "00415f40",
+        "00419e60",
+        "0041a050",
+        "0041a270",
+        "0041a3f0",
+        "0041b010",
+        "0041b3d0",
+        "0041b440"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Scene_Get_Animation",
+      "thunks": [
+        "EXTERNAL:0000009a"
+      ],
+      "callers": [
+        "0040e720"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Scene_Get_Object",
+      "thunks": [
+        "EXTERNAL:000000d7"
+      ],
+      "callers": [
+        "004043b0",
+        "00405670",
+        "00405b00",
+        "00408060",
+        "00408260",
+        "00408460",
+        "004085f0",
+        "004086a0",
+        "00409180",
+        "00409d10",
+        "0040bd50",
+        "0040cdf0",
+        "0040d0b0",
+        "0040d720",
+        "0040e720",
+        "0040fea0",
+        "00410470",
+        "00411d50",
+        "00411d70",
+        "00411de0",
+        "00412530",
+        "00412710",
+        "00412740",
+        "004128e0",
+        "004129a0",
+        "0041b440",
+        "00421480"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Scene_Init_Render",
+      "thunks": [
+        "EXTERNAL:000000b7"
+      ],
+      "callers": [
+        "0041af30"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Scene_Init_Resolution",
+      "thunks": [
+        "EXTERNAL:000000a6"
+      ],
+      "callers": [
+        "0041af30"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Scene_Pick_Object",
+      "thunks": [
+        "EXTERNAL:0000009d"
+      ],
+      "callers": [
+        "0041b540"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Scene_Release",
+      "thunks": [
+        "EXTERNAL:000000b6"
+      ],
+      "callers": [
+        "0041ae40"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Scene_Set_Active_Camera",
+      "thunks": [
+        "EXTERNAL:000000ac"
+      ],
+      "callers": [
+        "00418560"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Scene_Set_Ambient_Light",
+      "thunks": [
+        "EXTERNAL:000000ba"
+      ],
+      "callers": [
+        "0041b2f0",
+        "0041d2a0"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Sphere_Create",
+      "thunks": [
+        "EXTERNAL:000000a9"
+      ],
+      "callers": [
+        "00418560"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Sphere_Face_Collision",
+      "thunks": [
+        "EXTERNAL:000000da"
+      ],
+      "callers": [
+        "0041a050"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Sphere_Release",
+      "thunks": [
+        "EXTERNAL:000000a7"
+      ],
+      "callers": [
+        "00418540"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Sphere_Set_Position",
+      "thunks": [
+        "EXTERNAL:000000ad"
+      ],
+      "callers": [
+        "004187b0",
+        "00418ec0",
+        "0041a050"
+      ]
+    },
+    {
+      "library": "x3d.dll",
+      "name": "X3d_Sphere_Set_Radius",
+      "thunks": [
+        "EXTERNAL:000000a8"
+      ],
+      "callers": [
+        "00418560"
+      ]
+    }
+  ]
+}
