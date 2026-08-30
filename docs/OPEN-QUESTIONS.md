@@ -214,3 +214,30 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   in `MissionMonet.exe` itself, decompiling the function that owns the indirect
   pointer to `tete.dmf`), the format cannot be recovered.
 - **Status:** open
+
+### Q-0016 — What reads `.BIN`, `.FRA`, and `.CFG` files at runtime?
+- **Context:** 109 `.BIN` / 25 `.FRA` / 38 `.CFG` files in the corpus. Each
+  extension covers multiple distinct sub-formats — `.BIN` shows at least seven
+  distinct layouts across the corpus (App-style ASCII banner `Mission Monet`,
+  per-unit INFOACT/INFOOBJ u32-count records, SCENE with RGB header, dialogue
+  D1_xx.BIN with 6-byte records, etc.). `.FRA` shows 8 distinct 4-byte prefixes,
+  `.CFG` shows 3 distinct prefixes that decode as IEEE-754 floats (`0.4`, `1.0`,
+  `0.1`).
+- **What we checked:** the full engine SDK surface — every export of `x3d.dll`
+  (278), `x3dsdk.dll` (63), `h3d.dll` (52), `xd3d.dll` (29), `xs3d.dll` (28),
+  `x3dmp5/6/6k.dll` (31 each), `4xvideo.dll` (1), `AviPlay.dll` (5), `flc.dll`
+  (1). No symbol mentions `.bin`, `.fra`, or `.cfg` — and no string literal in
+  any DLL references those extensions at all. The handoff's plan of "load via the
+  loader too, not via corpus guesswork" cannot be applied because no such loader
+  exists in the decompiled DLL surface.
+- **Observed range:** `.BIN` spans 92 B (`SCENE.BIN`) to 28,324 B
+  (`U01/INFOACT.BIN`), 80 distinct 4-byte prefixes per E-0008. `.FRA` 25 files /
+  8 prefixes, values 1–23 (small u32 count shape). `.CFG` 38 files / 3 prefixes,
+  values 0.4 / 1.0 / 0.1 (IEEE-754 floats).
+- **Blocks:** 172 files / the corpus' last-mile data — these are exactly the
+  "load via the loader" formats the handoff warns against parsing from corpus
+  guesswork. The next agent must locate the readers in `MissionMonet.exe` /
+  `MissionD.exe` (decompiling the function(s) that own the indirect pointer
+  table to `App.bin`, `SCENE.BIN`, `INFOACT.BIN`, `INFOOBJ.BIN`, etc.) before
+  any of these three formats can be parsed.
+- **Status:** open
