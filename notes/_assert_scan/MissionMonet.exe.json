@@ -1,0 +1,602 @@
+{
+  "program": "MissionMonet.exe",
+  "strings": [
+    {
+      "address": "00442158",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LBitmapReader.cpp",
+      "xref_count": 2
+    },
+    {
+      "address": "004424f8",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LClassCreator.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004424bc",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LFrameReader.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00442544",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LMultipleMediaObject.cpp",
+      "xref_count": 2
+    },
+    {
+      "address": "00442220",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LOptionScreen.cpp",
+      "xref_count": 4
+    },
+    {
+      "address": "0044258c",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSharedMediaObject.cpp",
+      "xref_count": 2
+    },
+    {
+      "address": "004425c8",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSimpleMediaObject.cpp",
+      "xref_count": 3
+    },
+    {
+      "address": "00441fc0",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 20
+    },
+    {
+      "address": "00441ff0",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSoundManager.cpp",
+      "xref_count": 9
+    },
+    {
+      "address": "00442278",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LUser.cpp",
+      "xref_count": 2
+    },
+    {
+      "address": "0043fe84",
+      "value": "D:\\MissionD\\Source\\U00.cpp",
+      "xref_count": 2
+    },
+    {
+      "address": "0043f9a4",
+      "value": "D:\\MissionD\\Source\\U03.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00440588",
+      "value": "D:\\MissionD\\Source\\U04.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00441e94",
+      "value": "D:\\MissionD\\Source\\XAnimation.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00441338",
+      "value": "D:\\MissionD\\Source\\XCursor.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00441194",
+      "value": "D:\\MissionD\\Source\\XGameList.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00441eb8",
+      "value": "D:\\MissionD\\Source\\XObject3D.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00441788",
+      "value": "D:\\MissionD\\Source\\XScene.cpp",
+      "xref_count": 7
+    },
+    {
+      "address": "004417e8",
+      "value": "D:\\MissionD\\Source\\XSceneAnim.cpp",
+      "xref_count": 2
+    },
+    {
+      "address": "00441d78",
+      "value": "D:\\MissionD\\Source\\file.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00441e1c",
+      "value": "D:\\MissionD\\Source\\load.cpp",
+      "xref_count": 2
+    },
+    {
+      "address": "00441548",
+      "value": "FrameWork Sources\\MessageToUser.h",
+      "xref_count": 6
+    }
+  ],
+  "single": [
+    {
+      "address": "00406a80",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\U03.cpp",
+      "min_line": 762,
+      "max_line": 762,
+      "assert_count": 1,
+      "size": 1017,
+      "xref_count": 1,
+      "current_name": "U03_762"
+    },
+    {
+      "address": "0040d8a0",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\U04.cpp",
+      "min_line": 1066,
+      "max_line": 1066,
+      "assert_count": 1,
+      "size": 882,
+      "xref_count": 1,
+      "current_name": "U04_1066"
+    },
+    {
+      "address": "004136b0",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\XGameList.cpp",
+      "min_line": 59,
+      "max_line": 59,
+      "assert_count": 1,
+      "size": 494,
+      "xref_count": 3,
+      "current_name": "XGameList_59"
+    },
+    {
+      "address": "00414360",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\XCursor.cpp",
+      "min_line": 63,
+      "max_line": 63,
+      "assert_count": 1,
+      "size": 326,
+      "xref_count": 14,
+      "current_name": "XCursor_63"
+    },
+    {
+      "address": "00416b40",
+      "program": "MissionMonet.exe",
+      "source_file": "FrameWork Sources\\MessageToUser.h",
+      "min_line": 34,
+      "max_line": 34,
+      "assert_count": 1,
+      "size": 1017,
+      "xref_count": 1,
+      "current_name": "MessageToUser_34"
+    },
+    {
+      "address": "004174a0",
+      "program": "MissionMonet.exe",
+      "source_file": "FrameWork Sources\\MessageToUser.h",
+      "min_line": 34,
+      "max_line": 34,
+      "assert_count": 2,
+      "size": 683,
+      "xref_count": 1,
+      "current_name": "MessageToUser_34"
+    },
+    {
+      "address": "00417750",
+      "program": "MissionMonet.exe",
+      "source_file": "FrameWork Sources\\MessageToUser.h",
+      "min_line": 34,
+      "max_line": 34,
+      "assert_count": 1,
+      "size": 597,
+      "xref_count": 1,
+      "current_name": "MessageToUser_34"
+    },
+    {
+      "address": "00418290",
+      "program": "MissionMonet.exe",
+      "source_file": "FrameWork Sources\\MessageToUser.h",
+      "min_line": 34,
+      "max_line": 34,
+      "assert_count": 1,
+      "size": 185,
+      "xref_count": 1,
+      "current_name": "MessageToUser_34"
+    },
+    {
+      "address": "00418560",
+      "program": "MissionMonet.exe",
+      "source_file": "FrameWork Sources\\MessageToUser.h",
+      "min_line": 34,
+      "max_line": 34,
+      "assert_count": 1,
+      "size": 591,
+      "xref_count": 2,
+      "current_name": "MessageToUser_34"
+    },
+    {
+      "address": "0041a970",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\XScene.cpp",
+      "min_line": 70,
+      "max_line": 70,
+      "assert_count": 1,
+      "size": 895,
+      "xref_count": 2,
+      "current_name": "XScene_70"
+    },
+    {
+      "address": "0041acf0",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\XScene.cpp",
+      "min_line": 124,
+      "max_line": 124,
+      "assert_count": 1,
+      "size": 281,
+      "xref_count": 10,
+      "current_name": "XScene_124"
+    },
+    {
+      "address": "0041af30",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\XScene.cpp",
+      "min_line": 177,
+      "max_line": 177,
+      "assert_count": 1,
+      "size": 220,
+      "xref_count": 1,
+      "current_name": "XScene_177"
+    },
+    {
+      "address": "0041c170",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\XSceneAnim.cpp",
+      "min_line": 22,
+      "max_line": 22,
+      "assert_count": 1,
+      "size": 262,
+      "xref_count": 11,
+      "current_name": "XSceneAnim_22"
+    },
+    {
+      "address": "0041c400",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\XSceneAnim.cpp",
+      "min_line": 157,
+      "max_line": 157,
+      "assert_count": 1,
+      "size": 568,
+      "xref_count": 11,
+      "current_name": "XSceneAnim_157"
+    },
+    {
+      "address": "0041f620",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\load.cpp",
+      "min_line": 185,
+      "max_line": 185,
+      "assert_count": 1,
+      "size": 408,
+      "xref_count": 1,
+      "current_name": "load_185"
+    },
+    {
+      "address": "0041f8c0",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\load.cpp",
+      "min_line": 262,
+      "max_line": 262,
+      "assert_count": 1,
+      "size": 591,
+      "xref_count": 1,
+      "current_name": "load_262"
+    },
+    {
+      "address": "0041fda0",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\XAnimation.cpp",
+      "min_line": 55,
+      "max_line": 55,
+      "assert_count": 1,
+      "size": 189,
+      "xref_count": 1,
+      "current_name": "XAnimation_55"
+    },
+    {
+      "address": "00420ca0",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\XObject3D.cpp",
+      "min_line": 60,
+      "max_line": 60,
+      "assert_count": 1,
+      "size": 339,
+      "xref_count": 2,
+      "current_name": "XObject3D_60"
+    },
+    {
+      "address": "00421e80",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "min_line": 72,
+      "max_line": 72,
+      "assert_count": 1,
+      "size": 522,
+      "xref_count": 1,
+      "current_name": "LSound_72"
+    },
+    {
+      "address": "00422090",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "min_line": 185,
+      "max_line": 254,
+      "assert_count": 5,
+      "size": 947,
+      "xref_count": 4,
+      "current_name": "LSound_185"
+    },
+    {
+      "address": "00422460",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "min_line": 317,
+      "max_line": 340,
+      "assert_count": 2,
+      "size": 363,
+      "xref_count": 1,
+      "current_name": "LSound_317"
+    },
+    {
+      "address": "004225f0",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "min_line": 378,
+      "max_line": 378,
+      "assert_count": 1,
+      "size": 286,
+      "xref_count": 3,
+      "current_name": "LSound_378"
+    },
+    {
+      "address": "00422710",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "min_line": 446,
+      "max_line": 446,
+      "assert_count": 1,
+      "size": 431,
+      "xref_count": 1,
+      "current_name": "LSound_446"
+    },
+    {
+      "address": "004228c0",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "min_line": 469,
+      "max_line": 483,
+      "assert_count": 2,
+      "size": 238,
+      "xref_count": 4,
+      "current_name": "LSound_469"
+    },
+    {
+      "address": "004229d0",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "min_line": 543,
+      "max_line": 543,
+      "assert_count": 1,
+      "size": 158,
+      "xref_count": 1,
+      "current_name": "LSound_543"
+    },
+    {
+      "address": "00422a70",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "min_line": 574,
+      "max_line": 606,
+      "assert_count": 4,
+      "size": 379,
+      "xref_count": 1,
+      "current_name": "LSound_574"
+    },
+    {
+      "address": "00422bf0",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "min_line": 633,
+      "max_line": 658,
+      "assert_count": 3,
+      "size": 373,
+      "xref_count": 1,
+      "current_name": "LSound_633"
+    },
+    {
+      "address": "00423020",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSoundManager.cpp",
+      "min_line": 99,
+      "max_line": 154,
+      "assert_count": 4,
+      "size": 664,
+      "xref_count": 1,
+      "current_name": "LSoundManager_99"
+    },
+    {
+      "address": "004233a0",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSoundManager.cpp",
+      "min_line": 290,
+      "max_line": 311,
+      "assert_count": 2,
+      "size": 401,
+      "xref_count": 6,
+      "current_name": "LSoundManager_290"
+    },
+    {
+      "address": "00423580",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSoundManager.cpp",
+      "min_line": 397,
+      "max_line": 397,
+      "assert_count": 1,
+      "size": 149,
+      "xref_count": 4,
+      "current_name": "LSoundManager_397"
+    },
+    {
+      "address": "00423620",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSoundManager.cpp",
+      "min_line": 413,
+      "max_line": 419,
+      "assert_count": 2,
+      "size": 278,
+      "xref_count": 11,
+      "current_name": "LSoundManager_413"
+    },
+    {
+      "address": "00425340",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LBitmapReader.cpp",
+      "min_line": 579,
+      "max_line": 579,
+      "assert_count": 1,
+      "size": 769,
+      "xref_count": 1,
+      "current_name": "LBitmapReader_579"
+    },
+    {
+      "address": "004277e0",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LOptionScreen.cpp",
+      "min_line": 566,
+      "max_line": 566,
+      "assert_count": 1,
+      "size": 662,
+      "xref_count": 3,
+      "current_name": "LOptionScreen_566"
+    },
+    {
+      "address": "00427a80",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LOptionScreen.cpp",
+      "min_line": 588,
+      "max_line": 588,
+      "assert_count": 1,
+      "size": 218,
+      "xref_count": 3,
+      "current_name": "LOptionScreen_588"
+    },
+    {
+      "address": "00428a20",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LOptionScreen.cpp",
+      "min_line": 1144,
+      "max_line": 1144,
+      "assert_count": 1,
+      "size": 370,
+      "xref_count": 3,
+      "current_name": "LOptionScreen_1144"
+    },
+    {
+      "address": "00429b10",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LUser.cpp",
+      "min_line": 244,
+      "max_line": 244,
+      "assert_count": 1,
+      "size": 218,
+      "xref_count": 1,
+      "current_name": "LUser_244"
+    },
+    {
+      "address": "0042d290",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LFrameReader.cpp",
+      "min_line": 97,
+      "max_line": 97,
+      "assert_count": 1,
+      "size": 302,
+      "xref_count": 1,
+      "current_name": "LFrameReader_97"
+    },
+    {
+      "address": "0042e4e0",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LClassCreator.cpp",
+      "min_line": 128,
+      "max_line": 128,
+      "assert_count": 1,
+      "size": 302,
+      "xref_count": 1,
+      "current_name": "LClassCreator_128"
+    },
+    {
+      "address": "00430d90",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LMultipleMediaObject.cpp",
+      "min_line": 118,
+      "max_line": 118,
+      "assert_count": 1,
+      "size": 388,
+      "xref_count": 2,
+      "current_name": "LMultipleMediaObject_118"
+    },
+    {
+      "address": "004310b0",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LMultipleMediaObject.cpp",
+      "min_line": 313,
+      "max_line": 313,
+      "assert_count": 1,
+      "size": 920,
+      "xref_count": 1,
+      "current_name": "LMultipleMediaObject_313"
+    },
+    {
+      "address": "00433240",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSharedMediaObject.cpp",
+      "min_line": 72,
+      "max_line": 72,
+      "assert_count": 1,
+      "size": 118,
+      "xref_count": 2,
+      "current_name": "LSharedMediaObject_72"
+    },
+    {
+      "address": "004333e0",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSharedMediaObject.cpp",
+      "min_line": 241,
+      "max_line": 241,
+      "assert_count": 1,
+      "size": 752,
+      "xref_count": 1,
+      "current_name": "LSharedMediaObject_241"
+    },
+    {
+      "address": "00433850",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSimpleMediaObject.cpp",
+      "min_line": 69,
+      "max_line": 69,
+      "assert_count": 1,
+      "size": 118,
+      "xref_count": 2,
+      "current_name": "LSimpleMediaObject_69"
+    },
+    {
+      "address": "004338d0",
+      "program": "MissionMonet.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSimpleMediaObject.cpp",
+      "min_line": 88,
+      "max_line": 88,
+      "assert_count": 1,
+      "size": 130,
+      "xref_count": 1,
+      "current_name": "LSimpleMediaObject_88"
+    }
+  ],
+  "multi": []
+}

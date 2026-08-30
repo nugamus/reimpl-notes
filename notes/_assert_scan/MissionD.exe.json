@@ -1,0 +1,1463 @@
+{
+  "program": "MissionD.exe",
+  "strings": [
+    {
+      "address": "00479874",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LArray.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478f54",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LBitmapReader.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478f8c",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LBitmapReader.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478fc4",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LBitmapReader.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478ffc",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LBitmapReader.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004798b0",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LClassCreator.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004797e0",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LFrameReader.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00479820",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LFrameReader.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004798f4",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LKeyState.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00479928",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LKeyState.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "0047995c",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LKeyState.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00479990",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LKeyState.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004799c4",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LKeyState.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00479a88",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LMouseState.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00479ac0",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LMouseState.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00479af8",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LMouseState.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00479b30",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LMouseState.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00479b68",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LMouseState.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00479bd4",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LMultipleMediaObject.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00479c14",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LMultipleMediaObject.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00479314",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LOptionScreen.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "0047934c",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LOptionScreen.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00479398",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LOptionScreen.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004793d0",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LOptionScreen.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00479c74",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSharedMediaObject.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00479cb0",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSharedMediaObject.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00479d04",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSimpleMediaObject.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00479d40",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSimpleMediaObject.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00479d7c",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSimpleMediaObject.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004784e8",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478518",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478548",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478578",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004785a8",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004785d8",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478608",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478638",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478668",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478698",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004786c8",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004786f8",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478728",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478758",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478788",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004787b8",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004787e8",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478818",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478848",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478878",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004788a8",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004788d8",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478908",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478938",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478968",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478998",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478ac4",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSoundManager.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478afc",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSoundManager.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478b34",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSoundManager.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478b6c",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSoundManager.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478ba4",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSoundManager.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478bdc",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSoundManager.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478c14",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSoundManager.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478c4c",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSoundManager.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478c84",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSoundManager.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478cbc",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSoundManager.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478cf4",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSoundManager.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478d2c",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LSoundManager.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00479468",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LUser.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00479498",
+      "value": "D:\\MissionD\\Source\\FrameWork Sources\\LUser.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "0047633c",
+      "value": "D:\\MissionD\\Source\\Sound\\XSndStream.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00476418",
+      "value": "D:\\MissionD\\Source\\Sound\\XSndStream.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00476440",
+      "value": "D:\\MissionD\\Source\\Sound\\XSndStream.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "0047651c",
+      "value": "D:\\MissionD\\Source\\Sound\\XSndStream.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00476590",
+      "value": "D:\\MissionD\\Source\\Sound\\XSndStream.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004765b8",
+      "value": "D:\\MissionD\\Source\\Sound\\XSndStream.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004765f4",
+      "value": "D:\\MissionD\\Source\\Sound\\XSndStream.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00476634",
+      "value": "D:\\MissionD\\Source\\Sound\\XSndStream.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00476670",
+      "value": "D:\\MissionD\\Source\\Sound\\XSndStream.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004767b0",
+      "value": "D:\\MissionD\\Source\\Sound\\XTimer.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004767d4",
+      "value": "D:\\MissionD\\Source\\Sound\\XTimer.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004767f8",
+      "value": "D:\\MissionD\\Source\\Sound\\XTimer.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00476834",
+      "value": "D:\\MissionD\\Source\\Sound\\XWaveFile.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "0047685c",
+      "value": "D:\\MissionD\\Source\\Sound\\XWaveFile.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00476d14",
+      "value": "D:\\MissionD\\Source\\Tools\\CaptureWnd.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00476d3c",
+      "value": "D:\\MissionD\\Source\\Tools\\CaptureWnd.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00476d64",
+      "value": "D:\\MissionD\\Source\\Tools\\CaptureWnd.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00476d8c",
+      "value": "D:\\MissionD\\Source\\Tools\\CaptureWnd.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00476db4",
+      "value": "D:\\MissionD\\Source\\Tools\\CaptureWnd.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00476ddc",
+      "value": "D:\\MissionD\\Source\\Tools\\CaptureWnd.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00476e04",
+      "value": "D:\\MissionD\\Source\\Tools\\CaptureWnd.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00476e2c",
+      "value": "D:\\MissionD\\Source\\Tools\\CaptureWnd.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00476e54",
+      "value": "D:\\MissionD\\Source\\Tools\\CaptureWnd.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00476e7c",
+      "value": "D:\\MissionD\\Source\\Tools\\CaptureWnd.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00473e48",
+      "value": "D:\\MissionD\\Source\\U00.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00473f5c",
+      "value": "D:\\MissionD\\Source\\U00.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004734bc",
+      "value": "D:\\MissionD\\Source\\U03.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00474874",
+      "value": "D:\\MissionD\\Source\\U04.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00479ecc",
+      "value": "D:\\MissionD\\Source\\U99.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00477f34",
+      "value": "D:\\MissionD\\Source\\XAction.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "0047824c",
+      "value": "D:\\MissionD\\Source\\XAnimation.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478288",
+      "value": "D:\\MissionD\\Source\\XAnimation.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00476950",
+      "value": "D:\\MissionD\\Source\\XCursor.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00476114",
+      "value": "D:\\MissionD\\Source\\XGameList.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478344",
+      "value": "D:\\MissionD\\Source\\XObject3D.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004775a0",
+      "value": "D:\\MissionD\\Source\\XScene.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004775f8",
+      "value": "D:\\MissionD\\Source\\XScene.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00477628",
+      "value": "D:\\MissionD\\Source\\XScene.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004776b0",
+      "value": "D:\\MissionD\\Source\\XScene.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004776e0",
+      "value": "D:\\MissionD\\Source\\XScene.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00477724",
+      "value": "D:\\MissionD\\Source\\XScene.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00477768",
+      "value": "D:\\MissionD\\Source\\XScene.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00477800",
+      "value": "D:\\MissionD\\Source\\XSceneAnim.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00477854",
+      "value": "D:\\MissionD\\Source\\XSceneAnim.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478044",
+      "value": "D:\\MissionD\\Source\\file.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478110",
+      "value": "D:\\MissionD\\Source\\load.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "00478170",
+      "value": "D:\\MissionD\\Source\\load.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "0047818c",
+      "value": "D:\\MissionD\\Source\\load.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004781a8",
+      "value": "D:\\MissionD\\Source\\load.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "004781c4",
+      "value": "D:\\MissionD\\Source\\load.cpp",
+      "xref_count": 1
+    },
+    {
+      "address": "0047710c",
+      "value": "FrameWork Sources\\MessageToUser.h",
+      "xref_count": 1
+    },
+    {
+      "address": "004771c4",
+      "value": "FrameWork Sources\\MessageToUser.h",
+      "xref_count": 1
+    },
+    {
+      "address": "004771e8",
+      "value": "FrameWork Sources\\MessageToUser.h",
+      "xref_count": 1
+    },
+    {
+      "address": "0047720c",
+      "value": "FrameWork Sources\\MessageToUser.h",
+      "xref_count": 1
+    },
+    {
+      "address": "00477330",
+      "value": "FrameWork Sources\\MessageToUser.h",
+      "xref_count": 1
+    },
+    {
+      "address": "004774f8",
+      "value": "FrameWork Sources\\MessageToUser.h",
+      "xref_count": 1
+    },
+    {
+      "address": "0047751c",
+      "value": "FrameWork Sources\\MessageToUser.h",
+      "xref_count": 1
+    }
+  ],
+  "single": [
+    {
+      "address": "0040d70e",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\U03.cpp",
+      "min_line": 762,
+      "max_line": 762,
+      "assert_count": 1,
+      "size": 1190,
+      "xref_count": 1,
+      "current_name": "U03_762"
+    },
+    {
+      "address": "004132d7",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\U00.cpp",
+      "min_line": 245,
+      "max_line": 245,
+      "assert_count": 1,
+      "size": 488,
+      "xref_count": 1,
+      "current_name": "U00_245"
+    },
+    {
+      "address": "004138af",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\U00.cpp",
+      "min_line": 327,
+      "max_line": 327,
+      "assert_count": 1,
+      "size": 355,
+      "xref_count": 1,
+      "current_name": "U00_327"
+    },
+    {
+      "address": "00418357",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\U04.cpp",
+      "min_line": 1066,
+      "max_line": 1066,
+      "assert_count": 1,
+      "size": 1222,
+      "xref_count": 1,
+      "current_name": "U04_1066"
+    },
+    {
+      "address": "0042288a",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\XGameList.cpp",
+      "min_line": 59,
+      "max_line": 59,
+      "assert_count": 1,
+      "size": 867,
+      "xref_count": 1,
+      "current_name": "XGameList_59"
+    },
+    {
+      "address": "00424466",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\Sound\\XSndStream.cpp",
+      "min_line": 115,
+      "max_line": 115,
+      "assert_count": 1,
+      "size": 443,
+      "xref_count": 0,
+      "current_name": "XSndStream_115"
+    },
+    {
+      "address": "00424802",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\Sound\\XSndStream.cpp",
+      "min_line": 201,
+      "max_line": 201,
+      "assert_count": 1,
+      "size": 247,
+      "xref_count": 1,
+      "current_name": "XSndStream_201"
+    },
+    {
+      "address": "004249b0",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\Sound\\XSndStream.cpp",
+      "min_line": 245,
+      "max_line": 245,
+      "assert_count": 1,
+      "size": 594,
+      "xref_count": 1,
+      "current_name": "XSndStream_245"
+    },
+    {
+      "address": "00424c84",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\Sound\\XSndStream.cpp",
+      "min_line": 327,
+      "max_line": 327,
+      "assert_count": 1,
+      "size": 333,
+      "xref_count": 1,
+      "current_name": "XSndStream_327"
+    },
+    {
+      "address": "00424ef5",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\Sound\\XSndStream.cpp",
+      "min_line": 406,
+      "max_line": 406,
+      "assert_count": 1,
+      "size": 125,
+      "xref_count": 1,
+      "current_name": "XSndStream_406"
+    },
+    {
+      "address": "00424f72",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\Sound\\XSndStream.cpp",
+      "min_line": 445,
+      "max_line": 475,
+      "assert_count": 4,
+      "size": 472,
+      "xref_count": 1,
+      "current_name": "XSndStream_445"
+    },
+    {
+      "address": "004258c3",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\Sound\\XTimer.cpp",
+      "min_line": 19,
+      "max_line": 21,
+      "assert_count": 3,
+      "size": 178,
+      "xref_count": 1,
+      "current_name": "XTimer_19"
+    },
+    {
+      "address": "00425f21",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\Sound\\XWaveFile.cpp",
+      "min_line": 214,
+      "max_line": 226,
+      "assert_count": 2,
+      "size": 126,
+      "xref_count": 1,
+      "current_name": "XWaveFile_214"
+    },
+    {
+      "address": "00426350",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\XCursor.cpp",
+      "min_line": 63,
+      "max_line": 63,
+      "assert_count": 1,
+      "size": 393,
+      "xref_count": 1,
+      "current_name": "XCursor_63"
+    },
+    {
+      "address": "00428d11",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\Tools\\CaptureWnd.cpp",
+      "min_line": 132,
+      "max_line": 167,
+      "assert_count": 4,
+      "size": 498,
+      "xref_count": 1,
+      "current_name": "CaptureWnd_132"
+    },
+    {
+      "address": "00428f03",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\Tools\\CaptureWnd.cpp",
+      "min_line": 183,
+      "max_line": 219,
+      "assert_count": 6,
+      "size": 466,
+      "xref_count": 1,
+      "current_name": "CaptureWnd_183"
+    },
+    {
+      "address": "0042b9ed",
+      "program": "MissionD.exe",
+      "source_file": "FrameWork Sources\\MessageToUser.h",
+      "min_line": 34,
+      "max_line": 34,
+      "assert_count": 1,
+      "size": 1329,
+      "xref_count": 1,
+      "current_name": "MessageToUser_34"
+    },
+    {
+      "address": "0042ca36",
+      "program": "MissionD.exe",
+      "source_file": "FrameWork Sources\\MessageToUser.h",
+      "min_line": 34,
+      "max_line": 34,
+      "assert_count": 2,
+      "size": 1085,
+      "xref_count": 1,
+      "current_name": "MessageToUser_34"
+    },
+    {
+      "address": "0042ce73",
+      "program": "MissionD.exe",
+      "source_file": "FrameWork Sources\\MessageToUser.h",
+      "min_line": 34,
+      "max_line": 34,
+      "assert_count": 1,
+      "size": 738,
+      "xref_count": 1,
+      "current_name": "MessageToUser_34"
+    },
+    {
+      "address": "0042e388",
+      "program": "MissionD.exe",
+      "source_file": "FrameWork Sources\\MessageToUser.h",
+      "min_line": 34,
+      "max_line": 34,
+      "assert_count": 1,
+      "size": 208,
+      "xref_count": 1,
+      "current_name": "MessageToUser_34"
+    },
+    {
+      "address": "00431282",
+      "program": "MissionD.exe",
+      "source_file": "FrameWork Sources\\MessageToUser.h",
+      "min_line": 34,
+      "max_line": 34,
+      "assert_count": 1,
+      "size": 849,
+      "xref_count": 0,
+      "current_name": "MessageToUser_34"
+    },
+    {
+      "address": "0043168a",
+      "program": "MissionD.exe",
+      "source_file": "FrameWork Sources\\MessageToUser.h",
+      "min_line": 34,
+      "max_line": 34,
+      "assert_count": 1,
+      "size": 290,
+      "xref_count": 0,
+      "current_name": "MessageToUser_34"
+    },
+    {
+      "address": "00432d40",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\XScene.cpp",
+      "min_line": 70,
+      "max_line": 70,
+      "assert_count": 1,
+      "size": 1412,
+      "xref_count": 1,
+      "current_name": "XScene_70"
+    },
+    {
+      "address": "004332c4",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\XScene.cpp",
+      "min_line": 124,
+      "max_line": 124,
+      "assert_count": 1,
+      "size": 398,
+      "xref_count": 1,
+      "current_name": "XScene_124"
+    },
+    {
+      "address": "00433750",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\XScene.cpp",
+      "min_line": 177,
+      "max_line": 177,
+      "assert_count": 1,
+      "size": 269,
+      "xref_count": 1,
+      "current_name": "XScene_177"
+    },
+    {
+      "address": "0043495b",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\XScene.cpp",
+      "min_line": 609,
+      "max_line": 609,
+      "assert_count": 1,
+      "size": 271,
+      "xref_count": 1,
+      "current_name": "XScene_609"
+    },
+    {
+      "address": "00434a6a",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\XScene.cpp",
+      "min_line": 628,
+      "max_line": 628,
+      "assert_count": 1,
+      "size": 357,
+      "xref_count": 1,
+      "current_name": "XScene_628"
+    },
+    {
+      "address": "00434bcf",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\XScene.cpp",
+      "min_line": 651,
+      "max_line": 651,
+      "assert_count": 1,
+      "size": 377,
+      "xref_count": 1,
+      "current_name": "XScene_651"
+    },
+    {
+      "address": "00435960",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\XSceneAnim.cpp",
+      "min_line": 22,
+      "max_line": 22,
+      "assert_count": 1,
+      "size": 315,
+      "xref_count": 1,
+      "current_name": "XSceneAnim_22"
+    },
+    {
+      "address": "00435de7",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\XSceneAnim.cpp",
+      "min_line": 157,
+      "max_line": 157,
+      "assert_count": 1,
+      "size": 648,
+      "xref_count": 1,
+      "current_name": "XSceneAnim_157"
+    },
+    {
+      "address": "00439829",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\XAction.cpp",
+      "min_line": 265,
+      "max_line": 265,
+      "assert_count": 1,
+      "size": 1077,
+      "xref_count": 1,
+      "current_name": "XAction_265"
+    },
+    {
+      "address": "0043aa30",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\file.cpp",
+      "min_line": 31,
+      "max_line": 31,
+      "assert_count": 1,
+      "size": 315,
+      "xref_count": 1,
+      "current_name": "file_31"
+    },
+    {
+      "address": "0043b376",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\load.cpp",
+      "min_line": 185,
+      "max_line": 185,
+      "assert_count": 1,
+      "size": 543,
+      "xref_count": 1,
+      "current_name": "load_185"
+    },
+    {
+      "address": "0043b676",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\load.cpp",
+      "min_line": 234,
+      "max_line": 262,
+      "assert_count": 4,
+      "size": 829,
+      "xref_count": 1,
+      "current_name": "load_234"
+    },
+    {
+      "address": "0043c0fb",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\XAnimation.cpp",
+      "min_line": 55,
+      "max_line": 55,
+      "assert_count": 1,
+      "size": 204,
+      "xref_count": 1,
+      "current_name": "XAnimation_55"
+    },
+    {
+      "address": "0043c9fb",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\XAnimation.cpp",
+      "min_line": 274,
+      "max_line": 274,
+      "assert_count": 1,
+      "size": 369,
+      "xref_count": 1,
+      "current_name": "XAnimation_274"
+    },
+    {
+      "address": "0043dc17",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\XObject3D.cpp",
+      "min_line": 60,
+      "max_line": 60,
+      "assert_count": 1,
+      "size": 469,
+      "xref_count": 1,
+      "current_name": "XObject3D_60"
+    },
+    {
+      "address": "0043fb5f",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "min_line": 72,
+      "max_line": 72,
+      "assert_count": 1,
+      "size": 648,
+      "xref_count": 1,
+      "current_name": "LSound_72"
+    },
+    {
+      "address": "0043fde7",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "min_line": 185,
+      "max_line": 254,
+      "assert_count": 6,
+      "size": 1205,
+      "xref_count": 1,
+      "current_name": "LSound_185"
+    },
+    {
+      "address": "004402a9",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "min_line": 317,
+      "max_line": 340,
+      "assert_count": 2,
+      "size": 447,
+      "xref_count": 1,
+      "current_name": "LSound_317"
+    },
+    {
+      "address": "00440468",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "min_line": 369,
+      "max_line": 378,
+      "assert_count": 2,
+      "size": 406,
+      "xref_count": 1,
+      "current_name": "LSound_369"
+    },
+    {
+      "address": "004405fe",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "min_line": 406,
+      "max_line": 446,
+      "assert_count": 2,
+      "size": 577,
+      "xref_count": 1,
+      "current_name": "LSound_406"
+    },
+    {
+      "address": "0044083f",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "min_line": 469,
+      "max_line": 483,
+      "assert_count": 2,
+      "size": 335,
+      "xref_count": 1,
+      "current_name": "LSound_469"
+    },
+    {
+      "address": "004409b9",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "min_line": 517,
+      "max_line": 517,
+      "assert_count": 1,
+      "size": 247,
+      "xref_count": 1,
+      "current_name": "LSound_517"
+    },
+    {
+      "address": "00440ab0",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "min_line": 543,
+      "max_line": 543,
+      "assert_count": 1,
+      "size": 211,
+      "xref_count": 1,
+      "current_name": "LSound_543"
+    },
+    {
+      "address": "00440bac",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "min_line": 574,
+      "max_line": 606,
+      "assert_count": 4,
+      "size": 565,
+      "xref_count": 1,
+      "current_name": "LSound_574"
+    },
+    {
+      "address": "00440de1",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "min_line": 633,
+      "max_line": 658,
+      "assert_count": 3,
+      "size": 524,
+      "xref_count": 1,
+      "current_name": "LSound_633"
+    },
+    {
+      "address": "00440fed",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSound.cpp",
+      "min_line": 682,
+      "max_line": 696,
+      "assert_count": 2,
+      "size": 496,
+      "xref_count": 0,
+      "current_name": "LSound_682"
+    },
+    {
+      "address": "00441c10",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSoundManager.cpp",
+      "min_line": 99,
+      "max_line": 154,
+      "assert_count": 6,
+      "size": 1060,
+      "xref_count": 1,
+      "current_name": "LSoundManager_99"
+    },
+    {
+      "address": "0044209d",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSoundManager.cpp",
+      "min_line": 221,
+      "max_line": 221,
+      "assert_count": 1,
+      "size": 480,
+      "xref_count": 1,
+      "current_name": "LSoundManager_221"
+    },
+    {
+      "address": "0044235c",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSoundManager.cpp",
+      "min_line": 290,
+      "max_line": 311,
+      "assert_count": 2,
+      "size": 466,
+      "xref_count": 1,
+      "current_name": "LSoundManager_290"
+    },
+    {
+      "address": "00442652",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSoundManager.cpp",
+      "min_line": 397,
+      "max_line": 397,
+      "assert_count": 1,
+      "size": 164,
+      "xref_count": 1,
+      "current_name": "LSoundManager_397"
+    },
+    {
+      "address": "004426f6",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSoundManager.cpp",
+      "min_line": 413,
+      "max_line": 419,
+      "assert_count": 2,
+      "size": 363,
+      "xref_count": 1,
+      "current_name": "LSoundManager_413"
+    },
+    {
+      "address": "00446147",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LBitmapReader.cpp",
+      "min_line": 379,
+      "max_line": 388,
+      "assert_count": 2,
+      "size": 981,
+      "xref_count": 1,
+      "current_name": "LBitmapReader_379"
+    },
+    {
+      "address": "00446717",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LBitmapReader.cpp",
+      "min_line": 548,
+      "max_line": 579,
+      "assert_count": 2,
+      "size": 1325,
+      "xref_count": 1,
+      "current_name": "LBitmapReader_548"
+    },
+    {
+      "address": "0044a64d",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LOptionScreen.cpp",
+      "min_line": 566,
+      "max_line": 566,
+      "assert_count": 1,
+      "size": 873,
+      "xref_count": 1,
+      "current_name": "LOptionScreen_566"
+    },
+    {
+      "address": "0044a9b6",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LOptionScreen.cpp",
+      "min_line": 588,
+      "max_line": 588,
+      "assert_count": 1,
+      "size": 316,
+      "xref_count": 1,
+      "current_name": "LOptionScreen_588"
+    },
+    {
+      "address": "0044bc68",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LOptionScreen.cpp",
+      "min_line": 1120,
+      "max_line": 1120,
+      "assert_count": 1,
+      "size": 323,
+      "xref_count": 1,
+      "current_name": "LOptionScreen_1120"
+    },
+    {
+      "address": "0044bdab",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LOptionScreen.cpp",
+      "min_line": 1144,
+      "max_line": 1144,
+      "assert_count": 1,
+      "size": 500,
+      "xref_count": 1,
+      "current_name": "LOptionScreen_1144"
+    },
+    {
+      "address": "0044de63",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LUser.cpp",
+      "min_line": 222,
+      "max_line": 222,
+      "assert_count": 1,
+      "size": 872,
+      "xref_count": 1,
+      "current_name": "LUser_222"
+    },
+    {
+      "address": "0044e1cb",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LUser.cpp",
+      "min_line": 244,
+      "max_line": 244,
+      "assert_count": 1,
+      "size": 316,
+      "xref_count": 1,
+      "current_name": "LUser_244"
+    },
+    {
+      "address": "0045423a",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LFrameReader.cpp",
+      "min_line": 97,
+      "max_line": 97,
+      "assert_count": 1,
+      "size": 406,
+      "xref_count": 1,
+      "current_name": "LFrameReader_97"
+    },
+    {
+      "address": "004549f7",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LFrameReader.cpp",
+      "min_line": 381,
+      "max_line": 381,
+      "assert_count": 1,
+      "size": 164,
+      "xref_count": 1,
+      "current_name": "LFrameReader_381"
+    },
+    {
+      "address": "004555f3",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LArray.cpp",
+      "min_line": 35,
+      "max_line": 35,
+      "assert_count": 1,
+      "size": 197,
+      "xref_count": 1,
+      "current_name": "LArray_35"
+    },
+    {
+      "address": "00456d11",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LClassCreator.cpp",
+      "min_line": 128,
+      "max_line": 128,
+      "assert_count": 1,
+      "size": 359,
+      "xref_count": 1,
+      "current_name": "LClassCreator_128"
+    },
+    {
+      "address": "00458911",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LKeyState.cpp",
+      "min_line": 41,
+      "max_line": 72,
+      "assert_count": 5,
+      "size": 758,
+      "xref_count": 0,
+      "current_name": "LKeyState_41"
+    },
+    {
+      "address": "0045bde8",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LMouseState.cpp",
+      "min_line": 52,
+      "max_line": 87,
+      "assert_count": 5,
+      "size": 681,
+      "xref_count": 0,
+      "current_name": "LMouseState_52"
+    },
+    {
+      "address": "0045cbec",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LMultipleMediaObject.cpp",
+      "min_line": 118,
+      "max_line": 118,
+      "assert_count": 1,
+      "size": 440,
+      "xref_count": 1,
+      "current_name": "LMultipleMediaObject_118"
+    },
+    {
+      "address": "0045cf2f",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LMultipleMediaObject.cpp",
+      "min_line": 313,
+      "max_line": 313,
+      "assert_count": 1,
+      "size": 1106,
+      "xref_count": 1,
+      "current_name": "LMultipleMediaObject_313"
+    },
+    {
+      "address": "00460930",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSharedMediaObject.cpp",
+      "min_line": 72,
+      "max_line": 72,
+      "assert_count": 1,
+      "size": 168,
+      "xref_count": 1,
+      "current_name": "LSharedMediaObject_72"
+    },
+    {
+      "address": "00460b67",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSharedMediaObject.cpp",
+      "min_line": 241,
+      "max_line": 241,
+      "assert_count": 1,
+      "size": 922,
+      "xref_count": 1,
+      "current_name": "LSharedMediaObject_241"
+    },
+    {
+      "address": "00461370",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSimpleMediaObject.cpp",
+      "min_line": 69,
+      "max_line": 69,
+      "assert_count": 1,
+      "size": 168,
+      "xref_count": 1,
+      "current_name": "LSimpleMediaObject_69"
+    },
+    {
+      "address": "00461418",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSimpleMediaObject.cpp",
+      "min_line": 88,
+      "max_line": 88,
+      "assert_count": 1,
+      "size": 194,
+      "xref_count": 1,
+      "current_name": "LSimpleMediaObject_88"
+    },
+    {
+      "address": "00461574",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\FrameWork Sources\\LSimpleMediaObject.cpp",
+      "min_line": 204,
+      "max_line": 204,
+      "assert_count": 1,
+      "size": 726,
+      "xref_count": 1,
+      "current_name": "LSimpleMediaObject_204"
+    },
+    {
+      "address": "00464ead",
+      "program": "MissionD.exe",
+      "source_file": "D:\\MissionD\\Source\\U99.cpp",
+      "min_line": 248,
+      "max_line": 248,
+      "assert_count": 1,
+      "size": 793,
+      "xref_count": 1,
+      "current_name": "U99_248"
+    }
+  ],
+  "multi": []
+}
