@@ -291,3 +291,22 @@ An entry at `tentative` confidence must also have a matching line in
   signature scheme and same primitive set are visible in `X3d_Load_Sdk_s3d` and
   `X3d_Load_Sdk_c3d` exports, so the family claim is likely to extend to them once
   their layouts are recovered.
+
+### E-0021 — `.C3D` is the X3D engine's camera container; 6/6 corpus files parse
+- **Binary/file:** `x3d.dll`, `Original Game Files/Data/U0[2-7]*/Static/CAMERA.C3D` and
+  `Data/U04/Anim/U04_03_Lunettes/CAMERA.C3D` (6 files, 648 bytes total).
+- **Evidence:** signature `(c) 1998 4X Tech. 0.95 (C)` on all six. `python
+  tools/parsers/c3d.py` reports 6/6 files parsed with the cursor landing exactly on
+  end-of-file. Totals: 6 cameras, 648 bytes — matches the 648 B figure in E-0008.
+- **Method:** `X3d_Load_Sdk_c3d` at `x3d.dll` `0x1000124e` decompiled with
+  `tools/ghidra_scripts/decompile_one.py`; per-camera layout taken from the read
+  sequence in `FUN_100148e0` (`x3d.dll` `0x100148e0`) — `FUN_1000bb50` 32-byte name
+  into camera-struct offset `+0x0C`, then ten `FUN_1000bb20` f32s into camera-struct
+  offsets `+0x2C, +0x30, +0x34, +0x3C, +0x40, +0x44, +0x54, +0x58, +0x4C, +0x50`
+  (non-monotonic in file order — the parser tracks file order). `X3d_Camera_Create`
+  (`0x10001406`) called per camera. Per-camera size is 72 bytes, fixed regardless of
+  field semantics.
+- **Confidence:** proven for the layout (6/6 corpus, every byte consumed). The 10 f32s
+  carry no names; the split into three plausible vec3s at `+0x2C, +0x3C, +0x4C`
+  (position / target / up) is Q-0014, unproven. No 1.00 `.C3D` file exists in the
+  corpus.

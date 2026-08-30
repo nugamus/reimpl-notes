@@ -167,3 +167,24 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   spec stands. Matters only when an engine implementation needs to *write* a `.L3D`
   rather than read one, or when a Phase 1 trace reaches a light with non-default values.
 - **Status:** open
+
+### Q-0014 — What do the 10 f32s of a `.C3D` camera record mean?
+- **Context:** `tools/parsers/c3d.py` reads the per-camera record but the 10 f32s are
+  not named, only sized. They land at camera-struct offsets `+0x2C, +0x30, +0x34,
+  +0x3C, +0x40, +0x44, +0x54, +0x58, +0x4C, +0x50` (non-monotonic in file order).
+  The most plausible split is three triples at `+0x2C`, `+0x3C`, `+0x4C` — likely
+  position / target / up, matching every other engine's camera slot — but no
+  engine-side consumer reads the slots in the decompiled surface so the meanings
+  cannot be proved from the binary alone.
+- **What we checked:** the loader (`FUN_100148e0` at `x3d.dll` `0x100148e0`); all 6
+  corpus files.
+- **Observed range:** all 6 corpus cameras have plausible position values in the first
+  triple (e.g. `Camera03` at `(176.08, 84.75, 57.98)`) and plausible target values in
+  the second triple — consistent with the hypothesis but not evidence of it. The third
+  triple is in the small-magnitude range typical of an up vector (`(-0.11, 1.65, 0.0,
+  0.69)` for `Camera03`).
+- **Blocks:** nothing immediately — the record layout is fully recovered and the format
+  spec stands. Matters only when an engine implementation needs to *write* a `.C3D`
+  rather than read one, or when a Phase 1 trace reaches a camera with non-default
+  values.
+- **Status:** open
