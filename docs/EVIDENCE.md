@@ -193,3 +193,31 @@ An entry at `tentative` confidence must also have a matching line in
 - **Confidence:** proven
 - **Consequence:** does not change E-0003's conclusion. The Phase 1 proxy `.def` still
   needs all 278 `x3d.dll` exports.
+
+### E-0015 — The tracing proxy is transparent across calling conventions
+- **Binary/file:** `tools/proxy/generated/x3d_proxy.c`, `build/proxy/Release/x3d.dll`
+- **Evidence:** the built proxies export 278 (`x3d.dll`) and 52 (`h3d.dll`) symbols whose
+  name-and-ordinal sets are identical to the originals', `Machine = 0x14c`.
+  `proxy_selftest.exe` calls through the real proxy into a stand-in DLL and passes 8 of 8
+  checks: `__cdecl` with 4 arguments, `__stdcall` with 4 and with 8 arguments, a `double`
+  argument returned in ST(0), the caller's stack frame intact after `__stdcall` cleanup,
+  one trace line per call, and each call logged under its own export name.
+- **Method:** `pefile` export comparison; `cmake --build build/proxy --config Release`
+  then `build/proxy/Release/proxy_selftest.exe` (exit 0).
+- **Confidence:** proven for the four exercised shapes. Not proven for `__fastcall` or
+  for callees that read undefined registers on entry; no engine export has been observed
+  to do either, because no trace exists yet.
+
+### E-0016 — All 596 `.O3D` files share a 36-byte fixed header
+- **Binary/file:** `Original Game Files/Data/**/*.O3D`
+- **Evidence:** every file begins with the 27-byte `(c) 1998 4X Tech. 0.95 (O)\0`. Bytes
+  27, 29, 30 and 31 are constant across all 596 (`0x78`, `0xa1`, `0x63`, `0x00`); byte 28
+  takes 41 distinct values, all within `0xb7`-`0xc6`. The little-endian u32 at offset 32
+  ranges 0-87, and is 0 in 171 files. 1,476 NUL-terminated strings recovered from the
+  body end in `.TGA` and none in any other extension, although the corpus holds no `.TGA`
+  file (E-0008).
+- **Method:** `pathlib.Path.rglob` over the corpus with `struct.unpack_from`; counts in
+  `notes/o3d-findings.md`.
+- **Confidence:** proven for the header; the body layout is **not** established — two
+  fixed-stride hypotheses (112-byte materials, 192-byte objects) passed a length check
+  and were then refuted by a field-level check, 541 and 18,259 failures respectively.

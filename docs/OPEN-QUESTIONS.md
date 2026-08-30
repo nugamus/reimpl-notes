@@ -114,3 +114,28 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   auto-analysis missed a function boundary in the shipping build. Worth resolving before
   anyone trusts the 1,476 function count as complete.
 - **Status:** open
+
+### Q-0010 — What is the `.O3D` body layout after the 36-byte header?
+- **Context:** the header is proven (E-0016), the body is not. Two fixed-stride readings
+  were tested and refuted: 112-byte material records (541 of 2,133 candidate records have
+  a malformed name field) and 192-byte object records (18,259 malformed name fields
+  across 10,253 candidate slots). Both had passed a length check first.
+- **What we checked:** the corpus, exhaustively, at field level. The loader has not been
+  decompiled and no trace exists.
+- **Observed range:** u32 at offset 32 is 0-87; the plausible object count that follows a
+  112-byte-stride material array is 0-309.
+- **Blocks:** the `.O3D` spec, hence 596 files / 14.0 M of the corpus, hence any Phase 3
+  work on scene geometry.
+- **Status:** open — next step is `X3d_Load_Sdk_o3d` in `x3d.dll`, reached from
+  `U99.cpp` `0x00464ead` in `MissionD.exe`.
+
+### Q-0011 — `.O3D` files reference `.TGA` textures, but the corpus has no `.TGA` files
+- **Context:** 1,476 NUL-terminated strings in the `.O3D` bodies end in `.TGA` and none
+  in any other extension (E-0016). The corpus holds 381 `.BMP` and no other image format
+  (E-0008).
+- **What we checked:** the corpus inventory and a sweep of the `.O3D` bodies. The loader
+  has not been decompiled.
+- **Blocks:** texture resolution, and any claim that the `.BMP` set is the complete
+  texture set. Either the loader rewrites the extension at load time, or these are
+  authoring-time paths that never resolve at runtime.
+- **Status:** open
