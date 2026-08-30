@@ -152,3 +152,18 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   texture set. Either the loader rewrites the extension at load time, or these are
   authoring-time paths that never resolve at runtime.
 - **Status:** open
+
+### Q-0013 — What do the `.L3D` "extra" slots and the spot branch carry?
+- **Context:** `tools/parsers/l3d.py` reads the per-light record but two slots — three f32
+  (`extra_floats`) and two u32 (`extra_u32s`) — are not named, only sized. Every corpus
+  file has `is_spot == 0`, so the spot branch (3 f32 target + 2 f32 angles) is parsed but
+  has no corpus sample. The `X3d_Light_Set_Multiplier` export covers the multiplier
+  surface, plausibly tying one of the three f32s to that, but the others are opaque.
+- **What we checked:** the loader (`FUN_10014d50` at `x3d.dll` `0x10014d50`); all 5
+  corpus files. Across them `extra_floats` is almost always `(104.8, 125.2, ±1.0)` and
+  `extra_u32s` is `(0, 1)`, but no engine-side consumer reads the slots in the decompiled
+  surface so the meanings cannot be proved from the binary alone.
+- **Blocks:** nothing immediately — the record layout is fully recovered and the format
+  spec stands. Matters only when an engine implementation needs to *write* a `.L3D`
+  rather than read one, or when a Phase 1 trace reaches a light with non-default values.
+- **Status:** open

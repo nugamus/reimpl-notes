@@ -255,3 +255,39 @@ An entry at `tentative` confidence must also have a matching line in
 - **Confidence:** proven for version 0.95. The 1.00 LOD block in `FUN_10012920` is
   described in the `.ksy` but unimplemented and unexercised — no 1.00 file exists in the
   corpus, and the parser raises rather than guessing.
+
+### E-0019 — `.L3D` is the X3D engine's light container; 5/5 corpus files parse
+- **Binary/file:** `x3d.dll`, `Original Game Files/Data/U0[1-7]*/Static/*.L3D` (5 files,
+  5,718 bytes total).
+- **Evidence:** signature `(c) 1998 4X Tech. 0.95 (L)` (matching the engine family) on all
+  five. `python tools/parsers/l3d.py` reports 5/5 files parsed with the cursor landing
+  exactly on end-of-file. Totals: 78 lights, 0 spot, 5,718 bytes — matches the 5.6 K
+  `.L3D` figure in E-0008.
+- **Method:** `X3d_Load_Sdk_l3d` at `x3d.dll` `0x100012fd` decompiled with
+  `tools/ghidra_scripts/decompile_one.py`; per-light layout taken from the read sequence
+  in `FUN_10014d50` (`x3d.dll` `0x10014d50`) — `FUN_1000bb50` 32-byte name, three
+  `FUN_1000bb20` for position, three `FUN_1000baf0` for RGB, three more `FUN_1000bb20`,
+  two `FUN_1000ba90`, one `FUN_1000ba90` `is_spot`, plus a spot branch (3+2 f32) only
+  when set. Per-light size is 71 bytes omni / 91 bytes spot, fixed regardless of other
+  fields. `X3d_Light_Create` (`0x10001078`) called per omni light; `X3d_Spot_Light_Create`
+  (`0x10001253`) called per spot.
+- **Confidence:** proven for omni. The spot branch is parsed (test exercises it) but no
+  1.00 or spot-`.L3D` file exists in the corpus; that path is unexercised and logged as
+  Q-0013.
+
+### E-0020 — The `(c) 1998 4X Tech. 0.95 (X)` family spans at least `.O3D`, `.A3D`, `.L3D`
+- **Binary/file:** `x3d.dll`, corpus `.O3D` (596), `.A3D` (429), `.L3D` (5) files.
+- **Evidence:** all three extensions carry the engine's 27-byte `(c) 1998 4X Tech. 0.95`
+  signature with the suffix letter — `(O)`, `(A)`, `(L)` — in place, followed by an
+  `x3d.dll` global `DAT_1002d224` selector. The same four stream-read primitives
+  (`FUN_1000ba90` u32, `FUN_1000baf0` u8, `FUN_1000bb20` f32, `FUN_1000bb50` n-bytes) are
+  the only file-reading primitives any of the loaders touch. Per-format work differs only
+  in the per-record reader the top-level loader dispatches to (`FUN_10012920` for `.O3D`,
+  `FUN_10012ee0` for `.A3D`, `FUN_10014d50` for `.L3D`).
+- **Method:** decompiled `X3d_Load_Sdk_o3d`, `X3d_Load_Sdk_a3d`, `X3d_Load_Sdk_l3d` and
+  their per-format callees; confirmed the four primitives are the only file reads in each
+  via callee lists emitted by `tools/ghidra_scripts/decompile_one.py`.
+- **Confidence:** strong. `.S3D` and `.C3D` have not been recovered yet but the same
+  signature scheme and same primitive set are visible in `X3d_Load_Sdk_s3d` and
+  `X3d_Load_Sdk_c3d` exports, so the family claim is likely to extend to them once
+  their layouts are recovered.
