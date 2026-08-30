@@ -1,0 +1,45 @@
+# Game data and original binaries. Read-only source material (CLAUDE.md rule 7), 361 MB,
+# and not ours to redistribute. Keep it on disk, out of the repo.
+Original Game Files/
+
+# Vendored toolchains (Ghidra, PE-bear, dgVoodoo2). Reinstallable, hundreds of MB.
+third_party/
+
+# Cloned upstream MCP server, has its own git history.
+tools/ghidra-mcp/
+
+# Ghidra
+*.rep/
+*.gpr
+*.lock
+*.lock~
+ghidra_projects/
+
+# Proxy traces: large, machine-specific, regenerated per run. Golden traces that a test
+# depends on get force-added and named traces/golden-*.log.
+traces/*.log
+!traces/golden-*.log
+
+# Build output
+build/
+dist/
+*.obj
+*.o
+*.lib
+*.exp
+*.pdb
+*.ilk
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# Editor / OS
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
