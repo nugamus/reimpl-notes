@@ -188,3 +188,29 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   rather than read one, or when a Phase 1 trace reaches a camera with non-default
   values.
 - **Status:** open
+
+### Q-0015 — What reads `.DMF` files at runtime?
+- **Context:** 518 `.DMF` files / 48.4 M / 8 distinct magics in the corpus (E-0008).
+  The string literals `tete.dmf` and `teteBA.dmf` are present in both
+  `MissionMonet.exe` (at `0x000404d8` and `0x000404e4`) and `MissionD.exe` (at
+  `0x000747c0` and `0x000747cc`), but no function in either binary references them
+  via a direct `PUSH imm32` or `MOV reg, [imm32]` — they must be loaded through an
+  indirect pointer table that the Ghidra function map does not yet attribute.
+- **What we checked:** the entire engine SDK surface — `x3d.dll` exports 278
+  `X3d_*` symbols, none of them a DMF loader; `x3dsdk.dll` 63 `X3dsdk_*` symbols,
+  only `X3dsdk_Load_3ds` matches a file extension in the corpus, no DMF loader
+  there; `xd3d.dll`/`xs3d.dll` carry `X3d_Add_Map_Dll` / `X3d_Update_Map_Dll` —
+  the `*_Dll` suffix marks them as engine back-end helpers, not file readers. The
+  only `X3d_Scene_Construct_Map` (`x3d.dll` `0x100016e0`) is a 5-byte thunk that
+  delegates to `FUN_100105f0`, a 289-byte **buffer allocator** — it takes
+  width/height/bpp arguments and never reads a file. So `.DMF` files are loaded by
+  the EXE itself, not by any DLL whose loader we have decompiled.
+- **Observed range:** the file header is `00 fb <byte2> <byte3>` where `<byte2>:
+  <byte3>` takes 8 distinct values across the corpus — `22 00`, `32 04`, `28 04`,
+  `2c 00`, `32 84`, `36 00`, `2c 14`, `32 08` (Q-0005). The header is followed by
+  a structured body whose meaning is opaque without a parser.
+- **Blocks:** a `.DMF` parser for 518 files / 48.4 M of the corpus, and any
+  Phase 3 work that depends on scene maps. Until a DMF reader is located (likely
+  in `MissionMonet.exe` itself, decompiling the function that owns the indirect
+  pointer to `tete.dmf`), the format cannot be recovered.
+- **Status:** open
