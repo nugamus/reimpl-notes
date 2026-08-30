@@ -1,0 +1,7 @@
+; Export the test functions under their real x3d.dll names and ordinals, undecorated, so
+; the proxy's GetProcAddress finds them exactly as it would find the engine's.
+EXPORTS
+    X3d_Camera_Get_Fov @14
+    X3d_Camera_Get_Matrix @15
+    X3d_Camera_Get_Name @16
+    X3d_Camera_Get_Polar @17
