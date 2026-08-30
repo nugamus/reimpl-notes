@@ -44,3 +44,45 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** nothing yet.
 - **Blocks:** video/cutscene work, later.
 - **Status:** open
+
+### Q-0004 — Does `.X3D` cover two container formats, or one with two record kinds?
+- **Context:** corpus inventory (E-0008). 24 `.X3D` files, two distinct 4-byte prefixes:
+  21 files begin `3b 53 43 52` (`;SCR`, i.e. an ASCII `;` comment line) and 3 begin
+  `4f 42 4a 45` (`OBJE`). Both look textual, not binary magic.
+- **What we checked:** corpus survey only. Loader not yet decompiled; no traces exist.
+- **Observed range:** two prefixes across 24 files, 44 B to 7.7 K.
+- **Blocks:** Phase 2 scoping. If these are two grammars, `.X3D` needs two specs and two
+  validators, and the scene-file spec cannot claim 100% corpus coverage with one parser.
+- **Status:** open
+
+### Q-0005 — What discriminates `.DMF` variants at offset 2?
+- **Context:** corpus inventory (E-0008). All 518 `.DMF` files begin `00 fb`; bytes 2-3
+  take 8 distinct values (`22 00`, `32 04`, `28 04`, `2c 00`, `32 84`, `36 00`, `32 14`,
+  `32 08`). Consistent with one container plus a version/flags/type field at offset 2 —
+  but which of those it is, is unknown.
+- **What we checked:** corpus survey only.
+- **Observed range:** the 8 values above; `22 00` (215 files) and `32 04` (154) dominate.
+- **Blocks:** the `.DMF` spec. 48.4 M across 518 files makes this the largest
+  engine-specific format in the corpus after the media files.
+- **Status:** open
+
+### Q-0006 — `.BIN`, `.FRA`, `.CFG` have no magic at all — what identifies them?
+- **Context:** corpus inventory (E-0008). `.BIN` shows 80 distinct 4-byte prefixes over
+  109 files, nearly all of shape `xx 00 00 00` — consistent with a leading little-endian
+  count rather than a magic. `.FRA` (25 files, 8 prefixes) has the same shape, values
+  1-23. `.CFG` (38 files, 3 prefixes) begins with what decodes as an IEEE-754 float
+  (`cd cc cc 3e` = 0.4, `00 00 80 3f` = 1.0, `cd cc cc 3d` = 0.1).
+- **What we checked:** corpus survey only.
+- **Blocks:** any parser for these must be driven by the loader's expected layout, since
+  the file itself carries no self-identification. Decompile the loader before speccing.
+- **Status:** open
+
+### Q-0007 — `.BMP` magic spread is a tool artefact, not a format question
+- **Context:** the inventory reports 111 distinct magics for `.BMP`. Every one begins
+  `42 4d` (`BM`); bytes 2-3 are the low half of the BMP header's little-endian file-size
+  field, so the count tracks file sizes, not formats.
+- **What we checked:** corpus survey. All 381 files share the 2-byte `BM` signature.
+- **Blocks:** nothing. Recorded so a later reader does not re-open it. The general lesson
+  applies to `.DMF`/`.FRA`/`.BIN` too: `tools/inventory.py` groups on a fixed 4 bytes, so
+  a distinct-magic count above 1 is a prompt to look, not a verdict.
+- **Status:** RESOLVED (see E-0008)

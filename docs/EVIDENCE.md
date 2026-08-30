@@ -81,3 +81,31 @@ An entry at `tentative` confidence must also have a matching line in
   -analysisTimeoutPerFile 2400`, via the `C:\ghidra` junction (the stock `.bat` fails on
   the space in the repo path).
 - **Confidence:** proven
+
+### E-0007 — `MissionD.exe` has 2.07× the functions of `MissionMonet.exe`
+- **Binary/file:** all 13 programs in `ghidra_projects/Monet.gpr`
+- **Evidence:** Ghidra function counts after auto-analysis — `MissionD.exe` 3055,
+  `MissionMonet.exe` 1476, `x3d.dll` 702, `xs3d.dll` 241, `x3dsdk.dll` 222, `xd3d.dll`
+  181, `h3d.dll` 153, `AviPlay.dll` 111, `x3dmp5.dll` 74, `x3dmp6.dll` 74,
+  `4xvideo.dll` 58, `x3dmp6k.dll` 42, `flc.dll` 19.
+- **Method:** `get_function_count` over the Ghidra MCP bridge, one call per program with
+  an explicit `program` selector.
+- **Confidence:** proven
+- **Consequence:** the developer build carries ~1579 functions the shipping build does
+  not. Whether that is debug tooling, statically-linked CRT differences, or both is the
+  subject of the `phase0-summary.md` diff.
+
+### E-0008 — Corpus is 2,393 files / 343.3 M over 18 extensions; only `.X3D` shows two genuinely distinct container prefixes
+- **Binary/file:** `Original Game Files/Data/`
+- **Evidence:** `notes/corpus-inventory.md`. By total size: `.BMP` 381 files / 125.2 M,
+  `.AVI` 8 / 77.8 M, `.WAV` 244 / 56.0 M, `.DMF` 518 / 48.4 M, `.A3D` 429 / 21.4 M,
+  `.O3D` 596 / 14.0 M, then `.BIN` 109, `.S3D` 1, `.X3D` 24, `.FRA` 25, `.CFG` 38,
+  `.3DS` 1, `.L3D` 5, `.MAT` 5, `.ARN` 1, `.TXT` 1, `.C3D` 6, `.VIT` 1.
+  Single-magic extensions: `.AVI`, `.WAV`, `.A3D`, `.O3D`, `.S3D`, `.3DS`, `.L3D`,
+  `.MAT`, `.ARN`, `.TXT`, `.C3D`, `.VIT`. Multi-prefix extensions inspected by hand:
+  `.BMP` all `42 4d` (Q-0007), `.DMF` all `00 fb` (Q-0005), `.BIN`/`.FRA`/`.CFG` carry no
+  signature (Q-0006), `.X3D` splits `;SCR` (21 files) vs `OBJE` (3) (Q-0004).
+- **Method:** `python tools/inventory.py` over the user-confirmed data root, then a
+  re-read of the per-extension magic tables it emitted.
+- **Confidence:** proven for the counts; the "one container" readings of `.BMP` and
+  `.DMF` are strong, not proven — no loader has been decompiled yet.
