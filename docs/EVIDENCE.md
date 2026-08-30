@@ -357,3 +357,22 @@ An entry at `tentative` confidence must also have a matching line in
   `REFLECTION=` is a stable writer artefact across all 5 files.
 - **Confidence:** proven. No `.MAT` loader decompile was performed; the handoff's
   loader-skip note is the citation for this exception to the default rule.
+
+### E-0024 — `.BMP` files are standard Windows BITMAPINFOHEADER (BMP3); 381/381 corpus files parse
+- **Binary/file:** `Original Game Files/Data/**/*.BMP` (381 files, 131,324,774 bytes
+  on disk).
+- **Evidence:** all 381 files begin `BM`, all carry a 40-byte DIB header
+  (`0x00000028` at offset 14), all have `compression = BI_RGB (0)`. BPP counts:
+  24 bpp × 340 files, 16 bpp × 40 files, 8 bpp × 1 file. Total pixels 46,347,716.
+  `python tools/parsers/bmp.py` reports 381/381 files parsed; expected file size
+  (`off_bits + row_stride × |height|`) matches on-disk size for 136/381 — the
+  remaining 245 have a wrong-but-close declared `file_size` field (3 of them
+  short by 17–100 bytes — `SaveRetourD.BMP`, `SaveSommaireD.BMP`, `U01_04P.BMP`).
+  These are still valid BMPs because the writer flushed the header before the
+  trailing pixel rows; width/height/bpp stay self-consistent.
+- **Method:** layout derived from Microsoft's published BMP3 spec, no decompile
+  required. The validator derives size from `off_bits + row_stride × |height|`,
+  not from the declared field. `--selftest` exercises trailing bytes, magic,
+  DIB-header mismatch, truncation, palette handling, declared-size drift.
+- **Confidence:** proven for the corpus (381/381 parse). No `BITMAPV4`/`V5`,
+  `BI_BITFIELDS`, `BI_RLE4`/`8`, `BI_JPEG`, `BI_PNG` exist in the corpus.
