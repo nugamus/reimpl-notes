@@ -310,3 +310,26 @@ An entry at `tentative` confidence must also have a matching line in
   carry no names; the split into three plausible vec3s at `+0x2C, +0x3C, +0x4C`
   (position / target / up) is Q-0014, unproven. No 1.00 `.C3D` file exists in the
   corpus.
+
+### E-0022 — `.S3D` is the X3D engine's scene super-container; 1/1 corpus file parses
+- **Binary/file:** `x3d.dll`, `Original Game Files/Data/U02/anim/U02_02/U02_02.S3D`
+  (73,916 bytes).
+- **Evidence:** signature `(c) 1998 4X Tech. 0.95 (S)`. `python tools/parsers/s3d.py`
+  reports 1/1 file parsed with the cursor landing exactly on end-of-file. Totals: 0
+  cameras, 0 lights, 5 materials, 53 objects, 53 animations, 73,916 bytes — matches
+  the 72 K `.S3D` figure in E-0008.
+- **Method:** `X3d_Load_Sdk_s3d` at `x3d.dll` `0x100010e1` decompiled with
+  `tools/ghidra_scripts/decompile_one.py`. The loader is a sequencer that dispatches
+  to five per-format record readers — `thunk_FUN_100148e0` (cameras, same as `.C3D`),
+  `thunk_FUN_10014d50` (lights, same as `.L3D`), `thunk_FUN_10011450` (materials, from
+  the `.O3D` chain), `thunk_FUN_10012920` (objects, from the `.O3D` chain),
+  `thunk_FUN_10012ee0` (animations, same as `.A3D`). Each section starts with a u32
+  count, then that many records; no per-section signature. The parser is a thin wrapper
+  around the existing per-format record readers (`c3d._parse_camera`, `l3d._parse_light`,
+  `o3d.read_material`, `o3d.read_object`, `a3d.read_animation`) wired through a
+  `_O3dReaderAdapter` that bridges the `o3d.Reader` API onto the `common.Reader`
+  cursor.
+- **Confidence:** proven for the layout (1/1 corpus, every byte consumed). No 1.00
+  `.S3D` file exists in the corpus. Adding `.S3D` to the family claim (E-0020)
+  strengthens it: `.S3D` is the engine's own multiplex of the per-format record
+  shapes, not a new format.
