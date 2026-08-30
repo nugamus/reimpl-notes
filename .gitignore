@@ -15,6 +15,9 @@ tools/ghidra-mcp/
 *.lock~
 ghidra_projects/
 
+# Tool logs (headless analysis, builds). Regenerated, noisy.
+logs/
+
 # Proxy traces: large, machine-specific, regenerated per run. Golden traces that a test
 # depends on get force-added and named traces/golden-*.log.
 traces/*.log
