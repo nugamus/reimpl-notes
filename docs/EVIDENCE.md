@@ -333,3 +333,27 @@ An entry at `tentative` confidence must also have a matching line in
   `.S3D` file exists in the corpus. Adding `.S3D` to the family claim (E-0020)
   strengthens it: `.S3D` is the engine's own multiplex of the per-format record
   shapes, not a new format.
+
+### E-0023 — `.MAT` is the X3D engine's plain-ASCII material script; 5/5 corpus files parse
+- **Binary/file:** `Original Game Files/Data/U02/anim/U02_02/U02_02.MAT` (1,879 B),
+  `Data/U02/anim/U02_03/U02_03LOD.MAT` (144 B), `Data/U02/anim/U02_05/U02_06.MAT`
+  (484 B), `Data/U04/Anim/U04_02/OUVRE02.MAT` (1,863 B),
+  `Data/U05/anim/U05_05/ACTION01.MAT` (488 B).
+- **Evidence:** no magic. Each file is latin1 text. `python tools/parsers/mat.py`
+  reports 5/5 files parsed, every line consumed. Totals: 12 materials, 4,858 bytes —
+  matches the 4.7 K `.MAT` figure in E-0008. Empty material list accepted
+  (`U02_03LOD.MAT`).
+- **Method:** layout derived directly from the sample bytes per the handoff
+  (`03-HANDOFF-PHASE-2.md` §2) — "`.MAT` is plain ASCII (line 1 is `;-------...`),
+  so the loader skip applies — parse it directly off the sample bytes, no decompile
+  needed". The format is provable from sample bytes alone because every material block
+  is exactly 16 fixed lines in documented order with no flags or variable-length
+  sections. Decompiling the loader would only re-derive what the corpus already shows.
+- **Structure:** three-line header (banner `;` + 47 dashes, `; <path>`, banner), then
+  zero or more 16-line material blocks separated by banner lines. Per-block key order:
+  `MATERIAL`, `TYPE`, `AMBIENT`, `DIFFUSE`, `SPECULAR`, `LIGHT_COLOR`, `SHININESS`,
+  `SHININESS_STRENGTH`, `TRANSPARENCY`, `BINARY_OPACITY`, `TWO_SIDED`, `TILING`,
+  `TEXTURE_MAP`, `REFLECTION`, `LIGHT_MAP`, `REFLECTION`. The duplicated trailing
+  `REFLECTION=` is a stable writer artefact across all 5 files.
+- **Confidence:** proven. No `.MAT` loader decompile was performed; the handoff's
+  loader-skip note is the citation for this exception to the default rule.
