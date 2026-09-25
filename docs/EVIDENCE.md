@@ -1861,3 +1861,21 @@ An entry at `tentative` confidence must also have a matching line in
 - **Method:** engine `-d1` log and snap.ps1; original captures from `to_u01.sh`.
 - **Confidence:** proven for the end state; the timing of the intermediate moves is not
   compared frame by frame.
+
+### E-0090 — U01's click chain and ride run in the engine through to U02
+- **Binary/file:** engine `x3d` at "X3D: Ride U01's train through the siding into U02"; data
+  `Data/U01/INFOACT.BIN`, `INFOOBJ.BIN`.
+- **Evidence:** with `dev_handover` and scheduled console commands, the engine ran INFOACT
+  M02 (card), M21 (points), M23 (barrel slides away, revealing the key), M18 (clock
+  card), M15/M16 (fuse box, lever; the rod given with `hold`), M10 + M24 (the phone call:
+  handset lifted, `D1_10`, camera moves, door closed, gauge), M19 (ladder) and M20 (the
+  climb, ending over the booth roof `int05fen01`), and, from on top of the handcar, the
+  ride: holding Up moves the car along `U01_20.A3D`, the points send it onto
+  `U01_20A.A3D` near frame 90, and at its last frame the fade and the load of `U02.x3d`
+  follow (`traces/u01-ride-to-u02.png`, local). The siding clip must drive the train's
+  parent dummy (its root animation); bound to the train object itself the car leaves
+  the rails. The key (M07), door (M08) and rod (M14) clicks missed from the viewpoints
+  tried (occluded or too far), not a handler failure.
+- **Method:** `dev_commands` runs with `-d1` logs and snapshots; posted Up/Enter.
+- **Confidence:** proven that the handlers and the ride work as specified; not compared
+  against the original frame by frame.

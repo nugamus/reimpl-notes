@@ -532,3 +532,16 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** menu fidelity, not U01.
 - **Next to try:** `OptionLoad` / `OptionGalerie` handlers with an empty list; a live click.
 - **Status:** open
+
+### Q-0047 — How does the player get from the booth roof onto the handcar?
+- **Context:** u01.md says the climb (`MonterSurToit`) leaves the player "on the train
+  roof", but the climb's last position (485.775, −44.9, 139) is over the booth roof
+  (`int05fen01`), and the handcar `*U01_20`, paused at frame 20, is about 440 units away
+  at (320, 381) in the engine (E-0090).
+- **What we checked:** the engine's pose of `*U01_20` at frame 20 and an overhead view;
+  not the original after the climb.
+- **Blocks:** playing U01 to its end without teleporting.
+- **Next to try:** run the original through the climb (`to_u01.sh`, then the chain of
+  E-0090 with `send.ps1` clicks) and read `camera.ps1` and the ground object after it;
+  check whether walking across the roofs reaches the car.
+- **Status:** open
