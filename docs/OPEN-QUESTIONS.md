@@ -269,3 +269,14 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   windowed mode, `patch_exe.py` skips the 16-bit desktop check and the activating
   `ShowWindow`, the launcher drops inherited foreground rights (`LockSetForegroundWindow`),
   and background mode keeps the active flag set.
+
+### Q-0018 — What runs between the `OptionUser` players screen and the first U01 frame?
+- **Context:** boot (E-0032..E-0035). U00 opens `OptionUser` in app mode 2; U01 plays the
+  prologue when started with flag 1.
+- **What we checked:** WinMain, `LoadUnitScene`, `U00_Start`, `U01_Start`. Not yet: the
+  frame manager (`DAT_0046ec1c`, vtable `+0x90`), the `OptionUser` button handlers, who
+  calls `LoadUnitScene` with `U01`, and what `0x0046ed88` (skips the players screen) is.
+- **Blocks:** the engine's path from boot to U01. Until answered the engine goes from the
+  intro bitmaps straight to U01 with flag 1 (documented in `docs/engine-spec/boot.md`).
+- **Next to try:** xrefs to `LoadUnitScene` and to the scene-name slot game `+0x14c`; a
+  trace of entering a name and pressing OK.

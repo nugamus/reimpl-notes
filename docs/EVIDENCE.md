@@ -468,3 +468,76 @@ An entry at `tentative` confidence must also have a matching line in
 - **Method:** capstone disassembly; runtime confirmation: with the h3d proxy's
   `MONET_BACKGROUND=1` swallowing focus-loss messages, the game keeps rendering unfocused.
 - **Confidence:** proven.
+
+### E-0032 — WinMain shows `Intro1.bmp` for 3000 ms and `Intro2.bmp` for 2000 ms, busy-waiting on `timeGetTime`
+- **Binary/file:** `MissionMonet.exe`; `Data/2dbit/Intro1.bmp`, `Intro2.bmp`.
+- **Evidence:** WinMain (`0x00416b40`, renamed `WinMain_Boot`; the assert namer had
+  mislabelled it `MessageToUser_34`) formats `%s2dbit/Intro1.bmp` (`0x00441588`) with the
+  data root (app `+0x26a`, E-0027), calls `ShowFullscreenBitmap` (`0x00416fc0`), then
+  `WaitMilliseconds(3000)` (`0x004163d0`); then `%s2dbit/Intro2.bmp` (`0x00441574`),
+  `WaitMilliseconds(2000)`, and `ShowFullscreenBitmap` on Intro2 a second time.
+  `WaitMilliseconds` reads `timeGetTime` once and spins until the difference reaches the
+  argument: no message pump, no sleep, no input check. `ShowFullscreenBitmap` loads the
+  file into a surface (`FUN_004156a0`), `SetRect(0,0,0x280,0x1e0)`, blits it to (0,0) with
+  flags `0x10` (`DDBLTFAST_WAIT`) and calls `H3d_Show_BackBuffer`. Both files are
+  640×480 24-bit (921,656 bytes).
+- **Method:** MCP decompile of the three functions; runtime (`run.ps1`, which confirms the
+  startup dialog first): `snap.ps1` 3 s after launch shows Intro2, 6 s shows U00's 3D
+  garden with Monet, 9 s the players screen (E-0034).
+- **Confidence:** proven.
+
+### E-0033 — After the intro the app enters mode 1 with scene `U00.X3D`, and `LoadUnitScene` picks the unit class from the name's digits
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** WinMain copies `U00.X3D` (`0x0044156c`) to game `+0x14c` and calls
+  `SetAppMode(app, 1)` (`0x00417ce0`, stores app `+0x47c`). The main loop switches on that
+  mode: 1 calls `LoadUnitScene(game+0x14c, 1, 0)` (`0x004130b0`, thiscall on game); 2 renders the paused scene
+  plus the 2D frame (`FUN_00414800`/`FUN_00414630`, `H3d_Show_BackBuffer`); 0 calls the
+  scene's vtable `+0x24` and `+0x1c` each iteration. `LoadUnitScene` destroys the current
+  scene, takes 2 characters from index 1 of the name (`FUN_00416140(name,1,2)`), `atoi`s
+  them, and calls `CreateUnitScene(n)` (`0x00417f10`): 0 → `FUN_004097e0` (U00), 1 →
+  `FUN_00401000`, 2 → `FUN_00402af0`, 3 → `FUN_00404e70`, 4 → `FUN_0040a720`, 5 →
+  `FUN_0040ece0`, 6 → `FUN_00410940`, 7 → `FUN_004112b0`, 0x21 → `FUN_00407090`, 0x32 →
+  `FUN_004123c0`, other → base `FUN_0041a890`. It then calls `XScene_70(scene, name)`,
+  `SetAppMode(app, 0)`, vtable `+0x10(name)` and vtable `+0x14(a, b)`, where `a`, `b` are
+  its second and third arguments (`ret 0xc`; pushes at `0x00413157`..`0x00413169`). It has
+  two callers: the loop's mode-1 branch (`0x00416e5a`) passes `(game+0x14c, 1, 0)`, so every
+  scene switch goes through "write name to game `+0x14c`, set mode 1"; `0x00412d00` (reads
+  the scene name from a `.BIN`-chunked save stream, `FUN_004153a0(+0x14c, 0x14)`) passes
+  `(name, 0, stream)`. So `a == 1` means "entered normally", `a == 0` "restored from a save".
+- **Method:** MCP decompile of WinMain, `SetAppMode`, `LoadUnitScene`, `CreateUnitScene`.
+- **Confidence:** proven for the control flow; the meaning of vtable `+0x10`/`+0x14` is
+  read from the U00 and U01 overrides (E-0034, E-0035).
+
+### E-0034 — U00 is the menu scene: U04's garden with Monet, under the `OptionUser` frame ("The players")
+- **Binary/file:** `MissionMonet.exe`; `Data/U00/U00.x3d`.
+- **Evidence:** U00 vtable `0x004395d8`: `+0x10` = `0x0040a070` (created as `U00_Load`),
+  `+0x14` = `0x0040a1e0` (`U00_Start`). `U00_Load` asserts `D:\MissionD\Source\U00.cpp`
+  line `0xf5`, sets the map directory `%sU04/Maps/` (`0x0043feb8`) and the asset root
+  `%sU04/` (`0x0043fea8`); `U00.x3d` is a text script (`;SCRIPT`, `Object="static\u04.o3d"`,
+  `Lod="…,800"`, `Animation="Anim\porche.a3d"`) that names only U04 assets. `U00_Start`
+  loads animation `U04_03_Lunettes` for object `U04_03`, positions the camera
+  (`FUN_00419520(cam, 81.1334, 265.8100, 15.0)`, floats `0x42a2449c 0x4384e7ae 0x41700000`),
+  and, when `0x0046ed88 == 0`, calls `SetAppMode(app, 2)` and opens the 2D frame
+  `OptionUser` (`0x0043fec4`) through the frame manager's vtable `+0x90`.
+- **Method:** vtable read with `pefile`; functions created and decompiled over MCP.
+  Runtime: `snap.ps1` 9–50 s after launch shows a static screen titled "The players",
+  "New players : Player's name", a list box and OK; nothing else happens without input.
+- **Confidence:** proven for the sequence; the frame contents come from
+  `Data/2DFRA/OptionUser.fra` by name only (`.FRA` is still open, Q-0016).
+
+### E-0035 — U01 entered with flag 1 plays `Video/Prologue.AVI` with `Video/Prologue.wav`
+- **Binary/file:** `MissionMonet.exe`; `Data/Video/Prologue.avi`, `prologue.wav`.
+- **Evidence:** `0x00401230` (created as `U01_Start`; U01's constructor `0x00401000` installs
+  vtable `0x004393d0`, whose `+0x14` is `0x00401230`, so `LoadUnitScene` reaches it): if its first argument is nonzero it calls
+  `PlayVideo("Prologue", 0, 1)` (`0x00417030`), else vtable `+0x4c("U01", 1)` (`0x0043f124`). `PlayVideo`
+  sets app mode 3, opens `%sVideo/%s.AVI` (`0x0043fcb4`) with `AviOpenFile`, plays it at
+  (0,0) with `AviPlayMovie(0,0)`, then starts `%sVideo/%s.wav` (`0x0044159c`) through
+  `LSoundManager_290` when the name is non-empty. It loops pumping messages until key
+  `0x0d` (Enter) or `0x1b` (Escape) is down (`FUN_004163b0`) or `AviGetStatus() == 4`,
+  then `AviClose`, stops sound channel 2 when the third argument is set, and returns to
+  mode 0. `Prologue.avi`: one stream, IV50, 640×480, 100,000 µs/frame, 652 frames
+  (65.2 s). `prologue.wav`: PCM mono 8-bit 22,050 Hz, 63.3 s.
+- **Method:** capstone disassembly at `0x00401230`, MCP decompile of `PlayVideo`; AVI
+  `avih`/`strh` and WAV headers read with Python.
+- **Confidence:** proven: U01 entered normally (not from a save, E-0033) plays the prologue
+  first. The path from `OptionUser` to U01 is still Q-0018.

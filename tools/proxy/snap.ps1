@@ -1,6 +1,7 @@
 # Capture the running original game's window to a PNG, even when it is behind other
 # windows (PrintWindow with PW_RENDERFULLCONTENT). Reference images for the engine.
-#   powershell -ExecutionPolicy Bypass -File tools\proxy\snap.ps1 out.png
+#   powershell -ExecutionPolicy Bypass -File tools\proxy\snap.ps1 out.png [process]
+# [process] defaults to the original game; pass scummvm to capture the engine.
 Add-Type @'
 using System;using System.Runtime.InteropServices;
 public class Q{[DllImport("user32.dll")]public static extern bool PrintWindow(IntPtr h,IntPtr dc,uint f);
@@ -10,7 +11,8 @@ public struct RECT{public int L,T,R,B;}}
 '@
 [Q]::SetProcessDPIAware() | Out-Null
 Add-Type -AssemblyName System.Drawing
-$p = Get-Process MissionMonet, MissionD -ErrorAction SilentlyContinue | Select-Object -First 1
+$names = if ($args[1]) { $args[1] } else { 'MissionMonet', 'MissionD' }
+$p = Get-Process $names -ErrorAction SilentlyContinue | Select-Object -First 1
 if (-not $p) { 'game not running'; exit 1 }
 $h = $p.MainWindowHandle
 $r = New-Object Q+RECT; [Q]::GetWindowRect($h, [ref]$r) | Out-Null
