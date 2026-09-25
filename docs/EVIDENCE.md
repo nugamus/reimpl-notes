@@ -720,6 +720,9 @@ An entry at `tentative` confidence must also have a matching line in
 - **Method:** `tools/proxy/run.ps1` + `send.ps1` sequence in `tools/proxy/README.md`;
   `snap.ps1`; PIL side-by-side.
 - **Confidence:** proven for the three orientation questions; the differences are open.
+- **Superseded in part by E-0483:** the faint silhouettes are the haze planes
+  `Box139..Box146` (`fumgchtrans`/`fumgdrttrans`), not `immgch`/`immdrt`; the dark specks
+  are key texels of mode-0 materials (E-0481).
 
 ### E-0045 — Object names prefixed `$XYZ$`, `$Z$`, `$XZ$` get camera types 1, 2, 3
 - **Binary/file:** `MissionMonet.exe`, `x3d.dll`, `xd3d.dll`.
@@ -3732,3 +3735,109 @@ An entry at `tentative` confidence must also have a matching line in
   496, all 640×480.
 - **Method:** the parsers named; Python `wave` and RIFF header reads.
 - **Confidence:** proven.
+
+### E-0480 — A material's render state picks a drawer table; the renderer calls its `+4` per face, `+8..+0x1c` are clip planes, `+0x20` draws deferred faces
+- **Binary/file:** `xd3d.dll`.
+- **Evidence:** `FUN_1001e530` builds the state word at material `+0x6c`: `+0x5c`
+  (texture) → `0x1`, `+0x4c` (transparency) ≠ 0 → `0x8`, `+0x50` 1 or 3 → `0x2`, 2 →
+  `0x40`, 10 → `0x100`, 11 → `0x200`. `FUN_1001df90` stores in material `+0x70` a table
+  chosen by render class and state: class 0 (unlit) state 0 `0x10037200`, 1 `0x10037080`
+  (`0x100371c0` if material `+0x68`), 3 `0x10036d80`, 8 `0x10036c00`, 9 `0x10037140`
+  (`0x10037000`), 0xb `0x10037280`, 0x41 `0x10036d40`, 0x101 `0x10036e00`, 0x201
+  `0x10036e40`; class 2 (lit) 0 `0x10037180`, 1 `0x100370c0` (`0x10036e80`), 3
+  `0x10036ec0`, 8 `0x10037240`, 9 `0x10037040` (`0x10036dc0`), 0xb `0x10036f00`, 0x41
+  `0x10036fc0`. `FUN_1001f6f0` fills them (thunks resolved by capstone over
+  `0x10001000..0x100012a8`): class 2 state 1 `+4` = `FUN_10002420`, state 3 `+4` =
+  `FUN_100039c0`, state 0xb `+4` = `0x10005b00`, `+0x20` = `0x10006540`, state 9 `+4` =
+  `0x10004e70`, state 0x41 `+4` = `0x10002d00`, `+0x20` = `0x10003700`; class 0 state 1
+  `+4` = `FUN_1000a740`, state 3 `+4` = `FUN_1000b840`, state 0xb `+4` = `0x1000d150`,
+  `+0x20` = `0x1000d8d0`, state 0x41 `+4` = `0x1000ae50`, `+0x20` = `0x1000b5d0`. The
+  object renderer `FUN_10020720` calls, for each face, face `+0x10` (material) → `+0x70`
+  → `+4`. `FUN_100039c0` calls `+8`, `+0xc`, `+0x10`, `+0x14`, `+0x18`, `+0x1c` for the
+  outcode bits 1, 2, 8, 4, 0x20, 0x10 not shared by all vertices (clipping against the six
+  frustum planes); these six are the same functions in every textured table.
+- **Method:** MCP decompile of `FUN_1001e530`, `FUN_1001df90`, `FUN_1001f6f0`,
+  `FUN_10020720`, `FUN_100039c0`; capstone.
+- **Confidence:** proven.
+
+### E-0481 — Only draw modes 1, 2 and 3 colour-key; mode 0 draws key-coloured texels as they are
+- **Binary/file:** `xd3d.dll`, `h3d.dll`, `MissionMonet.exe`; `Data/U01/maps/*.dmf`,
+  `Static/U01.o3d`; `traces/u01-start-engine.png`.
+- **Evidence:** capstone sweep of every `SetRenderState` call (vtable `+0x5c`, pushes
+  before the call): `D3DRENDERSTATE_COLORKEYENABLE` (0x29) is set to 1 only at
+  `0x100037ce` (`0x10003700`), `0x10003fcf` (`FUN_100039c0`), `0x100065dc`
+  (`0x10006540`), `0x1000b67f` (`0x1000b5d0`), `0x1000bcc4` (`FUN_1000b840`),
+  `0x1000d94d` (`0x1000d8d0`), each reset to 0 in the same drawer: the drawers of states
+  3, 0xb and 0x41 (E-0480), i.e. material `+0x50` = 1, 2 or 3. The state 0/1/8/9 drawers
+  never set it. `h3d.dll`'s device setup (`0x10003c9f..0x10003eaf`) sets SHADEMODE 2,
+  TEXTUREPERSPECTIVE 1, ZENABLE 1, ZWRITEENABLE 1, ZFUNC 4 (LESSEQUAL), TEXTUREMAG and
+  TEXTUREMIN 2 (LINEAR), TEXTUREMAPBLEND 2 (MODULATE), FILLMODE 3, DITHERENABLE 1,
+  SPECULARENABLE 0, ANTIALIAS 0, FOGENABLE 0: no colour key, no alpha blending. The EXE's
+  only `H3d_D3DDriver_Set_Render_State` calls (`MessageToUser_34`, `FUN_00418350`,
+  `FUN_00418410`) set states 0x11, 0x12 (filtering) and 0x1a (dither). So a mode-0
+  material's texels equal to its `fb21` key draw in the key colour. U01: the sky materials
+  (`cieldev*`/`cielder*`, mode 0, key (194, 91, 58)) have key texels in `CDEVBAMD` (65)
+  and `CDEVBADT` (3); the water reflections `reflet2` (`MREFBAGH`, 276), `reflet9` (179),
+  `reflet7` (174), `reflet5` (80), `reflet1` (52). The engine's dark "birds" in U01's
+  first shot (engine capture pixels (224..277, 201..208), (287..294, 234), (352..357, 197),
+  and in the water (91..111, 316..319), (131..187, 348..374), window offset (9, 38))
+  project, with the E-0041 camera and the `scene.md` transforms, onto `cieldevbam`,
+  `Sphere02c7` (sky) and `QuadPatch3`/`QuadPatch4` (`reflet1`/`reflet2`) only: they are
+  those key texels cut out by the engine's alpha test over its black clear colour. No
+  bird object exists in U01's `.O3D` files.
+- **Method:** Python capstone sweep of `xd3d.dll`, `h3d.dll`; MCP xrefs in
+  `MissionMonet.exe`; `dmf.py`/`o3d.py` over U01; point-in-polygon projection script.
+- **Confidence:** proven for the states and the key-texel counts; the pixel attribution is
+  by projection.
+
+### E-0482 — Transparent faces: vertex alpha 255 − 2.55·t, drawn after everything, back to front by their farthest vertex, without Z writes
+- **Binary/file:** `xd3d.dll`, `h3d.dll`.
+- **Evidence:** the `+4` drawers of every state with `0x8` or `0x40` (class 2
+  `0x10004e70`, `0x10005b00`, `0x100067b0`, `0x10007650`, `0x10002d00`; class 0
+  `0x1000c7d0`, `0x1000d150`, `0x1000daf0`, `0x1000ae50`, and others) clip and project the
+  face into a record (0x6dc bytes) of the list `DAT_10036f64`, count `DAT_10036f54`,
+  instead of drawing it. `0x10005b00`: record `+0x4c` = the largest `_ftol` (MSVCRT import
+  at `0x1003818c`) of the vertices' view depth (the `+0x390` array, whose reciprocal is the
+  vertex rhw, `0x1000600b..0x100060aa`); each vertex's diffuse is `(_ftol(255 − material
+  +0x4c · 2.55) << 24) | lit RGB` (`0x1000614c..0x100061fa`; doubles 255.0 at
+  `0x10024018`, 2.55 at `0x10024028`); the same `fild [+0x4c]; fmul [0x10024028]` is in
+  all eight transparency queues (`0x100054bf`, `0x1000614f`, `0x10006e55`, `0x10007c1c`,
+  `0x1000cd39`, `0x1000d6b9`, `0x1000e0e0`, `0x1000feba`). The frame (`FUN_10020ee0`)
+  draws all objects, then radix-sorts the list ascending on `+0x4c` (`FUN_10021c00`),
+  sets ZWRITEENABLE 0, calls each record's material `+0x70` → `+0x20` from the last
+  (largest depth) to the first, and sets ZWRITEENABLE 1. `0x10006540` (class 2, state
+  0xb): TEXTUREADDRESS (clamp 3 or wrap 1 by `+0x58`), specular if `+0x48`, SHADEMODE 2,
+  COLORKEYENABLE 1, texture, ALPHABLENDENABLE 1, SRCBLEND 5 (SRCALPHA), DESTBLEND 6
+  (INVSRCALPHA), triangle fan, then blend and key off. `0x1000b5d0` (class 0, state 0x41,
+  mode 2) blends SRCBLEND 2 (ONE) with DESTBLEND 2 (ONE), or 6 when device `+0x1d7a0` →
+  `+0x198` is set. Textures: `FUN_1001e6b0` gives 15-bit maps `DAT_10036f48` (the device
+  format with 5, 5, 5 bits and no alpha, chosen in `FUN_1001f6f0`) unless `+0x198` is set
+  (then the 4, 4, 4, 4 format `DAT_10036f50`); `h3d.dll` `0x10002aa8` sets `+0x198` only
+  when the caps word `+0xf8` has bit 0x20 and not bit 2. With a map without alpha,
+  MODULATE takes the alpha from the vertex.
+- **Method:** capstone of `0x10005b00..0x10006330`, `0x10006540..0x10006728`; MCP
+  decompile of `FUN_10020ee0`, `FUN_10021c00`, `FUN_1001e6b0`, `FUN_1001f6f0`.
+- **Confidence:** proven for the alpha, order and states. Which caps bit `+0xf8` tests is
+  not identified; the U01 capture (E-0483) matches vertex alpha.
+
+### E-0483 — U01's faint distant "buildings" are the 72 % transparent haze planes `Box139..Box146`; the boats are back faces
+- **Binary/file:** `Data/U01/static/U01.o3d`, `Data/U01/maps/fumgch.dmf`, `fumdrt.dmf`;
+  `traces/u01-start-original.png`, `traces/u01-start-engine.png`.
+- **Evidence:** the blue silhouettes (smoke, cranes, masts) are the textures `FUMGCH` and
+  `FUMDRT` (15 bpp, key (56, 57, 47): 46,506 and 45,692 of 65,536 texels keyed) of
+  materials `fumgchtrans`/`fumgdrttrans` (`+0x4c` = 72, `+0x50` = 1, class 2), faces of
+  `Box139`..`Box146`. Projecting U01 with the E-0041 camera, game pixels (60, 230),
+  (150, 220), (500, 230) hit `Box142`, `Box145`/`Box141`, `Box143` in front of the sky
+  dome; `immgch`/`immdrt` (house fronts, `Box08`, `Box11`, `Box52..59`) are not what the
+  shot shows, so E-0044 named the wrong materials. Per E-0482 they draw with alpha
+  `_ftol(255 − 183.6)` = 71 (0.278), SRCALPHA/INVSRCALPHA, colour-keyed. Measured on the
+  captures: at 241 silhouette-edge samples (engine differs from the original by > 40,
+  sky 4 px outside), (original − sky) / (engine − sky) has median 0.24 (quartiles 0.13,
+  0.31). The engine capture predates E-0205; taking the `$Z$sun` faces (visible in both
+  captures) as front faces, the faces of `$Z$barque0`, `$Z$barque1`, `$Z$barques` wind the
+  other way on screen in this shot (signed areas −477, −644, −924 against +283 for
+  `$Z$sun`, camera-facing per E-0270), so back-face culling removes all three boats.
+- **Method:** `dmf.py --png`, `o3d.py`; projection script (world transforms of
+  `scene.md`, camera E-0041, 640×480, FOV 90); numpy over the captures.
+- **Confidence:** proven for the objects and the formula; the blend fit is a measurement
+  on edges (noisy).

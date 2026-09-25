@@ -351,7 +351,16 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   one used for them, and state 3's drawer (`FUN_1000b840`) draws opaque with the colour
   key. The faint look is still unexplained; lighting (Q-0019) is the next suspect, since
   the drawers modulate the texture by the vertex colour.
-- **Status:** open
+- **Answer (2026-09-26):** the faint silhouettes are not `immgch`/`immdrt` but the haze
+  planes `Box139..Box146` (`fumgchtrans`/`fumgdrttrans`, `+0x4c` = 72). Transparent faces
+  are queued and drawn after all objects, back to front, depth write off, SRCALPHA/
+  INVSRCALPHA with vertex alpha trunc(255 − 2.55·t) = 71 (E-0482, E-0483; the capture
+  fits). The boats are back faces in this shot (E-0483, E-0205). The engine's black
+  "birds" are key-coloured texels of mode-0 sky and reflection maps, which the original
+  does not colour-key (E-0481). Rule in `scene.md`, "Drawing order and blending". Left
+  open: which device caps bit selects 4444 textures and ONE/INVSRCALPHA for mode 2
+  (E-0482); it does not change U01 on the capture setup.
+- **Status:** RESOLVED (E-0481..E-0483)
 
 ### Q-0022 — What frame rate did the original run at, so what are its turn and pitch rates per second?
 - **Context:** E-0046: turning and pitching step 0.06 rad per rendered frame; nothing in the

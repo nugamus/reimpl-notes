@@ -33,8 +33,8 @@ A light's world position is its file position (lights are not parented in the co
 | `+0x3e` | colour 3: light colour | nothing in the renderer |
 | `+0x44` | u32 shininess (0..100) | untextured specular table |
 | `+0x48` | u32 shininess strength | untextured specular table |
-| `+0x4c` | u32 transparency % | blending (Q-0021), not lighting |
-| `+0x50` | u32 draw mode (1: colour key) | drawer choice, not lighting |
+| `+0x4c` | u32 transparency % | blending (`scene.md`, E-0482), not lighting |
+| `+0x50` | u32 draw mode (1, 3: colour key; 2: additive) | drawer choice (`scene.md`), not lighting |
 | `+0x58` | u32 tiling | 0: clamp texture coordinates, non-zero: wrap |
 
 Corpus: 1,537 materials have class 2, 596 class 0, none class 1. Every class-0 material

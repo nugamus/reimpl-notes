@@ -63,8 +63,24 @@ For scene file `Uxx.X3D`:
 - A material's `texture_map` name ends `.TGA`; replace the extension with `.dmf` and load
   it from the map search path. Materials without a map draw their second colour.
 - `.DMF` pixels: bpp 8 through a B, G, R, x palette; bpp 15 as RGB555; bpp 16 as RGB565.
-- A map with an `fb21` colour key: texels equal to the key are transparent (the loader
-  sets a "keyed" flag; how the rasteriser uses it is inferred).
+- A map with an `fb21` colour key: texels equal to the key are transparent, but only on
+  faces whose material draw mode (`+0x50`) is 1, 2 or 3. Mode 0 draws them in the key
+  colour, like any other texel (E-0481; U01's sky and water reflections have such texels).
+
+## Drawing order and blending (E-0480..E-0483)
+
+- Per face, by material: t = transparency `+0x4c` (0..100), mode = `+0x50`.
+- Opaque faces (t = 0, mode ≠ 2): drawn at once, in object and face order, depth test
+  "less or equal", depth write on, no blending; colour key if mode is 1 or 3.
+- Deferred faces (t ≠ 0, or mode 2): after every object is drawn, sort them by key =
+  the largest of the face's vertices' view depths truncated to an integer, and draw them
+  from the largest key down (equal keys: last queued first), with depth test on and depth write
+  off. Clipping happens before, so the key uses the clipped polygon.
+  - t ≠ 0: every vertex colour gets alpha a = trunc(255 − 2.55 · t) (72 → 71); blend
+    source · a + destination · (1 − a). Texture alpha does not enter (maps are uploaded
+    without alpha; the key only cuts texels). Colour key if mode is 1 or 3.
+  - mode 2: additive (source + destination), colour-keyed.
+- Lighting, specular and texture addressing are as for opaque faces (`lighting.md`).
 - UV v = 0 is the first stored row: upload the rows in file order (E-0044).
 
 ## Lighting
