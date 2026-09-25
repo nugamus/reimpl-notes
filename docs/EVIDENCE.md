@@ -2862,3 +2862,407 @@ An entry at `tentative` confidence must also have a matching line in
   `U05_StartUnit` then sets radius 32 and Z offset 0 (E-0361).
 - **Method:** Python `struct` over the file.
 - **Confidence:** proven.
+
+### E-0390 — U06's vtable and start: ambient `s4_11`, talker `U06_18`, `lourde` paused, clown yaw 3π/2, sphere offset 5, camera cut and autosave
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `CreateUnitScene` case 6 → `0x00410940`: base constructor, vtable
+  `0x00439760` (nothing else initialised). Vtable: `+8` `0x00410cf0` / `+0xc` `0x00410d10`
+  only call `Scene_RestoreState` / `Scene_WriteState` (no unit chunk), `+0x10` the generic
+  `0x0041acf0`, `+0x14` `U06_StartUnit` (`0x00410990`), `+0x18` generic, `+0x1c`
+  `U06_UpdateFrameLogic` (`0x00410ab0`), `+0x30` `U06_DispatchClickActions` (`0x00410da0`,
+  created), `+0x34` `0x00412aa0` (returns 1), `+0x40` `U06_HandleInput` (`0x00410d30`,
+  created). `U06_StartUnit`: `+0x4c("s4_11", 1)`; `FUN_0041ae10(a, b)`; `+0x28("U06_18",
+  "", "$$$DUMMY.*visage", 0, 8, 0)`; node list `+0x14("lourde", 1)` → if found
+  `FUN_00420060(1)` (paused); `+0x6d4` = 0; `+0x6c8` = node `*U03_02`, its `+0x68` = 0;
+  `+0x6cc` = hotspot `*U03_02`, its `+0x80` = `0x4096cbe4` (4.712389 = 3π/2);
+  `FUN_00419d00(camera, 5.0)` (sphere Z offset `+0x68`); if `a`: `FUN_00419520(−673.3,
+  475, 25.4)`, `FUN_00419550(2.16, π/2)`, game `+0x10(FUN_0042a3c0(0x3eb), 0)`
+  (autosave). `+0x6d0` has no writer outside the frame hook's helpers.
+- **Method:** capstone of `0x00410990..0x00410aa4` with strings and floats resolved; MCP
+  decompile; vtable read with `pefile`.
+- **Confidence:** proven.
+
+### E-0391 — U06's clown: a safe rectangle, a 330 range, three `Tir` shots, and a hotspot turned toward the walking player
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `U06_UpdateFrameLogic`: `Scene_RenderFrame`; `U06_IsSafeFromClown`
+  (`0x00410b80`): eye y (camera `+0x18`) > 280.0 → 1, else `FUN_00416030(eye, −800,
+  −100000, 100000, 230)` (strict bounds on x and y); not safe → `FUN_00415e40(eye,
+  hotspot +0x70)` compared with 330.0 (`0x004397b8`): `+0x6d0` = 0 and ≤ 330 →
+  `U06_ClownStartShooting` (`0x00410bc0`: node running, `+0x6d0` = 1); `+0x6d0` ≠ 0 and
+  > 330, or safe → `U06_ClownStopShooting` (`0x00410be0`: if `+0x6d0`,
+  `FUN_00420100(49.0, 1)`, `+0x6d0` = `+0x6d4` = 0). Then `+0x6d0` and node `+0x60` →
+  `FUN_004200c0(1.0)`, `FUN_00420060(0)`, `+0x50("Tir", eye, 0)`, `++(+0x6d4)` > 2
+  (signed) → `U06_ShotDown` (`0x00410c20`): `FUN_00414820(0, 0)`, `RunFor(800)`,
+  `MoveTo(800, none, 100, 2.0, 100)`, `MoveTo(1200, none, yaw + 0.5, 2.76, 100)`,
+  `MoveTo(1400, none, yaw + π, 100, 100)`, `+0x6d4` = 0, `FUN_0041bfd0(600)`,
+  `RunFor(1000)`, game `+0x14(1)`. `U06_HandleInput`: `Scene_HandleInput`, then if
+  `0x0046e878` (Up) or `0x0046e880` (Down): `FUN_00415ef0(hotspot +0x70, eye, &yaw,
+  &pitch)` (normalise(eye − hotspot), `X3d_Convert_To_Polar`), hotspot vtable
+  `+0x20("*U03_02", yaw, pitch, 0)`. Hotspot vtable `0x00439a20` `+0x20` =
+  `Hotspot_TurnToYaw` (`0x00420f00`, created): with the last argument 0 it acts on itself:
+  `X3d_Make_Rotation_Matrice_Z(R, +0x80 − yaw)`, `X3d_Matrice_Mult(T, +0x88, R)`, `+0x88`
+  := T, `+0x80` = yaw, `+0x84` = pitch, `+0x6c` = 1 (else match by object name and recurse
+  on `+0x50`). `FUN_00420b40` (hotspot with an object) sets `+0x80` = 0, `+0x84` = π/2,
+  `+0x88` = `X3d_Object_Get_Local_Matrice`. The tick `FUN_0041c350`: `Talker_Tick`, node
+  tick `FUN_0041fe90`, then `Hotspots_ApplyStoredMatrices` (`0x00420e00`): for each
+  hotspot with `+0x6c`, local := `X3d_Matrice_Mult(local, +0x88)`. Answers the
+  `FUN_00420e00` part of Q-0026. Corpus: `Anim/U03_02/TIRE.A3D` 1..50; INFOOBJ `*U03_02`
+  20 fps, paused.
+- **Method:** capstone of `0x00410ab0..0x00410d98`; MCP decompile of the functions named.
+- **Confidence:** proven for the logic; the visual result of the matrix product is Q-0170.
+
+### E-0392 — U06 handlers: `OpenDoor`, `UseArrosoir` (the camera rides the watering can, the man wakes and talks), `UseBiche` (down the drain to unit 7)
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `U06_DispatchClickActions`: `FUN_0041b700`, then the queue compared with
+  `OpenDoor` `0x00410e50`, `UseArrosoir` `0x00410ea0`, else `UseBiche` `0x00411140`.
+  `U06_OpenDoor`: node `*U06_16` `FUN_00420060(0)`, `+0x50("s1_04", eye, 0)`,
+  `FUN_00421300(list, 0, "*U06_16", 1)`. `U06_UseArrosoir`: `FUN_00414820(0, 0)`; hotspot
+  `*U06_17` `+0x28("", 1, 1)` (`Hotspot_ShowOrHide` `0x00421050`: "" = itself; show =
+  `X3d_Object_Unhide` and `+0x118` = 0; hide = `X3d_Object_Hide` and `+0x118` = arg 3);
+  node `*U06_17` `FUN_004200c0(1.0)`, running; `FUN_00420220(node *U06_18,
+  "%sAnim/U06_18/reveil.A3D", "reveil", 1, 0)`, `+0x68` = 0; half = (anim `+0x3c` −
+  `+0x38`) · 0.5; loop while node `+0x60` = 0 and not `FUN_004163b0(VK_RETURN)`:
+  `X3d_Object_Get_Global_Position(can)`, `FUN_00419520(G.x − 3.09, G.y − 8.542, eye z)`,
+  `FUN_00419c00(0, (−1058.87, 406.222, 15.2054))` (ms 0: face the point with
+  `FUN_00419580`, then `RunFor(0)`), once frame > half − 15 → `+0x50("s4_13")`, frame >
+  half → `FUN_00420080(clip, 1)` (a type-0x32 slot: `FUN_004201c0(node, slot, 1)`); then
+  `RunFor(0)` while the clip runs and not Enter; `Talkers_Say("U06_18", "d4_12")`;
+  `MoveTo(4000, (−1049.73, 395.246, 25.41), −2.8, 0.77)`; `RunFor(0)` while scene
+  `+0x168`; `MoveTo(1000, same, −5.2, 1.33)`; list `+0x28("*U06_18", 0, 1)`;
+  `FUN_00414820(1, 1)`. `U06_UseBiche`: suspend; node `*U06_21` `+0x68` = 0, running;
+  `+0x50("s4_15")`; wait `+0x60`; `MoveTo(1000, (−685.55, −1224.05, 25))`; `MoveTo(1000,
+  (−685.295, −1224.03, −7.15), 4.28)`; `RunFor(1000)`; `MoveTo(800, none, 4.11, 2.777)`;
+  `+0x70` = 1, running; `+0x50("s4_15")`; wait `+0x60`; game `+4(7)`.
+- **Method:** capstone of `0x00410e50..0x004112a7`; MCP decompile.
+- **Confidence:** proven.
+
+### E-0393 — U06 corpus: scale 12, INFOACT, INFOOBJ, the clown's `Tire`, the shed, the watering can and the drain cover
+- **Binary/file:** `Data/U06/SCENE.BIN`, `INFOACT.BIN`, `INFOOBJ.BIN`, `U06.X3D`, `Anim/**`,
+  `Static/**`, `Sound/*.wav`.
+- **Evidence:** `SCENE.BIN`: ambient (90, 90, 90), floats 12.0, 90.0, 20.0, 40.0, 7.0.
+  `infoact.py --file`: M01 trig 8 `*U06_16` → op 10 `OpenDoor`; M02 take `U06_17`; M03
+  trig 7 `U06_17` on `*U06_18` → op 3, `UseArrosoir`; M04 take `U06_19`; M06 take
+  `U06_20`; M07 trig 7 `U06_20` on `*U06_21` → op 3, `UseBiche`; all `TRUE`, max 1.
+  `infoobj.py`: `*U06_15` t5 c2, `*U03_02` t6 c0 20 fps paused, `*U06_16` t5 c2 7 fps no
+  loop, `*U06_17` t5 c4 running no loop, `*U06_18` t6 c5, `*U06_19..21` t4 c4/4/5, all
+  visible. Objects (`o3d.py`): `*U03_02` root of `Anim/U03_02/TIRE.O3D` (a clown:
+  `TETEclown`), `lourde` → `*U06_15` in `Anim/ORANGE.O3D`, `*U06_16` in `CABANEXT.O3D`,
+  `*U06_17` (children `eau02..05`) in `U06_17.O3D`, `*U06_19` in `Static/CABANE.O3D`,
+  `*U06_20` in `Static/U06_20.O3D`, `*U06_21` in `u06_21.O3D`. Ranges (`a3d.py`): `TIRE`
+  1..50, `CABANEXT` 1..40, `ORANGE` 0..50, `U06_17` 1..150, `U06_21` 1..30,
+  `U06_18/REVEIL` 1..40. Sounds: `Tir` 1.34 s, `d4_12` 26.15, `s1_04` 4.62, `s4_11`
+  21.02, `s4_12` 4.67, `s4_13` 1.74, `s4_15` 1.54. `s4_12` occurs in no `.BIN` and not in
+  `MissionMonet.exe`.
+- **Method:** the parsers named; Python `wave`; byte search.
+- **Confidence:** proven.
+
+### E-0394 — U07's vtable, renames and start: `Object04` → `*U06_26…`, `secretpioc`, halos out of collision, two positional loops, sphere s/4, shaft camera with walking off
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** case 7 → `0x004112b0`: vtable `0x004397d0`, `+0x6c8` = 0. Vtable: `+8`
+  `U07_ReadPlancheChunk` (`0x004117b0`), `+0xc` `U07_WritePlancheChunk` (`0x00411800`),
+  `+0x10` `U07_OnLoadRenames` (`0x00411300`, created), `+0x14` `U07_StartUnit`
+  (`0x00411470`, created), `+0x18` `U07_DeleteEmittersAndUnload` (`0x00411740`: deletes
+  `+0x184`, `+0x188`, then `0x0041ae40`), `+0x1c` `U07_UpdateFrameLogic` (`0x00411780`),
+  `+0x30` `U07_DispatchClickActions` (`0x004119d0`, created), `+0x40`
+  `U07_HandleLadderAndGround` (`0x00411850`, created). `U07_OnLoadRenames`: `XScene_124`;
+  loop `X3d_Scene_Get_Object("Object04")` → `sprintf(name, i = 1 ? "%s" : "%s%i",
+  "*U06_26", i)` from i = 0; `"secretpioc"` → strcpy `"*U06_28"`; `"*U06_27"` →
+  `"*U06_29"`; `X3d_Scene_Find_First/Next_Object(…, 1)` with `strncmp(obj, "halo", 4)` = 0
+  → `+0x118` = 1; object `"planche"`: strcpy into `[obj +0x20]` (its parent) `"*U06_30"`.
+  `U07_StartUnit`: `+0x4c("s4_16", 1)`; camera `+0x58` = 0; `FUN_0041ae10`; actions
+  `+0x42c` (M07 exhausted; the flags are at `+0x410 + 4·id`, as U02's `+0x430` = M08) = 0
+  → `+0x184` = `FUN_00414c80(4, s·50)`, `SoundEmitter_Play("%sSound/s4_22.wav", (1299,
+  −143, 473), 1)`; `+0x188` = `FUN_00414c80(5, s·50)`, `s4_19.wav` at (1536, 363, 374),
+  loop; `FUN_00419ce0(s · 0.25)` (camera `+0x64`, `+0x6c`, sphere object `+0x10`);
+  `FUN_00419d00(camera +0x5c · 0.4)`; camera `+0x3c` = hotspot `*U06_30` `+0x60`;
+  `+0x420` (M04) → `X3d_Scene_Get_Object("ColGrille")` `+0x118` = 1; if `a`:
+  `FUN_00419520(1454.67, 1912.72, 570.605)`, `FUN_00419550(1.04, 2.77)`, camera `+0x40` =
+  0, `+0x70` = 0; inventory `+0xb8()` `+0x90("U06_19P.bmp")` → list `+0x28("*U06_19", 0,
+  1)`; autosave (`0x3eb`).
+- **Method:** capstone of `0x00411300..0x00411840` (strings, floats, IAT names via
+  `pefile`); MCP decompile.
+- **Confidence:** proven.
+
+### E-0395 — U07's `PLANCHE` chunk is the plank-tipped flag; the input hook is a 20-unit ladder before the switch, then the plank and the water checks
+- **Binary/file:** `MissionMonet.exe`; `Data/U07/Anim/PLANCHE.*`.
+- **Evidence:** `U07_ReadPlancheChunk`: `FUN_0041d490(stream)`, then chunk `"PLANCHE"`
+  (`FUN_00415190`) → 4 bytes into `+0x6c8`; the writer mirrors it after `FUN_0041d650`.
+  The only other writer of `+0x6c8` is `U07_TipPlank` (`0x00412210`), which sets 1.
+  `U07_HandleLadderAndGround`: `Scene_HandleInput`; actions `+0x414` (M01 exhausted) = 0:
+  Up flag `0x0046e878` → p = eye + (0, 0, 20.0), `HasHeadroom(p)` → `MoveTo(1200, p,
+  100, 100, 100)`, flag := 0; Down flag `0x0046e880` → p = eye − 20, `FUN_00416000(p)`
+  (p.z − `FindGroundBelow`) ≥ camera `+0x5c` → `MoveTo(1200, p)`, flag := 0. Else:
+  `+0x6c8` = 0 and `_stricmp(camera +0x3c name, "Planch01")` = 0 → `U07_TipPlank`;
+  camera `+0x3c` null or `strncmp(name, "*eau", 4)` = 0 → `U07_FallInWater`
+  (`0x004120a0`). `U07_TipPlank`: suspend, `+0x6c8` = 1, `MoveTo(800, (1034.62, 287.2,
+  374), 7.863, 1.0108)`, `MoveTo(1000, (1034.55, 284.2, 374.3), 4.743, 0.85)`,
+  `X3d_Load_Sdk_a3d(scene, "%s/Anim/planche.A3D", &root)`, strcpy root name `"*U06_30"`,
+  `FUN_0041c280(root, hotspot *U06_30 +0x60, path, 30.0)`, node `*U06_30`
+  `FUN_00420080(1)`, `+0x68` = 0, `+0x50("planche", eye, 0)`, `RunFor(0)` until `+0x60`,
+  `MoveTo(1000, none, 100, π/2)`, resume. `U07_FallInWater`: suspend, `+0x50("eau",
+  eye)`, d = normalise(`X3d_Convert_From_Polar(yaw, pitch)`), P = eye + s·(d.x, d.y),
+  P.z = eye.z − `+0x5c` + 10.0, camera `+0x70` = 0, `Camera_Fall(eye, P)`, `MoveTo(800,
+  P, 100, 0.5, 40)`, two `MoveTo(600, none, yaw + 3.0)`, `FUN_0041bfd0(2000)`, game
+  `+0x14(1)`. Corpus: `PLANCHE.O3D` root `$$$DUMMY.Dummy02` with `planche` → `Planch01`;
+  `PLANCHE.A3D` 1..50 (commented out in `U07.X3D`).
+- **Method:** capstone of `0x004117b0..0x004119c0` and `0x004120a0..0x004123b8`; MCP
+  decompile.
+- **Confidence:** proven. Answers the U07 half of Q-0103.
+
+### E-0396 — U07 handlers: the switch starts a 270-s gauge and lowers the player; two secret walls, the grille; `CouperDynamite` plays `Epilogue` and opens the Option menu
+- **Binary/file:** `MissionMonet.exe`; `Data/Video/Epilogue.avi`, `epilogue.wav`.
+- **Evidence:** `U07_DispatchClickActions`: `FUN_0041b700`; queue names in order
+  `DoInterrupteur` (`0x00411ac0`), `Open1Secret` (`0x00411d70`), `Open2Secret`
+  (`0x00411de0`), `CouperDynamite` (`0x00411e60`), `OpenGrille` (`0x00411d50`).
+  `U07_DoInterrupteur`: suspend; node `*U06_22` running; `+0x50("s1_08bis", eye)`;
+  `RunFor(0)` while `FUN_00414ed0(+0x174)`; node `*Eteint01` running; `+0x50("s4_20")`;
+  `MoveTo(1000, none, 4.64, 0.3)`; wait `*Eteint01` `+0x60`; `FUN_0041a560(gauge, 270.0,
+  1, "", 0)`; `MoveTo(1000, none, 1.54286, 0.530796)`; Q = eye; loop { Q.z = eye.z −
+  s·0.6; `MoveTo(1000, Q)`; `RunFor(300)` } while `FUN_00416000(eye)` ≥ `+0x5c`·1.8
+  (double `0x00439830`); `Camera_FollowGround(eye)`; `sprintf("%s/SAUT.WAV", app
+  +0x26a)`, `FUN_00416370` (file exists) → `SoundEmitter_Play(+0x174, path, eye, 0)`;
+  `MoveTo(800, none, 100, π/2)`; `MoveTo(1500, (1453.19, 1912.76, 362.294), 2.663)`;
+  camera `+0x70` = 1, `+0x40` = 1; resume. `U07_OpenGrille`: `ColGrille` `+0x118` = 1.
+  `U07_Open1Secret`: `+0x50("s4_21", eye, 0)`, hotspot `*U06_28` `+0x28("*U06_28", 0,
+  1)`, `mursecret` `+0x118` = 1. `U07_Open2Secret`: same with `*U06_29`, then
+  `FUN_004212b0` with ecx = list `+0x1a0` (a stray `""` push), `mursecreth` `+0x118` = 1.
+  `U07_CouperDynamite`: `FUN_0041a680(gauge)`, `FUN_004212b0(list +0x1a0)`, hotspot
+  `*U06_26` `+0x28("", 0, 1)`, `FUN_00414dc0(+0x184)`, delete, `+0x184` = 0,
+  `RunFor(3000)`, `PlayVideo("Epilogue", "Epilogue", 0, 1)`, frame manager
+  (`DAT_0046ec1c`) `+0xc0(0)` (the Option screen, E-0105). No suspend and no game `+4` in
+  `CouperDynamite`. Corpus: `Epilogue.avi` IV50, 640×480, 100,000 µs/frame, 362 frames
+  (36.2 s); `epilogue.wav` 22,050 Hz mono 8-bit, 36.97 s.
+- **Method:** capstone of `0x004119d0..0x00411ef8`; MCP decompile; AVI header, `wave`.
+- **Confidence:** proven.
+
+### E-0397 — U07's gauge expiry: the explosion flickers FOV and ambient for 2 s, then game over
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `U07_UpdateFrameLogic`: `Scene_RenderFrame` (`0x0041b130`), then
+  `FUN_0041a6c0(gauge, 1)` → `U07_DynamiteExplodes` (`0x00411f00`): suspend;
+  `FUN_00414dc0(+0x184)`, delete; `FUN_00419550(9.16, π/2)`; `FUN_00419520(1390.44,
+  −120.8, 487.27)`; `+0x50("Explosion", eye, 0)`; t0 = `timeGetTime`, last = 0; while
+  now − t0 < 2000: `Camera_MoveTo(100, none, 100, 100, flag ? 70 : 90)` (flag starts 1,
+  toggles); now − last > 100 → last = now, `rand()·5/0x7fff` via table `0x00412084`:
+  1 → `FUN_0041b2f0(255, 0, 0)`, 2 → (128, 0, 255), 3 → (128, 255, 0), 4 → (255, 255,
+  255), else (0, 0, 0); vtable `+0x1c()`; then `FUN_0041bfd0(2000)`, game `+0x14(1)`.
+- **Method:** capstone of `0x00411f00..0x0041207f`; MCP decompile.
+- **Confidence:** proven.
+
+### E-0398 — U07 corpus: scale 35, INFOACT with a dead `xxx`, INFOOBJ, duplicate `Object04` / `*U06_27`, planks, water and sounds
+- **Binary/file:** `Data/U07/**`.
+- **Evidence:** `SCENE.BIN`: ambient (255, 255, 255), floats 35.0, 90.0, 20.0, 40.0, 7.0.
+  `infoact.py --file`: ids 1..8, all `TRUE`, max 1; M01 trig 8 `*U06_22` →
+  `DoInterrupteur`; M02 trig 0 → `xxx`; M03 take `U06_24`; M04 trig 8 `*U06_27` → op 4
+  `*U06_27`, op 13 `s4_20`, `OpenGrille`; M05 / M06 trig 7 `U06_24` on `*U06_28` /
+  `*U06_29` → `Open1Secret` / `Open2Secret`; M07 trig 7 `U06_19` on `*U06_26` →
+  `CouperDynamite`; M08 take `U06_19`. `infoobj.py`: 11 hotspots, all visible;
+  `*Eteint01` frame 8, 1 fps, paused, no loop. `U07.X3D` loads `Static/U07`, `ColTotal`,
+  `Col`, `Anim/Lum`, `Rat`, `Rat2` ×3, `Rat3`, `boutanche`, `U06_22`, `Planche` (no
+  animation), `U06_27`, then `Static/Taches`, `Cave2`, `Escalier`, `Chambre1`, `Entrez`,
+  `U06_24`, `Plaque`. Objects (`o3d.py`): `Object04` in `CAVE2.O3D` and `CHAMBRE1.O3D`
+  (also the unloaded `AMPOULES.O3D`); `secretpioc` in `CHAMBRE1.O3D` (and the unloaded
+  `CAVE.O3D`); `*U06_27` in `Anim/U06_27.O3D` and `Static/CAVE2.O3D`; `*U06_19` in
+  `CHAMBRE1.O3D`; `ColGrille` in `COL.O3D`; `mursecret`, `mursecreth` in `COLTOTAL.O3D`;
+  `*eau`, `*eau0..16` in `TACHES.O3D`; `halo469..582` in `LUM.O3D`. Ranges: `U06_22`
+  1..10, `U06_27` 1..70, `PLANCHE` 1..50, `LUM` 1..7. Sounds: `Couper` 0.68 s (named by
+  no code), `Explosion` 4.95, `Planche` 4.10, `eau` 5.62, `s1_08bis` 1.60, `s4_16` 14.87,
+  `s4_19` 6.13, `s4_20` 3.40, `s4_21` 4.34, `s4_22` 2.32.
+- **Method:** the parsers named; Python `wave`.
+- **Confidence:** proven.
+
+### E-0399 — Units chain by `Game_GoToUnit`; U07 has no successor: the game ends with `Epilogue` and the Option menu; unit 50 is the gallery viewer
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** game vtable `0x00439894` `+4` = `Game_GoToUnit` (`0x00412fb0`, created):
+  unit 8 → `+0x160` = 3 and scene `"U33.x3D"` (`0x0044112c`), else `+0x160` = n and
+  `"U%s.x3d"` with the two-digit number. Call sites `push n; call [vtable+4]`: U01
+  `0x00401c7e` (2), U02 `0x00404ab5` (3), U33 range `0x00407ebf` (4), U04 `0x0040b283`
+  (5), U05 `0x00410840` (6), U06 `0x0041129f` (7); `Scene_HandleInput`
+  `0x0041b8ca..0x0041b938` goes to 1..8 while Tab (`0x0046e804`) and Numpad 1..8
+  (`0x0046e964..0x0046e980`) are held. No immediate argument of 8 or more appears, and U07's
+  code does not call it. Unit 50 (`0x004123c0`, vtable `0x0043983c`) is created only by
+  `Game_OpenGalleryView` (`0x004131e0`): a 6-character picture name (`U11_01` … `U14_07`)
+  picks a scene `U01D.X3D`, `U02D`, `U03D`, `U33D`, `U04D`, `U05D` or `U06D.X3D`, stored
+  at game `+0x174`; `CreateUnitScene(0x32)`, load, `SetAppMode(0)`, `+0x10`, `+0x14(1, 0)`,
+  game `+0x168` = 1, `+0x170` = 1. `U50_OnLoadGalleryAmbient` (`0x00412410`) and
+  `U50_StartGalleryView` (`0x00412530`) look the name up in the 18-entry table
+  `0x00440d48` with unit numbers (`0x00440d90`: 1, 2, 2, 3, 33, 4 ×9, 5, 5, 6, 6) and
+  camera poses (`0x00440db4`, 20 bytes each: x, y, z, yaw, pitch), start that unit's
+  ambient, run its fix-ups and cut the camera; vtable `+0x30..+0x38` return 1 (no
+  clicks), `+0x44` (`0x00412ab0`) stores a pick. `Data/` has no `U50` directory.
+- **Method:** capstone scan of `.text` for `push imm; call [reg+4]`; MCP decompile;
+  `pefile` table dumps.
+- **Confidence:** proven for the chain and the end; the gallery's behaviour is not
+  specified here.
+
+### E-0300 — U03's vtable `0x004394e4`: start, frame hook and dispatcher overridden; no load hook, no save chunk; the file is `U03.cpp`
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `CreateUnitScene` case 3 → `U03::Construct` (`0x00404e70`, was
+  `FUN_00404e70`): `FUN_0041a890`, vtable `0x004394e4`, `+0x6e4` (follow) = 1, `+0x6fc`,
+  `+0x700`, `+0x704`, `+0x708` (cinematic objects / nodes), `+0x6e8`, `+0x6c8`, `+0x6cc`
+  (emitters) = 0, `DAT_0044262c` = this. Vtable (MCP memory read): `+0` `0x00404ec0`
+  (deleting destructor → `U03::Destruct` `0x00404ee0`: stop and delete both emitters,
+  `U03::ReleaseCinematique`), `+8` `0x0041d490`, `+0xc` `0x0041d650`, `+0x10`
+  `0x0041acf0` (all generic), `+0x14` `U03::StartUnit` (`0x00404f70`, function created),
+  `+0x1c` `U03::UpdateFrameLogic` (`0x00405480`), `+0x30` `U03::DispatchClickActions`
+  (`0x004054e0`, created), `+0x40` `0x0041b7f0` (`Scene_HandleInput`). `0x00406a80`
+  carries the assert `D:\MissionD\Source\U03.cpp` line 0x2fa (762); renamed
+  `U03::LoadCinematique`. The other U03 functions (`0x00405580`..`0x00407050`) are renamed
+  after what they do (`u03.md`).
+- **Method:** MCP decompile and memory read; capstone with strings resolved.
+- **Confidence:** proven.
+
+### E-0301 — `U03::StartUnit`: renames and hides before the generic start, sphere 30.5/10.5, emitters on groups 5 and 6, three talkers, M01, camera, autosave, `U01_19P`, `s2_01`
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** capstone `0x00404f70..0x0040546f`: `X3d_Scene_Get_Object` (case-sensitive,
+  E-0080) of `$$$DUMMY.Dummycolis` → `X3d_Object_Hide(1)`; strcpy renames `Box121` →
+  `*U03_22`, `*U03_18` → `Quille tete`, `u03_18` → `*U03_18`; `*U03_03` `+0x5c` = 1;
+  `pedaledrt` `+0x118` = `+0x5c` = 1; then `FUN_0041ae10` (generic start); camera
+  `FUN_00419ce0(30.5)`, `FUN_00419d00(10.5)`; hotspot list `+0x14("*U03_02", 1)` → `+0x6d0`,
+  node list → `+0x6d4`; node `*U03_08` `FUN_00420060(1)`; node `*U03_09` → `+0x6dc`,
+  `+0x78` = 15.0; node `*path` → `+0x6e0`, `+0x6c` = `+0x68` = 0, `+0x78` = 4.0; object
+  `*path` hidden and `U03::DisableCollisionTree(its parent)` (`0x00406f60`: `+0x118` = 1 on
+  the object, recursing over `+0x24` and `+0x28`); actions `+0x438` (M10 exhausted) = 0 →
+  `FUN_00421330(*U03_09, 1)` else `FUN_00421330(ColClown, 1)`; `FUN_00414c80(5, 1000.0)` →
+  `+0x6cc`, `SoundEmitter_Play("%sSound/s2_03.wav", global position of *U03_01, loop 1)`;
+  M10 not exhausted: `FUN_00414c80(6, 1000.0)` → `+0x6c8`, `s2_04.wav` at `*U03_02`, else
+  `+0x6e4` = 0; vtable `+0x28` talkers (`U03_01`, `$$$DUMMY.*visage`), (`U03_02`,
+  `$$$DUMMY.visage`), (`U03_09`, `$$$DUMMY.visage`), each (…, 0, 8, 0); if `a`:
+  `FUN_0041e4b0(actions +0x14)` (M01), `FUN_00415ed0(−132.19, −463.89, 70)`,
+  `U03::SnapToGround` (`0x00407050`: `FindGroundBelow`, z = hit z + camera `+0x5c`),
+  `FUN_00419520`, `FUN_00419550(−1.28, π/2)`, game `+0x10(message 1003, 0)`; then on both
+  paths (`0x0040540d`) inventory `+0x90`/`+0xa8("U01_19P")`, vtable `+0x4c("s2_01", 1)`.
+  `FUN_00414c80(group, range)` only stores them: these emitters are not in the scene's
+  emitter list (`Scene_UpdateEmitterVolumes`). Supersedes `sound.md`'s "U03's code plays on
+  4": U03 uses groups 5 and 6.
+- **Method:** capstone (strings and float immediates resolved), MCP decompile of
+  `FUN_00414c80`, `FUN_00414e00`, `FUN_00406f60`, `FUN_00407050`.
+- **Confidence:** proven.
+
+### E-0302 — U03's frame hook: the policeman takes `*path`'s transform turned by π; the two emitters are refreshed every frame
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `U03::UpdateFrameLogic` (`0x00405480`): if app `+0x47c` ≠ 1: `+0x6e4` ≠ 0
+  → `U03::FlicFollowPath` (`0x00405580`); `FUN_00414e00(+0x6c8)`, `FUN_00414e00(+0x6cc)`
+  (volume from distance when the group plays and a handle is held); `Scene_RenderFrame`.
+  `0x00405580`: if node `+0x6dc` `+0x60` = 0: `X3d_Object_Get_Local_Matrice(path obj)`,
+  `X3d_Make_Rotation_Matrice_Z(π)`, `X3d_Matrice_Mult(A, Rz, pathLocal)`,
+  `X3d_Matrice_Mult(B, flicLocal, A)`, `X3d_Object_Set_Local_Matrice(flic, B)`, then
+  `X3d_Object_Set_Global_Position(flic, global position of the path object)`. The main
+  loop runs the tick (`+0x24`) before `+0x1c` (E-0046), so the pose composed is the one
+  just sampled. `Matrice_Mult(dst, a, b)` = a·b (E-0042).
+- **Method:** MCP decompile.
+- **Confidence:** proven.
+
+### E-0303 — `AnimeSpeakClown`: walk, two lines, the clown's model swapped for `U03_02.O3D` + `magie.A3D`, the postcard `U03_06P`, the policeman stops, the clown walks off
+- **Binary/file:** `MissionMonet.exe`; `Data/U03/Anim/**`.
+- **Evidence:** `0x00405670`: `FUN_00414820(0, 0)`; `FUN_00421330(*U03_09, 0)`,
+  `(ColClown, 1)`; `Talkers_Say("U03_02", "U03_01_04")`; `FUN_00421300(+0x6d0, 0)`; clown
+  local position, `FUN_00415ed0(−126, −581, eye z)`, direction normalised → polar;
+  `FUN_00419620(eye, target, yaw, dirYaw, pitch, π/2, 6000, 0)` (arguments traced through
+  the stack, `0x004057b4..0x004057d3`; the function's full signature and yaw wrap from its
+  decompile); `RunFor(0)` while `+0x178` plays and not `FUN_004163b0(0x0d)`;
+  `Camera_MoveTo(3000, (−118, −644, 71), 1.62, 1.6, 43.0)`; scene `+0x1a4` = 0;
+  `U03::SwapClownModel` (`0x00405b60`: free the object's `+0x128`, `X3d_Object_Release`,
+  `FUN_00420080(old node, 0)`, `X3d_Animation_Release`, node name `ClownDeleted`,
+  `XObject3D_60("%sANIM/U03_02/U03_02.O3D")`, cursor `[+0x128]` = 0, `+0x1a8` = 0,
+  `+0x1a4` = hotspot, `GetCursorPos`/`ScreenToClient`/vtable `+0x44`, vtable
+  `+0x20("%sANIM/U03_02/magie.A3D", obj, 15.0)` → `+0x6d4`, `FUN_004200c0(1.0)`, paused,
+  `+0x68` = 0, talker `U03_02` renamed `Deleted`, vtable `+0x28("U03_02", "",
+  "$$$DUMMY.visage", 0, 8, 0)`, eye x += 3.5 (`0x00439540`), z += 5 (`0x004394cc`),
+  `FUN_004194f0`, stop and delete `+0x6c8`); `Say("U03_02", "U03_01_04B")`, `timeGetTime`;
+  `Camera_MoveTo(3000, saved eye, yaw, pitch, 90.0)`; loop: > 9000 ms or Enter → node
+  enable + run; node run; loop while the voice plays: frame > 48.0 (`0x0043953c`) or Enter
+  → `U03::GiveCartePostale` (`0x00405b00`: `*U03_03` `+0x5c` = 1, inventory
+  `+0x90`/`+0xa8("U03_06P")`); `U03::FlicAttenteHorloge` (`0x00405db0`:
+  `FUN_00420220(*U03_09 node, "Anim/U03_09/PARLENBOUCLE.A3D", "AttenteHorloge", 1, 1)`,
+  `+0x68` = 1, `+0x78` = 20.0, running, `+0x6e4` = 0, `FUN_00421300(list, 3, "*U03_09")`,
+  `FUN_0041e2a0(actions +0x60 = M20, 1)`); tick while node `+0x60` = 0 and not
+  `FUN_00419c70(1)`; pause; voice playing → `RunFor(7000)`; `FUN_00420220(+0x6d4,
+  "Anim/U03_02/marche.A3D", "marche", 1, 1)`, `+0x68` = 0, `+0x78` = 15.0, paused,
+  `U03::AnimateTransition(+0x6d4, clip, 10, node frame, clip frame)`, running, frame += 1.0
+  per `RunFor(0)` until paused; hotspot vtable `+0x28("", 0, 1)` (`0x00421050`, E-0272;
+  vtable read at `0x00439a20`); `FUN_00414820(1, 1)`. `FUN_00420220(parent, path, name,
+  slot, active)`, `FUN_00420360(parent, name, exact)` returns the slot or 0 (MCP decompile).
+- **Method:** capstone and MCP decompile.
+- **Confidence:** proven.
+
+### E-0304 — `FlicSalut`: walk to (−489, −464) on the ground, `salut` in slot 2 with transitions both ways
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `0x00405e90`: suspend; `FUN_0041b440("*U03_09", 0)` local position;
+  target (−489, −464, eye z) through `U03::SnapToGround` (the 4.72 stored in the next slot
+  is overwritten by the polar yaw; stack traced `0x00405efd..0x00405fc7`);
+  `FUN_00420360(node, "AttenteHorloge", 1)` `+0x68` = 0; `FUN_00419620(eye, target, yaw,
+  dirYaw, pitch, π/2, 2000, 0)`; `FUN_00420220(node, "Anim/U03_09/salut.A3D", "salut", 2,
+  0)`; `U03::AnimateTransition(Attente, salut, 10, its frame, salut frame)`;
+  `FUN_00420080(salut, 1)` (type-0x32 node: `FUN_004201c0(parent, slot, 1)`), `+0x68` =
+  0, `+0x78` = 15.0, running; `RunFor(0)` until frame ≥ last − 10; transition back with
+  (−1, −1); Attente active, running, `+0x68` = 1; `RunFor(0)` while
+  `LSoundManager_IsGroupPlaying(2)`; resume.
+- **Method:** capstone.
+- **Confidence:** proven.
+
+### E-0305 — `DoCinematiqueFlic`: the Coordcam/Cine01 cutscene with cuts on Coordcam frames, then `U33.X3D`; `AnimateTransition` lerps translations
+- **Binary/file:** `MissionMonet.exe`, `x3d.dll`; `Data/U03/cinematiques/*`.
+- **Evidence:** `0x00406250`: suspend; `FUN_0041e2a0(actions +0x74 = M25, 0)`;
+  `FUN_00421300(list, 0, "*U03_08")`; inventory `+0x98` (hide the bar, E-0252);
+  `U03::LoadCinematique` (`X3d_Load_Sdk_o3d` `cinematiques/Coordcam.o3d` → `+0x6fc`,
+  `Cine01.o3d` → `+0x700`; `X3d_Load_Sdk_a3d` of each `.a3d`, `FUN_0041fc20(type 1)`,
+  `FUN_0041fe60(node, anim, obj, 15.0, loop 0, paused 1)`, frame 1.0, paused → `+0x708`
+  (Coordcam), `+0x704` (Cine01), appended at the end of node list `+0x158` via `+0x50`,
+  vtable `+0x24`, both objects hidden); the walk of `FlicSalut` with 800 ms; run `"M31"`
+  (`FUN_0041dea0(actions +4, "M31", 1)`, `FUN_0041e4b0`); `FUN_00420220(node,
+  "Anim/U03_09/REFLECTION.A3D", "refelction", 3, 1)`, transition (−1, −1), 15 fps, tick +
+  `Scene_RenderFrame` until frame ≥ last − 47, pause; `FUN_00419620(eye, eye, yaw, 3.17
+  (`0x004394e0`), pitch, π/2, 2000, 0)`; `RunFor(4500)`; `FUN_00420220(node,
+  "Anim/U03_09/GOTOHORLOGE.A3D", "vers horloger", 4, 1)`, loop 0, 15 fps, paused,
+  `DAT_00442628` = it; `U03::FindObjectInTree(+0x6fc, "*camera")`; both nodes frame 1.0 and
+  `FUN_0041fe90`; hide the clip's object (the policeman); duration = last / fps;
+  `FUN_00419620(eye, (−871.48, −584.464, *camera z), yaw, yaw, pitch, π/2,
+  ftol(duration)·1000, U03::CinematiqueWalkCallback)`. Callback `0x00406120`: step = 8 →
+  `X3d_Object_Unhide`, run; `DAT_00442628` set and last − 45 < frame → `FUN_0041e4b0(actions
+  +0x94 = M33)`, clear; aim at the global position of (`*camera` `+0x20`) `+0x24` via
+  `FUN_00419550`. After the walk: pending → M33; callback(…, 100, 100); tick + render
+  until the clip pauses; unhide `+0x700`, hide the policeman, run `+0x704`, `+0x708`;
+  node `*U03_08` running, `+0x68` = 0; d = (50.0 − X3D camera `+0x50`) · 0.05; loop while
+  `+0x704` runs: cuts at Coordcam `+0x74` > 1/132/186/278 for k = 0/2/3/5
+  (`0x00439460`, `0x00439554`, `0x00439550`, `0x0043954c`): `FUN_00419520(*camera global)`,
+  `FUN_00419580(camera, target)` (yaw/pitch of target − camera), k++, break at 6; > 240
+  (`0x004394c4`) and k = 4 → run `"M35"`, k = 5; > 20 and k = 1 → k = 2; `RunFor(0)`;
+  camera `+0x10` > 50 → `+0x10` and X3D `+0x50` += d. Then pause both, `RunFor(7000)`, run
+  both; `RunFor(0)` until frame ≥ 420 (`0x00439548`), one cut at > 360 (`0x00439544`)
+  with k = 6; wait for the voice group; strcpy `"U33.X3D"` (`0x0043f940`) to game `+0x14c`,
+  `SetAppMode(1)`, `U03::ReleaseCinematique`, `FUN_00414820(1, 0)`.
+  `U03::AnimateTransition` (`0x00406f90`): for i = 1..n: vtable `+0x24`,
+  `X3d_Object_Animate_Transition(obj, animA, fa, animB, fb, i/n, 1, 1)`, `RunFor(0)`.
+  In `x3d.dll` (`0x10001032`) it calls four per-track functions and, for t < 0.5,
+  `FUN_10004860` on both; the first (`FUN_10004d70`) samples each clip's translation keys
+  linearly between the bracketing keys and writes pa + t·(pb − pa) to the object's local
+  translation, recursing over children (last argument).
+- **Method:** capstone (stack traced by hand for the `FUN_00419620` arguments), MCP
+  decompile in both programs; `o3d.py`/`a3d.py` over the cinematic files (`Coordcam`:
+  `$$$DUMMY.Dummy01` with children `*Target`, `*camera`, 450 frames; `Cine01` 600 frames).
+- **Confidence:** proven for the flow; which child `+0x24` is: Q-0142; the other tracks of
+  the transition: Q-0143.
+
+### E-0306 — U03 corpus: INFOACT, INFOOBJ, objects, clips and sounds
+- **Binary/file:** `Data/U03/**`, `Data/U04/INFOACT.BIN`, `MissionMonet.exe`.
+- **Evidence:** `SCENE.BIN` (`binchunk.parse`): ambient 255/255/255, scale 45.0; camera FOV
+  90, radius 20, Z offset 40, speed 7. `infoact.py --file Data/U03/INFOACT.BIN`: ids 1, 2,
+  10, 20, 25, 30, 31, 33, 34, 35, 40, 45, 50, 51 with the steps and conditions tabled in
+  `u03.md`; M34 and M50 have trigger 0 and nothing runs them (no `M34`/`M50` string in the
+  EXE, no read of actions `+0x98`/`+0xd8` in U03's code, no op 14 naming them).
+  `infoobj.py`: 26 hotspots, hidden `*U03_06`, `*U03_24`, `*U03_26`, `*U03_29`. `o3d.py`
+  over `U03.x3d`'s `OBject=` files: no object for `*U03_07`, `17`, `18` (after the rename),
+  `19`, `21`, `25`..`29`, nor for `$$$DUMMY.Dummycolis` or `u03_18`; `*U03_06` only in
+  `Anim/U03_02/MAGIE.O3D` (loaded by no code or script); clown root `*U03_02` at
+  (−115.7, −667.4, 47.5), `*U03_01` at (645.7, 22.1, 41.4), `*U03_09` at
+  (−490.8, −421.9, 50.1), door `*u03_08` at (−859.5, −447.2, 59.5). `a3d.py` frames:
+  PARLENBOUCLE 1..200, salut 1..90, REFLECTION 1..170, GOTOHORLOGE 1..155, U03_09 marche
+  1..62, path 1..3000, magie 1..130, U03_02 marche 1..38, Jongleur 1..70, attente 1..250,
+  portehorl 0..100. Sounds (Python `wave`): `U03_01_01` 12.45 s, `_03` 14.02, `_04` 17.93,
+  `_04B` 27.68, `_05` 2.86, `_06` 3.81, `_07` 2.69, `_08A` 21.92, `_08C` 19.57, `_08D`
+  18.74, `_08E` 16.16, `_09` 2.06, `s2_01` 35.57, `s2_03` 21.26 (16-bit), `s2_04` 5.32,
+  `s2_05` 2.15. No EXE or INFOACT reference to `U03_01_02`, `U03_01_0506`, `s2_06`.
+  `U03_06` is used in U04 (M17, `UseCartePostale`). `U03D.X3D` is referenced only from
+  `Game_OpenGalleryView` (`0x0041346a`).
+- **Method:** the parsers named; byte search of the EXE; MCP xrefs.
+- **Confidence:** proven.

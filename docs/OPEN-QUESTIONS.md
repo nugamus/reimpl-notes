@@ -693,3 +693,48 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Next to try:** decompile the class created for `TableauJeu` and its `+0x114`; parse
   `2DFRA/TableauJeu.fra` with `fra.py`; spec it in `ui.md`.
 - **Status:** open
+
+### Q-0140 — What does the original do on a U03 restore made after the clown's trick?
+- **Context:** `u03.md`, E-0301, E-0303. U03 writes no unit chunk. On restore with M10
+  exhausted, `U03::StartUnit` only stops the path follow and skips the clown emitter: the
+  juggler model is loaded again (not `U03_02.O3D`), the `AttenteHorloge` clip is not
+  created, and M20's condition comes from the save. `FlicSalut` and `DoCinematiqueFlic`
+  then call `FUN_00420360(node, "AttenteHorloge", 1)` and write `+0x68` of the result
+  without a null check.
+- **What we checked:** the start and both handlers (capstone); `save.md` (no U03 chunk;
+  `OBJECTS` restores hotspot visibility, `ANIMATIONS` covers nodes, Q-0101). No trace.
+- **Blocks:** faithful restore of U03 mid-chain; the engine should rebuild the post-trick
+  state from M10 rather than crash.
+- **Next to try:** in the original, save after the trick, reload, click the policeman.
+- **Status:** open
+
+### Q-0141 — Can the clown's line end before `magie` passes frame 48, so that no postcard is given?
+- **Context:** `AnimeSpeakClown` gives `U03_06P` only inside a loop that runs while the
+  voice group plays (E-0303). `U03_01_04B` is 27.7 s and the frame is reached about 12 s in,
+  but if Enter stops the voice (generic talk skip) the loop may end without the card.
+- **What we checked:** capstone of `0x00405942..0x0040599c`; whether Enter stops the voice
+  there depends on the talk system's skip, not read for this.
+- **Blocks:** whether the engine must guard against a soft lock (U04 needs `U03_06`).
+- **Next to try:** in the original, hold Enter through the clown's second line and check
+  the inventory.
+- **Status:** open
+
+### Q-0142 — Which child of Coordcam's root does `+0x24` return: `*Target` or `*camera`?
+- **Context:** the cutscene aims at (`*camera` `+0x20`) `+0x24` (E-0305). `Coordcam.o3d`'s
+  root `$$$DUMMY.Dummy01` has children `*Target` then `*camera` in file order. Aiming at
+  `*camera` from `*camera` would be degenerate at every cut, so `u03.md` assumes `*Target`.
+- **What we checked:** `o3d.py` file order; the child-list order of `X3d_Load_Sdk_o3d`
+  (prepend or append) not read.
+- **Blocks:** nothing if the assumption holds; the cutscene's framing if not.
+- **Next to try:** decompile the child linking in `x3d.dll`'s o3d loader.
+- **Status:** open
+
+### Q-0143 — How does `X3d_Object_Animate_Transition` blend rotation, scale and visibility?
+- **Context:** E-0305: translation is a linear mix; three more per-track functions and a
+  t < 0.5 branch (`FUN_10004860` on both clips) are unread.
+- **What we checked:** `x3d.dll` `0x10001032` and `FUN_10004d70` only.
+- **Blocks:** exact poses during U03's 10-frame transitions (the clown's walk-off, the
+  policeman's salute and reflection).
+- **Next to try:** decompile `FUN_10005550`, `FUN_10005cf0`, `FUN_100069a0`,
+  `FUN_10004860` in `x3d.dll`.
+- **Status:** open
