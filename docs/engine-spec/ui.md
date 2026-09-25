@@ -113,7 +113,7 @@ Adding appends at the end; removing shifts every later item 70 px left.
 
 U01 gives the player `U02_01P` (a banknote) at `U01_Start` if the bar does not have it
 (runtime: the first slot shows it at the hand-over). The bar's contents are saved in a
-`PORTEF` chunk: u32 last index, then 30-byte names.
+`PORTEF` chunk: u32 last index, then 30-byte names. Saving, loading, `OptionSave`, `OptionLoad` and the lists: `save.md`.
 
 ## Players screen: frame `OptionUser` (E-0105)
 

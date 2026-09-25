@@ -24,6 +24,7 @@ A format is done only when its validator passes 100% of the corpus, every byte c
 | `.DMF` texture | 518 | `dmf.py` | `dmf.ksy` | E-0038 | done (`fb22`/`fb23` opaque) |
 | `.FRA` 2D frame | 25 | `fra.py` | `fra.ksy` | E-0100 | done (view `unk_7`/`unk_8`, list fields opaque) |
 | `.CFG` (`x3dcfg.cfg`) | 38 | `cfg.py` | `cfg.ksy` | E-0103 | done; not read by the game |
+| Save files (`Save/`, not corpus) | 9 samples | `savegame.py` | `savegame.ksy` | E-0180..E-0183 | done over the samples; `unk_*` fields open (Q-0101, Q-0103) |
 
 Loader rule learned the hard way: the engine formats (`.O3D`/`.A3D`/`.L3D`/`.C3D`/`.S3D`,
 and `.DMF` through the host's file callbacks, E-0038) are read by `x3d.dll`; the

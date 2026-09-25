@@ -49,3 +49,6 @@ desktop.ini
 
 # Captures of the original (game imagery, not ours to redistribute)
 traces/*.png
+
+# Save files copied from runs of the original (binary, machine-specific).
+traces/save/

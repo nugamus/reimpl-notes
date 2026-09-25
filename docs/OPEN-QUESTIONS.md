@@ -595,3 +595,39 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** nothing (the engine saves a relative time).
 - **Next to try:** restore a U02 save after a reboot in the original and time the first call.
 - **Status:** open
+
+### Q-0100 — Do the dimmed `OptionSave` buttons (Back, Main menu, Quit) react before the first save?
+- **Context:** E-0184. They start with their `…D` bitmaps and switch to `…N` after a save;
+  their `RCS@` commands are registered either way.
+- **What we checked:** the OK handler; the frame file; a run that saved before using them.
+- **Blocks:** menu fidelity only.
+- **Next to try:** open the save screen and click Back before saving; look for code that
+  disables `RCS@` on those views (`0x004323a0` "enabled").
+- **Status:** open
+
+### Q-0101 — Which animation nodes does `ANIMATIONS` cover, and what are node `+0x1cc`/`+0x1d0`?
+- **Context:** E-0183. The writer recurses through node `+0x50` only (E-0056 calls it the
+  child link; the tick also walks `+0x5c`), so nodes reachable only as siblings may be
+  missing. The reader does not skip an entry whose node is not found, so the rest of the
+  chunk would be misread. Two saved u32 per slot are unnamed (0xCD in the sample).
+- **What we checked:** the reader and writer; one sample with a single node.
+- **Blocks:** restore of scripted clips in units with several `*` nodes.
+- **Next to try:** a save in U02 after the magpie or clerk clips; `FUN_0041fe90` for the
+  tree walk; writers of node `+0x1cc`.
+- **Status:** open
+
+### Q-0102 — What does a player's saved unit number drive, and which number labels a players-list row?
+- **Context:** E-0181, E-0185. `USERINFO`'s u16 is read only by `0x00425c10` (via
+  `FUN_00414150`); the players list prints a counter before each name.
+- **What we checked:** the writer and the one reader's call site.
+- **Blocks:** nothing for U01; the gallery (if that is the reader) and list fidelity.
+- **Next to try:** decompile `0x00425c10`; snap `OptionUser` with two players, one with a
+  gap in the `User_<i>` indices.
+- **Status:** open
+
+### Q-0103 — What do U04's `PARAMS` and U07's `PLANCHE` save?
+- **Context:** E-0182: U04 unit `+0x6ec`, `+0x6e8`, `+0x6e4`; U07 unit `+0x6c8`.
+- **What we checked:** the chunk reader/writer only.
+- **Blocks:** saves in U04 and U07.
+- **Next to try:** writers of those unit fields in U04's and U07's code.
+- **Status:** open

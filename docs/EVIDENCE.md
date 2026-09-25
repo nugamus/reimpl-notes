@@ -2155,3 +2155,157 @@ An entry at `tentative` confidence must also have a matching line in
   `d1_12`..`d1_33` 1.1–8.7 s (lip `.BIN` for all but `d1_25`, `d1_25_2`).
 - **Method:** the parsers named; Python `wave`.
 - **Confidence:** proven.
+
+### E-0180 — Save files are the `.BIN` chunk container, written by a mirror of the reader
+- **Binary/file:** `MissionMonet.exe`; `Save/` samples of two runs (`traces/save/run0`,
+  `run1`, local).
+- **Evidence:** the stream object (`FUN_00414f10`, 0x694 bytes) opens with mode `rb`/`wb`
+  (`FUN_00414f70`, `0x004411b8` / `0x00441378`); writing: `FUN_00415090` begins a chunk
+  (`sprintf("#%s#")`, `0x0044137c`, copied with its NUL into a 20-byte table name, offset =
+  `ftell`, size 0; refuses a second begin before the end), `FUN_00415340` `fwrite`s and adds
+  to the chunk size, `FUN_00415180` ends it, `FUN_00415000` appends the table (count · 0x1c
+  bytes from `+0x114`) and the u32 count. The table buffer holds (0x68c − 0x114) / 0x1c =
+  50 entries. Reads (`FUN_004153a0`) fail past the current chunk's end, which the
+  variable-length readers use as their loop end. `savegame.py`: 2/2 `Gamesave.*` and 7/7
+  `*.bin` samples parse through `binchunk.parse`, every payload consumed; `--selftest`.
+- **Method:** MCP decompile; validator over the samples.
+- **Confidence:** proven.
+
+### E-0181 — Players and settings: `Info.bin` `CURRENT`, `User_<i>/Info.bin` `USERINFO`, `InfoPara.bin` `FILTER`
+- **Binary/file:** `MissionMonet.exe`; samples as E-0180.
+- **Evidence:** player list `DAT_0046ec10`: `FUN_00413910` reads `CURRENT` (u16, via
+  `FUN_00413ee0`, `%s/Info.bin` `0x004411f4` in the save root app `+0x36e`), scans
+  `%sUser_*` (`0x004411e8`) folders, index = `atoi` after the last `_`, reads `USERINFO`
+  (`0x004411cc`) name[64] into `+0xce + 64·i` and u16 into `+0x198e + 2·i`, counts in
+  `+6`, then selects `CURRENT` (`FUN_004140b0`: stores the index, rewrites `CURRENT`
+  with `FUN_00413fd0`, rebuilds the save list `XGameList` for `%sUser_%i//`).
+  `FUN_00413b40` (new player) `_mkdir`s `%sUser_%i` (`0x00441228`), logs `File Copy: %s\*.*`
+  to `%sInstall.log` when present, writes `USERINFO` (name, u16 0); `LUser_SelectUser`
+  passes the player count as the index. `Game_WriteSave` ends with `FUN_00413d70`, which
+  rewrites `USERINFO` with the game's unit number (`+0x160`); its only reader is
+  `FUN_00414150`, called from `0x00425c24` (in `0x00425c10`). `InfoPara.bin`
+  (`0x004415c8`): startup (`0x004174a0`, `MessageToUser.h:34`) writes `FILTER` from
+  `DAT_0046ec00 +0x20` when missing, else reads it and on change sets D3D render states
+  0x11 and 0x12 to 1 (value 0) or 2; exit (`0x004172a0`) rewrites it when it changed.
+  Samples: `CURRENT` 0 and 1; `FILTER` 1; `USERINFO` `Player's nameName` with 0, and 1
+  after a save in U01.
+- **Method:** MCP decompile; samples.
+- **Confidence:** proven.
+
+### E-0182 — Save and load: `Gamesave.<slot>`, chunk order, restore through `LoadUnitScene(name, 0, stream)`
+- **Binary/file:** `MissionMonet.exe`; `traces/save/run1/User_0/Gamesave.1`, `.3` (local).
+- **Evidence:** game vtable `0x00439894`: `+0xc` `Game_LoadSave` (`0x00412d00`), `+0x10`
+  `Game_WriteSave` (`0x00412e40`). Write: slot > 99 → 0, path `%sGamesave.%i`
+  (`0x0044110c`) in the save list's `+0x1a5c`; chunk `GAME` (`0x004410f8`): name 0x40
+  (game `+8`), u16 `+0x160`, scene 0x14 (`+0x14c`); scene vtable `+0xc`; `PorteF` `+0x9c`
+  (strip view 200, `+0x11c` = `0x00431fc0`, chunk `PORTEF`); close; `FUN_00413d70`. Load:
+  name `Game%i`, open, `GAME` into the same fields, `PorteF +0xa0` (strip `+0x120` =
+  `0x00432070`: clear, then add names), `LoadUnitScene(+0x14c, 0, stream)` (pushes at
+  `0x00412dfe..0x00412e07`), close. `LoadUnitScene` then sets game `+0x164` = 0, `+0x168` =
+  1, `+0x160` = unit, app `+0x488` = 1. Scene vtables (`+8` restore / `+0xc` write): base
+  `0x00439934` `Scene_RestoreState` `0x0041d490` / `Scene_WriteState` `0x0041d650`; U01
+  `0x00402a30`/`0x00402a90` (`TRAIN_CHANGED`), U02 `0x00404ad0`/`0x00404b50`
+  (`TIMEVENDEUSE`), U04 `0x0040b2c0`/`0x0040b330` (`PARAMS` `0x004400e0`: `+0x6ec`,
+  `+0x6e8`, `+0x6e4`), U06 `0x00410cf0`/`0x00410d10` (base only), U07
+  `0x004117b0`/`0x00411800` (`PLANCHE` `0x00440c74`: `+0x6c8`); U00, U03, U05, U33, U50
+  use the base. Base start `0x0041ae10` calls `+8(stream)` then `+0x2c`; `U01_Start`
+  with a = 0 calls `+0x4c("U01", 1)` instead of the prologue, then sets the sphere offset
+  and calls `0x0041ae10`. Writer order in `Scene_WriteState`: `SCENE`, cursor
+  (`FUN_00414c20`), actions (`FUN_0041eb20`), camera (`FUN_00418890`), `OBJECTS`
+  (`FUN_0041d6f0`), `ANIMATIONS` (`FUN_00420760`), gauge (`FUN_0041a820`); restore order in
+  `Scene_RestoreState`: `SCENE` (`FUN_0041b2f0`), cursor (`FUN_00414bc0`), camera
+  (`FUN_004187b0`), `Scene_LoadObjectInfo(stream)`, `ANIMATIONS` (`FUN_00420410`), gauge
+  (`FUN_0041a790`), `FUN_00414960(cursor, 0)`, `Scene_LoadActions`, actions
+  (`FUN_0041ea90`). Runtime: saving on the first row wrote `Gamesave.1` (10,552 bytes,
+  chunks `GAME SCENE CURSOR ACTIONS CAMERA OBJECTS ANIMATIONS TRAIN_CHANGED PORTEF`);
+  loading it from `OptionLoad` put the camera back at −466.36, −452.495, 30.48, 4.7,
+  1.5708 (`camera.ps1`) with the mayor holding out the card (`traces/save/s7-loaded.png`).
+- **Method:** MCP decompile; capstone; one live run (`to_u01.sh`, Escape, Yes, OK, a second
+  save, Main menu, Load, OK).
+- **Confidence:** proven.
+
+### E-0183 — Scene chunk payloads: cursor, action tables, camera, hotspots, animation slots, gauge, inventory
+- **Binary/file:** `MissionMonet.exe`; `Gamesave.1`.
+- **Evidence:** `SCENE`: scene `+0x16c`, 4 bytes (r, g, b to the ambient). `CURSOR`
+  (`0x00441358`): cursor `+0x4d8` (30), `+0x4d4`, `+0x4d0`; `FUN_00414910` (from
+  `SetAppMode` and two others) sets them to image `+0x2c`, 1, 1 when mode `+4` = 1;
+  `FUN_00414960` restores (`FUN_00414540(mode, image)`) and clears `+0x4d0`. `ACTIONS`
+  (`0x00441c14`): manager (scene `+0x198`) `+0x410` (0x400), `+0x810` (0x400), then for
+  each non-null `+0x10[id]`, id 0..255, action `+0x368` (0x100, the condition, set by
+  `FUN_0041e020` from record `+0x22`); `FUN_0041e2e0` treats `+0x410[id]` ≠ 0 as not
+  runnable and passes `+0x410` to `EvalActionCondition`; `FUN_0041e320` increments action
+  `+0x364` and stores it in `+0x810[id]`, `FUN_0041e3a0` sets `+0x410[id]` = 1 at
+  `max_runs`; `Scene_LoadActions` copies the tables into `+0x360/+0x364` only when
+  `+0x810[id]` > 0, and it runs before the chunk is read. `CAMERA` (`0x00441668`): camera
+  `+0x14` (16 bytes), `+0x34`, `+0x38`, `+0x64`, `+0x68`, `+0x40`, `+0x44`, `+0x70`,
+  `+0x5c`; the reader then calls `FUN_00419520`, `FUN_00419550` and
+  `X3d_Sphere_Set_Position`. `OBJECTS`: `FUN_0041d6f0` reloads `INFOOBJ.BIN` and per
+  record `FUN_00421170` writes object cursor (`+0x128`), `+0x5c` == 0 and, for the node of
+  that name, `+0x74`, `+0x60`, `+0x68`. `ANIMATIONS` (`0x00441b94`): per node reachable
+  through `+0x50` with `+0x7c` set, name starting `*` and `+0x1c8` ≠ 0: name `+0xc` (64),
+  `+0x1c8`, `+0x1ca`, then per non-null slot 1..15 of `+0x188`: u16 slot, `+0x84` (260),
+  `+0xc` (64), `+0x64`, `+0x60`, `+0x68`, `+0x6c`, `+0x70`, `+0x74`, `+0x78`, anim
+  `+0x38`, `+0x3c`, `+0x1cc`, `+0x1d0`; the reader finds the node by name (list `+0x14`),
+  cuts the path after `Data` (`0x00441610`) + 1 and prefixes the data root (app
+  `+0x26a`), `FUN_00420220(path, name, slot, +0x64 value)`, then the remaining fields, and
+  the active slot. `JAUGE` (`0x00441760`): gauge `+0x12` (30), `+0x34`, `+8`, `+0xc`,
+  written only while `+4` ≠ 0; reading sets `+4` = `timeGetTime` when `+0xc` > 0.
+  `PORTEF` (`0x00442584`): strip `+0x34` (last index, −1 without a list, `0x004348b0`),
+  then each item's name (30). Sample values: ambient 255, 255, 255; exhausted[1] = 1; 23
+  condition blocks (U01 `INFOACT.BIN` has 26 records); camera can move 0, can turn 0,
+  collide 1, eye height 60, sphere 20 / 37; 25 hotspots; one node `*U01_02` with slot 1
+  `GiveCard` (`…/U01_02/Action03.A3D`, paused, frame 25, fps 15, frames 1..25); no gauge;
+  `PORTEF` `U02_01P`. Bears on Q-0091 (slot clips survive a save when their node is a
+  `*` node).
+- **Method:** MCP decompile; capstone; `savegame.py --dump`.
+- **Confidence:** proven for layout and order; `unk_1cc`/`unk_1d0` and the traversal limit
+  are Q-0101.
+
+### E-0184 — `OptionSave` / `OptionLoad`: slot lists, name edit, OK handlers
+- **Binary/file:** `MissionMonet.exe`; `Data/2DFRA/OptionSave.fra`, `OptionLoad.fra`;
+  `INSTALL/02_PR/Message.txt`.
+- **Evidence:** `RegisterFrameCommands` pushes `OptionSelectSave` → `0x0042b200` (option
+  screen `+0x40` = `0x00427470`), `OptionSelectGame` → `0x0042b1e0` (`+0x3c` =
+  `0x00427280`), `OptionSave3D` → `+0x44` (`0x004275b0`: close, `+0xc4`),
+  `OptionSaveSommaire` and `OptionScreen` → `0x0042b490` (`+0x38`, the Option menu),
+  `SaveQuit` → `0x0042b160` (`+0x20`, `OptionQuitter`). `0x00427470`: slot = save list
+  (`DAT_0046ec74`) `+0x12c` (= `+0x11c`), name = view 11 text, `Game_WriteSave`,
+  `XGameList_59`, list refresh, then views 2, 3, 5: the bitmap name's character 5 before
+  the end (`…D.BMP`) := `N`. `0x00427280`: slot = load list (`DAT_0046ec70`) `+0x13c`
+  (`0x004280f0`: the `+0x11c`-th used slot), −1 → nothing, else `Game_LoadSave`, close,
+  `+0xc4`. `XGameList_59` (`0x004136b0`, `XGameList.cpp:59`): clears 99 used flags
+  (`+0x10`) and names (`+0x19c`), scans `%sGamesave.*`, slot = `atoi` after the last `.`,
+  `fread` 0x40 bytes from offset 0 as the name, newest by `ftLastWriteTime.dwLowDateTime`
+  into `+8` (default 1), count `+0xc`. Save list `#SAV` (`0x004282b0`): 98 rows
+  (`+0x8c` = 32 · 0x62); iterator `0x004283f0` steps the slot and turns 0 into 1; initial
+  selection `0x00428450` = first free slot from 1 (< 98), scrolled into view. Load list
+  `#LOA` (`0x00428010`): iterator `0x004280b0` skips unused slots; rows = count.
+  Row drawing `0x00427b60`: rows 32 px (`DAT_004421d0`), width `+0x1c` − 38
+  (`DAT_004421d4`), `sprintf("%i", slot + 1)` + `" - "` (`0x00442258`) + name, or message 1
+  (`FUN_0042a3c0(1)`, `Message.txt` beside the EXE: `Empty`); `SetTextColor` 0x5ac4f7 for
+  the selected row else 0xebba87, `DrawTextA` flags 0x925; surface colour key 0x502020
+  (`LOptionScreen.cpp:588`). `Message.txt`: 300 `Save without name`, 301 `Player's name`.
+  Runtime (`traces/save/s2`..`s7`, local): the save screen showed rows `2 - Empty` …
+  `10 - Empty`, the first highlighted, edit `Save without name`, Back/Main menu/Quit dim;
+  typing ` A` and OK wrote `Gamesave.1` named `Save without name A` and brightened the
+  three buttons; clicking the third row and typing `B` wrote `Gamesave.3` named
+  `Save without name AB`; the load screen listed `2 - Save without name A` and
+  `4 - Save without name AB`, none selected, OK dim until a row was clicked.
+- **Method:** MCP decompile; capstone; `fra.py`; one live run (the one of E-0182).
+- **Confidence:** proven.
+
+### E-0185 — The players list: rows as the save lists; a click copies the name into the edit
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `#USc` (`0x00429510`, list `DAT_0046ec78`, vtable `0x0043a784`): iterator
+  `0x00429eb0` skips indices whose used flag (player list `+8 + 2·i`) is 0; draw
+  `0x00429bf0` uses row height `0x00442268` = 32, width − 38 (`0x0044226c`), `"%i"` +
+  `" - "` + name, the same two text colours, `DrawTextA` 0x925, colour key 0x502020. Click
+  `0x00429f10`: row → `+0x11c`, redraw, `+0x140` = `0x0042a050`: walk to the row-th used
+  player and set view 11's text to its name, then `+0x144` = `0x0042a0e0` (edit changed):
+  empty text → OK view (id 2) bitmap `…N`, no selection; else `…M`, select the row whose
+  name matches (`+0x138`) and scroll to it. `LUser_SelectUser` is reached only through the
+  `SelectUser` command.
+- **Method:** capstone of the methods named.
+- **Confidence:** proven for the logic; the number printed before the name (the counter
+  passed to `sprintf` at `0x00429d72`) is not traced (Q-0102). Answers Q-0061 except the
+  scroll bar.
