@@ -317,3 +317,42 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Next to try:** the object class vtable in `x3d.dll` (`+0x6c`: `+0x10` camera type,
   `+0x14` LOD pick); what `+0x50` does in `xd3d.dll`'s face setup.
 - **Status:** open
+
+### Q-0022 — What frame rate did the original run at, so what are its turn and pitch rates per second?
+- **Context:** E-0046: turning and pitching step 0.06 rad per rendered frame; nothing in the
+  EXE caps the frame rate (only the flip in `h3d.dll` or the driver can).
+- **What we checked:** the main loop and `Scene_RenderFrame` (no Sleep, no timer wait); no
+  traces yet.
+- **Blocks:** a faithful per-second turn rate in the engine (it uses a provisional tick).
+- **Next to try:** in the original, hold Right for 10 s in U01 and count full turns
+  (dgVoodoo caps at 60 fps, `traces/INDEX.md`); read `H3d_Show_BackBuffer`'s flip flags.
+- **Status:** open
+
+### Q-0023 — Which side of a face is its front for collision?
+- **Context:** E-0048: sphere and segment tests use face `+0x40` (`+8` plane normal, `+4`
+  edge normals) and are one-sided.
+- **What we checked:** the collision exports only, not where `x3d.dll` builds `+0x40`.
+- **Blocks:** correct wall, floor and ceiling tests (the engine must derive the normal from
+  the `.O3D` vertex order).
+- **Next to try:** the `.O3D` loader's face setup in `x3d.dll`; check against U01 floor faces
+  (their normals must point up for the ground ray to hit).
+- **Status:** open
+
+### Q-0024 — How does `X3d_Scene_Pick_Object` pick, and where do hotspots and actions come from?
+- **Context:** E-0051: the pick goes through the renderer's vtable `+0xc`; hotspots are named
+  after `$` in object names and looked up in scene `+0x1a0`; actions are queued and
+  dispatched by name.
+- **What we checked:** the EXE side of hover and click only.
+- **Blocks:** mouse interaction in U01, including the `TakeCard` click that starts free
+  movement (E-0050).
+- **Next to try:** the pick method in `xd3d.dll`; the hotspot list's loader (scene `+0x1a0`)
+  and `FUN_0041b700`'s queue (scene `+0x198`).
+- **Status:** open
+
+### Q-0025 — Minor camera and collision fields
+- **Context:** `Camera_DistanceAhead` also skips objects with object `+0x40` ≠ 0; each walk or
+  turn step sets camera `+0x50` and calls `FUN_004147a0(cursor, 1, 0)` and `FUN_0041bf30`
+  (3D sound update); which units enable run (`+0x48`) and jump (`+0x4c`), E-0047.
+- **What we checked:** the call sites only.
+- **Blocks:** nothing in U01 beyond the halved speed near walls and the cursor while moving.
+- **Status:** open

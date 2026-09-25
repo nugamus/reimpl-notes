@@ -733,3 +733,133 @@ An entry at `tentative` confidence must also have a matching line in
 - **Method:** byte search of the binaries, MCP xrefs and decompiles.
 - **Confidence:** proven for the mapping; that the types are billboard modes (face the
   camera around all axes / Z / X and Z) is inferred from the names.
+
+### E-0046 — One logic step per rendered frame; movement is scaled by a QueryPerformanceCounter frame rate, turning is not
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** the main loop in `WinMain_Boot` (`0x00416e64`..`0x00416ea3`, capstone) calls,
+  per iteration after the message pump `FUN_00416990`, scene vtable `+0x24`, `+0x1c`, and,
+  if app `+0x480` is 0, `+0x40`. U01's vtable is `0x00439468` (stored by the constructor at
+  `0x00402afa`; `+4` is `FUN_0041d340`, E-0039): `+0x24` `FUN_0041c350` (animation and sound
+  tick), `+0x1c` `U01_UpdateFrameLogic` (`0x00402f70`, calls `Scene_RenderFrame` first),
+  `+0x40` `Scene_HandleInput` (`0x0041b7f0`, calls `Camera_HandleKeys`). `Scene_RenderFrame`
+  (`0x0041b130`) renders (`X3d_Render`), then `QueryPerformanceCounter` into scene `+0x128`
+  and sets scene `+0x144 = frequency / (counter − scene +0x120)` (frequency from
+  `QueryPerformanceFrequency` at `+0x130`, set with the first counter in `XScene::XScene_124`
+  `0x0041acf0`), copies the counter to `+0x120`, and presents (`H3d_Show_BackBuffer`). No
+  `Sleep` or wait in the loop. `Camera_SetWalkVelocity` (`0x00418b60`) divides by
+  `max(+0x144, 8.0)`; `FUN_00418d30`/`FUN_00418d00`/`FUN_00418d60`/`FUN_00418da0` add
+  camera `+0xc · 0.06` per call with no time factor. `Scene_RunFor` (`0x0041bf70`): with
+  ms = 0 one `FUN_0041c350` + `Scene_RenderFrame` + pump, otherwise repeated until
+  `timeGetTime` has advanced ms.
+- **Method:** MCP decompile; capstone disassembly of the loop; vtable read with `pefile`.
+- **Confidence:** proven for the order and formulas. The real frame rate of the original
+  is not known (Q-0022).
+
+### E-0047 — Keyboard camera: key table, bindings, speeds, turn and pitch steps, head bob
+- **Binary/file:** `MissionMonet.exe`, `x3dmp5.dll`.
+- **Evidence:** the window procedure (`0x00416650`) sets `0x0046e7e0 + vk·4` to 1 on
+  WM_KEYDOWN (`0x00416877`) and to 0 on WM_KEYUP (`0x00416860`). `Camera_HandleKeys`
+  (`0x00418970`) reads, in order: `0x0046e824` (VK 0x11 Ctrl; with camera `+0x48` sets mode
+  `+0x54` = 1), `0x0046e960` (0x60 Numpad 0 → `Camera_Crouch`), `0x0046e820` (0x10 Shift →
+  `Camera_Jump`), `0x0046e878` Up → `FUN_00418c70`, `0x0046e880` Down → `FUN_00418cb0`,
+  `0x0046e87c` Right → `FUN_00418d30`, `0x0046e874` Left → `FUN_00418d00`, `0x0046e864`
+  PgUp → `FUN_00418d60` and `0x0046e868` PgDn → `FUN_00418da0` (both only without Ctrl).
+  Up/Down need camera `+0x40`, set `+8` to 2.0 (`DAT_00441660`) / to half of it when equal,
+  call `Camera_SetWalkVelocity` (1 / 0), `Camera_HeadBob` (`0x00418f60`) and
+  `FUN_00418fd0`. Turns and pitches need `+0x44`; pitch is stepped only while
+  `+0x38 < 2.7` (up) or `> 0.6` (down). `Camera_SetWalkVelocity`:
+  `X3d_Convert_From_Polar(a, e)` (`x3dmp5.dll` `0x10001450`: (cos a·sin e, −sin a·sin e,
+  −cos e)), normalised; step = `+8 · scene+0x138 / max(fps, 8)`, halved when
+  `Camera_DistanceAhead` (`0x00419dc0`) < 2·`+0x64`; ×2 for mode 1, ×0.25 for modes 2 and
+  4, ×0.5 for mode 3; writes only velocity x, y (`+0x24`, `+0x28`). The constructor
+  `FUN_004184b0` sets `+0xc` = 1.0, `+0x10` = 90, `+0x40` = `+0x44` = 1, `+0x48` = `+0x4c`
+  = 0, `+0x58` = 1, `+0x70` = 1. `Camera_HeadBob`: global roll `0x0046ec30 += 0x00441664 /
+  fps` (1.0), clamped to ±0.4 with the rate's sign flipped at the clamp, stored as X3D
+  camera `+0x4c` (roll, degrees, E-0040). `U01_Start` sets the sphere Z offset to 37.0
+  (`FUN_00419d00`); the camera init runs earlier, from `XScene::XScene_124`. Camera `+0x48`
+  and `+0x4c` are written only at `0x00407d43`, `0x00409575`, `0x0040957e`, `0x0040977f`,
+  `0x00409788` (outside U01's code).
+- **Method:** MCP decompile; capstone read of the window procedure and `x3dmp5.dll`;
+  byte scan for camera-field writes after a load of scene `+0x14c`.
+- **Confidence:** proven.
+
+### E-0048 — Collision: sphere slide against every non-flagged object, then a downward ray snaps the eye to ground + eye height
+- **Binary/file:** `MissionMonet.exe`, `x3d.dll`.
+- **Evidence:** `Camera_HandleKeys` ends with position += velocity when camera `+0x70` is 0,
+  else `Camera_ApplyVelocity(1)` (`0x00419d30`): `Camera_SlideSphere` (`0x00419f70`: centre
+  = eye − (0,0,`+0x68`) + velocity → `Sphere_ResolveAgainstScene` `0x0041a050` → + offset),
+  then `Camera_FollowGround` (`0x0041a270`): segment eye → eye − (0,0,10000) against every
+  face, keeps the highest hit; ≤ 1.3·`+0x5c` below → z = hit + `+0x5c`, return 0; else
+  `Camera_Fall` (`0x00419390`: z = z₀ − t²·scale·5.9 until the drop is covered, then
+  `%s/SAUT.WAV` (`0x00440cc4`) if camera `+0x58` and drop > 1.5·scale), return 2 → slide
+  again; no hit → 3. Velocity is zeroed after. `Sphere_ResolveAgainstScene` walks
+  `X3d_Scene_Find_First_Object` / `_Next_Object(scene, 1)` (depth-first over children,
+  `x3d.dll`), skips objects with `+0x118` ≠ 0 or failing `X3d_Object_Check_Sphere_Collision`
+  (world bounding sphere vs sphere), and per face calls `X3d_Sphere_Face_Collision(…, 2)`:
+  signed plane distance must be in (0, r); inside all edge planes → contact = projection,
+  return 2; else nearest edge/vertex point, return 1 if closer than r. On 1 the push normal
+  is normalize(centre − contact), on 2 `X3d_Face_Get_Collision_Normal` (face `+0x40` `+8`);
+  if its z ≥ cos(π/4) or ≤ −cos(π/4) the function returns at once, else centre = contact +
+  normal·r. `X3d_Line_Face_Collision(…, 2)`: the endpoints' plane distances must have
+  opposite signs with the start ≥ 0, and the crossing point inside every edge plane.
+  `X3d_Object_Hide` sets object `+0x5c`, not `+0x118`; `+0x118` is written only by unit
+  code, e.g. U01 `0x00401175` on `X3d_Scene_Get_Object(scene, "Box203")` (also hidden),
+  `0x0041000c` on `ColPorte1`.
+- **Method:** MCP decompile of the EXE functions and the four `x3d.dll` exports; capstone
+  scan for `+0x118` stores.
+- **Confidence:** proven for the algorithm. Which side a face's normal points to (vertex
+  winding) is open (Q-0023).
+
+### E-0049 — Jump, crouch, headroom and the `XHELP` debug mode
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `Camera_Jump` (`0x00419000`, needs camera `+0x4c` and `+0x40`): mode
+  `3 − (mode ≠ 1)`; Up/Down sampled once with `GetAsyncKeyState`; loop t += Δ`timeGetTime`
+  / 1000, z = z₀ + scale·t − t·scale·t·0.5 (ends when negative), returns if eye z minus
+  `FindGroundBelow` (`0x00415f40`, via `0x00416000`) < `+0x5c` or `HasHeadroom` fails,
+  slides, sets the position, `Scene_RunFor(0)`; at the end clears velocity, mode and
+  `+0x50` and sends WM_KEYUP. `Camera_Crouch` (`0x004191e0`): mode 4, offset
+  `scale·0.5 + 3 − r − 1`, height `scale·0.5 + 3`, `Camera_MoveTo(1000)` down by the height
+  difference; loop until Numpad 0 is up and `HasHeadroom`, then `Camera_MoveTo(2000)` up and
+  restore. `HasHeadroom` (`0x0041a3f0`): segment eye → eye + (0,0,10000), lowest hit, true if
+  ≥ 0.4·scale above. `CheckDebugCode` (`0x0041b780`), called on every WM_KEYUP, matches
+  `XHELP` (`0x004417d0`) and sets game `+0x16c`, which gates Insert (`+0x70` toggle), the
+  Ctrl debug keys in `Camera_HandleKeys` and the overlay `FUN_0041c690` in
+  `Scene_RenderFrame`.
+- **Method:** MCP decompile.
+- **Confidence:** proven.
+
+### E-0050 — Scripted camera moves are frame-counted lerps; U01 hands over with movement disabled until `TakeCard`
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `Camera_MoveTo` (`0x00419860`): 100.0 (`0x00439444`) means keep yaw
+  (`+0x34`), pitch (`+0x38`), FOV (`+0x10`); N = ftol(ms · scene `+0x144` · 0.001
+  (`0x00439908`)), minimum 1; angles `fmod`-reduced, +2π when negative, short way; per
+  frame adds the deltas, `+0x24` tick, `Scene_RenderFrame`, `FUN_0041bf30`, pump; then sets
+  the targets. `FUN_00419bc0` / `FUN_00419c00` turn toward an object's global position.
+  `U01_Start` (`0x00401230`) after E-0041: `Scene_RunFor(1500)`, app `+0x484` = 0,
+  look at `TETE` (`0x0043f0a8`) 1000 ms, `MoveTo(2500, (−405.67, −494.31, 29.5), 2.9)`,
+  `MoveTo(800, (−468.4, −481.3, 29.5), 1.76)`, voice wait (Enter), `RunFor(1000)`,
+  `_U01_03`, look at `TETE` 1000, `RunFor(400)`, `MoveTo(1400, (−466.36, −452.495, 30.48),
+  4.7)`, `MoveTo(1800, same, 4.7, 1.4908, fov 45)`, camera-animation wait (Enter),
+  `MoveTo(600, current, keep, π/2, saved fov)`, `GiveCard`, camera `+0x40` = `+0x44` = 0,
+  app `+0x484` = 1. `0x00401d30` (referenced from `0x00439400`) on action `TakeCard`
+  (`0x0043f224`) calls `0x00401fb0`, which waits for an animation and sets `+0x40` = `+0x44`
+  = 1 (`0x00402020`, `0x0040202d`).
+- **Method:** MCP decompile; floats decoded with Python.
+- **Confidence:** proven for the sequence and constants; the animations' content is not
+  covered.
+
+### E-0051 — Hover picks through `X3d_Scene_Pick_Object` within 4 · scale; clicks are rate-limited and dispatched by action name
+- **Binary/file:** `MissionMonet.exe`, `x3d.dll`.
+- **Evidence:** WM_MOUSEMOVE → `App_OnMouseMove` (`0x00417ca0`) → scene `+0x38` → `+0x44`
+  `Scene_PickHover` (`0x0041b540`); WM_KEYUP also calls `+0x44` at `GetCursorPos` /
+  `ScreenToClient`. `Scene_PickHover`: `X3d_Scene_Pick_Object(scene, x, y, &obj, &dist)`
+  (delegates to the renderer object's vtable `+0xc`, `x3d.dll` `0x100016c7`); no pick if
+  dist > scene `+0x138 · 4`; `FUN_0041b6a0` walks parents (`+0x20`) to a name containing `$`
+  and looks the rest up in the hotspot list (`+0x1a0` vtable `+0x14`); `FUN_0041b600` sets
+  the cursor. WM_LBUTTONDOWN → `App_OnLButtonDown` (`0x00417c10`): needs app `+0x480` and
+  `+0x47c` = 0 and ≥ 1000/fps + 10 ms since the last click (app `+0x490`), then scene
+  `+0x30`; U01's is `U01_DispatchClickActions` (`0x00403340`): `FUN_0041b700` (hover, then
+  queue the hotspot's action), then drain the queue comparing names (`ClickControleur`,
+  `ClickGuichetier`, …, `MonterDansTrain`).
+- **Method:** MCP decompile; capstone read of the window procedure.
+- **Confidence:** proven for the flow; picking internals and hotspot data are open (Q-0024).
