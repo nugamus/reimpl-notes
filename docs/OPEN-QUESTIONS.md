@@ -415,7 +415,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   (z) < 100.
 - **What we checked:** the handler only.
 - **Blocks:** one alternate way onto U01's roof.
-- **Status:** open
+- **Status:** resolved by E-0084 (`+0x460` is action 20's exhausted flag)
 
 ### Q-0070 — Why do the lip tables not match their voices' lengths?
 - **Context:** E-0126: 28 of 81 tables run past the `.wav`, others stop seconds early.
@@ -456,4 +456,24 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   `telgrisi2.wav` has no reference found. Their triggers were not followed.
 - **Blocks:** U01's sound completeness, not the sound system.
 - **Next to try:** xrefs to those strings; the handlers owning `0x004017f3`, `0x0040188f`.
+- **Status:** open
+
+### Q-0045 — Which U01 objects become `Box203` and `*U01_21`?
+- **Context:** E-0080. The renames depend on the order of X3D's top-level object list
+  (newest first). If every `.O3D` root enters that list once, `Box203` is INTCAB's `Box20`
+  and the renamed `Box31` is `U01_21.O3D`'s (the switch); `u01.md` assumes that.
+- **What we checked:** `X3d_Scene_Get_Object`, `X3d_Object_Get_Son`,
+  `X3d_Scene_Add_Object`; not how `X3d_Load_Sdk_o3d` adds a file's objects.
+- **Blocks:** which object U01 hides and which one is the switch hotspot.
+- **Next to try:** trace `X3d_Scene_Get_Object` return values at U01 load and read the
+  names at those addresses.
+- **Status:** open
+
+### Q-0046 — What do the frame manager's `+0xb8` → `+0x90` / `+0xa8` do with `U02_01P`?
+- **Context:** E-0081: U01's entry calls `+0x90("U02_01P")` and, when it returns 0,
+  `+0xa8("U02_01P")`. `Data/2dbit/U02_01P.BMP` exists; `*P` bitmaps are inventory
+  pictures (Q-0041).
+- **What we checked:** the call site only.
+- **Blocks:** the starting inventory (probably "add the item if missing").
+- **Next to try:** decompile the object returned by `0x00426a40` and its `+0x90`, `+0xa8`.
 - **Status:** open

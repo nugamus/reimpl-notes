@@ -1392,3 +1392,192 @@ An entry at `tentative` confidence must also have a matching line in
   on scene `+0x174`, `Scene_RunFor(20)`.
 - **Method:** Python RIFF walk over the corpus; `infoact.py --file`; capstone.
 - **Confidence:** proven.
+
+### E-0080 — U01's load hook renames the switch, the `Box20` family, `tige` and `*U01_08P`; X3D's object list is newest first
+- **Binary/file:** `MissionMonet.exe`, `x3d.dll`; `Data/U01/U01.X3D`, `Data/U01/**/*.O3D`.
+- **Evidence:** U01 vtable `+0x10` (`0x00401050`, after `XScene_124`): the object found by
+  `X3d_Scene_Get_Object("Box31")` gets the name `*U01_21` (`0x0040108a`), the node found as
+  `Object07` in the node list (scene `+0x158` vtable `+0x14`) gets `*U01_21` at node `+0xc`;
+  a loop (`0x004010f8..0x0040114b`) finds `Box20`, copies `sprintf("Box20%i", ++i)` over
+  its name and looks `Box20` up again until none is left; `Box203` gets `+0x118` = `+0x114`
+  = 1 and `X3d_Object_Hide`, `Cylinder07` is hidden (E-0060); `tige` is renamed `*U01_12`,
+  `*U01_08P` `*U01_08`; unit `+0x6e4` = 0 (the constructor `0x00401000` also sets `+0x6e8`
+  = 0). `X3d_Scene_Get_Object` walks the scene list (`+0x2c` next) and in each root
+  `X3d_Object_Get_Son` (case-sensitive `strcmp`, self, then children `+0x24` and siblings
+  `+0x28` depth first); `X3d_Scene_Add_Object` prepends. Corpus (`o3d.py`): `Box20` is in
+  PTITRAIN, INTCAB, RAILS, PLDV (U01.X3D order), `Box31` in U01, PTITRAIN, RAILS,
+  `U01_21.O3D`; no file has `Box203`. Unit vtable `+8` (`0x00402a30`) / `+0xc`
+  (`0x00402a90`) read / write chunk `TRAIN_CHANGED` (`0x0043f2a4`): u32 `+0x6e4`, u32
+  `+0x6e8`.
+- **Method:** capstone with strings resolved; MCP decompile of the x3d.dll functions.
+- **Confidence:** proven for the renames and list order; which object becomes `Box203`
+  follows from the load order only if every root enters the list once (Q-0045).
+
+### E-0081 — `U01_Start` in full: talkers, ambient, the `d1_01` / M01 talks; the wait E-0050 calls "camera animation" is the talk wait
+- **Binary/file:** `MissionMonet.exe`; `Data/U01/INFOACT.BIN`, `Data/U01/Sound`.
+- **Evidence:** `U01_Start` (`0x00401230`, capstone): `PlayVideo("Prologue")` or (restore)
+  vtable `+0x4c("U01", 1)`; `FUN_00419d00(37.0)`; `FUN_0041ae10` (vtable `+8`, `+0x2c`);
+  vtable `+0x28` = `XSceneAnim::XSceneAnim_157` twice with ("U01_01", "",
+  "$$$DUMMY.*01SParle", 0, 8, 0) and ("U01_02", "", "$$$DUMMY.*02SParle", 0, 8, 0); unit
+  `+0x6d0`/`+0x6d4` = node/hotspot `*U01_02`, `+0x6c8`/`+0x6cc` `*U01_01`, `+0x6dc` hotspot
+  `*U01_20`, `+0x6d8` = `FUN_00420190(*U01_20)` (the node's active slot); if `+0x6e8`,
+  camera `+0x3c` = the `*U01_20` object; `+0x6e0` = (`*U01_21` node frame ≥ 2.0,
+  `0x00439428`); `FUN_00421330(*Ernest object, 1)` sets `+0x118` on it, its children and
+  siblings recursively; `FUN_0041b440("Tapiroug*" match, 0)` → `+0x114` = 1. New game:
+  `+0x4c("U01", 1)`; `FUN_00414820(cursor, 0, 0)` (app `+0x480` = 1, the suspend flag of
+  E-0046/E-0051); `FUN_00421300` cursor 0 on `*U01_02`, `*U01_01`; `DAT_0046ec1c` vtable
+  `+0xb8` → `+0x90("U02_01P")`, if 0 `+0xa8("U02_01P")`; camera E-0041; `RunFor(1500)`;
+  scene `+0x13c` = 0, app `+0x484` = 0; `FUN_004215f0(talkers, "U01_01", "d1_01")`;
+  `LookAt(1000, FUN_0041b4c0(*U01_01 object, "TETE", exact))`; two `MoveTo` (E-0050);
+  voice-emitter wait (`+0x178`, Enter); `RunFor(1000)`; `FUN_0041e4b0(actions +0x14)`.
+  The action manager (scene `+0x198`) keeps action pointers at `+0x10 + id·4`
+  (`Scene_LoadActions` `0x0041dc9e`), so this runs M01 (`Marsaillaise` op 13, `d1_02` op 1
+  on `U01_02`) and counts it (`FUN_0041e320`). Then `*U01_03` running; `LookAt(1000, TETE
+  under *U01_02)`; `RunFor(400)`; FOV saved; two `MoveTo`; loop while
+  `DAT_00442640 + 0x168` ≠ 0 and Enter up. `+0x168` is the current talker: `FUN_004215f0`
+  stores it (`DAT_00442640[0x5a]`), `FUN_00421730` (talk stop) clears it, `FUN_0041c350`
+  ticks it. Then stop `+0x178` and `+0x174`, pause `*U01_03`, `MoveTo(600, keep, keep, π/2,
+  saved)`, `GiveCard`, camera `+0x40` = `+0x44` = 0, app `+0x484` = 1, `*U01_01` cursor 3,
+  scene `+0x13c` = 1, `FUN_00414820(cursor, 1, 1)`. Corpus: `d1_01.WAV` 23.43 s (no
+  `.BIN`), `d1_02.WAV` 41.60 s, `Marsaillaise.WAV` 9.0 s.
+- **Method:** capstone of `0x00401230..0x0040178e` with strings and floats resolved; MCP
+  decompile of the helpers named; `infoact.py --file`; Python `wave`.
+- **Confidence:** proven. Supersedes E-0050's "camera-animation wait (Enter)" (it is the
+  talk wait) and answers the `+0x168` part of Q-0026.
+
+### E-0082 — U01's per-frame hook: a 20-second gauge started by the phone call; expiry plays "caught" and opens `OptionLoad`
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** U01 vtable `+0x1c` (`0x004017a0`) calls `Scene_RenderFrame`, then
+  `FUN_0041a6c0(scene +0x148, 1)`: true once when gauge `+0x30` ≥ 1.0, resetting it
+  (`FUN_0041a680`: `+4`, `+0x10`, `+0x30` = 0). The gauge (save chunk `JAUGE`,
+  `0x00441760`; `FUN_0041a820`/`FUN_0041a790`): `FUN_0041a560(seconds, visible, name, id)`
+  sets duration `+8` = ⌊seconds⌋·1000, start `+4` = `timeGetTime`, elapsed `+0xc` = 0;
+  `Scene_RenderFrame` calls `FUN_0041a5d0` only while `+4` ≠ 0 (`0x0041b1bc`), which
+  accumulates elapsed, sets `+0x30` = elapsed / duration and, below 1.0 and if visible,
+  fills (`FUN_0041a700`, DirectDraw `Blt` colour fill of a RECT) (9, 9, 111, 21) with
+  0x808080 and (10, 10, 110 − ftol(100·p), 20) with 0xFF. The only start in U01 is
+  `0x004024ca` (`20.0`, visible 1); `MonterSurToit` resets it (`0x0040268c`). On expiry:
+  `FUN_00414820(0, 0)`, app `+0x488` = 0, `+0x50("S1_10", eye)`, wait `+0x174`, hotspot
+  list `+0x28("*Ernest", 1, 0)` (`0x00421050`: show, `+0x118` = 0), `LookAt(100, *U01_07
+  object)`, door node `FUN_004200c0(2.0)`, `0x00402050` (OpenDoor), `+0x48("s1_11", eye)`,
+  wait for the door node's `+0x60`, `MoveTo(1000, (486.059, −107.99, 24), 0.0831, 1.95)`,
+  `MoveTo(2000, none, 0.1631, 2.19, 35)`, `FUN_0041bfd0(2000)` (N = ftol(ms · fps ·
+  0.001) steps lowering ambient `+0x16c..+0x16e` by start/N via `FUN_0041b2f0`,
+  `RunFor(10)` each, app `+0x488` = 0 then 1), then game object (`DAT_0046ec18`, vtable
+  `0x00439894`) `+0x14` = `FUN_004135b0`: stop all sounds, frame manager
+  (`DAT_0046ec1c`, vtable `0x00439e5c`) `+0xc0(2)` = `FUN_004266c0` → `FUN_00426ea0`
+  loads frame `OptionLoad` and sets app mode 2.
+- **Method:** capstone and MCP decompile of the functions named.
+- **Confidence:** proven. The fill colour's channel order (red) is inferred.
+
+### E-0083 — U01's input hook rides the train while the eye stands on `*U01_20`
+- **Binary/file:** `MissionMonet.exe`; `Data/U01/Anim/U01_20*.A3D`, `INFOOBJ.BIN`.
+- **Evidence:** U01 vtable `+0x40` (`0x00401940`): `+0x6e8` = (camera `+0x3c` ==
+  `*U01_20` object); `Camera_FollowGround` (`0x0041a270`) stores the highest hit's object in
+  camera `+0x3c`. If set: camera `+0x70` = 0; `GetAsyncKeyState(VK_UP)` → `0x00401a40`,
+  else `Camera_HandleKeys`; `Camera_FollowGround` on a copy of the eye; camera `+0x70` = 1
+  if the ground object changed. Always `Scene_HandleInput` (`0x0041b7f0`, which calls
+  `Camera_HandleKeys` again); then if on the train and Up up, stop `+0x174`.
+  `0x00401a40`: `FUN_0041ff20(+0x6d8)` (the frame advance, which does not test the paused
+  flag; E-0056's tick does); global positions of the train object (P) and hotspot
+  `*U01_23`'s object (Q); `+0x50("s1_12", eye, 1)` if `+0x174` is silent, else emitter
+  `+8` := eye; Q.z += 10, P.z := Q.z(old) + 18 (`0x00401ad3..0x00401af6`);
+  `FUN_00415e80` d = normalize(Q − P); `FUN_00419520(P.x − 40 d.x, P.y − 40 d.y,
+  P.z − 20 d.z)` (`0x0043942c` = 40, `0x00439430` = 20); `FUN_00419580(P, Q)` (yaw/pitch
+  by `X3d_Convert_To_Polar`); pitch := π/2; `0x00401b90`. `0x00401b90`: with `+0x6e4` = 0,
+  `+0x6e0` set and |ftol(frame) − 90| ≤ 1: `+0x6e4` = 1,
+  `FUN_00420220(node, "%sAnim/U01_20A.A3D", "Train2", 1, 1)`, `FUN_0041fe60(clip, own
+  animation, train object +0x20, 10.0, 0, 1)`, frame 15.0, `+0x6d8` = the clip; with
+  `+0x6e4` set and frame == (float) last frame: the exit (E-0087). Corpus (`a3d.py`):
+  `U01_20.A3D` frames 1..270 with children `*U01_20` → `*U01_23`; `U01_20A.A3D` 0..120;
+  INFOOBJ `*U01_20` frame 20, paused, 15 fps, looping.
+- **Method:** capstone (stack offsets tracked by hand; the MCP decompile misreads them);
+  MCP decompile of the callees.
+- **Confidence:** proven.
+
+### E-0084 — U01's click handlers (`0x00401d30` dispatch)
+- **Binary/file:** `MissionMonet.exe`; `Data/U01/INFOACT.BIN`, `INFOOBJ.BIN`.
+- **Evidence:** names at `0x00401d76..0x00401ead` →
+  `TakeCard` `0x00401fb0` (E-0057; then `FUN_00421300(*U01_02 hotspot, 3)`);
+  `ClickMaire` `0x00401f40`: static `0x0043f010` (initial 1) → `d1_04` and cleared, else
+  `rand` scaled by 2/32767 (`imul 0x80010003`, `sar 0xe`) = 1 → `d1_04`, else `d1_05`,
+  `FUN_004215f0("U01_02", …)`;
+  `OpenDoor` `0x00402050`: node `*U01_07` `+0x70` = 0, `+0x78` = 2.5,
+  `FUN_00420100(12.0, 1)`, `+0x50("OpenDoor", hotspot +0x70, 0)`;
+  `CloseDoor` `0x004020b0`: `+0x50("CloseDoor.wav", hotspot +0x70, 0)`, `+0x70` = 1,
+  `+0x78` = 4.0, `FUN_00420100(0.0, 1)`;
+  `TakeCarteHorloge` `0x00402110`: `FUN_00421300(list, 2, "*U01_11", by name)`;
+  `OpenBoitier` `0x00402510`: node `*U01_13` frame == 10.0 → `+0x70` = 1,
+  `FUN_00420100(0, 1)`; else `+0x70` = 0, `FUN_00420100(10.0, 1)`;
+  `BaisserManette` `0x00402570`: node `*U01_14` `FUN_00420100(10.0, 1)`;
+  `OpenTiroir1`/`2` → `0x004025a0("*U01_15"/"*U01_16")`: `FUN_00420140(0, 10)` (animation
+  first/last := 0/10, old values kept at node `+0x1cc/+0x1d0`); frame == 10 → stop
+  `+0x174`, `+0x50("s1_05", eye)`, `+0x70` = 1, run to 0; else frame ≤ 1.0 → stop
+  `+0x174`; `+0x50("s1_05", eye)`, run to 10, `+0x70` = 0;
+  `DoInterrupteur` `0x00402840`: node `*U01_21` `+0x68` = 0, running, `+0x50("s1_13",
+  eye)`, eye and angles saved, then the two branches on `+0x6e0` with `FUN_00419520` /
+  `FUN_00419550` cuts to (667, 723.8, 94) 6.02/0.79 and (753.22, 662.18, 93.55) 6.26/π/2,
+  `RunFor` 1200/1500 (or 600, 1500, 1200 with `FUN_00420100(100.0, 1)`), restore,
+  `RunFor(0)`. After the queue: action manager `+0x460` (= exhausted flag of id 20,
+  `+0x410 + id·4`), hovered hotspot `*U01_09` (`_stricmp`) and eye z < 100 →
+  `MonterSurToit`. `Light255` and `EcouterConversation` are not compared.
+- **Method:** capstone with strings and floats resolved; MCP decompile of the node API
+  (`FUN_00420060`, `FUN_004200c0`, `FUN_00420100`, `FUN_00420140`, `FUN_004201c0`).
+- **Confidence:** proven. Resolves Q-0042.
+
+### E-0085 — `ClicTel`: M10's run count picks pick-up or hang-up; with the lever down the call starts the gauge
+- **Binary/file:** `MissionMonet.exe`; `Data/U01/INFOACT.BIN`, `Anim/Combine.A3D`.
+- **Evidence:** `0x00402130`: node and hotspot `*U01_11`; `fmod(actions +0x838, 2.0)`
+  (`+0x810 + 10·4`: M10's count, already incremented since the steps and count run before
+  the queue) == 0 → `+0x70` = 1, running, loop `RunFor(0)` + vtable `+0x40` until
+  `+0x60`, stop and delete `+0x184`, `+0x50("TelGrisi", hotspot +0x70)`. Else `+0x70` = 0;
+  actions `+0x450` (M16 exhausted) → `FUN_00421300(hotspot, 0)`, `FUN_0041e2a0(M10, 0)`
+  (condition `FALSE`, `0x00441cc0`), `0x00402380`, running; otherwise `+0x50("TelGrisi")`,
+  loop while `+0x174` plays, `+0x184` = new emitter `FUN_00414c80(4, s·50)`,
+  `SoundEmitter_Play("%sSound/TelGrisi2.wav", hotspot +0x70, 1)`, running. Then count == 1
+  → `FUN_0041e2a0(0)` on actions `+0x20`, `+0x24`, `+0x28` (M04, M05, M06) and cursor 0 on
+  `*U01_01`. `0x00402380`: suspend, node forward running, if actions `+0x470` (M24
+  exhausted) = 0: `FUN_0041e4b0(M24)`, `FUN_0041e2a0(M19, 1)` (`TRUE`, `0x00441cc8`),
+  `MoveTo(1500, (433.788, −91.1468, 24.7812), 2.84318, 1.0708)`, wait `+0x178` (Enter),
+  `MoveTo(1000, (421.145, −69.187, 24.78), 0.6431)`, `+0x50("CloseDoor", eye)`,
+  `0x004020b0`, `FUN_0041a560(20.0, 1, "", 0)`, cursor 4 on `*U01_08`, resume. Corpus:
+  M24 = op 1 `D1_10` on `U01_11` (type 5), `d1_10.wav` 48.24 s; `Combine.A3D` animates
+  `*U01_11`, frames 0..62.
+- **Method:** capstone; MCP decompile of `FUN_0041e2a0`, `FUN_0041e320`, `FUN_0041e4b0`,
+  `SoundEmitter_Play`, `FUN_00414c80`; `Scene_LoadActions` for the id table.
+- **Confidence:** proven.
+
+### E-0086 — `MonterSurToit` climbs in five steps of D/7 and leaves the eye on the train roof
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `0x00402670`: `FUN_00414820(0, 0)`, `FUN_0041a680(gauge)`,
+  `X3d_Object_Unhide(*U01_10, 1)`, `MoveTo(1000, (439.833, −50.66, 28.2052), 100, π/2)`,
+  `MoveTo(800, eye, −0.45)`, `RunFor(500)`, D = `FUN_00415e40` (distance) from the eye to
+  (439.833, −50.66, 100.637), five times `MoveTo(500, (439.833, −50.66, eye.z + D ·
+  0.142857))` + `RunFor(200)`, `MoveTo(1500, (469.932, −40.2943, 110.637), 7.2731)`,
+  `MoveTo(1200, (485.775, −44.9, 139))`, `FUN_00419d00(20.0)`, `FUN_00414820(1, 1)`.
+- **Method:** capstone and MCP decompile.
+- **Confidence:** proven.
+
+### E-0087 — U01 ends when the siding clip reaches its last frame: fade, train sound fade, go to unit 2 (`U02.x3d`)
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `0x00401b90` (E-0083) with `+0x6e4` set and the clip at its last frame:
+  `FUN_00414820(0, 0)`, `FUN_0041bfd0(2000)`, app `+0x488` = 0, `+0x50("s1_12", eye, 1)`,
+  `FUN_00423360(sound manager, 1)`, d += 10 while d < scene `+0x138` · 60 with
+  `FUN_00414e40(+0x174, d)` and `RunFor(20)`, then game vtable `+4(2)`. Game vtable
+  `0x00439894` `+4` = `0x00412fb0`: returns if app mode is already 1; else mode 1,
+  `n == 8` → name `U33.x3D` (`0x0044112c`, `+0x160` = 3), otherwise `sprintf("U%s.x3d",
+  FUN_00416250(n, 2 digits))` into game `+0x14c`. The debug keys in `Scene_HandleInput`
+  call the same method with 1..8.
+- **Method:** MCP decompile and capstone.
+- **Confidence:** proven for the call; U02's own entry is not covered.
+
+### E-0088 — Step op 9 shows the target when its argument is `0` and hides it (no collision) otherwise
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `Action_RunStep` case 9 (`0x0041e526..0x0041e55b`): `atoi(arg)` (0 when the
+  argument is empty), `sete bl`, then target hotspot vtable `+0x28(target name, atoi == 0,
+  1)`. Hotspot vtable `0x00439a20` `+0x28` = `0x00421050(name, show, noCol)`: finds by
+  name, `show` ≠ 0 → `X3d_Object_Unhide(obj, 1)` and `+0x118` = 0, else
+  `X3d_Object_Hide(obj, 1)` and `+0x118` = `noCol`.
+- **Method:** capstone.
+- **Confidence:** proven. Supersedes the op-9 row of `interaction.md` ("show if `arg` ≠ 0"),
+  which is inverted.
