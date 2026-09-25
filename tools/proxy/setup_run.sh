@@ -29,6 +29,7 @@ set_key DesktopBitDepth 16          # the game's windowed mode needs a 16-bit pr
 set_key FPSLimit 60                 # windowed rendering is otherwise uncapped (~200+ fps)
 set_key dgVoodooWatermark false
 set_key Resolution unforced
+set_key CaptureMouse false          # do not trap the mouse in the window
 
 # Tracing proxies (build them first: see tools/proxy/README.md, Build).
 cp "$repo/build/proxy/Release/x3d.dll" "$repo/build/proxy/Release/h3d.dll" "$run/"
