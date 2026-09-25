@@ -1,10 +1,11 @@
 # Launch the game from the run folder and auto-confirm the startup dialog (portrait, OK/Exit).
-#   powershell -ExecutionPolicy Bypass -File tools\proxy\run.ps1 [-Exe MissionD.exe] [-Foreground]
+#   powershell -ExecutionPolicy Bypass -File tools\proxy\run.ps1 [-Exe MissionD.exe] [-Background]
 #
-# Default is background mode: MONET_BACKGROUND=1 makes the h3d proxy swallow focus-loss
-# messages, so the game keeps running behind other windows (tools/proxy/README.md), and
-# the window is never brought to the front. -Foreground restores the original behaviour:
-# the dialog and game get focus, and the game minimises and pauses when it loses focus.
+# Default: the dialog and game get focus, as with a real click. The game minimises and
+# pauses when it loses focus.
+# -Background (EXPERIMENTAL, does not work yet): MONET_BACKGROUND=1 makes the h3d proxy
+# swallow focus-loss messages and the window is never brought forward. Under dgVoodoo the
+# game still loses its DirectDraw surfaces when not active and then crashes. See Q-0017.
 #
 # The dialog's OK button has control ID 1011 (not IDOK); this posts the same
 # WM_COMMAND(1011, button) a click sends.
