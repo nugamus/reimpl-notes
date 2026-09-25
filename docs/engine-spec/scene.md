@@ -85,6 +85,11 @@ by the ambient colour / 255 (U01's ambient is white).
 - Widescreen (engine goal, not the original): keep the vertical extent of the 4:3 frame
   and widen the horizontal one.
 
+## U01 unit setup (E-0060)
+
+After loading, U01's unit code hides `Box203` (which also loses collision, E-0048) and
+`Cylinder07`.
+
 ## U01 start camera (E-0041)
 
 p = (−258.44, −508.20, 29.546), a = 1.31, e = π/2 (1.5707960). This is the first shot of
@@ -92,8 +97,11 @@ U01's scripted entry, right after the prologue video.
 
 ## Camera-facing objects
 
-Objects whose names contain `$XYZ$`, `$Z$` or `$XZ$` get camera types 1, 2, 3 (E-0045);
-how they are oriented is not specified yet (Q-0021). The static view draws them as stored.
+Objects whose names contain `$XYZ$`, `$Z$` or `$XZ$` get camera types 1, 2, 3 (E-0045).
+Type 2 (the only one in U01) is drawn with the view rotation of yaw π/2 and the camera's
+pitch (E-0058) while its origin (row 3 of W) keeps its place in the true view: a vertex
+at offset d from the origin is drawn at origin + d · R(π/2, e) · R(a, e)ᵀ (E-0062). Types
+1 and 3 (fixed yaw −π/2, level; type 3 with roll) are not needed for U01.
 
 ## Validation
 

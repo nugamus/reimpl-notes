@@ -1177,3 +1177,51 @@ An entry at `tentative` confidence must also have a matching line in
 - **Confidence:** proven. Supersedes the U01 attribution of `0x00439468`, `0x00402f70` and
   `0x00403340` in E-0046 and E-0051; the loop structure they describe holds for U01 with
   the addresses above.
+
+### E-0059 — Walking, the collision stop and the wall slide match the original to within key-timing jitter
+- **Binary/file:** `MissionMonet.exe` (x3d/h3d proxies, background mode, dgVoodoo capped at
+  60 fps); engine `x3d` at "X3D: Walk, turn and collide in U01" (60 logic steps/s).
+- **Evidence:** from the hand-over state (−466.36, −452.495, 30.48, yaw 4.7) after
+  `TakeCard`, the same posted key holds give, original vs engine
+  (`tools/proxy/camera.ps1`; engine `-d1` log):
+  Down 1 s → (−465.85, −493.37, 29.546) vs (−465.85, −493.45, 29.546);
+  Down 2 s more, stopped by collision → (−464.859, −508.173) vs (−464.852, −508.168);
+  Left 1 s → yaw 1.10 vs 0.92 (3.60 vs 3.78 rad: 60 vs 63 steps of 0.06; the posted hold
+  lasts ~1.0–1.05 s); Up 2 s along a wall → Δy ≈ 0 in both, Δx = 36.75 vs 48.85, each
+  = 40 units/s (half speed, face ahead within 2r) · 2 s · cos(yaw). The original turned
+  0.06 rad per rendered frame at dgVoodoo's 60 fps cap. `traces/u01-walk-compare.png`
+  (local).
+- **Method:** `tools/proxy/to_u01.sh`, `send.ps1` click on the card (game coordinates
+  (262, 338)), `send.ps1 -Key` holds on both programs.
+- **Confidence:** proven for speeds, ground snap and the collision stop; the turn rate per
+  second depends on the frame rate (Q-0022).
+
+### E-0060 — U01's constructor hides `Box203` and `Cylinder07`
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** in the U01 constructor, `0x00401159` pushes `Box203` (`0x0043f044`) for a
+  scene lookup whose result goes to `X3d_Object_Hide` at `0x00401181`; `0x0040118c` pushes
+  `Cylinder07` (`0x0043f038`), hidden at `0x0040119e` (`push 1`). The trace of a U01 run
+  shows `X3d_Object_Hide` from `0x00401183` and `0x004011a0` (return addresses).
+- **Method:** capstone read with the pushed strings resolved; proxy trace.
+- **Confidence:** proven. (`Box203` also loses collision, E-0048.)
+
+### E-0061 — Welded skinning and `.A3D` playback reproduce the mayor's pose
+- **Binary/file:** engine `x3d` at "X3D: Play .A3D animations and pose welded characters";
+  the original after `TakeCard`.
+- **Evidence:** at the hand-over camera the mayor's body, sash, arms and head fall on the
+  same pixels in both (`traces/u01-mayor-posed-compare.png`, local); before skinning the
+  same mesh was garbled (E-0053). A diagonal wire from the pole top, left of the mayor,
+  is drawn by the engine only; it is neither `Box203` nor `Cylinder07` (Q-0021).
+- **Method:** `snap.ps1` of both windows.
+- **Confidence:** proven for the pose at that moment.
+
+### E-0062 — Drawing `$Z$` objects as camera-facing about their origin leaves U01's first shot unchanged
+- **Binary/file:** engine `x3d`, U01 first shot (E-0041).
+- **Evidence:** with type-2 objects drawn per E-0058 (offsets from the object's origin
+  rotated by the yaw-π/2 view instead of the camera's, the origin placed by the true
+  view), the sun disc stays on the same pixels as the original and the boat hulls only
+  widen slightly: the boats still show where the original shows none. So their absence in
+  the original is not the camera type.
+- **Method:** engine render with `start_camera=-258.44,-508.20,29.546,1.31,1.570796`
+  beside `traces/u01-start-original.png`.
+- **Confidence:** proven for this shot; how the renderer uses `+0x164` stays inferred.

@@ -32,7 +32,8 @@ until `timeGetTime` has advanced `ms` (0 = one frame).
 Run logic in fixed ticks, render as often as possible, interpolate the camera between the
 last two ticks. Movement: per tick move `speed · s · dt`. Turning: the original's 0.06 rad
 per rendered frame has no per-second value until Q-0022 is answered; the engine uses
-0.06 rad per tick with a tick rate constant (provisional, a deviation until then).
+0.06 rad per tick at 60 ticks per second, which matches the original under dgVoodoo's
+60 fps cap (E-0059) and is provisional until then.
 
 ## Camera state (E-0047)
 
