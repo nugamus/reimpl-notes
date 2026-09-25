@@ -863,3 +863,36 @@ An entry at `tentative` confidence must also have a matching line in
   `ClickGuichetier`, …, `MonterDansTrain`).
 - **Method:** MCP decompile; capstone read of the window procedure.
 - **Confidence:** proven for the flow; picking internals and hotspot data are open (Q-0024).
+
+### E-0052 — LODs pair two object hierarchies child by child; the renderer picks by squared distance
+- **Binary/file:** `x3d.dll`, `xd3d.dll`.
+- **Evidence:** `X3d_Load_Sdk_o3d` (`0x10001302`) returns the file's first object (the
+  `*param_3 = *piStack_38` after `X3d_Scene_Add_Object`). `FUN_10012920` appends each
+  object to its parent's child list (`+0x24` first child, `+0x28` next sibling) in file
+  order. `X3d_Object_Add_Lod(base, lod, scene, d)` squares d (negative → 0), and when the
+  base's transform block `+0` is 0 walks both child lists in step, calling
+  `FUN_100152c0(child, lodChild, scene, d²)` (recursing the same way, doing nothing when
+  either is null), unlinks the LOD object from the scene and inserts it in the base's
+  LOD chain `+0x3c`, sorted by its threshold `+0x38`. The object class method table
+  (`FUN_1000b690` fills `0x1002d144`) has `+0x14` = `FUN_10015200`: with s = squared
+  distance from the object's global position (`+0xfc` → `+0x124..0x12c`) to the camera
+  position (camera `+0x2c..0x34`), it returns the chain entry with the largest threshold
+  ≤ s, else the object itself. `xd3d.dll` `FUN_10020720` draws the returned object's
+  faces.
+- **Method:** MCP decompile of the functions named; functions created at `0x10015200`
+  and `0x10019730`.
+- **Confidence:** proven for pairing and selection. That the chosen LOD object uses its
+  own world matrix is inferred (the draw call passes both objects).
+
+### E-0053 — A second U01 viewpoint matches the original; the original's camera can be read live
+- **Binary/file:** `MissionMonet.exe` (running, x3d proxy with the data-export fix); engine
+  `x3d` with `start_camera`.
+- **Evidence:** `tools/proxy/camera.ps1` reads `[0x00442640]` (current scene) → `+0x14c`
+  (camera) → `+0x14` position, `+0x34`/`+0x38` angles (E-0041's setters). At the
+  post-intro hand-over it prints `-466.36,-452.495,30.4799728,4.7,1.570796`, the free-roam
+  state E-0050 derives statically. Rendering the engine from that camera gives the same
+  wall, wire, sheds, barrels and red carpet on the same pixels as the original
+  (`traces/u01-mayor-compare.png`, local). The mayor (a weld object with an animation) is
+  garbled in the engine: Q-0020.
+- **Method:** ReadProcessMemory from PowerShell; snap.ps1 of both windows.
+- **Confidence:** proven for the static geometry and the camera reader.

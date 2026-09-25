@@ -23,8 +23,7 @@ For scene file `Uxx.X3D`:
 3. Run the `.X3D` script (grammar in `docs/formats/README.md`). In file order:
    - `object=`: load the `.O3D` and add its objects. Objects from a path starting
      `static\col` are loaded but hidden: they are collision geometry.
-   - `lod=`: attach a lower-detail `.O3D` to the last object, used beyond the given
-     distance. Switching rules are not specified yet; the engine draws the base object.
+   - `lod=`: attach a lower-detail `.O3D` to the last object (see Levels of detail).
    - `animation=`: attach an `.A3D` to the last object. Not played in the static view.
    - `light=`: load an `.L3D`; every light affects every object.
    - `camera=`: load a `.C3D` (U01 has it commented out).
@@ -45,6 +44,19 @@ For scene file `Uxx.X3D`:
 - Objects whose faces index their parent's vertices ("weld" objects, the characters) are
   drawn with the vertex owner's W: the bind pose (Q-0020).
 - Faceless objects (splines, helpers) are not drawn; some carry garbage coordinates.
+
+## Levels of detail (E-0052)
+
+- `object=` yields the file's first object (its root). `lod="file,d"` pairs the LOD file's
+  root with that root, then recursively the i-th child of each base object with the i-th
+  child of its partner, children in file order; a base child with no partner gets no LOD.
+  Each partner becomes a LOD of its base object with threshold d² (d < 0 counts as 0).
+  Several `lod=` lines on one object add more partners.
+- Every frame, for each base object: s = squared distance from the object's world origin
+  (row 3 of its W) to the camera position. Draw the partner with the largest threshold
+  ≤ s; if none qualifies, draw the base object. The chosen object is drawn with its own
+  geometry, materials and W (the LOD file's hierarchy). LOD files are never drawn on
+  their own.
 
 ## Materials and textures (E-0038)
 

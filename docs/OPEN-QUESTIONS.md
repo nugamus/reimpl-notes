@@ -313,9 +313,21 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   `fum*trans` have 72). The faint buildings' materials have `+0x4c` = 0 and `+0x50` = 1, as
   do `barques` and `soleil`. Drawing every `lod=` file instead of its base object blanks
   the sky, so a LOD replaces single objects, not the whole file.
+- **Also checked (2026-09-25):** LOD pick is specified (E-0052) and does not change this
+  shot. `xd3d.dll` `FUN_1001e530` turns material `+0x50` into render-state bits (1 or 3 →
+  `0x2`, 2 → `0x40`, 10 → `0x100`, 11 → `0x200`; texture → `0x1`, transparency → `0x8`);
+  state 3 (texture + mode 1) selects a face drawer (`FUN_1000b840`) that differs from
+  state 1 only by setting `D3DRENDERSTATE_COLORKEYENABLE` and flat shading, with vertex
+  diffuse `0x00FFFFFF` (alpha 0). Material `+0x50` = 1 is on the boats (`barques`), the
+  buildings (`immgch`/`immdrt`) and the sun (`soleil`). The distant "trees" in the engine
+  are the `BARQUES` texture on `$Z$barque*` objects. Camera types (E-0045) are applied in
+  `x3d.dll` `FUN_10019730` (object class `+0x6c` → `+0x10`): types 1–3 build the view
+  rotation from fixed angles instead of the camera's; which angle type 2 keeps is
+  ambiguous in the x87 decompile. A 50% blend on `+0x50` = 1 looked close but has no
+  support in the code and was dropped.
 - **Blocks:** matching the original's distant view.
-- **Next to try:** the object class vtable in `x3d.dll` (`+0x6c`: `+0x10` camera type,
-  `+0x14` LOD pick); what `+0x50` does in `xd3d.dll`'s face setup.
+- **Next to try:** whether the global alpha-blend state is on while state-3 faces draw
+  (vertex alpha 0); disassemble `FUN_10019730` case 2 by hand for the angle.
 - **Status:** open
 
 ### Q-0022 — What frame rate did the original run at, so what are its turn and pitch rates per second?
