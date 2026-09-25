@@ -18,7 +18,8 @@ A format is done only when its validator passes 100% of the corpus, every byte c
 | `#ACTIONS#` (INFOACT.BIN) | 9 | `infoact.py` | `infoact.ksy` | E-0071 | done |
 | `#SCENE#` `#CAMERA#` (SCENE.BIN) | 9 | — | below | E-0039 | done |
 | `#GAME#` (App.bin) | 1 | — | below | E-0037 | first 30 bytes read: start scene name |
-| `#INDEX#` `#APP#` | 82 | — | — | — | open |
+| `#INDEX#` (Sound/*.bin lip sync) | 81 | `lip.py` | `lip.ksy` | E-0124 | done |
+| `#APP#` (App.bin) | 1 | — | — | — | open |
 | `.X3D` scene script | 24 | `x3d.py` | this file (text) | E-0036 | done |
 | `.DMF` texture | 518 | `dmf.py` | `dmf.ksy` | E-0038 | done (`fb22`/`fb23` opaque) |
 | `.FRA` | 25 | — | — | Q-0016 | open |
@@ -666,3 +667,11 @@ bytes, read by `Scene_LoadActions` (`0x0041da90`). Record: `u32 id`, `char name[
 `python tools/parsers/infoact.py` → 9/9 files, 198 records, every byte consumed
 (`--selftest`, `--file` dumps a unit). Corpus: trigger 8 ×115, 7 ×74, 0 ×9; `max_runs`
 1 ×143, 100 ×52, 2, 3, 9 once each; ops 1, 2, 3, 4, 7, 9, 10, 13, 14, 15, 16, 101.
+
+## `#INDEX#` (Sound/*.bin, lip sync, E-0124)
+
+`u32 count`, then `count` records of `u32 time_ms, u16 shape, u16 unk_pad` (`lip.ksy`).
+81 files, all under `Uxx/Sound/`, each beside a `.wav` of the same name; 10,373 records;
+shapes 1..8 (1: 1,289, 2: 914, 3: 571, 4: 1,608, 5: 1,566, 6: 971, 7: 986, 8: 2,468);
+`unk_pad` is 0xCDCD throughout; first time 0 in every file; steps 44 ms minimum, 46 ms
+median. What the shapes do is `docs/engine-spec/sound.md`.

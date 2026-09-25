@@ -178,8 +178,8 @@ The first step's ground snap sets z to ground + 60.
   `interaction.md`, which supersedes this line). Set the cursor to match.
 - **Click** (WM_LBUTTONDOWN): ignored if less than 1000/fps + 10 ms after the previous one,
   otherwise hover at the click point and queue the hotspot's action; the unit's click
-  handler then dispatches queued actions by name (U01's names: `interaction.md`; `ClickControleur` … `MonterDansTrain` are U02's, E-0075,
-  and `TakeCard`).
+  handler then dispatches queued actions by name (U01's, e.g. `TakeCard`: `interaction.md`;
+  `ClickControleur` … `MonterDansTrain` are U02's, E-0075).
 - Picking internals, hotspot table and actions: Q-0024.
 - Both are ignored while input is suspended or the app is not in mode 0.
 
