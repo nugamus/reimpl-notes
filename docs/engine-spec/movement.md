@@ -174,10 +174,11 @@ The first step's ground snap sets z to ground + 60.
 - **Hover** (WM_MOUSEMOVE, and at every key release using the current cursor): ask X3D for
   the object under the cursor (`X3d_Scene_Pick_Object(x, y)` → object, distance). Nothing if
   the distance exceeds 4 · s (U01: 160). From the picked object walk up the parents to the
-  first name containing `$`; the text after `$` names the hotspot. Set the cursor to match.
+  first name containing `*` and look the hotspot up (details and the INFOOBJ hotspot list:
+  `interaction.md`, which supersedes this line). Set the cursor to match.
 - **Click** (WM_LBUTTONDOWN): ignored if less than 1000/fps + 10 ms after the previous one,
   otherwise hover at the click point and queue the hotspot's action; the unit's click
-  handler then dispatches queued actions by name (U01: `ClickControleur` … `MonterDansTrain`,
+  handler then dispatches queued actions by name (U01's names: `interaction.md`; `ClickControleur` … `MonterDansTrain` are U02's, E-0075,
   and `TakeCard`).
 - Picking internals, hotspot table and actions: Q-0024.
 - Both are ignored while input is suspended or the app is not in mode 0.

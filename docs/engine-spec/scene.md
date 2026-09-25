@@ -41,8 +41,8 @@ For scene file `Uxx.X3D`:
   where Tr(t) is the identity with t in row 3 and M the object's stored 4×4 (row-vector
   form, translation in elements 12..14). The parent is the named object loaded earlier in
   the same file. World space is Z up.
-- Objects whose faces index their parent's vertices ("weld" objects, the characters) are
-  drawn with the vertex owner's W: the bind pose (Q-0020).
+- Objects whose faces index their parent's vertices ("weld" objects, the characters): each
+  vertex is drawn with its owning object's W, per `animation.md` "Welded objects" (E-0054).
 - Faceless objects (splines, helpers) are not drawn; some carry garbage coordinates.
 
 ## Levels of detail (E-0052)
