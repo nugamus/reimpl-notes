@@ -23,12 +23,10 @@ The window title of this release is "Monet - The Mystery of the Orangerie Museum
    (the original redraws it so both buffers hold it). The waits are a `timeGetTime` busy
    loop: no input is read, nothing can skip them.
 2. **Menu scene** (E-0033, E-0034). Set the next scene name to `U00.X3D` and app mode 1.
-   The loop then loads U00 normally (`a = 1`). U00 is U04's garden (assets under `U04/`,
-   maps under `U04/Maps/`) with Monet playing `U04_03_Lunettes`, camera at
-   (81.1334, 265.8100, 15.0). U00 switches to app mode 2 and opens the 2D frame
-   `OptionUser`: the "The players" screen (new player name, player list, OK). The 3D
-   garden shows briefly before the frame covers it (runtime snap at 6 s). It stays
-   there until the user acts.
+   The loop then loads U00 normally (`a = 1`): U04's garden with Monet, who says `sb01`;
+   then app mode 2 and the 2D frame `OptionUser` ("The players"). The 3D garden shows
+   briefly before the frame covers it (runtime snap at 6 s). Load, start, the players
+   screen timing and the tutorial: `u00.md`.
 3. **Players screen to U01** (E-0105): name + OK; a new player gets U00's tutorial, then
    Escape opens the Option menu; a known player gets the menu at once; New game reads
    `App.bin` and enters U01 with `a = 1`. Details in `ui.md` "Boot to U01".

@@ -1879,3 +1879,87 @@ An entry at `tentative` confidence must also have a matching line in
 - **Method:** `dev_commands` runs with `-d1` logs and snapshots; posted Up/Enter.
 - **Confidence:** proven that the handlers and the ride work as specified; not compared
   against the original frame by frame.
+
+### E-0200 — U00 load and start: U04 assets, U00 info/voices, `*Lunettes0` renames, sphere 3/1, talker `U04_03`, `sb01` then `OptionUser`
+- **Binary/file:** `MissionMonet.exe`; `Data/U00/{SCENE.BIN,Infoobj.bin,Infoact.bin,Sound/*}`.
+- **Evidence:** `U00_Load` (`0x0040a070`, `U00.cpp:0xf5`): maps `%sU04/Maps/`, script path
+  `%s%s` (unit root + name), root `%sU04/`, vtable `+0x4c("s3_01", 1)` (unit ambient).
+  `U00_Start` (`0x0040a1e0`, disassembly): `X3d_Scene_Get_Object("*Lunettes0")` → copy
+  `*U04_81`, `+0x5c` = 1 (the `X3d_Object_Hide` flag, E-0048), kept at unit `+0x6dc`; again
+  `*Lunettes0` → `*U04_80`; `+0x5c` = 1 on `*U04_63`, `*U04_31`, `*U04_44`, `*U04_05`,
+  `*U04_53` (`0x0043ff0c..0x0043ff44`); root `%sU00/`, vtable `+8` (INFOOBJ/INFOACT,
+  E-0072), root `%sU04/`, vtable `+0x2c`; camera `FUN_00419ce0(3.0)` (sphere radius `+0x64`)
+  and `FUN_00419d00(1.0)` (Z offset); `+0x6c8`/`+0x6cc` hotspot/node `*U04_03`,
+  `+0x6d0`/`+0x6d4` `*U04_32`; node paused, vtable `+0x28("U04_03", "", "$$$DUMMY.*visage",
+  0, 8, "%sAnim/U04_03_Lunettes/")`, node running; camera (81.1334, 265.81, 15.0), yaw/pitch
+  `0x409570a4`/`0x3fbc28f6` = 4.67/1.47; if `0x0046ed88` = 0: `RunFor(0)`,
+  `U00_SayMonet("sb01", 0, 0)`, `SetAppMode(2)`, frame `OptionUser`. `U00_SayMonet`
+  (`0x0040a5c0`): third argument ≠ 0 → root `%sU00/`, vtable `+0x54(line, 0, 100)` (op 101's
+  player, group 2) and return; else, second argument ≠ 0 → save camera position, yaw, pitch,
+  FOV and set (81.1334, 265.81, 15), 4.67, 1.47, FOV 90 (`0x42b40000`); node running;
+  `Talkers_Say("U04_03", line)` (`0x004215f0`); `RunFor(0)` while `FUN_00414ed0(+0x178)`;
+  restore. U00 overrides vtable `+0x48` (`U00_PlayVoiceFile`, `0x0040a4a0`, `U00.cpp:0x147`)
+  with `%sU00/Sound/%s.wav`. Corpus: `U00/SCENE.BIN` ambient (255, 255, 255), scale 10.0,
+  `#CAMERA#` FOV 90, 20, 40, 7; INFOOBJ 5 entries (`*U04_03` type 6, `*U04_32` 5,
+  `*U04_36` 4 hidden, `*U04_43` 4, `*U04_80` 4 cursor 4); INFOACT M01 (trigger 8 on
+  `*U04_80`: op 2, op 10 `TakeLunettes`, max 1), M02 (trigger 7 item `U04_80` on `*U04_03`:
+  op 10 `DonnerLunettes`, max 2); `U00/Sound` holds 18 WAVs and no `.bin`; the EXE and
+  `MissionD.exe` name only sb01, sb03, sb03_bis, sb04..sb11, sb14.
+- **Method:** MCP decompile and disassembly; strings and floats with `pefile`/Python;
+  `infoobj.py`, `infoact.py`, Python `wave`. Functions renamed in Ghidra.
+- **Confidence:** proven.
+
+### E-0201 — U00's tutorial: a hidden 10-s gauge carries the hint state; the frame hook replays lines, the input hook advances states
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `U00_UpdateFrame` (`0x00409850`, vtable `+0x1c`): `Scene_RenderFrame`; if
+  `+0x704` = 0: set it, `U00_SayMonet(0x0046ed88 ? "sb03_bis" : "sb03", 0, 0)`,
+  `FUN_0041a560(gauge, 10.0, 0, "deplace", 1)`, camera to the start pose, FOV 90. Else if
+  gauge `+4` ≠ 0 and `FUN_0041a6c0(gauge, 0)` (fires without stopping: elapsed `+0xc` is
+  not reset, E-0082), switch on gauge `+0x10`: 1 `sb04` (1, 0) → 1 `deplace`; 2/3/4/5 need
+  `+0x6d8`: `sb06`/`sb05`/`sb07`/`sb08` with (1, 1) → 2 `Sauter` / 3 `Sauter` / 5 `Take2`
+  (and `+0x6f0` = 1) / 5 `Take2`; 7: cursor mode (`DAT_0046ec14 +4`) = 1 → `sb09` (1, 1),
+  7 `""`; else if `+0x6fc` = 0: `+0x6fc` = 1, stop (`FUN_0041a680`), if `+0x6d8` → 3 `""`;
+  8: if `+0x700` = 0, `sb11` (0, 0) → 8 `""`. Restart is `FUN_0041a560(10.0, 0, label, n)`.
+  `U00_ProcessTutorialKeys` (`0x00409b40`, vtable `+0x40`), key table `0x0046e7e0 + vk·4`:
+  state 1 and Up/Down (`0x46e878`/`0x46e880`) → stop, `+0x6e4` = 1; state 2 and
+  Left/Right/PgUp/PgDn (`0x46e874`, `0x46e87c`, `0x46e864`, `0x46e868`) → stop, `+0x6e8`
+  = 1; `+0x6d8` and `+0x6e8` and not `+0x6f0` and state ≠ 4 → start 4 `Take`; Shift
+  (`0x46e820`) and `+0x6d8` → `U00_JumpOffStone` and return; Space (`0x46e860`) →
+  `+0x700` = 1, stop if state 8; `Scene_HandleInput`; not `+0x6d8` and `_stricmp(camera
+  +0x3c name, "*U04_32")` = 0 → `U00_StepOntoStone`; `+0x6f0`, not `+0x700`, state ≠ 8 and
+  `FUN_00415e40(Monet hotspot +0x70, eye)` < 2·scale → `FUN_00419bc0(1000, Monet object)`,
+  `+0x6fc` = 1, `sb10` (0, 0), start 8 `""`. `U00_StepOntoStone` (`0x00409d10`): `+0x6d8`
+  = 1; eye := stone hotspot `+0x70..+0x78` + (0, 0, 10.0); camera `+0x40` (can move) = 0,
+  `+0x70` (collision) = 0; `FUN_00419bc0(0, "*U04_43")`; `+0x6ec` = 1; if not `+0x6e8`:
+  start 2 `Tourner`. Hotspot `+0x70` is `X3d_Object_Get_Global_Position` at hotspot
+  creation (`FUN_00420b40`). `U00_JumpOffStone` (`0x00409dc0`): `+0x6d8` = 0;
+  `Camera_MoveTo(2000, (149.87, 60.56, −9.0), 0.427, π/2, keep)`; `+0x40` = `+0x70` = 1,
+  `+0x3c` = 0; stop if state 2. No store to app `+0x484` between `0x004097e0` and
+  `0x0040a720` (capstone scan of all `+0x484` stores). `OptionEntrenement` calls game
+  `+4(0)` and sets `0x0046ed88` = 1 (E-0105's handler list).
+- **Method:** MCP decompile; key slots decoded from the table base; floats with Python.
+- **Confidence:** proven for the logic; the gauge labels' use is open (Q-0110).
+
+### E-0202 — `TakeLunettes` starts state 7; `DonnerLunettes` plays `prend`/`MET`, `sb14`, then opens the Option menu
+- **Binary/file:** `MissionMonet.exe`; `Data/U04/Anim/U04_03_Lunettes/`.
+- **Evidence:** U00 vtable `+0x30` (`U00_DispatchClickActions`, `0x00409aa0`, created):
+  after `FUN_0041b700`, drains the queue `+0x198`: `DonnerLunettes` → `0x00409e90`,
+  `TakeLunettes` → `0x00409e50`. `U00_TakeLunettes`: stop, start 7 `""`, `+0x6f0` = 1.
+  `U00_DonnerLunettes`: `FUN_004144b0(cursor, 0, 0, 0)`, `FUN_00414820(cursor, 0, 0)`,
+  `+0x700` = 1, stop; `FUN_00420220(Monet node, "%sANIM/U04_03_Lunettes/prend.A3D",
+  "monet", 1, 1)`, slot loop `+0x68` = 0; `Camera_MoveTo(1000, start pose, 4.67, 1.47,
+  90)`; `RunFor(0)` until slot `+0x60`; `*U04_81` `+0x5c` = 0; same with `MET.A3D`;
+  `U00_SayMonet("sb14", 0, 0)`; `RunFor(0)` until slot frame `+0x74` ≥ 50.0; `*U04_81`
+  `+0x5c` = 0; until `+0x60`; `RunFor(2000)`; frame manager `+0xc0(0)` (Option, E-0105);
+  `FUN_00414820(cursor, 1, 0)`.
+- **Method:** function created and decompiled over MCP.
+- **Confidence:** proven.
+
+### E-0203 — Live: a new player lands at the start pose facing Monet; posted arrows did not move the camera
+- **Binary/file:** `C:\MonetRun` (`run.ps1`, `send.ps1`, `snap.ps1`).
+- **Evidence:** launch, 14 s, a new random name + Enter; snaps at +5 s and +25 s show the
+  garden from the start pose with Monet centred in front of the terrace (identical frames).
+  Right 0.8 s and Down 1.5 s (about +38 s), then six Down taps of 1 s every 3 s, with snaps
+  after each batch and 25–30 s later: the view never changed.
+- **Method:** one live run; `MissionMonet.exe` killed afterwards.
+- **Confidence:** proven for the start pose; the keys' effect is unresolved (Q-0111).

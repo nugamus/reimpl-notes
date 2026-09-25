@@ -545,3 +545,23 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   E-0090 with `send.ps1` clicks) and read `camera.ps1` and the ground object after it;
   check whether walking across the roofs reaches the car.
 - **Status:** open
+
+### Q-0110 — Do U00's gauge labels (`deplace`, `Tourner`, `Sauter`, `Take`, `Take2`) show anything?
+- **Context:** `FUN_0041a560` copies a label to gauge `+0x12`; U00 always starts the gauge
+  invisible (E-0201). `u00.md` treats the labels as inert.
+- **What we checked:** the gauge's start, check, stop and draw functions; not the save
+  chunk `JAUGE` or other readers of `+0x12`.
+- **Blocks:** nothing for play.
+- **Next to try:** xrefs to reads of gauge `+0x12` (`FUN_0041a820`/`FUN_0041a790`).
+- **Status:** open
+
+### Q-0111 — Why did posted arrow keys not move the camera in U00's tutorial?
+- **Context:** E-0203: after a new name, posted Down/Right key messages left the view
+  unchanged for over a minute, so the tutorial's states past the first line are specified
+  from code only (E-0201).
+- **What we checked:** one run; keys posted with `send.ps1` (scan code, extended bit).
+- **Blocks:** runtime confirmation of `u00.md`'s state machine.
+- **Next to try:** the same run with `camera.ps1` reading the eye before and after a long
+  Up hold; check whether a Say was blocking (keys released during a Say are lost), or
+  whether collision with Monet blocks the first step; or the user plays it by hand.
+- **Status:** open
