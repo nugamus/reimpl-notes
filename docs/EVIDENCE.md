@@ -3486,3 +3486,249 @@ An entry at `tentative` confidence must also have a matching line in
   contain `*U04_03`, so `Talkers_Say` takes its no-talker branch (voice at the eye).
 - **Method:** parsers; MCP decompile; capstone.
 - **Confidence:** proven.
+
+### E-0420 — U33 is reached only from U03's `DoCinematiqueFlic` (and debug key 8), plays as unit 3, and leaves for unit 4; vtable `0x00439560`
+- **Binary/file:** `MissionMonet.exe`, `MissionD.exe`.
+- **Evidence:** constructor `0x00407090` (E-0075's unit 33) stores vtable `0x00439560`
+  and zeroes unit `+0x6c8`, `+0x6cc`. Vtable: `+0` `0x004070b0` (deleting destructor),
+  `+8`/`+0xc` `0x0041d490`/`0x0041d650` (generic `Scene_RestoreState`/`WriteState`), `+0x10`
+  `0x0041acf0` (generic load), `+0x14` `U33::StartUnit` `0x004070e0` (function created),
+  `+0x1c` `U33::UpdateFrameLogic` `0x00407770`, `+0x30` `U33::DispatchClickActions`
+  `0x00407940` (created), `+0x40` `0x0041b7f0` `Scene_HandleInput`; the other slots equal
+  U02's (`0x00439468`). Capstone scan of `.text` for game-object vtable `+4` calls: pushes
+  2 (`0x00401c7e`, U01), 3 (`0x00404ab5`, U02), 4 (`0x00407ebf`, U33), 5, 6, 7, 0, and the
+  debug keys (8 at `0x0041b938`); no unit code pushes 8. U03's `0x00406a1e..0x00406a54`
+  (end of `FUN_00406250`, dispatched for `DoCinematiqueFlic` at `0x00405552`) waits for
+  voice group 2, copies `U33.X3D` (`0x0043f940`) into game `+0x14c` and calls
+  `SetAppMode(1)`; it does not touch game `+0x160` (unit number), which the game `+4(8)`
+  path sets to 3 (E-0087). `U33D.X3D` (`0x00441158`) is used only by `FUN_004131e0` for
+  gallery key `U12_04`. Assert paths: `MissionD.exe` names `U00.cpp`, `U03.cpp`,
+  `U04.cpp`, `U99.cpp`, `MissionMonet.exe` the first three; none is referenced from
+  `0x004070b0..0x004097df`. `FUN_00407b80` (`TransitionVelo`) belongs to U33, not U03 as
+  E-0121 says.
+- **Method:** MCP read of the vtable and decompile; capstone scan (`call [reg+4]` after a
+  load of `0x0046ec18`); byte search for `Source\U*.cpp`.
+- **Confidence:** proven. Refines E-0121's attribution of `0x00407b80`.
+
+### E-0421 — `U33::StartUnit`: renames, hides, collision off for the clown and Ernest, talkers, start camera, autosave, ambient `s2_01`
+- **Binary/file:** `MissionMonet.exe`; `Data/U33/U33.x3d`, its `.o3d` files.
+- **Evidence:** `0x004070e0..0x00407765` (capstone, strings resolved): `X3d_Scene_Get_Object`
+  + strcpy `GeoSphere0`→`*U03_30`, `GeoSphere1`→`*U03_31`, `GeoSphere2`→`*U03_32`,
+  `U03_18`→`*U03_18` (each also node list `+0x14(name, 1)` → node `+0xc`);
+  `X3d_Object_Hide($$$DUMMY.Dummycolis, 1)`; node `*U03_08`: `FUN_00420060(1)`, `+0x74` =
+  0; `quille hau`→`*U03_33`; `Box121`→`*U03_22`; `X3d_Object_Hide(*Ecran01 +0x20, 1)`
+  (the parent); `*u03_24`→`*U03_244`; `*U03_36f`→`*U03_36`; `*u03_24`→`*U03_34`; node
+  `*U03_24`→`*U03_34`; `*U03_244`→`*U03_24`; `*U03_13 bo`→`*U03_37`;
+  `*U03_36cle`→`*U03_36`; `pedalegch`→`Zpedale`; `pedaledrt`→`ZZpedale`. Then the
+  `XScene` start `0x0041ae10(a, b)`; `0x00409300(*U03_02, 1)`, `0x00409300(*Ernest, 1)`
+  (renamed `U33::SetNoCollisionTree`: `+0x118` := v, recurse into `+0x28` (next sibling),
+  loop over `+0x24` (first child)); hide `*Ernest`, `*U03_25`; nodes `*U03_30..32`
+  `FUN_00420060(1)`; vtable `+0x28` talkers (`U03_01`, `$$$DUMMY.*visage`), (`U03_02`,
+  `$$$DUMMY.visage`), (`U03_09`, `$$$DUMMY.visage`), each with `0x00442618`, 0, 8, 0. If a
+  ≠ 0: `FUN_00419ce0(38.5)`, `FUN_00419d00(19.0)`, eye `0x00407050`(−132.19, −463.89, 70)
+  (floats `0xc30430a4`, `0xc3e7f1ec`, `0x428c0000`) via `FUN_00419520`,
+  `FUN_00419550(−1.28, π/2)`, game `+0x10(FUN_0042a3c0(0x3eb), 0)`. Always vtable
+  `+0x4c("s2_01", 1)`. `0x00407050` (named `U03::SnapToGround` by the U03 spec): z :=
+  `FindGroundBelow` + camera `+0x5c`. `FUN_0041b440` (`FindObject(name, exact)`):
+  `X3d_Scene_Get_Object` (strcmp), else walk every object with `FUN_00416180(name, exact)`
+  (U33 passes 0). Corpus (`o3d.py` over `U33.x3d`): one `*u03_24` (`static/u03.o3d`);
+  `GeoSphere0`/`GeoSphere1` in `anim/balles.o3d` and `anim/coffre.o3d`;
+  `pedalegch`/`pedaledrt` in `static/U03_35.o3d` and `static/u03.o3d`; no `*U03_36f`;
+  `*Ecran01..10` children of `Prefilm.o3d`'s `$$$DUMMY.Dummy01`.
+- **Method:** capstone, MCP decompile, `o3d.py`/`x3d.py`.
+- **Confidence:** proven for the code; which duplicate each rename hits is Q-0180.
+
+### E-0422 — U33's frame hook: caravan gauge, the 25-s nag, the clown's 7-s delay on a shared timer, the policeman's gauge
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `U33::UpdateFrameLogic` (`0x00407770`), action manager = scene `+0x198`,
+  exhausted flags `+0x410 + 4·id`, action pointers `+0x10 + 4·id` (E-0073): `+0x580`
+  (M92) ≠ 0 and `+0x4f8` (M58) = 0 and `FUN_0041a6c0(gauge, 1)` → `0x00408eb0`, return 1
+  (no `Scene_RenderFrame`); `+0x424` (M05) and not `+0x428` (M06): unit `+0x6c8` :=
+  `GetTickCount` if 0; > `+0x6c8` + 25000 and `LSoundManager_IsGroupPlaying(2)` = 0 →
+  `FUN_0041e4b0(+0x28` = M06`)`, `+0x6c8` := 0; `+0x430` (M08) and not M06 →
+  `FUN_0041e3a0(M06)`; `+0x508` (M62), not `+0x510` (M64), not `+0x50c` (M63), group 2
+  silent: start `+0x6c8` if 0, > + 7000 → `FUN_0041e4b0(+0x10c` = M63`)` (no reset);
+  M62, not M64, M63, group 2 silent → `FUN_0041e3a0(+0x110` = M64`)`; `+0x564` (M85) and
+  `FUN_0041a6c0(gauge, 1)` → game vtable `+0x14(1)` (game over, E-0082); then
+  `Scene_RenderFrame`. `+0x6c8` is written only here and by the constructor (capstone of
+  `0x004070b0..0x004097df`); `+0x6cc` is never read.
+- **Method:** MCP decompile; capstone.
+- **Confidence:** proven.
+
+### E-0423 — U33's click dispatcher: the curtain trap before picking, then eighteen op-10 names; the small handlers
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `U33::DispatchClickActions` (`0x00407940`): if manager `+0x508` (M62) ≠ 0
+  and `+0x510` (M64) = 0 → `0x00409030` (renamed `U33::CaughtBehindCurtain`), return,
+  before `FUN_0041b700`. Else `FUN_0041b700`, then the queue with `FUN_0041e940` against
+  `FinTestM06` (`0x00408050`: `FUN_0041e3a0(M06)`), `MaskBoiteAllu` (`0x00408060`),
+  `DoCinema` (`0x004085f0`), `OuvreVolet` (`0x004086a0`), `TransitionInterieurRoulotte`
+  (`0x004089e0`), `OuvreTiroirFond` (`0x00408aa0`), `OuvreMalle` (`0x00408a70`),
+  `OuvreDiablotin` (`0x00408b30`), `CacheDerriereRideau` (`0x00408c80`),
+  `DoGameOverClown1` (`0x00408eb0`), `SortRideau` (`0x00408b60`), `PousseMalle`
+  (`0x00409180`), `OuvrePorte` (`0x00409260`), `DoParleProjectionniste` (`0x00409290`),
+  `DoCinemaA` (`0x00408460`), `AttenteFinFlicParle` (`0x00407ed0`), `TransitionVelo`
+  (`0x00407b80`), `OuvrePorteClown` (`0x004097a0`); all renamed `U33::<name>`.
+  `CaughtBehindCurtain`: `FUN_00414820(0, 0)`; node `*U03_18` running, `+0x68` = `+0x70`
+  = 0; `FUN_00420220(node *U03_02, "<unit>Anim/U03_02/choppe02.a3d", "Choppe02", 1, 1)`,
+  `+0x68` = 1, `+0x78` = 15.0, running; `X3d_Object_Unhide(clip +0x80, 1)`;
+  `FUN_0041e4b0(+0x104` = M61`)`; tick + `Scene_RenderFrame` while group 2 plays; game
+  `+0x14(1)`; `FUN_00414820(1, 0)`. `OuvrePorteClown`: `FUN_0041dea0(list, "M36", 1)`
+  (result unused); if `+0x4a0` (M36) = 0, `FUN_0041e4b0(FUN_0041dea0("M03"))`
+  (`mov ecx, eax` at `0x004097d7`). `DoParleProjectionniste`: `+0x52c` (M71) ? (`+0x540`
+  M76 clear → run M76, else `+0x544` M77 clear → run M77) : (`+0x548` M78 → M78, else
+  `+0x54c` M79 → M79). `OuvreMalle`: node `*U03_21` `FUN_00420080(1)` (`+0x64` = 1,
+  active slot 0), running, `+0x68` = 0. `OuvreTiroirFond`: nodes `*U03_17`, `*U03_30..32`
+  running, loop 0. `OuvreDiablotin`: `*U03_20` running, loop 0. `PousseMalle`:
+  `FUN_00420220(*U03_21, "<unit>Anim/coffre.a3d", "XXChoppe02", 1, 1)`, running, loop 0;
+  unhide `*U03_33`, `*U03_22`. `MaskBoiteAllu`: hide `*U03_14`.
+  `FUN_00420220(node, path, name, slot, active)` builds a clip node from the node's
+  object, fps, loop and paused flags.
+- **Method:** MCP decompile; capstone.
+- **Confidence:** proven.
+
+### E-0424 — `FUN_00419620` interpolates yaw and pitch and calls an optional per-step callback; it does not snap to the ground itself
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `FUN_00419620(from, to, yaw₀, yaw₁, pitch₀, pitch₁, ms, cb)`: N =
+  `_ftol`(ms · fps / 1000), at least 1; per step eye += Δ/N (`FUN_00419520`), yaw and
+  pitch += their Δ/N (yaw via ±2π the short way), `cb(x, y, z, yaw, pitch, i, N)` if
+  non-null, scene vtable `+0x24`, `Scene_RenderFrame`, `Scene_UpdateEmitterVolumes`, the
+  message pump; finally eye := to, yaw := yaw₁, pitch := pitch₁. U02's callback
+  `0x00402f50` is `Camera_FollowGround(eye)`; U33 passes 0 except `0x00408090`. On U33's
+  calls the third and fifth arguments are the values from `X3d_Camera_Get_Polar`
+  (current yaw, pitch) and the sixth is π/2 (pushes at `0x00407fb7`, `0x00408fa1`).
+- **Method:** MCP decompile; capstone.
+- **Confidence:** proven. Agrees with `u03.md`'s `WalkPath`.
+
+### E-0425 — U33's films: walk to the screen with a countdown callback, `U33_01` with M11 run during it, `U33_02` through `PlayVideo`; `PlayVideo` takes (avi, wav, redraw, stopVoice)
+- **Binary/file:** `MissionMonet.exe`; `Data/Video/U33_01.avi`, `U33_02.avi`.
+- **Evidence:** `U33::WalkToScreen` (`0x00408260`): `FUN_00414820(0, 0)`; walk to
+  `0x00407050`(699, 61, eye.z), yaw → 0, pitch → π/2, 6000, no callback; `FUN_00419620(eye,
+  (825.89, 60.1939, 62), yaw, 0, pitch, π/2, 6000, 0x00408090)`; unhide `Box186`; eye :=
+  `0x00407050`(699, 61, z₀) via `FUN_00419520`; `FUN_00414820(1, 1)`.
+  `U33::CountdownCallback` (`0x00408090`, created): table at `esp+0x38` = 9, 8, 10, 7, 9,
+  6, 10, 5, 9, 4, 10, 3, 9, 2, 10, 1; k = `_ftol`((N − fmod(N, 15)) · (1/15)); if
+  fmod(i, k) = 0, j = i / k + 1; for 0 < j < 16: hide `Box186`, `X3d_Object_Hide(*Ecran01
+  +0x20, 1)`, unhide `sprintf("*Ecran%i", 10)` when T[j] = 10 else `"*Ecran0%i"`.
+  `DoCinemaA` (`0x00408460`): unhide `*U03_37`; `FUN_00415eb0(eye)`, z += 3 · scene
+  `+0x138`; vtable `+0x50("s2_12", p, 0)`; `WalkToScreen`; hide `*Ecran01 +0x20`;
+  `SetAppMode(3)`; `AviOpenFile("%sVideo/%s.AVI", U33_01)` (−1 → `FUN_00417dd0("File not
+  found")` log, return); `AviSetWindow`, `FUN_00416f40` (black fill 640×480, present),
+  `[0x004432d4]` vtable `+0x28`, `AviPlayMovie(0, 0)`; `FUN_0041e4b0(+0x3c` = M11`)`; loop
+  until `AviGetStatus()` = 4: `FUN_004163b0(0x0d)` → `FUN_00414dc0(+0x178)` and leave,
+  else pump; `AviClose`; `SetAppMode(0)`; `0x004083f0` (renamed `U33::AfterFilm`:
+  `FUN_00414dc0(+0x174)`, `FUN_004194f0(0x00407050(686, 90, 68))`, `FUN_00419550(2.16,
+  π/2)`); vtable `+0x1c`. `DoCinema` (`0x004085f0`): `FUN_00421300(0, "*U03_10", 1)`; the
+  same effect and walk; hide; `PlayVideo("U33_02", "", 1, 0)`; `AfterFilm`. `PlayVideo`
+  (`0x00417030`) reads four arguments (`esp+0x20c` avi, `+0x210` wav: skipped when
+  empty, `+0x214` redraw via scene vtable `+0x1c`, `+0x218` stop group 2); its loop ends
+  on Enter, Escape or status 4. AVI headers: `U33_01` IV41 640×480 10 fps 189 frames, no
+  `01wb` chunk in the first 200 KB; `U33_02` IV41 15 fps 455 frames.
+- **Method:** capstone; MCP decompile; Python over the RIFF headers.
+- **Confidence:** proven. Refines the `PlayVideo("Prologue", 0, 1)` reading of E-0035
+  (the second argument is the WAV name).
+
+### E-0426 — `OuvreVolet`: the shutter, Ernest at the window, the projectionist sits, the key appears
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `0x004086a0`: `FUN_00414820(0, 0)`; `FUN_00421300(5, "*U03_09", 1)`;
+  target `0x00407050`(−412.59, 203.73, 70); node `*U03_15` running, `+0x68` = 0; hide
+  `*fenetrero`, unhide `*Ernest`; `FUN_00419620(…, yaw, 4.56, pitch, π/2, 4000, 0)`;
+  `FUN_00420220(node *U03_01, "<unit>Anim/U03_01/Assis.a3d", "Assis", 1, 1)`, `+0x68` = 1,
+  `+0x78` = 15.0, running; while group 2 plays: vtable `+0x24`, `Scene_RenderFrame`,
+  `FUN_004163b0(0x0d)` → `LSoundManager_StopGroup(2)`, leave; `*U03_15` running,
+  `+0x68` = 0, `+0x70` = 1, `FUN_004200c0(10.0)`; `FUN_0041e4b0(+0x198` = M98`)`; tick +
+  render until `+0x60` ≠ 0; `Camera_MoveTo(800, (−450.2, 214.38, 68.82), 4.02, 100, 100)`;
+  `Scene_RunFor(0)` while `FUN_00414ed0(+0x174)`; hide `*Ernest`, unhide `*fenetrero`,
+  `*U03_36`; `Camera_MoveTo(1000, same, 6.3, 100, 100)`; `FUN_00414820(1, 1)`.
+- **Method:** capstone.
+- **Confidence:** proven.
+
+### E-0427 — The caravan: M02's run count is the inside/outside flag; eye height and run/jump flags change; the flag is lost on restore
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `TransitionInterieurRoulotte` (`0x004089e0`): `0x00409330`; app `+0x484`
+  = 0; 3000 ms `GetTickCount` loop of `Scene_RunFor(0)` + vtable `+0x40`;
+  `FUN_0041e4b0(+0xdc` = M51`)`; `FUN_0041a560(gauge, 20.0, 1, "", 0)`; app `+0x484` = 1.
+  `0x00409330` (renamed `U33::EnterCaravan`): app `+0x484` = 0; `FUN_00414820(0, 0)`;
+  `FUN_00419ce0(22.5)`, `FUN_00419d00(8.5)`; walk to G(−248, 230, 200), yaw → 3.44, 2000;
+  door `*U03_16` running, `+0x68` = `+0x70` = 0; `FUN_00419cb0(58.0)` (camera `+0x5c`, eye
+  height); `FUN_0041e4b0(+0x194` = M97`)`; tick + render while `+0x74` < 30; `+0x74` =
+  60.0; yaw of normalize(G(−358, 265, 100) − eye); door running, `+0x70` = 1; walk to
+  that point, 2000; M02 (`+0x18`) action `+0x364` = 0; `FUN_0041e3a0(+0xb8` = M42`)`;
+  camera `+0x4c` = `+0x48` = 0; `FUN_00414820(1, 1)`; app `+0x484` = 1. `0x004095a0`
+  (`U33::LeaveCaravan`): `FUN_00419ce0(38.5)`, `FUN_00419d00(19.0)`,
+  `FUN_00419cb0(67.5)`; walk to G(−321, 252, 100), yaw → 0.32; door forward, M97,
+  `Scene_RunFor(0)` while frame < 30, frame := 60; door backward; walk to G(−216, 215,
+  100), yaw → 0.08; M02 `+0x364` = 1; camera `+0x4c` = `+0x48` = 1; `FUN_00414820(1, 1)`.
+  `OuvrePorte` (`0x00409260`): M02 `+0x364` ≠ 0 → `EnterCaravan`; else `+0x4f8` (M58) ≠ 0
+  → `LeaveCaravan`. Camera `+0x48` gates the Ctrl run mode and `+0x4c` the jump (E-0047,
+  `Camera_Jump`). The `ACTIONS` chunk saves `+0x810[id]`, which only `FUN_0041e320`
+  writes, and the load copies it into `+0x364` only when > 0; the `CAMERA` chunk has no
+  `+0x48`/`+0x4c` (E-0183).
+- **Method:** MCP decompile; capstone.
+- **Confidence:** proven.
+
+### E-0428 — The curtain and the clown: hiding, coming out, and `DoGameOverClown1`
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `CacheDerriereRideau` (`0x00408c80`): `FUN_00414820(0, 0)`; node
+  `*U03_18` running, `+0x68` = `+0x70` = 0; walk to G(−335, 260, 85), yaw → 4.56, 2000;
+  tick + render while `+0x74` < 30; pause; walk to G(−362, 303, 60) with yaw₀ = yaw₁ =
+  current, 2000; `FUN_00419620(eye, same point, yaw, 7.28, pitch, π/2, 2000, 0)`;
+  `+0x70` = 1, running; tick + render until paused; `+0x70` = 0, paused; `FUN_0041a680`;
+  `FUN_0041e4b0(+0x108` = M62`)`; camera `+0x40` = 0; `FUN_00414820(1, 1)`. `SortRideau`
+  (`0x00408b60`): curtain running forward, loop 0; tick + render while frame < 30; pause;
+  walk to G(−335, 260, 85) yaw kept, 2000; camera `+0x40` = 1; resume.
+  `DoGameOverClown1` (`0x00408eb0`): `FUN_00414820(0, 0)`; `FUN_0041a680(gauge)`; door
+  running, loop 0, forward; node `*U03_02` running, loop 0, `X3d_Object_Unhide(+0x80,
+  1)`; M61 (`+0x104`); walk to G(−362, 263, 100), yaw → 6.56, 2000; tick + render while
+  group 2 plays; `Scene_RunFor(1000)`; game `+0x14(1)`; `FUN_00414820(1, 0)`.
+- **Method:** capstone; MCP decompile.
+- **Confidence:** proven.
+
+### E-0429 — The policeman: walk to him, 27 s, a 15-s gauge and the bike shown
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `AttenteFinFlicParle` (`0x00407ed0`): `FUN_00414820(0, 0)`;
+  `FindObject("*U03_09", 0)`; P = `0x00407050`(−489, −464, eye.z); dir = normalize(object
+  local position − P) → `X3d_Convert_To_Polar`; `FUN_00419620(eye, P, yaw, dir yaw,
+  pitch, π/2, 6000, 0)` (the 4.72 stored first in the yaw slot is overwritten by the
+  polar call); `Scene_RunFor(0)` until `GetTickCount` ≥ start + 27000 (`0x6978`);
+  `FUN_0041a560(gauge, 15.0, 1, "", 0)`; unhide `FindObject("*U03_35", 0)`;
+  `FUN_00414820(1, 1)`.
+- **Method:** capstone; MCP decompile.
+- **Confidence:** proven.
+
+### E-0430 — `TransitionVelo`: the ride on `*U03_25` with a ±1° roll, two looping sounds on group 4, fade, `RouGiv`, unit 4
+- **Binary/file:** `MissionMonet.exe`; `Data/U33/Anim/velo.a3d`, `Data/Video/RouGiv.avi`.
+- **Evidence:** `0x00407b80`: `FUN_00414820(0, 0)`; `FUN_0041a680(gauge)`; hide
+  `FindObject(*U03_23)`, `FindObject(*U03_24)`; unhide `*U03_25`; node `*U03_25`:
+  `FUN_004200c0(0)`, running, `+0x68` = 0, `+0x74` = 50.0, `+0x78` = `+0x78` · 0.5 + 2.0;
+  hide `*selle`, `*guidon`; `LSoundManager_290("<unit>Sound/s2_24.wav", 1, 0, 0, 4, 1, 85,
+  100, 100)`. Loop while `+0x74` < 260: vtable `+0x24`; r += ρ / scene `+0x144` (ρ = 2.0),
+  r > 1 → 1 and ρ := −ρ, r < −1 → −1 and ρ := −ρ; X3D camera `+0x4c` := r (`0x00407d43`,
+  the roll of E-0047); the first time frame > 170: `s2_23.wav` the same with volume 90;
+  eye := `X3d_Object_Get_Local_Position(*U03_25)` + (0, 0, 33.0); yaw from
+  `X3d_Convert_To_Polar(*guidon global − *selle global)`, pitch π/2; `Scene_RenderFrame`.
+  Then pause, `FUN_00423540` on both sounds, `FUN_0041bfd0(2000)`, `PlayVideo("RouGiv",
+  "s6_1", 0, 1)`, game `+4(4)`. `velo.a3d` spans 0..500; INFOOBJ `*U03_25` fps 15.
+- **Method:** capstone; MCP decompile; `a3d.py`, `infoobj.py`.
+- **Confidence:** proven.
+
+### E-0431 — U33 corpus: SCENE.BIN, INFOACT, INFOOBJ, sounds, videos, clip ranges
+- **Binary/file:** `Data/U33/SCENE.BIN`, `INFOACT.BIN`, `INFOOBJ.BIN`, `Sound/*.wav`,
+  `Anim/**/*.A3D`; `Data/Video/U33_0[12].avi`, `RouGiv.avi`, `S6_1.wav`.
+- **Evidence:** `binchunk.py`: `#SCENE#` r g b 225, 220, 220, scale 45.0; `#CAMERA#` FOV
+  90, radius 20, Z offset 40, speed 7. `infoact.py --file`: 50 records (ids in `u33.md`);
+  op-10 names `OuvrePorteClown` (M01), `DoCinemaA` (M10), `MaskBoiteAllu` (M31),
+  `DoCinema` (M36), `OuvreVolet` (M40), `FinActionM01` (M44), `OuvrePorte` (M50, M72),
+  `OuvreMalle` (M55), `OuvreTiroirFond` (M56), `OuvreDiablotin` (M57),
+  `CacheDerriereRideau` (M58), `DoGameOverClown1` (M60), `SortRideau` (M68),
+  `PousseMalle` (M69), `DoParleProjectionniste` (M75), `AttenteFinFlicParle` (M85),
+  `TransitionVelo` (M90), `TransitionInterieurRoulotte` (M92). `infoobj.py`: 28 hotspots
+  as in `u33.md`. `a3d.py`: `porteroul`, `rido`, `volet`, `coffre`, `COFFRECOUVERCLE`,
+  `diablotin`, `balles`, `portehorl` 0..100; `velo` 0..500; `Trafic` 1..400;
+  `U03_02/Choppe01`, `Choppe02`, `U03_01/Assis` 1..2; `U03_01/ATTENTE` 1..250;
+  `U03_09/PARLENBOUCLE` 1..200. Python `wave` (22,050 Hz 8-bit): `s2_01` 35.57 s,
+  `s2_12` 37.83, `s2_24` 6.56, `S2_23` 6.77, `U03_01_10` 11.8, `_11` 2.94, `_13` 60.11,
+  `_15` 43.9, `_16` 57.25, `_19` 10.98, `_20` 4.59, `_22` 7.67, `_24` 2.82, `_29` 38.1;
+  `S6_1` 33.0. AVIs: `U33_01` IV41 10 fps 189 frames, `U33_02` 15 fps 455, `RouGiv` 15 fps
+  496, all 640×480.
+- **Method:** the parsers named; Python `wave` and RIFF header reads.
+- **Confidence:** proven.

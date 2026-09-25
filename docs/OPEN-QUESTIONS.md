@@ -809,3 +809,31 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Next to try:** `o3d.py`/`a3d.py` over `Static/U04.o3d`, `BARKE_TRAJECTOIRE1.A3D`,
   `BARKE_TOURNEROND.A3D`: the key's position against the path; then a live row.
 - **Status:** open
+
+### Q-0180 — Which duplicates do U33's renames hit (`GeoSphere0/1`, `pedalegch`, `pedaledrt`)?
+- **Context:** E-0421. `X3d_Scene_Get_Object` takes the first match in X3D's list:
+  `GeoSphere0`/`GeoSphere1` exist in `anim/balles.o3d` (the juggling balls, nodes
+  `*U03_30`/`*U03_31`) and `anim/coffre.o3d` (inside the trunk); `pedalegch`/`pedaledrt`
+  in `static/U03_35.o3d` (the policeman's bike) and `static/u03.o3d`. With a newest-first
+  list (Q-0045) the later file wins: `coffre.o3d`'s spheres become the `*U03_30`/`*U03_31`
+  hotspots' objects and `u03.o3d`'s pedals become `Zpedale`/`ZZpedale`. The nodes are
+  renamed separately and are `balles.a3d`'s either way.
+- **What we checked:** the rename code and `U33.x3d`'s load order; not X3D's list at
+  runtime.
+- **Blocks:** which objects the hotspots `*U03_30`/`*U03_31` pick; nothing in INFOACT
+  uses them (cursor 0), so only hover is affected.
+- **Next to try:** answered with Q-0045 (trace `X3d_Scene_Get_Object` at load).
+- **Status:** open
+
+### Q-0181 — Is a root object's next-sibling link (`+0x28`) always null?
+- **Context:** E-0421. `U33::SetNoCollisionTree(obj, 1)` sets `+0x118` on the object, its
+  descendants and every later sibling (`+0x28`) with theirs. `*U03_02` and `*Ernest` are
+  file roots: X3D links roots through `+0x2c` (E-0080) and fills `+0x24`/`+0x28` only
+  from parent links (E-0052), so the call should cover the two characters' subtrees
+  only; `u33.md` assumes that.
+- **What we checked:** the recursion and both link fields; not that object creation
+  zeroes `+0x28`.
+- **Blocks:** whether other top-level objects (the `COL*` meshes) lose collision in U33.
+- **Next to try:** decompile the object constructor in `x3d.dll` (`FUN_10011ea0`'s
+  allocation) for `+0x28`.
+- **Status:** open
