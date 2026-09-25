@@ -659,8 +659,10 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** the chunk reader/writer only.
 - **Blocks:** saves in U04 and U07.
 - **Next to try:** writers of those unit fields in U04's and U07's code.
-- **U07 answered:** `PLANCHE` is the plank-tipped flag (E-0395); U04 still open.
-- **Status:** open
+- **U07 answered:** `PLANCHE` is the plank-tipped flag (E-0395).
+- **U04 answered (E-0332):** `+0x6ec` on the boat, `+0x6e8` face map swapped (never
+  read), `+0x6e4` Monet finished painting (`u04.md`).
+- **Status:** RESOLVED (E-0332, E-0395)
 
 ### Q-0130 — From where on the platform does the original let the player click the whistle cord?
 - **Context:** E-0273. Geometry puts the cord in the locomotive's cab, visible and within
@@ -691,6 +693,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** the opener `0x00426780`; not the frame class, its `+0x114`, or
   `TableauJeu.fra`.
 - **Blocks:** the painting clicks in U05 (and any other unit's `DoTableau*`).
+  Also U04's `ScrollTableau` (E-0334): `U13_01`, `U13_99`, `U13_04`, `U13_06`, `U16_02`,
+  `U16_01`, `U14_01`, `U13_11`.
 - **Next to try:** decompile the class created for `TableauJeu` and its `+0x114`; parse
   `2DFRA/TableauJeu.fra` with `fra.py`; spec it in `ui.md`.
 - **Status:** open
@@ -793,4 +797,15 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** which object `CouperDynamite` hides and the fuse's position.
 - **Next to try:** the engine's object order compared with `X3d_Scene_Get_Object`; a live
   hover over the dynamite.
+- **Status:** open
+
+### Q-0150 — Where do the key, the boat's trajectory and the banks lie in U04's pond?
+- **Context:** E-0338. The key `*U04_36` is fishable only from the boat (M29 is TRUE while
+  aboard); the pick depth there is 4·s = 80. Jumping off works only when the boat clip's
+  frame is < 60 or > last − 60, and always lands at (149.87, 60.56, −9).
+- **What we checked:** code only.
+- **Blocks:** confirming that the key is reachable with two oars and whether one oar
+  (`BARKE_TOURNEROND`) can reach it.
+- **Next to try:** `o3d.py`/`a3d.py` over `Static/U04.o3d`, `BARKE_TRAJECTOIRE1.A3D`,
+  `BARKE_TOURNEROND.A3D`: the key's position against the path; then a live row.
 - **Status:** open

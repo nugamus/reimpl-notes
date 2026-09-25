@@ -3266,3 +3266,223 @@ An entry at `tentative` confidence must also have a matching line in
   `Game_OpenGalleryView` (`0x0041346a`).
 - **Method:** the parsers named; byte search of the EXE; MCP xrefs.
 - **Confidence:** proven.
+
+### E-0330 — U04's unit class: vtable `0x00439630`; `U04.x3d` is the unit scene, `U04D.X3D` a gallery backdrop, `U04Cpl.x3d` unused
+- **Binary/file:** `MissionMonet.exe`; `Data/U04/U04.x3d`, `U04D.x3d`, `U04Cpl.x3d`.
+- **Evidence:** `CreateUnitScene` case 4 → `0x0040a720` stores vtable `0x00439630` and zeroes
+  unit `+0x6e8`, `+0x6ec`, scene `+0x184`, `+0x6d4..+0x6e4`, `+0x6d0`. Vtable: `+8`
+  `U04_ReadParamsChunk` (`0x0040b2c0`), `+0xc` `U04_WriteParamsChunk` (`0x0040b330`),
+  `+0x10` generic `0x0041acf0`, `+0x14` `U04_StartUnit` (`0x0040a7a0`), `+0x1c`
+  `U04_UpdateFrameLogic` (`0x0040aac0`), `+0x30` `U04_DispatchClickActions`
+  (`0x0040adb0`), `+0x40` `U04_HandleInput` (`0x0040afd0`), `+0x44`
+  `U04_PickHoverHiddenTargets` (`0x0040b3a0`), the rest generic (`+0x34` `0x00412aa0`,
+  `+0x48..+0x54` sound). `U04D.X3D` (`0x0044114c`) is referenced only by `FUN_004131e0`
+  for `U13_01`, `U13_03`, `U13_04`, `U13_05`, `U13_06`, `U13_11`, `U13_12`, `U13_13`,
+  `U13_14` (unit class `0x32`, E-0037). No string `Cpl` in either EXE or any DLL of
+  `02_PR`. `diff` of the scripts (CR stripped): `U04Cpl.x3d` = `U04.x3d` with the
+  `irisdevant`, `arbrefond`, `arbustefond`, `plantelac1..6`, `plante1..4`,
+  `plantelacdevant1`, `chevaletpetit` lines uncommented and without
+  `static\ColTable04.o3d`; `U04D.x3d` has `COLBARQUE.O3D` for `CANNAPECHE.O3D`, pots
+  `potbas1/2`, `pothaut2/3` on, and `tubepeinture`, `morceauverre`, `coffre`, `abeille`,
+  `BARKE_PLACEMENT`, `rondbarke`, `Salon`, `Chaise`, `U04_37`, `PinssoPalette`,
+  `ColTable04`, the `tablo3`/`porche` animations, `U04_02\Ouvre01.a3d` and Monet
+  (`anim\U04_03\U04_03.o3d`, `peint.a3d`) off.
+- **Method:** MCP decompile and memory read; `diff`; Python byte search of `02_PR`.
+- **Confidence:** proven.
+
+### E-0331 — `U04_StartUnit`: fix-ups, sphere 5/0, emitters by state, boat restore, talker, face, autosave
+- **Binary/file:** `MissionMonet.exe`; `Data/U04/SCENE.BIN`, `Anim/**`, `maps/tete*.dmf`.
+- **Evidence:** `0x0040a7a0` (EBX = first argument `a`): game `+0x160` = 4; vtable
+  `+0x4c("s3_01", 1)`; `U04_FixObjectNames` (`0x0040e720`); `+0x6f8` =
+  `X3d_Scene_Get_Object("Box70")`; `FUN_0041ae10(a, b)`; `FUN_00419ce0(5.0)`,
+  `FUN_00419d00(0.0)`; `+0x6c8`/`+0x6cc` hotspot/node `*U04_03`, `+0x6f0`/`+0x6f4`
+  `*U04_32`; action manager `+0x488` (id 30) = 0 → `+0x6d4` = `*U04_43`'s hotspot object;
+  `+0x4a8` (id 38) = 0 → `+0x6d8` = `*U04_52`'s; `+0x41c` (id 3) and not `+0x454` (id 17)
+  → `U04_StartStudioEmitter` (`0x0040b9e0`: new emitter `FUN_00414c80(5, s·50.0)` at
+  scene `+0x188`, `SoundEmitter_Play("%sSound/s3_07.wav", (165.82, 332.92, 15), 1)`); id 3
+  and not `+0x424` (id 5) → `U04_StartBeeEmitter` (`0x0040bab0`: group 4, `+0x184`,
+  `s3_05.wav` at `*U04_06` hotspot `+0x70`, looping); `+0x6ec` ≠ 0 →
+  `FUN_00419520(x, y, boat hotspot z + 10.0)`, scene `+0x138` = 20.0; vtable
+  `+0x28("U04_03", "", "$$$DUMMY.*visage", 0, 8, 0)`; id 18 (`+0x458`) and not id 20
+  (`+0x460`) → `U04_SetMonetFaceMap(1)`; `+0x6e4` → `pain_Sot01` `+0x5c` = 1; id 18 →
+  `kokliko01` `+0x5c` = 1 if found; `a` ≠ 0 → inventory `+0x90`/`+0xa8` `U01_04P`,
+  `U03_06P`; `FUN_00419520(−33.566, 352.43, 15.0)`, `FUN_00419550(1.36, π/2)`; game
+  `+0x10(FUN_0042a3c0(0x3eb), 0)`. `U04_SetMonetFaceMap` (`0x0040d630`): `TETE` of Monet's
+  object (`FUN_0041b4c0`, exact = 1), first material's map, `X3d_Map_Create`, name
+  `tete.dmf` (`0x004404d8`, arg 0) or `teteBA.dmf` (`0x004404e4`, arg 1), `X3d_Map_Init`,
+  `X3d_Scene_Add_Map`, `X3d_Material_Update`, `+0x6e8` = 1. `U04/maps` holds `tete.dmf`
+  and `teteBa.dmf`; `U04/Sound` has no `.bin`. `U04/SCENE.BIN`: ambient 255/255/255,
+  f32 10.0, 90, 20, 40, 7.
+- **Method:** MCP decompile; capstone with strings and floats resolved; directory lists.
+- **Confidence:** proven.
+
+### E-0332 — U04's `PARAMS`: on the boat, face swapped (never read), painting done
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `U04_ReadParamsChunk`/`U04_WriteParamsChunk` (E-0182) move `+0x6ec`,
+  `+0x6e8`, `+0x6e4` (4 bytes each). Every access in `0x0040a720..0x0040ece0` (capstone
+  scan): `+0x6ec` written by the constructor, `U04_StepOntoBoat` (1) and
+  `U04_JumpOffBoat` (0), read by start, the frame hook and the input hook; `+0x6e8`
+  written by the constructor and `U04_SetMonetFaceMap` only, read by nothing but the
+  chunk writer; `+0x6e4` written by the constructor and `U04_MonetFinishesPainting` (1),
+  read by start and `U04_ScrollTableau`. Answers Q-0103 for U04.
+- **Method:** capstone scan of the U04 range for `+0x6d0..+0x6f8`; MCP decompile.
+- **Confidence:** proven.
+
+### E-0333 — U04's frame, input and hover hooks
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `U04_UpdateFrameLogic` (`0x0040aac0`): `Scene_RenderFrame`; gauge `+4` ≠ 0:
+  (not id 3, label `Door` `0x0043ffd8`, `FUN_0041a6c0(gauge, 1)`) → Monet slot 1 `+0x70`
+  = 1, running, `+0x78` = 10.0, door node `+0x70` = 1, running, loop `RunFor(0)` + vtable
+  `+0x40` until door `+0x60`, camera `+0x40` = 1, `FUN_0041e2a0(M02, 1)`; (not id 17,
+  camera x > 180, y > 275, label `Paint`, fired: the fire test is the last operand) →
+  `U04_MonetFinishesPainting`; (`+0x6ec`, `ecroule`, fired) → `U04_BoatSinks`
+  (`0x0040d4e0`); (`PlusVite`, fired) → `+0x48("d3_20", eye − (s·10, 0, 0))`. Then id 17
+  and not id 18 and y < 40 → `U04_AuSecours` (`0x0040d720`); id 18, not id 20, not id 40
+  (`+0x4b0`), distance to (213.47, 296.4, 15) < 2·s → `U04_ErnestLocksStudio`; not
+  `+0x6ec` and `_stricmp(camera +0x3c, "*U04_32")` = 0 → `U04_StepOntoBoat`.
+  `U04_HandleInput`: not on boat: id 24 (`+0x470`), Shift (`0x46e820`), distance to
+  (191, 240.8, 15) < s·0.5, yaw := `FUN_00416080` (fmod into [0, 2π)), |yaw − 1.54| < 1.5
+  → `U04_ClimbOutOfWindow` (`0x0040dde0`); id 32 (`+0x490`), id 39 (`+0x4ac`), Up
+  (`0x46e878`), x < −22, y > 307, |yaw − 4.9| < 1.5 → suspend, `Camera_MoveTo(2000,
+  (−28.948, 358.7, 15), 4.6, π/2, 90)`, `FUN_0041bfd0(2000)`, `PlayVideo("GivParis",
+  "s6_1", 0, 1)`, game `+4(5)`. On boat: Up → `U04_RowBoat(0, 1)`, Down (`0x46e880`) →
+  `(0, 0)`; Shift → slot = boat node `+0x18c` or the node; frame `+0x74` < 60 or > anim
+  last − 60 → `U04_JumpOffBoat`, `FUN_004200c0(1.0)`; no slot → `U04_JumpOffBoat`. Then
+  camera `+0x3c` == `+0x6f8` → climb out; `Scene_HandleInput`.
+  `U04_PickHoverHiddenTargets`: `+0x5c` = 0 on the four `+0x6d4` objects,
+  `Scene_PickHover`, `+0x5c` = 1.
+- **Method:** MCP decompile; capstone for strings, floats and the Say arguments.
+- **Confidence:** proven.
+
+### E-0334 — U04's door, studio, pot, tube, painting-finished and painting-view handlers
+- **Binary/file:** `MissionMonet.exe`; `Data/2dbit/U13_*`, `U14_01*`, `U16_0*`.
+- **Evidence:** dispatcher `0x0040adb0`, order as in `u04.md`. `U04_MonetOpenDoor`
+  (`0x0040b400`): run count `+0x818` (M02) = 1 → `FUN_00420220(Monet, ouvre01.A3D,
+  "OpenDoor", 1, 1)`; door anim `+0x3c` = 0x19; `+0x50("s3_13", eye)`; `d3_01`
+  (`0x004400f0`) / `d3_02` (`0x004400e8`); `FUN_0041a560(12.0, 0, "Door", 0)`.
+  `U04_EntrerDansAtelier` (`0x0040b630`): moves of 1000/1500/1000/9000/3000 ms as
+  specified, `d3_03`, clips `ouvre02`, `change`, door `ouvre02` frame := anim `+0x3c`; M07
+  (`+0x2c`) FALSE, loop while the voice plays and id 7 is not exhausted, TRUE; app
+  `+0x484` 0/1. `U04_UsePot` (`0x0040bb80`): `FUN_00420080(*U04_06 node, 0)`, hide
+  `*U04_06`, show `*U04_53`, `FUN_00414dc0(+0x184)`, `s3_06`, `*U04_07` cursor 4.
+  `U04_UseTube` (`0x0040bc20`): `FUN_0041a560(80.0, 0, "Paint", 0)`, `Recharge.A3D` in
+  slot 2, `FUN_004203c0(2)` deletes slot 2 (`+0x188[2]`, count −1).
+  `U04_MonetFinishesPainting` (`0x0040bd50`): `far` = y > 308 (`fcomp`, `test ah, 0x41`
+  at `0x0040bd87`), clips and lines `d3_14` (`0x0044029c`), `d3_17` (`0x00440254`), Enter
+  = `FUN_004163b0(0xd)`, `+0x6e4` = 1, Monet cursor 5, hide `*U04_50`, `range.A3D`, M17
+  (`+0x54`) TRUE, `FUN_0041a680`. `U04_EnablePaintingActions` / `Disable`
+  (`0x0040c3f0` / `0x0040c440`): manager `+0x30..+0x50` (ids 8..16), `FUN_0041e2a0(1/0)`,
+  cursor 2/0 on each action's hotspot `+0xac`. `U04_ScrollTableau` (`0x0040c240`):
+  current action (`+0xc`) id `+8`, switch 8..16 → frame manager (`DAT_0046edb0`) `+0xc8`
+  (`0x00426780`: frame `TableauJeu` via `+0x90`, `+0x114(id)`, app `+0x47c` = 2,
+  `+0x484` = 0); the guard `strstr("d3_14"/"d3_03", voice emitter +0x18)` looks for the
+  stored full path (`FUN_0041baf0` builds `%sSound/%s.WAV`; `SoundEmitter_Play` copies it
+  to `+0x18`) inside the short literal, so it never matches; then id 7 and not `+0x6e4` →
+  `FUN_0041a560(30.0, 0, "Paint", 0)`.
+- **Method:** MCP decompile; capstone.
+- **Confidence:** proven.
+
+### E-0335 — `UseCartePostale` (Mazout) and `U04_AuSecours` (the kidnapping)
+- **Binary/file:** `MissionMonet.exe`; `Data/U04/Anim/U04_04/`, `Sound/`.
+- **Evidence:** `0x0040c490`: `Camera_MoveTo(4000, (201.19, 300.77, 15), 6.24, π/2)`,
+  `replace.A3D`, `parle02.A3D`, `FUN_00414dc0(voice)`; `FUN_00420a90(new, 6, 0,
+  "*U04_04", 0)`, `XObject3D_60("%sANIM/U04_04/U04_04.o3d")`, hotspot list `+4`, vtable
+  `+0x20(invite.a3d)`, `+0x28("U04_04", "", "$$$DUMMY.*visage", 0, 8, 0)`; `ZIVAT.A3D`
+  until frame 50 (`0x00439448`); P = Monet position + (s, −s·0.5) (cdecl
+  `X3d_Object_Get_Global_Position`, `0x0040c816..0x0040c83e`), `FindGroundBelow`
+  (`0x00415f40`) + camera `+0x5c`, `Camera_MoveTo(800, P, 3.14, π/2)`, until frame 300
+  `FUN_004194f0(P)`; `Camera_MoveTo(2000, (78.51, 272.95, 15), 3.4, 1.5)`; `Say(U04_03,
+  "d3_18b")`; `Presente.A3D`; `+0x50("ArbreCraque", eye − (10, 0, 0))`, `RunFor(1500)`;
+  `Say(U04_04, "d3_19")` with a 1000 ms `timeGetTime` cap; `Course.A3D` "Mazout", first
+  frame > 50 → `+0x50("s3_08_pas", the same point)`, frame > 100 → `FUN_00419bc0(0,
+  Mazout's object)`; `Camera_MoveTo(1000, (75.9, 261.43, 15), 2.071)`; hide `*U04_04`,
+  show `*U04_44`; release; `parle04.A3D` 5 fps. `U04_AuSecours` (`0x0040d720`): manager
+  `+0x458` = 1; `+0x48("d3_21", eye − (s·8, 0, 0))`; `evanoui.A3D` looping; hide
+  `*U04_08`; `U04_SetMonetFaceMap(1)`; door `SENVAT.A3D` slot 1 paused at frame 1;
+  `FUN_0041a560(6.0, 0, "PlusVite", 0)`; hide `kokliko01`.
+- **Method:** MCP decompile; capstone.
+- **Confidence:** proven.
+
+### E-0336 — `U04.cpp:1066` is Ernest locking the studio
+- **Binary/file:** `MissionMonet.exe`; `Data/U04/Anim/Ernest/`.
+- **Evidence:** `0x0040d8a0` (renamed `U04_ErnestLocksStudio`; its error call passes line
+  `0x42a` = 1066 and `D:\MissionD\Source\U04.cpp`): suspend; `FUN_0041e3a0(M40)`
+  (exhausted); `FUN_00419bc0(800, Monet's object)`; `+0x48("d3_23", eye)`; `timeGetTime`;
+  `X3d_Load_Sdk_o3d("%sANIM/Ernest/ERNST2.O3D")`, `X3d_Scene_All_Light_Include_Object`;
+  vtable `+0x20(respect.A3D, obj, 15.0)`; `FUN_00419bc0(1000, door object)`; wait while
+  the voice plays, < 28000 ms, Enter up; `SENVAT.A3D` "senvat"; door slot running; frame
+  ≥ 70 (`0x004396cc`); `s3_09a`; door paused; `RunFor(2000)`; `X3d_Animation_Release`
+  ×2, `X3d_Object_Release`; show `*U04_36`; door cursor 5; Monet cursor 2; M20 (`+0x60`)
+  TRUE; stop the effects group; resume; `RunFor(2000)`; `s3_09b`.
+- **Method:** MCP decompile; capstone.
+- **Confidence:** proven.
+
+### E-0337 — U04's ungagging, hints, window and ladder handlers
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `U04_EnleverBaillon` (`0x0040dc20`): `U04_SetMonetFaceMap(0)`,
+  `reveil.A3D`, `Talkers_Say("*U04_03", "d3_24")` (`0x0040dc8c..0x0040dc96`), Monet cursor
+  3, `parle03.A3D`, `*U04_22` cursor 2, `*U04_23` cursor 4, app `+0x484` 0/1 around a
+  voice loop with vtable `+0x40`, 6 fps. `U04_MonetTalkAfterBaillon` (`0x0040e5c0`): id
+  29 (`+0x484`) or id 24 exhausted → nothing; count `+0x8b4` 1 → `d3_25`, 2 → `d3_26`,
+  else ⌊rand·2/32767⌋ = 1 → `d3_25`, else `d3_26`. `U04_MonetTalkAfterMarteau`
+  (`0x0040e640`): count `+0x8b8`: 1 → id 29 ? `d3_29` : `d3_28`; 2 → `d3_29`; 3 → id 29 ?
+  `d3_29` : `d3_30`; else r = ⌊rand·3/32767⌋: id 29 or r = 2 → `d3_29`, r = 1 → `d3_28`,
+  else `d3_30`. `U04_BriserVitre` (`0x0040cd50`): `+0x50("Vitre", eye)`, show `*U04_41`,
+  wait for the effects group, climb out. `U04_ClimbOutOfWindow` (`0x0040dde0`):
+  `Camera_MoveTo(1000, (194, 246, 21), 1.707, 1.57)`, `(1000, (186, 220.26, 21), keep)`,
+  `Camera_ApplyVelocity(1)`, `s3_12`. `U04_MonterSurEchelle` (`0x0040ded0`): y < 240 →
+  `(187.89, 234, 24)` 4.9 / 1.57, `(189.43, 244, 24)`, step, `s3_12`; else climb out.
+  `U04_UseEchelle` (`0x0040deb0`): `+0x6d8` = 0, `*U04_63` cursor 2.
+- **Method:** capstone (Say arguments; the decompiler drops them); MCP decompile.
+- **Confidence:** proven.
+
+### E-0338 — U04's boat: step on and off, rowing, sinking, cork, oars
+- **Binary/file:** `MissionMonet.exe`; `Data/U04/Anim/BARKE_*.A3D`.
+- **Evidence:** `U04_StepOntoBoat` (`0x0040cdf0`): `+0x6ec` = 1, `+0x138` = 20.0, eye =
+  the boat hotspot's position + 10 z, camera `+0x40` = `+0x70` = 0, `FUN_00419bc0(0,
+  *U04_43)`; run count `+0x888` (M30) = 0 → if gauge `+4`: a `FUN_0041a510` copy of its 15
+  dwords at `+0x6d0`; `FUN_0041a560(20.0, 1, "ecroule", 0)`, `+0x50("s3_15", eye)`;
+  `*U04_36` cursor 5; M29 (`+0x84`) TRUE. `U04_JumpOffBoat` (`0x0040cfa0`): `+0x138` =
+  10.0, `+0x6ec` = 0, `Camera_MoveTo(2000, (149.87, 60.56, −9.0), 0.427, π/2)`, camera
+  `+0x40` = `+0x70` = 1, `+0x3c` = 0; label `ecroule` → stop the gauge, stop `+0x174`,
+  copy back and free `+0x6d0`; `*U04_36` cursor 0; M29 FALSE. `U04_RowBoat`
+  (`0x0040d0b0`): right = `+0x494` | `+0x498`, left = `+0x49c` | `+0x4a0`; clip names
+  `Rond` (`0x00440484`), `Traj` (`0x004404ac`), loaded with loop 1, paused, 30 fps;
+  direction `+0x70` as in `u04.md`; `s3_14`; `FUN_0041ff20(slot)`; boat position, eye +
+  10; `FUN_00415ef0(eye, *U04_43 position, &yaw, &pitch)`, `+6.283` while < 0
+  (`0x0040d414..0x0040d45f`); |ftol(camera yaw − yaw)| + |ftol(camera pitch − pitch)| >
+  0.6 → `FUN_00419c00(1000, position)`, else `FUN_00419550` (`0x0040d463..0x0040d4cd`).
+  `U04_BoatSinks` (`0x0040d4e0`): `BARKE_PLACEMENT_COULE1.A3D` "deplacement", 30 fps,
+  `s3_15`, the eye follows, `FUN_0041bfd0(2000)`, game `+0x14(1)`. `U04_UseBouchon`
+  (`0x0040dfd0`): `+0x6d4` = 0, stop the gauge and `+0x174`, restore `+0x6d0`.
+  `U04_RameToGauche` / `Droite` (`0x0040cdb0` / `0x0040cdd0`): cursor 0 on `*U04_40` /
+  `*U04_39`.
+- **Method:** MCP decompile; capstone.
+- **Confidence:** proven.
+
+### E-0339 — `UseCle`, the exit to U05, and U04's item path
+- **Binary/file:** `MissionMonet.exe`; `Data/U05/INFOACT.BIN`; `Data/Video/GivParis.avi`.
+- **Evidence:** `U04_UseCle` (`0x0040e030`): Monet cursor 0; M43 (`+0xbc`) FALSE; x ≤ 156
+  → `(135.25, 280.78, 15)` yaw 0.5, else `(169.9, 269.81, 15)` 3.64; `s3_18`;
+  `RunFor(400)`; door slot `FUN_00420080(1)`, `+0x70` = 1, 15 fps, loop 0; `RunFor(1000)`;
+  `d3_31B`; `RACOMPAGNE.A3D` to half, `FUN_00419bc0(1000, TETE)`, to last − 30;
+  `Camera_MoveTo(5000, (80.5, 259.2, 15), 5.042)`; `+0x490` (id 32) = 0 → `d3_31_3`,
+  `TROUVLEGANT.A3D`, look at `*U04_44`, camera `+0x40` = `+0x44` = 0, loop until id 32,
+  `d3_35` (`0x0040e45c..0x0040e48a`); `ASSOIT.A3D`, `parle04.A3D` 5 fps; id 32 → `d3_35`
+  (`0x0040e576..0x0040e58e`). Exit: E-0333. `infoact.py` on U05: M09 uses `U04_44` on
+  `*U05_05` (use up). E-0253: `U01_04` is U04's M03.
+- **Method:** MCP decompile; capstone; `infoact.py --file`.
+- **Confidence:** proven.
+
+### E-0340 — U04's INFOACT/INFOOBJ, and `Say("*U04_03")` finds no talker
+- **Binary/file:** `MissionMonet.exe`; `Data/U04/INFOACT.BIN`, `INFOOBJ.BIN`.
+- **Evidence:** `infoact.py --file Data/U04/INFOACT.BIN`: 42 records, ids 1..43 without
+  16, steps and conditions as in `u04.md`; M18 and M40 have trigger 0. `infoobj.py`: 48
+  entries as tabled. Talkers: `XSceneAnim_157` (`0x0041c400`) creates the talker with
+  `FUN_00421360(this, character, face)` (`0x0041c57e..0x0041c590`), whose name `+0xc` is
+  the character (`FUN_0041dd90(6, 0, name)`); `Talkers_Say` looks it up with vtable
+  `+0x14(name, 0)` = `FUN_0041dea0` → `FUN_00416180(talker name, query, 0)`: `_stricmp`,
+  else `strstr` of the upper-cased query in the upper-cased name. `U04_03` does not
+  contain `*U04_03`, so `Talkers_Say` takes its no-talker branch (voice at the eye).
+- **Method:** parsers; MCP decompile; capstone.
+- **Confidence:** proven.
