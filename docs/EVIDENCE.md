@@ -2381,3 +2381,79 @@ An entry at `tentative` confidence must also have a matching line in
   banknote `U02_01` U02 M03 / M05. `2dbit` has `…C` and `…P` images for all six.
 - **Method:** `infoact.py --file` on each unit; directory listing.
 - **Confidence:** proven.
+
+### E-0230 — `U00_Start` first runs U04's name fix-ups (`U04_FixObjectNames`): renames, hides, no-pick and no-collision boxes
+- **Binary/file:** `MissionMonet.exe`; `Data/U00/U00.x3d`, the `Data/U04/**/*.o3d` it loads.
+- **Evidence:** `U00_Start` (`0x0040a1e0`) calls `0x0040e720` (renamed
+  `U04_FixObjectNames`) with the X3D scene before its own renames. Other callers:
+  `0x0040a7c6` (the unit whose constructor `0x0040a720` installs vtable `0x00439630`) and
+  `FUN_004129a0`. Body, in order, each by `X3d_Scene_Get_Object` (newest-first lookup,
+  u01.md): `*U04_37` → `*U04_44`, then the next `*U04_37` → `*U04_63`; `*U04_26`
+  animation + object → `FUN_0041c280(scene, anim, obj, "")`; `*U04_05t` → `*U04_05`;
+  `*pot confi` → `*U04_53`; `*U04_27` → `*U04_61`; `*U04_28` → `*U04_62`; `*U04_16t` →
+  `*U04_16`; `$$$DUMMY.*dummycann` → `*U04_29`; `Cylinder38`, `Box1448`, `Box1449`,
+  `Box1450`, `Box1447` → `*U04_51`; child of `*U04_03` matching `PALETTE`
+  (`FUN_0041b4c0(obj, "PALETTE", 1)`) → `*U04_50`; `* face ech` → `*U04_52` and `+0x5c` = 1
+  (hidden); while `Box36` exists: rename `Box36_%i` (i = 0, 1, …; format `0x0044078c`) and
+  `+0x114` = 1 (not pickable, E-0070); `Box1162` `+0x114` = 1; `+0x118` = 1 (out of
+  collision and ground casts, E-0059) on `Box368`, `Box366`, `Box373`, `Box430`, `Box431`,
+  `Box435`, `Box436`, `Box437`, `Box682`, `Box686`, `Box687`, `Box690`, `Box691`, `Box708`,
+  `Box198`, `Box199`, `Box429`, `Box619`, `Box620`, `Box212`, `Box214`, `Box218`, `Box713`,
+  `Box822`. Strings at `0x004406c4..0x00440858`, `0x0043ff0c..0x0043ff2c`, `0x00440204`.
+  Corpus (o3d.py over U00.x3d's `Object=` files): present in U00 are `*U04_37` twice
+  (`static/u04.o3d`, `static/U04_37.o3d`), `*U04_05t`, `*pot confi`, `* face ech`,
+  `*U04_31` (u04.o3d), `*U04_27`/`*U04_28` (children of `*U04_32`, `Anim/barke_placement.o3d`),
+  `Cylinder38` and `Box1447..1450` (`static/potabeille.o3d`), `Box36` seven times (u04,
+  bosketjone1, parterrehaut, barreba1, barrecote1, barreho2, pontsous), `Box1162`, and of
+  the collision list all but `Box431`, `Box435`, `Box436`, `Box686`, `Box687`, `Box619`,
+  `Box620`, `Box429`; absent: `*U04_26` (no object or A3D node of that name), `*U04_16t`,
+  the dummy, any `PALETTE` object. So U00_Start's hides of `*U04_44`, `*U04_63`, `*U04_05`,
+  `*U04_53` only find their objects through these renames.
+- **Method:** MCP decompile of `0x0040e720` and `U00_Start`; xrefs; `pefile` strings;
+  `o3d.py` / `a3d.py` over U00's object list. Function renamed in Ghidra.
+- **Confidence:** proven.
+
+### E-0231 — U00's ground object is the object whose face the walking ground cast hit; the boat is `*U04_32`
+- **Binary/file:** `MissionMonet.exe`; `Data/U04/Anim/barke_placement.o3d`, `static/lunette.o3d`.
+- **Evidence:** `Camera_FollowGround` (`0x0041a270`) walks every object
+  (`X3d_Scene_Find_First/Next_Object(scene, 1)`), skips `+0x118` ≠ 0, tests each face with
+  `X3d_Line_Face_Collision` and stores the object of the highest hit in camera `+0x3c`
+  (0 if none); it runs only in the walking ground step (movement.md). U00's other writer
+  is `U00_JumpOffStone` (`+0x3c` = 0, `0x00409e2d`); U01's is the train (`0x00401368`).
+  `U00_ProcessTutorialKeys` compares `_stricmp(*(char **)(camera + 0x3c), "*U04_32")`, the
+  hit object's own name, with no parent walk. `barke_placement.o3d` ("barque", a boat):
+  top object `*U04_32` (109 faces, local position (141.39, 66.87, −21.82)) with children
+  `Box02`, `Box01`, `*U04_30`, `*U04_40`, `*U04_39`, `*U04_28`, `*U04_27`, `*U04_43`,
+  `Line07`, none welded. The ground glasses `*Lunettes0` (`static/lunette.o3d`, top level,
+  22 faces) are at (141.37, 70.74, −20.33); Monet's own `*Lunettes0` is a child of
+  `montur` in `anim/U04_03_Lunettes/U04_03_LUNETTES.O3D`, the last file U00.x3d loads, so
+  newest-first lookup finds it first (→ `*U04_81`). Near-Monet distance `FUN_00415e40` is
+  the 3D Euclidean distance between Monet's hotspot `+0x70` and the eye (camera `+0x14`).
+  `U00_SayMonet` with a non-zero third argument never touches the talker, so Remarks do
+  not animate Monet. The U00 unit's constructor (`0x004097e0`) zeroes `+0x6d8`,
+  `+0x6e0..+0x703` and `+0x704`; of the flags `+0x6e4` (moved) is written and never read,
+  `+0x6ec` is read only to set itself (capstone scan of `0x00409820..0x0040a770`).
+- **Method:** MCP decompile; capstone scans for `+0x3c` stores and U00 field accesses;
+  `o3d.py`.
+- **Confidence:** proven.
+
+### E-0232 — U00's interactables are two actions on five hotspots; the designed path stores the glasses through the bar the take step raised
+- **Binary/file:** `Data/U00/Infoobj.bin`, `Infoact.bin`; `MissionMonet.exe`.
+- **Evidence:** full parse (`infoobj.py`, `infoact.py`): hotspots `*U04_03` (type 6, cursor
+  0, anim running looping), `*U04_32` (5, cursor 0, paused), `*U04_36` (4, hidden),
+  `*U04_43` (4, cursor 0), `*U04_80` (4, cursor 4). Actions: only M01 (trigger 8 on
+  `*U04_80`, TRUE, steps op 2 `U04_80`, op 10 `TakeLunettes`, max 1) and M02 (trigger 7,
+  item `U04_80` on `*U04_03`, TRUE, op 10 `DonnerLunettes`, max 2). No action names
+  `*U04_32`, `*U04_36` or `*U04_43`, so clicks on them, and plain clicks on Monet, run
+  nothing. U00's vtable (`0x004395d8`, 22 slots up to `+0x54`) overrides only `+0`
+  (destructor `0x00409820`), `+0x10` Load, `+0x14` Start, `+0x1c` frame, `+0x30` dispatch,
+  `+0x40` input and `+0x48` voice path; the dispatcher knows only `DonnerLunettes` and
+  `TakeLunettes`; the other slots are the base scene's (same addresses as U01's
+  `0x004393d0` and U02's `0x00439468` at `+4`, `+0x18`, `+0x20..+0x2c`, `+0x34..+0x3c`,
+  `+0x44`, `+0x4c..+0x54`; `+8`/`+0xc` are `0x0041d490`/`0x0041d650`, which U01 and U02
+  override). Op 2
+  shows the bar (E-0104), so a take leaves the bar up and one strip click stores the
+  glasses without Space; `spaceSeen` (`+0x700`) is set only by Space (and
+  `DonnerLunettes`), and the near-Monet line `sb10` needs it clear.
+- **Method:** parsers; vtable dump with `pefile`; E-0201/E-0202 functions.
+- **Confidence:** proven for the data and code; what the lines say is not checked (Q-0120).

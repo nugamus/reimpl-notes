@@ -566,6 +566,26 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   whether collision with Monet blocks the first step; or the user plays it by hand.
 - **Status:** open
 
+### Q-0120 — What do U00's tutorial lines say?
+- **Context:** E-0232: the code fixes when each of `sb03`..`sb14` plays, not what it asks
+  for. The designed path in `u00.md` (store the glasses with a strip click, `sb10` near
+  Monet, `sb11` until Space) is read from the conditions alone.
+- **What we checked:** EXE strings (no subtitles), the WAV list.
+- **Blocks:** nothing for play; confirms the reading of `sb05`/`sb06`/`sb07`/`sb09`/`sb10`/`sb11`.
+- **Next to try:** the user listens to `Data/U00/Sound/sb*.wav` and notes one line each.
+- **Status:** open
+
+### Q-0121 — Does the original step back onto the boat after the Shift jump, and where is the step-on reachable?
+- **Context:** E-0231: the step-on needs the walking ground cast's highest hit to be
+  `*U04_32` itself (not a child such as `*U04_30` or `Line07`). The jump lands at
+  (149.87, 60.56, −9.0), about 10.6 units from the boat's origin, with the ground object
+  cleared; the first step's cast may hit the boat again.
+- **What we checked:** static code and object positions only.
+- **Blocks:** confirming that the tutorial can be left by walking after the jump.
+- **Next to try:** in the original, walk onto the boat, Shift, then Up; read
+  `camera.ps1` before and after and see whether the view snaps back onto the boat.
+- **Status:** open
+
 ### Q-0090 — Which duplicate objects do U02's renames hit?
 - **Context:** E-0160. `*U02_01` exists in the clerk's and the seller's `.O3D`, `*U02_07`
   in `Static/U02.O3d` and `Static/U02_07.o3d`; the renames take the first found. With a
