@@ -17,8 +17,8 @@ camera, recomputed at pick time, not the last frame's.
    Skip an object when:
    - it is hidden (`X3d_Object_Hide`: collision meshes, hidden hotspots), or
    - its bounding box is entirely outside the view frustum (near 0.1, far 1,000,000), or
-   - it is a welded object below its hierarchy top (its faces belong to the top's mesh,
-     E-0054; the hit is reported for the top).
+   - it is a welded object below its hierarchy top (its faces are tested with the top's
+     mesh, E-0054; a hit on one of its faces reports the welded object itself, E-0076).
 
    Children are visited even when the parent is skipped. The LOD actually drawn
    (E-0052) supplies the faces; the reported object is the base object.

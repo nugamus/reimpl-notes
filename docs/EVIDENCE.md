@@ -1225,3 +1225,16 @@ An entry at `tentative` confidence must also have a matching line in
 - **Method:** engine render with `start_camera=-258.44,-508.20,29.546,1.31,1.570796`
   beside `traces/u01-start-original.png`.
 - **Confidence:** proven for this shot; how the renderer uses `+0x164` stays inferred.
+
+### E-0076 — A pick on a welded object's face reports that object, not its hierarchy top
+- **Binary/file:** `Data/U01/Anim/U01_02/U01_02.O3D`; `MissionMonet.exe` (running).
+- **Evidence:** the mayor's card `*U01_04` is a welded child (`welded` 1, no own vertices,
+  2 faces) of `mainG` under `*U01_02`, the hierarchy top holding the 426-vertex array
+  (`tools/parsers/o3d.py`). Clicking the card in the original at game (262, 338) runs
+  INFOACT M02 on hotspot `U01_04` (`TakeCard`, E-0059's run). If the pick reported the top
+  (`*U01_02`, E-0070's reading), the hover walk would find hotspot `*U01_02` and M02 could
+  never run. The engine, reporting the face's own object, picks `*U01_04` at depth 22.6
+  there and the same action follows.
+- **Method:** parser dump; engine `-d2` log with `dev_click=262,338,3000`.
+- **Confidence:** strong (behavioural). Supersedes the "hit is reported for the top" clause
+  of E-0070; the rest of E-0070 stands.
