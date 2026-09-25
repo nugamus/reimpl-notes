@@ -659,6 +659,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** the chunk reader/writer only.
 - **Blocks:** saves in U04 and U07.
 - **Next to try:** writers of those unit fields in U04's and U07's code.
+- **U07 answered:** `PLANCHE` is the plank-tipped flag (E-0395); U04 still open.
 - **Status:** open
 
 ### Q-0130 — From where on the platform does the original let the player click the whistle cord?
@@ -737,4 +738,59 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   policeman's salute and reflection).
 - **Next to try:** decompile `FUN_10005550`, `FUN_10005cf0`, `FUN_100069a0`,
   `FUN_10004860` in `x3d.dll`.
+- **Status:** open
+
+### Q-0170 — What does U06's clown look like after he first turns?
+- **Context:** E-0391. `Hotspot_TurnToYaw` builds M = (local matrix at hotspot creation) ·
+  Rz(yaw_old − yaw) and every tick sets local := posed local · M, so the load-time local
+  matrix is applied on top of the animation's pose. If that matrix is not the identity,
+  the clown jumps on his first turn; the sign convention of `X3d_Make_Rotation_Matrice_Z`
+  and `X3d_Matrice_Mult` decides which way he turns.
+- **What we checked:** the EXE side (decompile); not the x3d.dll matrix routines, not the
+  local matrix of `*U03_02` in `TIRE.O3D`, no trace.
+- **Blocks:** a faithful clown in U06 (he must face the player).
+- **Next to try:** read `*U03_02`'s local transform with `o3d.py`; decompile
+  `X3d_Make_Rotation_Matrice_Z` / `X3d_Matrice_Mult` in x3d.dll; a live run walking
+  around the clown.
+- **Status:** open
+
+### Q-0171 — What is U06's `shooting` flag before its first write?
+- **Context:** E-0390. Neither the constructor nor `U06_StartUnit` writes unit `+0x6d0`;
+  the debug CRT fills new blocks with 0xCD, so it would read non-zero. From the new-game
+  start (y = 475, safe) the first frame's stop clears it and runs the clown to frame 49.
+  After a restore inside the danger zone, `shots` counts up from 0 but `shooting` starts
+  true, so the first shot comes when the paused clip is seen, at once.
+- **What we checked:** constructor `0x00410940`, base constructor `0x0041a890`, start.
+- **Blocks:** exact behaviour right after a restore near the clown (minor).
+- **Next to try:** `operator new` in `MSVCRTD.DLL` / a memory read of a fresh U06 object.
+- **Status:** open
+
+### Q-0172 — After a restore with `PLANCHE` = 1, what state is U07's plank in?
+- **Context:** E-0395. The tip loads `planche.A3D` at run time and binds a new node; a
+  restore reads only the flag and never re-creates the node, so the plank would be in its
+  untipped pose while the tip can no longer fire.
+- **What we checked:** the chunk reader and writer, the start, the input hook.
+- **Blocks:** saves made in U07 after the tip.
+- **Next to try:** whether the generic `ANIMATIONS` chunk (Q-0101) restores nodes added at
+  run time; a live save/restore after the tip.
+- **Status:** open
+
+### Q-0173 — Whose cursor does U07's use-up on the hotspot list head clear?
+- **Context:** E-0396. `Open2Secret` and `CouperDynamite` call `FUN_004212b0` with the
+  list head at scene `+0x1a0` instead of a hotspot. If the head is the object-less hotspot
+  of `FUN_00420a90` (`+0x60` = 0), the cursor write is skipped and only the item is used
+  up.
+- **What we checked:** `FUN_004212b0`, `FUN_00421300` (skips a null object),
+  `FUN_00420a90`; not who creates the head.
+- **Blocks:** nothing visible if the head has no object.
+- **Next to try:** xrefs to `FUN_00420a90` and the writer of scene `+0x1a0`.
+- **Status:** open
+
+### Q-0174 — Which `Object04` is U07's dynamite?
+- **Context:** E-0394. The first `Object04` found is renamed `*U06_260`, the second
+  `*U06_26` (the hotspot). With the newest-first object list that is `Cave2.O3d`'s.
+- **What we checked:** the rename loop; the files that hold `Object04` (E-0398).
+- **Blocks:** which object `CouperDynamite` hides and the fuse's position.
+- **Next to try:** the engine's object order compared with `X3d_Scene_Get_Object`; a live
+  hover over the dynamite.
 - **Status:** open

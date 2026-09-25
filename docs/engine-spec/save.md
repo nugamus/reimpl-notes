@@ -87,7 +87,7 @@ Field notes:
 - **Unit chunks.** U01: u32 `train2Loaded`, u32 `onTrain` (`u01.md`). U02: u32
   `callStart`, `callPeriod`, `callOff`, `magpie` (`u02.md`; `callStart` is a raw clock
   value, Q-0092). U04 `PARAMS`: u32 unit `+0x6ec`, `+0x6e8`, `+0x6e4`; U07 `PLANCHE`: u32
-  unit `+0x6c8` (meanings: Q-0103). U00, U03, U05, U06, U33 and U50 write none.
+  unit `+0x6c8`, the plank-tipped flag (`u07.md`, E-0395; U04's meanings: Q-0103). U00, U03, U05, U06, U33 and U50 write none.
 
 ## Saving (E-0182)
 
