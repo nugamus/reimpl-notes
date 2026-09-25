@@ -4010,3 +4010,14 @@ An entry at `tentative` confidence must also have a matching line in
   `PorteFD` is unused (E-0104); the `nCC#`/`nIC#` frames are never loaded (E-0100).
 - **Method:** capstone; `ptr_scan.py`; `fra.py`.
 - **Confidence:** proven statically.
+
+### E-0206 — Engine check: with E-0205 and E-0480..E-0483 U01's first shot matches the original
+- **Binary/file:** `traces/u01-start-original.png`, `traces/u01-start-engine-2.png` (local
+  captures).
+- **Evidence:** engine (commit "Draw translucent and additive faces after the rest") at the
+  E-0041 start camera: the harbour haze planes are faint as in the original, no boats, and
+  the sky shows no dark specks once the 3D frame keeps alpha 1 (ScummVM composites the
+  frame by its alpha, so alpha-0 key texels of mode-0 maps showed black). Side-by-side
+  crops of both captures agree in layout and tone.
+- **Method:** snap.ps1 of both, cropped and compared by eye.
+- **Confidence:** visual. Closes the visible part of Q-0021.
