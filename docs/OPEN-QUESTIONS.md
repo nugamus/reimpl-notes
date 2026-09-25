@@ -302,3 +302,18 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Next to try:** `X3d_Object_Get_Number_Weld` and the per-object transform in the render
   callback; render comparison of a character.
 - **Status:** open
+
+### Q-0021 — Why do U01's distant buildings look faint and its boats missing in the original?
+- **Context:** E-0044. Candidates: LOD switching (`X3d_Object_Add_Lod`; the renderer asks
+  the object class `+0x6c` vtable `+0x14` which object to draw, `xd3d.dll` `FUN_10020720`),
+  camera-facing objects (E-0045), material fields.
+- **What we checked:** material reader `FUN_10011450`: the five `unk` u32s go to material
+  `+0x44`, `+0x48`, `+0x4c`, `+0x50`, `+0x58`; `X3d_Material_Init` sets `+0x6c`→`+8` to
+  `31 − (+0x4c)·31/100`, so `+0x4c` is a transparency percentage (smoke materials
+  `fum*trans` have 72). The faint buildings' materials have `+0x4c` = 0 and `+0x50` = 1, as
+  do `barques` and `soleil`. Drawing every `lod=` file instead of its base object blanks
+  the sky, so a LOD replaces single objects, not the whole file.
+- **Blocks:** matching the original's distant view.
+- **Next to try:** the object class vtable in `x3d.dll` (`+0x6c`: `+0x10` camera type,
+  `+0x14` LOD pick); what `+0x50` does in `xd3d.dll`'s face setup.
+- **Status:** open

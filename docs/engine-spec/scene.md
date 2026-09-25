@@ -53,7 +53,7 @@ For scene file `Uxx.X3D`:
 - `.DMF` pixels: bpp 8 through a B, G, R, x palette; bpp 15 as RGB555; bpp 16 as RGB565.
 - A map with an `fb21` colour key: texels equal to the key are transparent (the loader
   sets a "keyed" flag; how the rasteriser uses it is inferred).
-- Rows are stored bottom-up and UV v = 0 is the bottom row, as the comparison shows.
+- UV v = 0 is the first stored row: upload the rows in file order (E-0044).
 
 ## Lighting
 
@@ -67,6 +67,7 @@ by the ambient colour / 255 (U01's ambient is white).
 - View direction (cos a · sin e, −sin a · sin e, −cos e); up is world +Z when e = π/2.
   Camera axes (row-vector X3D form): right = (−sin a, −cos a, 0),
   up = (cos e · cos a, −cos e · sin a, sin e), forward = (sin e · cos a, −sin e · sin a, −cos e).
+  Camera up is screen up and right is screen right (E-0044).
 - x is scaled by 1 / tan(f/2); y by 4/3 of that, whatever the output size: the original
   frames every mode as 4:3 (E-0040). Near plane 0.1, far 1,000,000.
 - Widescreen (engine goal, not the original): keep the vertical extent of the 4:3 frame
@@ -77,7 +78,13 @@ by the ambient colour / 255 (U01's ambient is white).
 p = (−258.44, −508.20, 29.546), a = 1.31, e = π/2 (1.5707960). This is the first shot of
 U01's scripted entry, right after the prologue video.
 
+## Camera-facing objects
+
+Objects whose names contain `$XYZ$`, `$Z$` or `$XZ$` get camera types 1, 2, 3 (E-0045);
+how they are oriented is not specified yet (Q-0021). The static view draws them as stored.
+
 ## Validation
 
 `tools/proxy/run.ps1` + `snap.ps1` capture of the original at the same moment, side by
-side with `snap.ps1 … scummvm`.
+side with `snap.ps1 … scummvm`. Done for U01's first shot (E-0044); open differences in
+Q-0021.

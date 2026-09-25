@@ -701,3 +701,35 @@ An entry at `tentative` confidence must also have a matching line in
   (background agent, 2026-09-25).
 - **Confidence:** proven for the checks and addresses; that Space's bar is the inventory
   is the user's observation.
+
+### E-0044 — U01's first shot, original vs engine: transform, UV v and screen orientation confirmed
+- **Binary/file:** `MissionMonet.exe` with the real `x3d.dll` (`X3D_PROXY=0`); ScummVM engine
+  `x3d` at the commit that adds `scene.cpp`; `Data/U01/`.
+- **Evidence:** `traces/u01-start-original.png` (snap.ps1 of the original ~64 s after New
+  game, first U01 frame) and `traces/u01-start-engine.png` (engine, `start_scene=U01.X3D`,
+  camera E-0041), side by side in `traces/u01-start-compare.png` (captures stay local,
+  `.gitignore`). The sky dome's cloud bands, the sun disc, its reflection streak on the
+  water and the horizon line fall on the same pixels in both. So: vertices transformed
+  per E-0042 are right (the "used as stored" reading is superseded); `.DMF` rows uploaded
+  in file order with UV v = 0 at the first stored row are right (a flip would turn the
+  clouds upside down); camera "up" (world +Z at e = π/2) is screen up and x is not
+  mirrored. Differences: the original draws the distant buildings (`Box*`, materials
+  `immgch`/`immdrt`) faint, blended with the sky; the engine draws them opaque. The engine
+  shows boats (`$Z$barque0/1`, `$Z$barques`) and dark specks the original does not show
+  (Q-0021).
+- **Method:** `tools/proxy/run.ps1` + `send.ps1` sequence in `tools/proxy/README.md`;
+  `snap.ps1`; PIL side-by-side.
+- **Confidence:** proven for the three orientation questions; the differences are open.
+
+### E-0045 — Object names prefixed `$XYZ$`, `$Z$`, `$XZ$` get camera types 1, 2, 3
+- **Binary/file:** `MissionMonet.exe`, `x3d.dll`, `xd3d.dll`.
+- **Evidence:** `FUN_0041b010` walks the scene's objects (`X3d_Scene_Find_First_Object` /
+  `_Next_Object`) and calls `X3d_Object_Set_Camera_Type(obj, 1)` for names containing
+  `$XYZ$` (`0x004417c8`), `2` for `$Z$` (`0x004417c4`), `3` for `$XZ$` (`0x004417bc`), then
+  rewrites the name from the next `$` string match (`0x004417b8`). The setter stores
+  object `+0x108`, read only by `xd3d.dll` (`FUN_10020310`, `FUN_10020720`, …), which
+  passes it to the object class's render method (`+0x6c` vtable `+0x10`). U01's sun and
+  boats are `$Z$` objects.
+- **Method:** byte search of the binaries, MCP xrefs and decompiles.
+- **Confidence:** proven for the mapping; that the types are billboard modes (face the
+  camera around all axes / Z / X and Z) is inferred from the names.
