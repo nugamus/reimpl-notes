@@ -12,16 +12,20 @@ using System;using System.Runtime.InteropServices;
 public class I{[DllImport("user32.dll")]public static extern bool PostMessage(IntPtr h,uint m,IntPtr w,IntPtr l);
   [StructLayout(LayoutKind.Sequential)] public struct R { public int l, t, r, b; }
   [DllImport("user32.dll")] public static extern bool GetClientRect(IntPtr h, out R r);
-  [DllImport("user32.dll")] public static extern IntPtr SetThreadDpiAwarenessContext(IntPtr c);}
+  [DllImport("user32.dll")] public static extern IntPtr SetThreadDpiAwarenessContext(IntPtr c);
+  [DllImport("user32.dll")] public static extern uint MapVirtualKey(uint code, uint type);}
 '@
 $names = if ($Process) { $Process } else { 'MissionMonet', 'MissionD' }
 $p = Get-Process $names -ErrorAction SilentlyContinue | Select-Object -First 1
 if (-not $p) { 'game not running'; exit 1 }
 $h = $p.MainWindowHandle
 function Tap($vk, $ms) {
-    [I]::PostMessage($h, 0x0100, [IntPtr]$vk, [IntPtr]1) | Out-Null        # WM_KEYDOWN
+    # lParam carries the scan code: SDL (the engine) maps most keys by it
+    $sc = [int64][I]::MapVirtualKey($vk, 0) -shl 16
+    if (($vk -ge 0x21 -and $vk -le 0x28) -or $vk -eq 0x2D -or $vk -eq 0x2E) { $sc += 0x1000000 }   # extended key
+    [I]::PostMessage($h, 0x0100, [IntPtr]$vk, [IntPtr](1 + $sc)) | Out-Null        # WM_KEYDOWN
     Start-Sleep -Milliseconds $ms
-    [I]::PostMessage($h, 0x0101, [IntPtr]$vk, [IntPtr]0xC0000001) | Out-Null   # WM_KEYUP
+    [I]::PostMessage($h, 0x0101, [IntPtr]$vk, [IntPtr](0xC0000001 + $sc)) | Out-Null   # WM_KEYUP
 }
 foreach ($c in $Text.ToCharArray()) { [I]::PostMessage($h, 0x0102, [IntPtr][int]$c, [IntPtr]1) | Out-Null; Start-Sleep -Milliseconds 60 }
 if ($Enter) { Tap 0x0D 80 }
