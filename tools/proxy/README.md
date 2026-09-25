@@ -81,7 +81,8 @@ play; switching away does not pause it. How:
   surfaces to lose when focus changes.
 - `MONET_BACKGROUND=1` makes the h3d proxy swallow focus-loss messages. Otherwise the
   game's window procedure clears its "active" flag and the main loop stalls (E-0031).
-  The trace header says `# background mode` when this is on.
+  It also makes posted key-downs visible to `GetAsyncKeyState`, so a driver can skip
+  videos and voice lines. The trace header says `# background mode` when this is on.
 
 To undo everything, delete `C:\MonetRun` and run step 1 again.
 
@@ -102,8 +103,10 @@ delete that folder's contents for a fresh start.
 Reaching U01 with posted messages only (E-0043): `run.ps1`; wait 12 s; `send.ps1 -Text Name
 -Enter`; after 5 s `send.ps1 -Key 0x1B -HoldMs 70000` (Monet's tutorial polls Escape only
 between lines, so hold it); the menu appears; `send.ps1 -ClickX 376 -ClickY 37` (New game);
-the prologue cannot be skipped by posted keys (it reads `GetAsyncKeyState`), so wait ~62 s.
-The first U01 shot holds for 1.5 s, then the camera moves. Never post Escape on the players
+after ~8 s `send.ps1 -Key 0x0D -HoldMs 1500` skips the prologue. Background mode redirects
+the exe's `GetAsyncKeyState` so posted keys count as held (E-0043 lists what reads it):
+posted Enter also cuts U01/U04 voice lines. The first U01 shot holds for 1.5 s, then the
+camera moves. Never post Escape on the players
 screen: it quits the game.
 
 ### 4. Play the scenarios

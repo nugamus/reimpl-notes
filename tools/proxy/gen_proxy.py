@@ -223,9 +223,56 @@ void missing_export(int index)
 typedef int (__cdecl *h3d_wndproc_t)(void *, HWND, UINT, WPARAM, LPARAM, int *, LRESULT *);
 static h3d_wndproc_t g_real_wndproc;
 
+/* Background mode also lets posted keys reach GetAsyncKeyState. Videos and scripted waits
+   poll the physical key state (Enter/Escape, E-0043), which posted WM_KEYDOWNs never set,
+   so a test driver could not skip them. The exe's GetAsyncKeyState import is redirected
+   to report a key as down while a posted WM_KEYDOWN has not been followed by WM_KEYUP. */
+static volatile LONG g_posted_down[256];
+static SHORT (WINAPI *g_real_gaks)(int);
+
+static SHORT WINAPI background_gaks(int vk)
+{
+    SHORT real = g_real_gaks(vk);
+    return (vk >= 0 && vk < 256 && g_posted_down[vk]) ? (SHORT)(real | 0x8000) : real;
+}
+
+/* Rewrites the exe's IAT slot. Done on the first window message, when the exe's imports
+   are certainly bound. */
+static void hook_get_async_key_state(void)
+{
+    BYTE *base = (BYTE *)GetModuleHandleA(NULL);
+    IMAGE_NT_HEADERS *nt = (IMAGE_NT_HEADERS *)(base + ((IMAGE_DOS_HEADER *)base)->e_lfanew);
+    IMAGE_DATA_DIRECTORY dir = nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
+    IMAGE_IMPORT_DESCRIPTOR *d = (IMAGE_IMPORT_DESCRIPTOR *)(base + dir.VirtualAddress);
+    FARPROC target = GetProcAddress(GetModuleHandleA("user32.dll"), "GetAsyncKeyState");
+
+    for (; d->Name; d++) {
+        IMAGE_THUNK_DATA *t = (IMAGE_THUNK_DATA *)(base + d->FirstThunk);
+        for (; t->u1.Function; t++) {
+            if ((FARPROC)t->u1.Function == target) {
+                DWORD old;
+                VirtualProtect(&t->u1.Function, sizeof(t->u1.Function), PAGE_READWRITE, &old);
+                g_real_gaks = (SHORT (WINAPI *)(int))target;
+                t->u1.Function = (DWORD)(DWORD_PTR)background_gaks;
+                VirtualProtect(&t->u1.Function, sizeof(t->u1.Function), old, &old);
+                if (g_log)
+                    fprintf(g_log, "# background mode: posted keys reach GetAsyncKeyState\n");
+                return;
+            }
+        }
+    }
+}
+
 static int __cdecl background_wndproc(void *ctx, HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
                                       int *handled, LRESULT *result)
 {
+    static int hooked;
+    if (!hooked) {
+        hooked = 1;
+        hook_get_async_key_state();
+    }
+    if ((msg == WM_KEYDOWN || msg == WM_KEYUP) && wp < 256)
+        g_posted_down[wp] = (msg == WM_KEYDOWN);
     if ((msg == WM_ACTIVATEAPP && !wp) || (msg == WM_ACTIVATE && LOWORD(wp) == WA_INACTIVE)) {
         *handled = 1;
         *result = 0;
