@@ -15,15 +15,51 @@ A format is done only when its validator passes 100% of the corpus, every byte c
 | `.BMP` | 381 | `bmp.py` | `bmp.ksy` | E-0024 | done |
 | `.BIN` chunk container | 109 | `binchunk.py` | — | E-0025 | container done; payloads below |
 | `#OBJECTS#` (INFOOBJ.BIN) | 9 | `infoobj.py` | `infoobj.ksy` | E-0026 | layout done, fields opaque |
-| `#INDEX#` `#ACTIONS#` `#SCENE#` `#CAMERA#` `#APP#` `#GAME#` | 100 | — | — | — | open |
-| `.X3D` | 24 | — | — | E-0008, Q-0004 | open |
-| `.DMF` | 518 | — | — | Q-0005, Q-0015 | open, reader lives in the EXE |
+| `#SCENE#` `#CAMERA#` (SCENE.BIN) | 9 | — | below | E-0039 | done |
+| `#GAME#` (App.bin) | 1 | — | below | E-0037 | first 30 bytes read: start scene name |
+| `#INDEX#` `#ACTIONS#` `#APP#` | 91 | — | — | — | open |
+| `.X3D` scene script | 24 | `x3d.py` | this file (text) | E-0036 | done |
+| `.DMF` texture | 518 | `dmf.py` | `dmf.ksy` | E-0038 | done (`fb22`/`fb23` opaque) |
 | `.FRA` | 25 | — | — | Q-0016 | open |
 | `.CFG` | 38 | — | — | Q-0016 | open |
 
-Loader rule learned the hard way: the engine formats (`.O3D`/`.A3D`/`.L3D`/`.C3D`/`.S3D`)
-are read by `x3d.dll`; everything game-specific (`.BIN`, and very likely `.DMF`/`.FRA`)
-is read by `MissionMonet.exe` itself. Look there first.
+Loader rule learned the hard way: the engine formats (`.O3D`/`.A3D`/`.L3D`/`.C3D`/`.S3D`,
+and `.DMF` through the host's file callbacks, E-0038) are read by `x3d.dll`; the
+game-specific ones (`.BIN`, `.X3D`, `.FRA`) by `MissionMonet.exe`.
+
+## `.X3D` — scene script (E-0036)
+
+Text, read whole and parsed by `load::load_262`. Whitespace (space, tab, CR, LF) is
+skipped; `;` comments to end of line; otherwise one of these keywords, case-insensitive,
+each followed by one `"`-quoted field (a field ends at `"`, CR or `,`):
+
+| Keyword | Field | Effect |
+|---|---|---|
+| `scene=` | `"path.s3d"` | `X3d_Load_Sdk_s3d` (unused in the corpus) |
+| `object=` | `"path.o3d"` | load; becomes the "last object"; hidden if the path starts `static\col` (collision meshes) |
+| `lod=` | `"path.o3d,distance"` | load and attach to the last object as a level of detail at `distance` |
+| `animation=` | `"path.a3d[,fps]"` | attach to the last object, fps default 30 |
+| `light=` | `"path.l3d"` | load lights; every light includes every object |
+| `camera=` | `"path.c3d"` | load cameras |
+
+Paths are relative to `Data/<first three characters of the script name>/` (U00 uses
+`U04/`), with `\` separators. No `.ksy`: Kaitai does not describe token grammars; the
+validator is the spec's executable form.
+
+## `.DMF` — texture (E-0038)
+
+`u16 0xfb00`, `u32 file size`, then chunks `u16 id, u32 size` (size counts the 6-byte
+header). See `dmf.ksy`. Palette entries are B, G, R, 0; 15-bit pixels are 555, 16-bit
+565. Maps are referenced from `.O3D` materials by `.TGA` names, which the loader rewrites
+to `.dmf`. The EXE registers `Data/<unit>/Maps\` as the scene's map search path
+(`XScene_70` → `FUN_0041dd30`, a list at scene `+0x1b0`); that the host file callback
+searches that list is inferred, not traced.
+
+## `SCENE.BIN` payloads (E-0039)
+
+`#SCENE#`: u32 r, u32 g, u32 b (ambient light), f32 scale (the unit that eye height and
+collision sphere derive from). `#CAMERA#`: f32 fov (degrees, horizontal), f32 sphere
+radius, f32 sphere Z offset, f32 `unk_speed` (read, then overwritten with 2.0).
 
 ## `.O3D` — what the corpus proves so far
 

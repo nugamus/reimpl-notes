@@ -541,3 +541,117 @@ An entry at `tentative` confidence must also have a matching line in
   `avih`/`strh` and WAV headers read with Python.
 - **Confidence:** proven: U01 entered normally (not from a save, E-0033) plays the prologue
   first. The path from `OptionUser` to U01 is still Q-0018.
+
+### E-0036 — `.X3D` is a keyword script read by `load.cpp`; 24/24 parse
+- **Binary/file:** `MissionMonet.exe`; `Data/**/*.X3D` (24 files).
+- **Evidence:** `FUN_0041fb30` dispatches on the lower-cased name: `.s3d` →
+  `X3d_Load_Sdk_s3d`, `.o3d` → `X3d_Load_Sdk_o3d`, `.x3d` → read the whole file and call
+  `load::load_262` (`0x0041f8c0`, assert `D:\MissionD\Source\load.cpp`). That loop skips
+  space/tab/CR/LF (`FUN_0041f1e0`), skips `;` lines (`FUN_0041f220`), and matches a keyword
+  with `_strnicmp` against the table at `0x00441d94`: `scene=` `object=` `animation=`
+  `camera=` `light=` `lod=` (indices 0..5); no match asserts (load.cpp `0xea`). Each takes
+  a `"`-quoted field read by `FUN_0041f260` (stops at `"`, CR or `,`; 255 chars max).
+  Handlers: `scene=` → `X3d_Load_Sdk_s3d`; `object=` (`FUN_0041f3f0`) →
+  `X3d_Load_Sdk_o3d`, remembers the object in `0x0046ec44`, and hides it
+  (`X3d_Object_Hide(obj,1)`) when the lower-cased path starts `static\col` (`0x00441df4`);
+  `animation=` (`FUN_0041f500`) takes an optional `,fps` (default 30.0) and calls the
+  scene's vtable `+0x20(path, lastObject, fps)`; `camera=` → `X3d_Load_Sdk_c3d`; `light=`
+  → `X3d_Load_Sdk_l3d` then `X3d_Scene_All_Light_Include_Scene_All_Object(scene,1)`;
+  `lod=` (`load::load_185`, `0x0041f620`) takes a mandatory `,distance`, loads the `.O3D` and calls
+  `X3d_Object_Add_Lod(lastObject, lod, scene, distance)` and
+  `X3d_Scene_All_Light_Include_Object`. Every path is prefixed with the scene's asset
+  directory (`"%s%s"`, `0x0043feb0`, scene `+8`).
+- **Method:** MCP decompile of the functions named; strings read with `pefile`;
+  `python tools/parsers/x3d.py` → 24/24 (`--selftest` passes). Corpus totals: object 619,
+  lod 406, animation 169, light 4, camera 4, no `scene=`. Every file referenced by the 18
+  scene scripts in `Data/Uxx/` exists; the 6 scripts under `Anim/`/`Capt/` are authoring
+  leftovers with 45 dangling references between them.
+- **Confidence:** proven. Resolves Q-0004 (one grammar; the `OBJE` prefix is a script
+  without the `;SCRIPT` comment line).
+
+### E-0037 — A new game starts at the scene named in `App.bin` `#GAME#` (`U01.X3D`); `U##D.X3D` belong to the gallery
+- **Binary/file:** `MissionMonet.exe`; `Data/App.bin`.
+- **Evidence:** `FUN_00412b80` opens `%sAPP.BIN` (`0x00441100`), seeks chunk `GAME`
+  (`0x004410f8`) and reads 0x1e bytes into game `+0x14c` (the next-scene slot, E-0033);
+  if that fails it copies `U01.X3D` (`0x004410f0`). It then names the player `NoName`
+  (`0x004410e8`) and calls `SetAppMode(app, 1)`. `App.bin` `#GAME#` is at offset 0x15e,
+  size 0x1e: `U01.X3D\0` followed by filler. `FUN_004131e0` maps painting ids (`U11_01`
+  → `U01D.X3D`, `U11_02`/`U11_03` → `U02D.X3D`, … `U14_07` → `U06D.X3D`) and loads them
+  with `CreateUnitScene(0x32)`: the `D` scripts are the painting view's backdrops.
+- **Method:** MCP decompile; `App.bin` bytes read with `xxd`.
+- **Confidence:** proven for what `FUN_00412b80` does; which UI button calls it is part of
+  Q-0018.
+
+### E-0038 — `.DMF` is the texture format; `x3d.dll` reads it for every `.TGA` map name; 518/518 parse
+- **Binary/file:** `x3d.dll`; `Data/**/*.DMF` (518 files).
+- **Evidence:** `X3d_Map_Init` (`0x10001618`) overwrites a map name from its first `.`
+  with the 5 bytes at `0x10027c14` (`.dmf\0`). `FUN_10016020` opens that file through the
+  host's file callbacks, `FUN_10010ba0` requires `u16 0xfb00` (`cmp word [esp+6], 0xfb00`,
+  `0x10010bc5`) and a `u32` total size, then loops `FUN_100108a0` over chunks
+  `u16 id, u32 size` (size includes the 6-byte header) until the cursor equals the total:
+  `0xfb10` u16 bpp, u16 width, u16 height (`FUN_100105f0` allocates; bpp 8 also gets a
+  0x600-byte palette buffer); `0xfb20` 0x400 palette bytes; `0xfb21` 4 bytes colour key
+  (first three R, G, B; sets map `+0x2c = 1`); `0xfb22` u32 to map `+0x28`; `0xfb23` u32
+  to the map's animation block `+8` and sets its `+4 = 1`; `0xfb30` raw pixels (w·h bytes
+  at bpp 8, else w·h u16); `0xfb31` 2×2 vector quantisation (`FUN_10010770`: 0x800-byte
+  codebook of 256 × 4 u16, then (w/2)(h/2) index bytes); other ids skipped by size.
+  After loading, a bpp-15 map is converted to 565 when the display is 16-bit.
+- **Method:** capstone scan of `x3d.dll` for the chunk ids, MCP decompile of the four
+  functions; `python tools/parsers/dmf.py` → 518/518, every byte consumed (`--selftest`
+  passes). Corpus: bpp 15 × 251, bpp 8 × 267; chunk layouts `10 22 30` × 215,
+  `10 20 21 22 30` × 162, `10 20 22 30` × 105, `10 21 22 30` × 33, `10 21 23 22 30` × 3;
+  no `0xfb31`. Palette entries are B, G, R, 0: decoding U01's `MonetTet.dmf`,
+  `Costard.dmf` and `Palette.dmf` in that order gives skin tones and wood, R, G, B order
+  gives blue skin. bpp 15 is 555 (U01 `djeul.dmf`, a face, decodes correctly).
+- **Confidence:** proven for the layout and the pixel formats; `unk_fb22`/`unk_fb23` stay
+  opaque. Resolves Q-0005 (the header bytes are the file size), Q-0011 (the `.TGA` names
+  are rewritten to `.dmf`) and Q-0015 (the reader is in `x3d.dll`, behind the host file
+  callbacks, which is why no string or import pointed at it).
+
+### E-0039 — `SCENE.BIN` `#SCENE#` is ambient RGB + a scene scale; `#CAMERA#` is FOV, collision sphere and speed
+- **Binary/file:** `MissionMonet.exe`; `Data/U*/SCENE.BIN` (9 files).
+- **Evidence:** the scene's vtable `+4` (`FUN_0041d340`) reads `#SCENE#` (`0x00441b74`) as
+  u32 r, g, b and f32 into scene `+0x138`, then calls `FUN_0041b2f0(scene, r, g, b)`, which
+  calls `X3d_Scene_Set_Ambient_Light` (trace call site `0x0041b31f`). The camera init
+  (`0x00418560`) reads `#CAMERA#` (`0x00441668`) as four f32: camera `+0x10` (passed to
+  `X3d_Camera_Set_Fov`), `+0x64` (sphere radius), `+0x68` (sphere Z offset), `+8`. It
+  then overwrites `+8` with 2.0, sets the eye height `+0x5c = scale · 1.5`, the position
+  (0, 0, eye height), angles (0, π/2), creates the collision sphere with radius
+  `scale · 0.5` and Z offset `eye height − 2 · radius`. Values: U01 `#SCENE#` (255, 255,
+  255, 40.0), `#CAMERA#` (90, 20, 40, 2); all nine files have FOV 90.
+- **Method:** MCP decompile of `FUN_0041d340` and `0x00418560`; payloads read with Python
+  (E-0025 container).
+- **Confidence:** proven for the layout and where the values go. The meaning of scene
+  `+0x138` beyond "unit length" (eye height and sphere derive from it) is inferred.
+
+### E-0040 — The X3D view: horizontal FOV in degrees, yaw/pitch angles, a 4:3 frame at any resolution
+- **Binary/file:** `x3d.dll`, `MissionMonet.exe`.
+- **Evidence:** `X3d_Camera_Set_Fov` stores camera `+0x50`, `X3d_Camera_Set_Polar`
+  `+0x54`/`+0x58`, `X3d_Camera_Set_Position` `+0x2c..0x34`. `FUN_10007dd0` (`x3d.dll`)
+  builds the view: translation by −position; a rotation R with rows
+  (−sin a, cos e·cos a, sin e·cos a), (−cos a, −cos e·sin a, −sin e·sin a), (0, sin e, −cos e)
+  for a = `+0x54`, e = `+0x58` (row vectors, v·T·R); a roll by `+0x4c` degrees; and a
+  scale of x by `1/tan(fov·π/360)` and y by `1/tan(fov·π/360) · (w/2) / ((h/2) · k)`.
+  `X3d_Scene_Init_Resolution` stores w/2, h/2 at viewport `+0x10`/`+0x14` and `k` at scene
+  `+0x34`; the EXE (`0x0041af4e`..`0x0041af88`) passes origin (0,0), the video mode's
+  width and height, `k` = video `+0x14`, near 0.1 (`0x3dcccccd`), far 1,000,000
+  (`0x49742400`). `FUN_00418350` sets video `+0x14 = (w/h) · 0.75`, so the y scale is
+  always `4/3 · x scale`: the picture is framed for 4:3 whatever the mode.
+- **Method:** MCP decompile of the four `x3d.dll` functions and `FUN_00418350`; capstone
+  disassembly of the `X3d_Scene_Init_Resolution` call.
+- **Confidence:** proven for the matrices. With e = π/2 the camera looks along
+  (cos a, −sin a, 0) with world +Z up; the screen-space sign of y is taken from render
+  comparison (docs/engine-spec/scene.md).
+
+### E-0041 — U01's normal entry puts the camera at (−258.44, −508.20, 29.55), angles (1.31, π/2)
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `U01_Start` (`0x00401230`), after the prologue, builds a vec3 with
+  `FUN_00415ed0(v, 0xc3813852, 0xc3fe199a, 0x41ec5e35)` and passes it to `FUN_004194f0`
+  (camera: copy to `+0x14`, `X3d_Camera_Set_Position`), then `FUN_00419550(cam,
+  0x3fa7ae14, 0x3fc90fd8)` (angles to camera `+0x34`/`+0x38` and X3D camera
+  `+0x54`/`+0x58`), then runs the scene for 1500 (`0x5dc`) through `FUN_0041bf70` before
+  scripted camera moves (`FUN_00419860`) and handing over control.
+- **Method:** MCP decompile of `U01_Start` and the camera setters; floats decoded with
+  Python.
+- **Confidence:** proven for the values. The following camera moves and what
+  `FUN_0041bf70`'s argument measures belong to the main-loop spec (next milestone).

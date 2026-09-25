@@ -59,7 +59,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Observed range:** two prefixes across 24 files, 44 B to 7.7 K.
 - **Blocks:** Phase 2 scoping. If these are two grammars, `.X3D` needs two specs and two
   validators, and the scene-file spec cannot claim 100% corpus coverage with one parser.
-- **Status:** open
+- **Status:** RESOLVED (E-0036: one keyword grammar)
 
 ### Q-0005 — What discriminates `.DMF` variants at offset 2?
 - **Context:** corpus inventory (E-0008). All 518 `.DMF` files begin `00 fb`; bytes 2-3
@@ -70,7 +70,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Observed range:** the 8 values above; `22 00` (215 files) and `32 04` (154) dominate.
 - **Blocks:** the `.DMF` spec. 48.4 M across 518 files makes this the largest
   engine-specific format in the corpus after the media files.
-- **Status:** open
+- **Status:** RESOLVED (E-0038: bytes 2-5 are the u32 file size)
 
 ### Q-0006 — `.BIN`, `.FRA`, `.CFG` have no magic at all — what identifies them?
 - **Context:** corpus inventory (E-0008). `.BIN` shows 80 distinct 4-byte prefixes over
@@ -157,7 +157,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** texture resolution, and any claim that the `.BMP` set is the complete
   texture set. Either the loader rewrites the extension at load time, or these are
   authoring-time paths that never resolve at runtime.
-- **Status:** open
+- **Status:** RESOLVED (E-0038: `X3d_Map_Init` rewrites the extension to `.dmf`)
 
 ### Q-0013 — What do the `.L3D` "extra" slots and the spot branch carry?
 - **Context:** `tools/parsers/l3d.py` reads the per-light record but two slots — three f32
@@ -219,7 +219,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   Phase 3 work that depends on scene maps. Until a DMF reader is located (likely
   in `MissionMonet.exe` itself, decompiling the function that owns the indirect
   pointer to `tete.dmf`), the format cannot be recovered.
-- **Status:** open
+- **Status:** RESOLVED (E-0038: `x3d.dll` `FUN_10016020`, through the host file callbacks)
 
 ### Q-0016 — What reads `.BIN`, `.FRA`, and `.CFG` files at runtime?
 - **Context:** 109 `.BIN` / 25 `.FRA` / 38 `.CFG` files in the corpus. Each
@@ -280,3 +280,14 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   intro bitmaps straight to U01 with flag 1 (documented in `docs/engine-spec/boot.md`).
 - **Next to try:** xrefs to `LoadUnitScene` and to the scene-name slot game `+0x14c`; a
   trace of entering a name and pressing OK.
+
+### Q-0019 — How does X3D light a face?
+- **Context:** `docs/engine-spec/scene.md`. `#SCENE#` sets an ambient colour, `.L3D` adds
+  omni/spot lights, materials carry four RGB triples (`.O3D`), and objects list the lights
+  that include them.
+- **What we checked:** where ambient is stored (`X3d_Scene_Set_Ambient_Light`, scene
+  `+0x40..0x43`). Not the per-vertex or per-face shading code in `x3d.dll` / `xd3d.dll`.
+- **Blocks:** faithful brightness. The static view uses texture × ambient / 255.
+- **Next to try:** the render callback installed by `X3d_Scene_Init_Render`; compare a
+  dark unit (U06, ambient 90) against the original.
+- **Status:** open
