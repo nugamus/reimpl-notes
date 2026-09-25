@@ -1,16 +1,18 @@
-# Launch the game from the run folder and auto-confirm the startup dialog (portrait, OK/Exit).
-#   powershell -ExecutionPolicy Bypass -File tools\proxy\run.ps1 [-Exe MissionD.exe] [-Background]
+# Launch the game windowed and in the background, without stealing focus.
+#   powershell -ExecutionPolicy Bypass -File tools\proxy\run.ps1 [-Exe MissionD.exe]
+# Click the game window when you want to play; switching away later does not pause it.
 #
-# Default: the dialog and game get focus, as with a real click. The game minimises and
-# pauses when it loses focus.
-# -Background (EXPERIMENTAL, does not work yet): MONET_BACKGROUND=1 makes the h3d proxy
-# swallow focus-loss messages and the window is never brought forward. Under dgVoodoo the
-# game still loses its DirectDraw surfaces when not active and then crashes. See Q-0017.
-#
-# The dialog's OK button has control ID 1011 (not IDOK); this posts the same
-# WM_COMMAND(1011, button) a click sends.
-param([string]$Exe = 'MissionMonet.exe', [string]$Run = 'C:\MonetRun', [int]$TimeoutSec = 180,
-      [switch]$Background, [int]$Width = 0, [int]$Height = 0)
+# How (tools/proxy/README.md, "Windowed and background"):
+# - The startup dialog (portrait, OK/Exit) is the game's resource passed to Video4x_Init
+#   (4xvideo.dll 0x10001005). Its dialog procedure (0x10001a20) sets fullscreen = 1 on
+#   WM_INITDIALOG but still accepts the stock 4X "Window" command 0x3f7, which selects
+#   h3d's windowed mode (DDSCL_NORMAL, no exclusive mode, no surface loss on focus change).
+#   OK is control 0x3f3 (1011). Both are posted as the WM_COMMANDs the buttons would send.
+# - MONET_BACKGROUND=1 makes the h3d proxy swallow focus-loss messages, so the game's own
+#   window procedure (MissionMonet.exe 0x00416650) never clears its "active" flag.
+# - The process starts with SW_SHOWMINNOACTIVE and tools/proxy/patch_exe.py makes the game
+#   window SW_SHOWNOACTIVATE; nothing here calls SetForegroundWindow.
+param([string]$Exe = 'MissionMonet.exe', [string]$Run = 'C:\MonetRun', [int]$TimeoutSec = 180)
 
 Add-Type @'
 using System;using System.Runtime.InteropServices;using System.Text;
@@ -21,11 +23,21 @@ public class U{
   [DllImport("user32.dll")] public static extern int GetClassName(IntPtr h, StringBuilder s, int n);
   [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr h);
   [DllImport("user32.dll")] public static extern bool PostMessage(IntPtr h, uint m, IntPtr w, IntPtr l);
-  [DllImport("user32.dll")] public static extern IntPtr FindWindowEx(IntPtr p, IntPtr a, string c, string t);
-  [DllImport("user32.dll")] public static extern int GetDlgCtrlID(IntPtr h);
-  [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr h, int c);
-  [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h);
-  [DllImport("user32.dll")] public static extern bool SetWindowPos(IntPtr h, IntPtr a, int x, int y, int cx, int cy, uint f);
+  [DllImport("user32.dll")] public static extern IntPtr GetDlgItem(IntPtr h, int id);
+  [DllImport("user32.dll")] public static extern bool LockSetForegroundWindow(uint code);
+  [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)] public struct SI {
+    public int cb; public string r, d, t; public int x, y, w, h, xc, yc, fill, flags; public short show, r2;
+    public IntPtr r3, i, o, e; }
+  [StructLayout(LayoutKind.Sequential)] public struct PI { public IntPtr hp, ht; public int pid, tid; }
+  [DllImport("kernel32.dll", CharSet=CharSet.Unicode, SetLastError=true)] static extern bool CreateProcess(
+    string app, string cmd, IntPtr pa, IntPtr ta, bool inherit, int flags, IntPtr env, string dir, ref SI si, out PI pi);
+  // STARTF_USESHOWWINDOW + SW_SHOWMINNOACTIVE: Windows applies it to the process's first
+  // shown window (the startup dialog), so nothing appears in front or takes focus.
+  public static int Start(string exe, string dir){
+    var si = new SI(); si.cb = Marshal.SizeOf(si); si.flags = 1; si.show = 7; PI pi;
+    if (!CreateProcess(exe, null, IntPtr.Zero, IntPtr.Zero, false, 0, IntPtr.Zero, dir, ref si, out pi))
+      throw new System.ComponentModel.Win32Exception();
+    return pi.pid; }
   public static IntPtr FindWindowOf(int pid, string cls){
     IntPtr found = IntPtr.Zero;
     EnumWindows((h, l) => {
@@ -37,20 +49,20 @@ public class U{
 }
 '@
 
-$Foreground = -not $Background
-$env:MONET_BACKGROUND = if ($Background) { '1' } else { '0' }
-$p = Start-Process -FilePath (Join-Path $Run $Exe) -WorkingDirectory $Run -PassThru
+$WM_COMMAND = 0x0111; $ID_WINDOWED = 0x3f7; $ID_OK = 0x3f3
+$env:MONET_BACKGROUND = '1'
+# Launched from a terminal you are typing in, this script and the game inherit the right
+# to take the foreground: the dialog then activates on creation and the game window when the
+# dialog closes. LSFW_LOCK drops that right until you next click or press Alt.
+[U]::LockSetForegroundWindow(1) | Out-Null
+$p = Get-Process -Id ([U]::Start((Join-Path $Run $Exe), $Run))
 $deadline = (Get-Date).AddSeconds($TimeoutSec)
 $confirmed = $false
 while ((Get-Date) -lt $deadline -and -not $p.HasExited -and -not $confirmed) {
     $dlg = [U]::FindWindowOf($p.Id, '#32770')
-    $ok = if ($dlg -ne [IntPtr]::Zero) { [U]::FindWindowEx($dlg, [IntPtr]::Zero, 'Button', 'OK') } else { [IntPtr]::Zero }
-    if ($ok -ne [IntPtr]::Zero) {
-        # Foreground mode: a real click hands the game focus, and dgVoodoo's DDraw.dll
-        # crashes (c000041d) if Direct3D is set up while the game is merely in the background.
-        if ($Foreground) { [U]::SetForegroundWindow($dlg) | Out-Null }
-        Start-Sleep -Milliseconds 300
-        [U]::PostMessage($dlg, 0x0111, [IntPtr][U]::GetDlgCtrlID($ok), $ok) | Out-Null   # WM_COMMAND
+    if ($dlg -ne [IntPtr]::Zero -and [U]::GetDlgItem($dlg, $ID_OK) -ne [IntPtr]::Zero) {
+        [U]::PostMessage($dlg, $WM_COMMAND, [IntPtr]$ID_WINDOWED, [IntPtr]::Zero) | Out-Null
+        [U]::PostMessage($dlg, $WM_COMMAND, [IntPtr]$ID_OK, [U]::GetDlgItem($dlg, $ID_OK)) | Out-Null
         Start-Sleep -Seconds 1
         $confirmed = ([U]::FindWindowOf($p.Id, '#32770') -eq [IntPtr]::Zero)
     }
@@ -59,16 +71,11 @@ while ((Get-Date) -lt $deadline -and -not $p.HasExited -and -not $confirmed) {
 if ($p.HasExited) { "game exited early (code $($p.ExitCode))"; exit 1 }
 if (-not $confirmed) { "no startup dialog confirmed within $TimeoutSec s (pid $($p.Id))"; exit 2 }
 
-# Wait for the main game window, then size it (dgVoodoo scales the 640x480 image into it).
+# The game only runs while its "active" flag is set; set it without activating the window.
 $main = [IntPtr]::Zero
 for ($i = 0; $i -lt 50 -and $main -eq [IntPtr]::Zero; $i++) {
     Start-Sleep -Milliseconds 200
     $main = [U]::FindWindowOf($p.Id, 'Monet - The Mystery of the Orangerie Museum')
 }
-if ($main -ne [IntPtr]::Zero) {
-    [U]::ShowWindow($main, 4) | Out-Null                                       # SW_SHOWNOACTIVATE
-    if ($Width -gt 0) { [U]::SetWindowPos($main, [IntPtr]::Zero, 40, 40, $Width, $Height, 0x0014) | Out-Null }   # NOZORDER|NOACTIVATE; resizing can lose DirectDraw surfaces
-    if ($Foreground) { [U]::SetForegroundWindow($main) | Out-Null }
-    else { [U]::PostMessage($main, 0x001C, [IntPtr]1, [IntPtr]::Zero) | Out-Null }   # WM_ACTIVATEAPP(TRUE): sets the game's active flag
-}
-"started $Exe pid $($p.Id), background=$(-not $Foreground)"
+if ($main -ne [IntPtr]::Zero) { [U]::PostMessage($main, 0x001C, [IntPtr]1, [IntPtr]::Zero) | Out-Null }   # WM_ACTIVATEAPP(TRUE)
+"started $Exe pid $($p.Id), windowed, background"

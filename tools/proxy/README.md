@@ -24,111 +24,75 @@ being transparent, that is where it shows.
 
 ## Capturing traces: step-by-step
 
-**Status on the capture machine (2026-09-25):** steps 1, 3, 4 and 5 are done. `C:\MonetRun`
-has the binaries, `Data/`, dgVoodoo2 (windowed, 2x, no watermark) and the proxies. The
-baseline ran, and the proxy was verified to trace. Indeo (step 2) is **not** installed.
-Start at step 6.
+Commands are Git Bash from the repo root; `!` in front runs them from the Claude Code prompt.
 
-Launch with the helper instead of double-clicking (foreground; see Q-0017 for why it cannot run behind other windows yet):
+### 1. Set up the run folder (once; already done on the capture machine)
+
+```sh
+bash tools/proxy/setup_run.sh            # builds C:\MonetRun
+```
+
+What it does, and why:
+
+- **No CD, no installer.** The game reads `<exe folder>\Data\` whenever `Data\APP.BIN` is
+  there and only otherwise hunts for the CD by volume label (E-0027). The script copies
+  the `02_PR` binaries and `Data/`. The originals are never touched (rule 7).
+- **dgVoodoo2** (32-bit `MS/x86` DLLs) runs the game's DirectDraw/Direct3D 5 on D3D11:
+  windowed, `DesktopBitDepth = 16` (the game's windowed mode needs a 16-bit primary
+  surface), `FPSLimit = 60` (windowed rendering is otherwise uncapped, ~200+ fps), no
+  watermark.
+- **Proxies** replace `x3d.dll`/`h3d.dll`; the real ones become `x3d_orig.dll`/`h3d_orig.dll`.
+  Build them first (Build, above).
+- **Two patches to the copied exe** (`tools/proxy/patch_exe.py`, byte-verified, E-0030/E-0031):
+  skip the "set your screen to 16 bits" check, and show the game window without
+  activating it.
+
+### 2. Video codecs (Indeo 4 and 5)
+
+The cutscene AVIs are `IV50` and `IV41`. The game CD's own installer has both (`ir50_32.dll`,
+`ir41_32.ax`; Intel, 2000). It needs admin rights and a few clicks:
+
+```sh
+powershell -Command "Start-Process 'V:\Indeo\iv5setup.exe' -Verb RunAs"
+```
+
+(or `Original Game Files\Indeo\iv5setup.exe` if the disc is not mounted). Accept the
+defaults. The game runs without them; videos are just skipped or black. Do **not** run
+the DirectX 7 installer.
+
+### 3. Launch
 
 ```sh
 powershell -ExecutionPolicy Bypass -File tools/proxy/run.ps1            # MissionMonet.exe
 powershell -ExecutionPolicy Bypass -File tools/proxy/run.ps1 -Exe MissionD.exe
 ```
 
-Every launch shows a startup dialog (Monet portrait, **OK / Exit**). The script focuses it
-and clicks OK. Two things it works around, both seen on this machine:
+The game opens as a normal 640×480 window **behind** whatever you are using. It does not
+take focus, and it keeps running while you do other things. Click it when you are ready to
+play; switching away does not pause it. How:
 
-- the game **minimises itself and stops its loop when it loses focus**. Don't alt-tab
-  during a scenario, because the pause ends up in the trace;
-- if OK is clicked while the game is in the background, dgVoodoo's `DDraw.dll` crashes
-  (`c000041d`, Windows Application log) during Direct3D setup.
+- The startup dialog (portrait, OK/Exit) is started minimised and never activated. The
+  script sends it the stock 4X "Window" command and then OK. Monet's dialog hides the
+  Fullscreen/Window radio buttons, but `4xvideo.dll` still honours the command (E-0029),
+  which selects h3d's real windowed mode. Windowed mode has no exclusive DirectDraw
+  surfaces to lose when focus changes.
+- `MONET_BACKGROUND=1` makes the h3d proxy swallow focus-loss messages. Otherwise the
+  game's window procedure clears its "active" flag and the main loop stalls (E-0031).
+  The trace header says `# background mode` when this is on.
 
-This is the part only a human can do: play the game with the proxies in place. Budget
-about two hours the first time. Commands are Git Bash; `!` in front runs them from the
-Claude Code prompt.
-
-### 1. Make a runnable copy (no CD, no installer)
-
-The game reads `<exe folder>\Data\` whenever `Data\APP.BIN` exists there, and only
-otherwise hunts for the CD by volume label (E-0027). So a plain folder works:
-
-```sh
-mkdir -p /c/MonetRun
-cp -r "Original Game Files/INSTALL/02_PR/." /c/MonetRun/
-cp -r "Original Game Files/Data" /c/MonetRun/Data        # 350 MB
-ls /c/MonetRun/Data/App.bin /c/MonetRun/Save             # both must exist
-```
-
-Use a path without spaces, outside the repo and never inside `Original Game Files/`
-(rule 7). Everything below happens in `C:\MonetRun`.
-
-### 2. Video codec (Indeo 5)
-
-Cutscenes are AVI files decoded by the system's Indeo 5 codec. Run
-`Original Game Files\Indeo\iv5setup.exe` as administrator. If it refuses on Windows 11,
-carry on and write "no Indeo" in `traces/INDEX.md`, because videos will then fail or show black.
-Do **not** run the DirectX 7 installer; dgVoodoo2 replaces it.
-
-### 3. dgVoodoo2 (Direct3D 5 on a modern GPU)
-
-`h3d.dll` draws through DirectDraw/Direct3D. dgVoodoo2 replaces those with a D3D11
-back end, so it runs correctly on Windows 11.
-
-```sh
-cp third_party/dgVoodoo2_87_3/MS/x86/DDraw.dll \
-   third_party/dgVoodoo2_87_3/MS/x86/D3DImm.dll \
-   third_party/dgVoodoo2_87_3/dgVoodoo.conf \
-   third_party/dgVoodoo2_87_3/dgVoodooCpl.exe /c/MonetRun/
-```
-
-Use the `MS/x86` DLLs, not `x64`. The game is 32-bit. Then run
-`C:\MonetRun\dgVoodooCpl.exe`, make sure the config folder at the top is `C:\MonetRun`, and set:
-
-- **General:** Appearance *Windowed*; Scaling mode *Stretched, keep aspect ratio*.
-- **DirectX:** Videocard *dgVoodoo Virtual 3D Accelerated Card*; VRAM 256 MB;
-  untick *dgVoodoo Watermark*; Resolution *Unforced*.
-- Apply, close.
-
-Windowed mode makes it easy to watch the trace files and to quit cleanly.
-
-### 4. Baseline run, without the proxy
-
-Double-click `C:\MonetRun\MissionMonet.exe`. Get to the main menu, start a game, walk a
-few steps, quit through the game's own menu. **Do not continue until this works.** A
-crash here is a setup problem, not a proxy problem:
+To undo everything, delete `C:\MonetRun` and run step 1 again.
 
 | Symptom | Fix |
 |---|---|
-| "needs Direct3D acceleration" (message 950) | dgVoodoo DLLs missing or the x64 ones; redo step 3 |
-| "insert CD" style box and exit | `Data\App.bin` is not next to the exe; redo step 1 |
-| `MSVCRTD.DLL` missing | it ships in `02_PR`; the copy in step 1 was incomplete |
-| crash at start | right-click exe, Properties, Compatibility: *Windows XP (SP3)*, retry |
-| black video, game continues | Indeo missing (step 2), note it and move on |
+| "needs Direct3D acceleration" (message 950) | dgVoodoo DLLs missing or the x64 ones; rerun step 1 |
+| "insert CD" style box and exit | `Data\App.bin` is not next to the exe; rerun step 1 |
+| "Please set your screen to 16 bits" | the exe copy is unpatched: `python tools/proxy/patch_exe.py` |
+| `run.ps1` says no dialog confirmed | the game hit an error box; look at the window, then report it |
 
-Write down any setting you had to change. It goes in the header of `traces/INDEX.md`.
+### 4. Play the scenarios
 
-### 5. Install the proxies
-
-```sh
-cd /c/MonetRun
-mv x3d.dll x3d_orig.dll
-mv h3d.dll h3d_orig.dll
-cp "<repo>/build/proxy/Release/x3d.dll" "<repo>/build/proxy/Release/h3d.dll" .
-```
-
-Copy **only** those two. `build/proxy/Release/x3d_orig.dll` is the self-test stand-in,
-not the game's DLL; copying it would break the game. If the build folder is missing,
-run the Build section above first. To undo: delete the two proxies and rename the
-`_orig` files back.
-
-Leave `MONET_TRACE` unset. Each proxy then writes `monet-trace-<dll>-<pid>.log` into
-`C:\MonetRun`, one file per DLL per run.
-
-### 6. Play the scenarios
-
-**One scenario per launch.** Start the game, do exactly the scenario, quit through the
-game's menu. Quitting properly writes the final `# N calls` line; Alt+F4 or killing
+**One scenario per launch.** Launch (step 3), click the window when ready, do exactly the
+scenario, quit through the game's menu. Quitting properly writes the final `# N calls` line; Alt+F4 or killing
 the process loses it, although the trace is still usable. Go slowly and don't wander:
 a short, clean trace is worth more than a long mixed one.
 
@@ -162,7 +126,7 @@ game's `Save/DbgInfo.txt` as `-dbginfo.log`, and warns if a trace has no end mar
 Then add a row to `traces/INDEX.md` saying what you actually did, including any
 deviations. The notes matter as much as the logs.
 
-### 7. Which engine DLLs actually load (Q-0001)
+### 5. Which engine DLLs actually load (Q-0001)
 
 During any run, while the game is open, run this from a normal Command Prompt:
 
@@ -174,32 +138,44 @@ and copy `modules.log` into `traces/`. If it lists nothing useful, Sysinternals
 Process Explorer (View, Lower Pane View, DLLs) shows the same thing. We want to know
 which of `xd3d`/`xs3d` and `x3dmp5/6/6k` the game picked.
 
-### 8. Optional: the developer build
+### 6. Optional: the developer build
 
 Repeat scenario 02 with `MissionD.exe` from the same folder, named `02-idle-D-*.log`.
 It is a superset of the shipping build (E-0012) and may log more.
 
-### 9. Hand-off
+### 7. Hand-off
 
 `traces/*.log` stays on this machine (gitignored); commit only `traces/INDEX.md`. Tell
 the next agent the traces are in, and it reads `traces/INDEX.md` first.
 
 ## Traces
 
-One line per run of calls:
-
 ```
 # monet proxy trace: x3d.dll, 278 exports
-1 t=658601400.285 x3d.dll!X3d_Init_Mathlib ret=0x004182cb
-5 t=658601412.901 x3d.dll!X3d_Object_Animate_Spline ret=0x0041c2a0 x33
-# 38 calls
+# background mode: focus-loss messages swallowed      (h3d only, when on)
+# mode: frames, boundary X3d_Render
+1581 t=660369100.836 x3d.dll!X3d_Object_Animate_Spline ret=0x0041ff02 x32
+1613 t=660369100.872 x3d.dll!X3d_Render ret=0x0041b18b
+= x412
+1614 t=660369114.795 x3d.dll!X3d_Object_Get_Global_Position ret=0x0042167f
+...
+# 38000 calls
 ```
 
-The first number is the sequence number of the first call in the run. `t=` is
-`QueryPerformanceCounter` in ms, a machine-wide clock, so the x3d and h3d files of one
-run merge by time. ` xN` means N consecutive calls to the same export from the same call
-site. Without it the game's uncapped render loop wrote about 130 MB a minute. The log is
-flushed at least once a second, so a killed game loses at most the last second.
+Default is **frame mode**. A frame ends at the boundary export (`X3d_Render` for x3d,
+`H3d_Show_BackBuffer` for h3d). Within a frame each (export, call site) pair is written
+once, in order of its first call, with ` xN` for its count. The leading number and `t=`
+belong to that first call. A frame whose list of pairs equals the previous frame's is not
+written. Instead `= xN` counts how many such frames followed. The game runs per-face
+collision loops every frame (`X3d_Object_Find_Next_Face` / `X3d_Line_Face_Collision`
+alternating), which made per-call logging about 10 MB/s.
+
+`MONET_TRACE_RAW=1` gives the full stream instead: one line per run of identical
+consecutive calls (same export and call site), ` xN` for the run length.
+
+`t=` is `QueryPerformanceCounter` in ms, a machine-wide clock, so the x3d and h3d files of
+one run merge by time. The log is flushed at least once a second, so a killed game loses
+at most the last second.
 
 `ret` is the return address at the call site, which identifies the calling function and
 joins straight back to `notes/function-map.csv`.

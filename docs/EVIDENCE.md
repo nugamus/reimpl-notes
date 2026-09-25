@@ -426,3 +426,45 @@ An entry at `tentative` confidence must also have a matching line in
 - **Method:** `pefile` import tables plus a byte scan for `*.dll` strings.
 - **Confidence:** strong. It shows the names exist, not which one is picked at runtime (Q-0001).
   `xf3d.dll` and `xvr3d.dll` are not in the install payload.
+
+### E-0029 — The startup dialog is 4xvideo's device dialog; its hidden "Window" command selects h3d's windowed mode
+- **Binary/file:** `4xvideo.dll`, `h3d.dll`.
+- **Evidence:** `Video4x_Init` (`4xvideo.dll` `0x10001005`) runs `DialogBoxParamA(hinst, 0x65,
+  hwnd, 0x10001a20)` using the *game's* module handle, so the game's own dialog resource
+  (portrait, OK/Exit) is shown. The dialog procedure (`0x10001a20`) sets the fullscreen flag
+  `DAT_10005548 = 1` on `WM_INITDIALOG`, sets it to 1/0 on commands `0x3f6`/`0x3f7`, and ends
+  the dialog on `0x3f3` (OK). Monet's dialog has no `0x3f6`/`0x3f7` controls, but the
+  procedure still honours the commands. `FUN_10001290` then calls
+  `H3d_DDDriver_Init_D3DDriver_And_Video_Mode(ctx, driver, mode, DAT_10005548, 1)`. In
+  `h3d.dll` a zero fourth argument sets `ctx[0x8d36] = 0`, sizes the window to the mode with
+  `AdjustWindowRectEx`/`SetWindowPos` and calls `SetCooperativeLevel(hwnd, 0x808)`
+  (`DDSCL_NORMAL | DDSCL_FPUSETUP`). Nonzero calls `SetCooperativeLevel(hwnd, 0x811)`
+  (exclusive, fullscreen) and `SetDisplayMode`. In windowed mode `H3d_WindowProc` blits the
+  back buffer to the client rectangle on `WM_PAINT`.
+- **Method:** MCP decompile of `Video4x_Init`, `FUN_10001290`, `0x10001a20`,
+  `H3d_DDDriver_Init_D3DDriver_And_Video_Mode`, `H3d_WindowProc`. Confirmed at runtime:
+  posting `WM_COMMAND 0x3f7` then `0x3f3` gives a 640×480 window that renders 3D.
+- **Confidence:** proven.
+
+### E-0030 — In windowed mode the game refuses any desktop colour depth but 16 bpp
+- **Binary/file:** `MissionMonet.exe`, `MissionD.exe`.
+- **Evidence:** `MissionMonet.exe` `0x00417683` calls `GetDeviceCaps(GetDC(hwnd), BITSPIXEL)`
+  when `0x004667a4` (fullscreen flag returned by `Video4x_Init`) is 0; `cmp eax, 0x10` /
+  `je 0x004176c3` at `0x00417689`/`0x0041768c` skips message 951 "Please set your screen to 16
+  bits colour mode." `MissionD.exe` has the same check at `0x0042cd62`/`0x0042cd6b`.
+- **Method:** capstone disassembly at the `push 0x3b7` site. Seen at runtime on a 32-bit
+  desktop. `tools/proxy/patch_exe.py` turns the `je` into `jmp` in the run-folder copy.
+- **Confidence:** proven.
+
+### E-0031 — The game stalls its main loop while inactive, and lets `H3d_WindowProc` pre-empt every message
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** window procedure at `0x00416650`: every message goes first to
+  `H3d_WindowProc(ctx, hwnd, msg, wp, lp, &handled, &result)` (`0x004166d5`, cdecl, 7 args).
+  If `handled` is set it returns `result` immediately. Otherwise `WM_ACTIVATE`
+  (`0x00416738`) sets the active flag `0x0046ec08` to 1 only if `LOWORD(wp) != WA_INACTIVE`
+  and `HIWORD(wp) == 0`, else 0. `WM_ACTIVATEAPP` (`0x0041678f`) sets it to 1 for `wp` 1 or 2,
+  else 0. Both clear the 1020-byte key-state array at `0x0046e7e0`. WinMain's loop at
+  `0x00416b40` spins `FUN_00416990` while `0x0046ec08 == 0`.
+- **Method:** capstone disassembly; runtime confirmation: with the h3d proxy's
+  `MONET_BACKGROUND=1` swallowing focus-loss messages, the game keeps rendering unfocused.
+- **Confidence:** proven.

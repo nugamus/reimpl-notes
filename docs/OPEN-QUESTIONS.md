@@ -264,4 +264,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   while the game is in the background also crashes dgVoodoo's `DDraw.dll` (`c000041d`).
 - **Next to try:** run the game on its own desktop (`CreateDesktop`) or in a VM, or find the
   dgVoodoo or h3d path that reports loss while inactive.
-- **Status:** open. Until then traces are captured in the foreground (tools/proxy/README.md).
+- **Status:** resolved (E-0029, E-0030, E-0031). Surface loss came from fullscreen-exclusive
+  mode, and 4xvideo still honours its hidden "Window" command. `tools/proxy/run.ps1` selects
+  windowed mode, `patch_exe.py` skips the 16-bit desktop check and the activating
+  `ShowWindow`, the launcher drops inherited foreground rights (`LockSetForegroundWindow`),
+  and background mode keeps the active flag set.

@@ -61,6 +61,7 @@ int main(void)
     _snprintf(env, sizeof(env), "MONET_TRACE=%s", trace_path);
     env[sizeof(env) - 1] = 0;
     _putenv(env);
+    _putenv("MONET_TRACE_RAW=1");   /* first pass: one line per run of identical calls */
     DeleteFileA(trace_path);
 
     proxy = LoadLibraryA(proxy_path);
@@ -130,6 +131,31 @@ int main(void)
     check(seen_run, "three calls from one site logged as a single ' x3' line");
     check(seen_fov && seen_name && seen_matrix && seen_polar,
           "each call logged under its own export name");
+
+    /* Second pass, frame mode (the default): with no X3d_Render the calls form one open
+       frame, written at unload, one line per call site with its count. */
+    _putenv("MONET_TRACE_RAW=0");
+    DeleteFileA(trace_path);
+    proxy = LoadLibraryA(proxy_path);
+    fov = (fn_cdecl4)GetProcAddress(proxy, "X3d_Camera_Get_Fov");
+    name = (fn_stdcall4)GetProcAddress(proxy, "X3d_Camera_Get_Name");
+    for (i = 0; i < 2; i++) {
+        fov(11, 22, 33, 44);
+        name(11, 22, 33, 44);
+    }
+    FreeLibrary(proxy);
+    calls = seen_run = 0;
+    fh = fopen(trace_path, "r");
+    while (fh && fgets(line, sizeof(line), fh)) {
+        if (line[0] == '#')
+            continue;
+        calls++;
+        if (strstr(line, " x2\n"))
+            seen_run++;
+    }
+    if (fh)
+        fclose(fh);
+    check(calls == 2 && seen_run == 2, "frame mode groups alternating calls per call site");
 
     printf("%s (%d failure(s))\n", failures ? "FAILED" : "proxy selftest ok", failures);
     return failures ? 1 : 0;

@@ -69,13 +69,20 @@ static CRITICAL_SECTION g_lock;
 static LONG             g_seq;
 static double           g_ms_per_tick;
 static DWORD            g_last_flush;
-/* Run-length state: consecutive calls to the same export from the same call site are
-   written once, with " xN", when the run ends. Keeps 1000-fps loops readable. */
-static int              g_run_index = -1;
-static void            *g_run_ret;
-static LONG             g_run_seq;
-static LONGLONG         g_run_tick;
-static LONG             g_run_count;
+/* Frame mode (default). A frame ends at a boundary export (X3d_Render in x3d.dll,
+   H3d_Show_BackBuffer in h3d.dll). Within a frame each (export, call site) pair is written
+   once, in order of first call, with " xN" for its count; the seq and t= are those of the
+   first call. A frame whose list of (export, call site) pairs equals the previous frame's
+   is not written: "= xN" counts such frames. This keeps per-face collision loops and
+   uncapped frame rates (~240 fps windowed) to a few lines per distinct frame.
+   MONET_TRACE_RAW=1: one line per run of identical consecutive calls instead. */
+#define FRAME_MAX 512
+typedef struct { int index; void *ret; LONG seq; LONGLONG tick; LONG count; } entry_t;
+static entry_t          g_frame[FRAME_MAX], g_prev[FRAME_MAX];
+static int              g_frame_n, g_prev_n;
+static LONG             g_same_frames;
+static int              g_raw;
+static int              g_boundary = -1;
 
 /* Resolve REAL_DLL next to this proxy rather than by search order: the proxy carries the
    same name as the DLL it replaces, so a bare LoadLibrary risks finding itself. */
@@ -111,17 +118,53 @@ static void open_log(void)
 
 /* Caller holds g_lock. Time is QueryPerformanceCounter in ms, a machine-wide clock, so
    the x3d and h3d traces of one run can be merged by it. */
-static void flush_run(void)
+static void write_entry(const entry_t *e)
 {
-    if (g_run_index < 0)
-        return;
-    fprintf(g_log, "%ld t=%.3f %s!%s ret=0x%08lx", (long)g_run_seq,
-            (double)g_run_tick * g_ms_per_tick, PROXY_NAME, g_names[g_run_index],
-            (unsigned long)(UINT_PTR)g_run_ret);
-    if (g_run_count > 1)
-        fprintf(g_log, " x%ld", (long)g_run_count);
+    fprintf(g_log, "%ld t=%.3f %s!%s ret=0x%08lx", (long)e->seq,
+            (double)e->tick * g_ms_per_tick, PROXY_NAME, g_names[e->index],
+            (unsigned long)(UINT_PTR)e->ret);
+    if (e->count > 1)
+        fprintf(g_log, " x%ld", (long)e->count);
     fputc('\n', g_log);
-    g_run_index = -1;
+}
+
+static void flush_same(void)
+{
+    if (g_same_frames) {
+        fprintf(g_log, "= x%ld\n", (long)g_same_frames);
+        g_same_frames = 0;
+    }
+}
+
+/* Caller holds g_lock. */
+static void end_frame(void)
+{
+    int i, same = g_frame_n > 0 && g_frame_n == g_prev_n;
+    for (i = 0; same && i < g_frame_n; i++)
+        same = g_frame[i].index == g_prev[i].index && g_frame[i].ret == g_prev[i].ret;
+    if (same) {
+        g_same_frames++;
+    } else {
+        flush_same();
+        for (i = 0; i < g_frame_n; i++)
+            write_entry(&g_frame[i]);
+        memcpy(g_prev, g_frame, sizeof(entry_t) * g_frame_n);
+        g_prev_n = g_frame_n;
+    }
+    g_frame_n = 0;
+}
+
+/* Caller holds g_lock. Written at DLL_PROCESS_DETACH. */
+static void flush_all(void)
+{
+    if (g_raw) {
+        if (g_frame_n)
+            write_entry(&g_frame[0]);
+        g_frame_n = 0;
+    } else {
+        end_frame();
+        flush_same();
+    }
 }
 
 /* __cdecl: the thunk cleans up its own two arguments. */
@@ -130,19 +173,37 @@ void log_entry(int index, void *ret_addr)
     LONG seq = InterlockedIncrement(&g_seq);
     LARGE_INTEGER now;
     DWORD tick;
+    int i;
     if (!g_log)
         return;
     EnterCriticalSection(&g_lock);
-    if (index == g_run_index && ret_addr == g_run_ret) {
-        g_run_count++;
+    if (g_raw) {
+        if (g_frame_n && g_frame[0].index == index && g_frame[0].ret == ret_addr) {
+            g_frame[0].count++;
+        } else {
+            if (g_frame_n)
+                write_entry(&g_frame[0]);
+            QueryPerformanceCounter(&now);
+            g_frame[0].index = index; g_frame[0].ret = ret_addr; g_frame[0].seq = seq;
+            g_frame[0].tick = now.QuadPart; g_frame[0].count = 1;
+            g_frame_n = 1;
+        }
     } else {
-        flush_run();
-        QueryPerformanceCounter(&now);
-        g_run_index = index;
-        g_run_ret = ret_addr;
-        g_run_seq = seq;
-        g_run_tick = now.QuadPart;
-        g_run_count = 1;
+        for (i = g_frame_n - 1; i >= 0; i--)
+            if (g_frame[i].index == index && g_frame[i].ret == ret_addr)
+                break;
+        if (i >= 0) {
+            g_frame[i].count++;
+        } else {
+            if (g_frame_n == FRAME_MAX)
+                end_frame();
+            QueryPerformanceCounter(&now);
+            i = g_frame_n++;
+            g_frame[i].index = index; g_frame[i].ret = ret_addr; g_frame[i].seq = seq;
+            g_frame[i].tick = now.QuadPart; g_frame[i].count = 1;
+        }
+        if (index == g_boundary)
+            end_frame();
     }
     /* A killed process never reaches DLL_PROCESS_DETACH; lose at most ~1 s of trace. */
     tick = GetTickCount();
@@ -210,8 +271,11 @@ BOOL WINAPI DllMain(HINSTANCE self, DWORD reason, LPVOID reserved)
                         MB_OK | MB_ICONERROR);
             return FALSE;
         }
+        g_raw = getenv("MONET_TRACE_RAW") && *getenv("MONET_TRACE_RAW") == '1';
         for (i = 0; i < EXPORT_COUNT; i++) {
             g_real[i] = GetProcAddress(real, g_names[i]);
+            if (strcmp(g_names[i], "X3d_Render") == 0 || strcmp(g_names[i], "H3d_Show_BackBuffer") == 0)
+                g_boundary = i;
             if (strcmp(g_names[i], "H3d_WindowProc") == 0 && g_real[i]
                 && getenv("MONET_BACKGROUND") && *getenv("MONET_BACKGROUND") == '1') {
                 g_real_wndproc = (h3d_wndproc_t)g_real[i];
@@ -220,10 +284,15 @@ BOOL WINAPI DllMain(HINSTANCE self, DWORD reason, LPVOID reserved)
                     fprintf(g_log, "# background mode: focus-loss messages swallowed\n");
             }
         }
+        if (g_log)
+            fprintf(g_log, "# mode: %s%s\n", g_raw ? "raw" : "frames, boundary ",
+                    g_raw ? "" : (g_boundary >= 0 ? g_names[g_boundary] : "none"));
         break;
     case DLL_PROCESS_DETACH:
         if (g_log) {
-            flush_run();
+            EnterCriticalSection(&g_lock);
+            flush_all();
+            LeaveCriticalSection(&g_lock);
             fprintf(g_log, "# %ld calls\n", (long)g_seq);
             fclose(g_log);
             g_log = NULL;
