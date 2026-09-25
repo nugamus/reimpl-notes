@@ -14,10 +14,11 @@ A format is done only when its validator passes 100% of the corpus, every byte c
 | `.MAT` material script | 5 | `mat.py` | `mat.ksy` | E-0023 | done |
 | `.BMP` | 381 | `bmp.py` | `bmp.ksy` | E-0024 | done |
 | `.BIN` chunk container | 109 | `binchunk.py` | — | E-0025 | container done; payloads below |
-| `#OBJECTS#` (INFOOBJ.BIN) | 9 | `infoobj.py` | `infoobj.ksy` | E-0026 | layout done, fields opaque |
+| `#OBJECTS#` (INFOOBJ.BIN) | 9 | `infoobj.py` | `infoobj.ksy` | E-0026, E-0072 | done |
+| `#ACTIONS#` (INFOACT.BIN) | 9 | `infoact.py` | `infoact.ksy` | E-0071 | done |
 | `#SCENE#` `#CAMERA#` (SCENE.BIN) | 9 | — | below | E-0039 | done |
 | `#GAME#` (App.bin) | 1 | — | below | E-0037 | first 30 bytes read: start scene name |
-| `#INDEX#` `#ACTIONS#` `#APP#` | 91 | — | — | — | open |
+| `#INDEX#` `#APP#` | 82 | — | — | — | open |
 | `.X3D` scene script | 24 | `x3d.py` | this file (text) | E-0036 | done |
 | `.DMF` texture | 518 | `dmf.py` | `dmf.ksy` | E-0038 | done (`fb22`/`fb23` opaque) |
 | `.FRA` | 25 | — | — | Q-0016 | open |
@@ -571,16 +572,20 @@ The 9 corpus files all follow this exact layout (verified by `tools/parsers/info
 where each entry is:
 
 ```
-+0x00  8  bytes     name (NUL-terminated, e.g. "*U04_03\0")
-+0x08  32 bytes     reserved (every byte is 0xCD in the corpus)
-+0x28  4  bytes     u32 field_a
-+0x2C  4  bytes     u32 field_b   <-- overwritten at runtime with a pointer
-+0x30  4  bytes     u32 field_c
-+0x34  4  bytes     f32 field_d
-+0x38  4  bytes     u32 field_e
-+0x3C  4  bytes     u32 field_f
-+0x40  4  bytes     u32 field_g
++0x00  40 bytes    name (NUL-terminated, e.g. "*U04_03\0", then 0xCD garbage)
++0x28  4  bytes     u32 type          hotspot type; INFOACT actions match on it; 6 = character
++0x2C  4  bytes     u32 cursor        cursor kind (0 default, 2 click, 3 voice, 4 take, 5 use)
++0x30  4  bytes     u32 visible       0 = hidden at load
++0x34  4  bytes     f32 anim_frame    animation node frame
++0x38  4  bytes     u32 anim_paused   non-zero = paused at anim_frame
++0x3C  4  bytes     u32 anim_fps      animation node frame rate
++0x40  4  bytes     u32 anim_loop     animation node loop flag
 ```
+
+Field meanings (E-0072, superseding the "field_a..g" and "reserved" readings below):
+`Scene_LoadObjectInfo` (`0x0041d8e0`) creates one hotspot per entry and applies it with
+`FUN_004210d0`; the savegame's `OBJECTS` chunk (`FUN_0041d6f0`, the writer, not a loader)
+has the same layout. Behaviour: `docs/engine-spec/interaction.md`.
 
 and the terminator is:
 
@@ -648,3 +653,16 @@ files: 9  passed: 9  failed: 0
   bytes:   12768
 100% of corpus parsed
 ```
+
+## `#ACTIONS#` (INFOACT.BIN, E-0071)
+
+The only chunk of `Data/U##/INFOACT.BIN`: `u32 count`, then `count` records of 0x440
+bytes, read by `Scene_LoadActions` (`0x0041da90`). Record: `u32 id`, `char name[30]`,
+`char condition[258]`, `i32 max_runs`, `u32 trigger`, `char item[32]`,
+`u32 hotspot_type`, `char hotspot[32]`, `u32 target_type`, `char target[32]`,
+`u32 step_count` (≤ 10), then 10 steps of `u32 op` + `char arg[64]`. Field docs in
+`infoact.ksy`, behaviour in `docs/engine-spec/interaction.md`.
+
+`python tools/parsers/infoact.py` → 9/9 files, 198 records, every byte consumed
+(`--selftest`, `--file` dumps a unit). Corpus: trigger 8 ×115, 7 ×74, 0 ×9; `max_runs`
+1 ×143, 100 ×52, 2, 3, 9 once each; ops 1, 2, 3, 4, 7, 9, 10, 13, 14, 15, 16, 101.

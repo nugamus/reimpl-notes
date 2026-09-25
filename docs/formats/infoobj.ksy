@@ -31,25 +31,10 @@ doc: |
 
   and `obj_offset` is the file offset of the `#OBJECTS#` tag itself (a back-reference).
 
-  Each 68-byte entry is:
-
-      [8  b NUL-terminated name, e.g. "*U04_03\0"]
-      [32 b reserved: 0xCD on every corpus file — MSVC uninitialised-heap pattern]
-      [4  b u32 field_a]
-      [4  b u32 field_b]
-      [4  b u32 field_c]
-      [4  b f32 field_d]
-      [4  b u32 field_e]
-      [4  b u32 field_f]
-      [4  b u32 field_g]
-
-  Entry names mirror the per-unit scene asset names (`*U04_03`, `*Ernest`, `*U02_06a`,
-  ...). The reserved 32 bytes are written by the engine to disk as 0xCD but the runtime
-  loader overwrites entry offset `+0x2C` (byte 44, field_b) with a pointer to the loaded
-  object's handle, so this slot is repurposed as a pointer at runtime. The seven numeric
-  fields after the reserved block are not yet understood — their meaning is opaque
-  (see OPEN-QUESTIONS). The reserved 32 bytes and the seven trailing fields are kept in
-  the spec as raw bytes/ints so the validator can detect any future deviation.
+  Each 68-byte entry is the initial state of one hotspot (E-0072): a 40-byte object name
+  followed by seven u32/f32 fields. `FUN_0041d8e0` (Scene_LoadObjectInfo) binds each entry
+  to the scene object of that name and applies it with `FUN_004210d0`; the savegame's
+  `OBJECTS` chunk (`FUN_0041d6f0`) writes the same layout back from the live state.
 
   Validated by `tools/parsers/infoobj.py` against all 9 `INFOOBJ.BIN` files in the corpus:
   every file parses, every byte is consumed. Totals: 183 entries, 12,768 bytes.
@@ -67,56 +52,43 @@ seq:
 
 types:
   entry:
-    doc: |
-      One 68-byte object-info record. The seven numeric fields after the reserved block
-      carry per-object state; their semantic names are unknown.
+    doc: One hotspot's initial state (E-0072).
     seq:
       - id: name
         type: strz
-        size: 8
+        size: 40
         doc: |
-          NUL-terminated object name, padded to 8 bytes. Examples from the corpus:
-          `*U04_03`, `*Ernest`, `*U02_06a`, `*Eteint01`. The leading `*` is consistent
-          across every corpus file.
-      - id: reserved
-        size: 32
-        doc: |
-          Fixed 32-byte region. Every byte is `0xCD` in every corpus file — MSVC's
-          uninitialised-heap pattern (`0xCDCDCDCD`). The runtime loader overwrites the
-          first 4 bytes of this region (entry offset `+0x2C`, see `field_b`) with a
-          pointer to the loaded object's handle, so this slot becomes a pointer at
-          runtime even though the on-disk value is meaningless. Left as raw bytes here
-          so the validator surfaces any deviation.
-      - id: field_a
-        type: u4
-        doc: Entry offset `+0x28`. Values seen in the corpus: 4, 5, 6.
-      - id: field_b
+          Scene object name, NUL-terminated (`*U01_04`, `*Ernest`); the bytes after the NUL
+          are writer garbage (0xCD in every corpus file). Looked up case-insensitively,
+          depth first.
+      - id: type
         type: u4
         doc: |
-          Entry offset `+0x2C`. The on-disk value is overwritten at runtime with a
-          pointer, so its semantic meaning is that of a runtime pointer rather than an
-          integer. On-disk values seen in the corpus: 0, 2, 3, 4, 5.
-      - id: field_c
+          Hotspot type (entry `+0x28`, hotspot `+4`); an INFOACT action applies only when its
+          `hotspot_type` equals it. 6 = character (op 1 talks through the character).
+          Corpus: 4, 5, 6.
+      - id: cursor
         type: u4
-        doc: Entry offset `+0x30`. Mostly `1` in the corpus (180/183 entries).
-      - id: field_d
+        doc: |
+          Cursor kind shown over the hotspot (object `+0x128`): 0 default, 2 click,
+          3 voice, 4 take, 5 use. Corpus: 0, 2, 3, 4, 5.
+      - id: visible
+        type: u4
+        doc: 0 = hide the object at load (save writes object `+0x5c` == 0).
+      - id: anim_frame
         type: f4
-        doc: |
-          Entry offset `+0x34`. Almost always `1.0`; one entry in U01 has `20.0`. Looks
-          like a scalar parameter rather than a flag.
-      - id: field_e
-        type: u4
-        doc: Entry offset `+0x38`. Mostly `1` in the corpus.
-      - id: field_f
+        doc: Frame of the object's animation node (node `+0x74`).
+      - id: anim_paused
         type: u4
         doc: |
-          Entry offset `+0x3C`. Mostly `15` in the corpus (170/183 entries), with outliers
-          of `0`, `2`, `4`, `50`. The strong mode at 15 looks like a default category ID
-          or a type tag.
-      - id: field_g
+          0 = set the frame (clamped to the animation's range) and leave the node as it is
+          (running); otherwise set the frame and pause the node (node `+0x60`).
+      - id: anim_fps
         type: u4
-        doc: Entry offset `+0x40`. Mostly `1` in the corpus (139/183), with `0` in the
-          rest. Looks like a boolean flag.
+        doc: Node frame rate (node `+0x78`, as a float). Corpus: mostly 15.
+      - id: anim_loop
+        type: u4
+        doc: Node loop flag (node `+0x68`).
 
   terminator:
     doc: |

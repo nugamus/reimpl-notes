@@ -365,7 +365,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   movement (E-0050).
 - **Next to try:** the pick method in `xd3d.dll`; the hotspot list's loader (scene `+0x1a0`)
   and `FUN_0041b700`'s queue (scene `+0x198`).
-- **Status:** open
+- **Status:** RESOLVED (see E-0070, E-0071, E-0072, E-0073, E-0074; spec in
+  `docs/engine-spec/interaction.md`)
 
 ### Q-0025 — Minor camera and collision fields
 - **Context:** `Camera_DistanceAhead` also skips objects with object `+0x40` ≠ 0; each walk or
@@ -386,4 +387,32 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Next to try:** callers of `FUN_00420060`/`FUN_00420100` during U01 load
   (`FUN_0041e500`, the U01 constructor); decompile `FUN_00421b90` and what fills
   `+0x1a0` entries' `+0x6c`/`+0x88`.
+- **Status:** open
+
+### Q-0040 — Which face test does the pick install, and what is face `+0x38`?
+- **Context:** E-0070. The face class `+0` is `FUN_1000b040` or `FUN_1000b180`
+  depending on `FUN_1000b690`'s argument; both return "not pickable" when face `+0x38` ≠ 0.
+- **What we checked:** the two functions and their installer; not the caller's argument,
+  not the O3D field that fills `+0x38`.
+- **Blocks:** nothing in U01 as long as the engine picks front faces only; would matter if
+  some faces are double-sided or flagged unpickable.
+- **Next to try:** callers of `FUN_1000b690`; writers of face `+0x38` in `x3d.dll`'s O3D
+  reader.
+- **Status:** open
+
+### Q-0041 — Where does the held-item cursor image come from, and what is the inventory UI?
+- **Context:** E-0073/E-0074: a take step sets the cursor item to `<name>C` through the
+  cursor manager `DAT_0046edc8` vtable `+0x18`; `Data/2dbit/<name>C.BMP` (32×32) and
+  `<name>P.BMP` (50×50) exist for every U01 take target. Steps 2 and 3 also call
+  `DAT_0046ec1c` vtable `+0xb8` → `+0x94` / `+0x98` (inventory add/remove, by the look).
+- **What we checked:** file names and sizes only.
+- **Blocks:** the exact file path and colour key of the item cursor; the inventory screen.
+- **Status:** open
+
+### Q-0042 — What is the action queue's `+0x460` flag in U01's click handler?
+- **Context:** `U01_DispatchClickActions` (`0x00401d30`) ends by running `MonterSurToit`
+  when queue object `+0x460` ≠ 0, the hovered hotspot is `*U01_09` and camera `+0x1c`
+  (z) < 100.
+- **What we checked:** the handler only.
+- **Blocks:** one alternate way onto U01's roof.
 - **Status:** open

@@ -1028,3 +1028,152 @@ An entry at `tentative` confidence must also have a matching line in
 - **Method:** capstone disassembly by hand; MCP decompile.
 - **Confidence:** proven for the angles. How the renderer places the object with
   `+0x164` is not read (Q-0021).
+
+### E-0070 — `X3d_Scene_Pick_Object` is a screen-space polygon test over front faces of visible, in-frustum objects; the distance is camera-space depth
+- **Binary/file:** `x3d.dll`, `xd3d.dll`.
+- **Evidence:** `X3d_Scene_Pick_Object` (`x3d.dll` `0x100016c7`) returns 0 when the
+  renderer table (scene `+0x4c`) has no `+0x70`, else calls its `+0xc`, the rasteriser's
+  `X3d_Pick_Dll` (the name is among the `_Dll` strings `x3d.dll` resolves, `0x10028c24`).
+  `X3d_Pick_Dll` (`xd3d.dll` `0x1000129e`): builds the camera matrix (camera `+100`
+  method), sets *dist = scene `+0x30` (far; `X3d_Scene_Init_Resolution` stores near
+  `+0x2c`, far `+0x30`, viewport centre `+0x3c`→`+8/+0xc` = origin + size/2, half size
+  `+0x10/+0x14`), object = 0, and walks the top-level list (`+0x2c`) with `FUN_10021970`,
+  recursing children `+0x24` and siblings `+0x28` (`FUN_10021760`) whatever the parent's
+  outcome. An object is tested when object `+0x40` (weld flag, E-0054) and `+0x114` are 0;
+  weld tops go through `FUN_100213f0`, which tests the top's faces (the shared weld mesh)
+  and reports the top. Per object: class methods `+0x10` (camera type), `+0x14` (LOD,
+  E-0052), `+0x18` = `FUN_1001a010`: `+0x60` = 0 when hidden (`+0x5c`), else 1 if any
+  bounding-box corner (`+0x68`, `+0x7c..`) is inside all six planes (near, far, ±x ≤ z,
+  ±y ≤ z) or the box straddles all of them; `+0x11c` forces 1. Only `+0x60` objects are
+  tested. Per face: face class `+0` (`FUN_1000b040` / `FUN_1000b180`, x3d `0x1000118b` /
+  `0x1000106e`) is 1 when face `+0x38` = 0 and n · v0 < −0.01 with
+  n = (v0 − v1) × (v2 − v1) in camera space (the second variant retries later vertex
+  triples). `FUN_1001efa0`: outcode AND/OR over the six planes rejects faces outside one
+  plane; near/far clipping (`FUN_10010250`, `FUN_10010660`); projection
+  sx = cx + fx · X/Z, sy = cy − fy · Y/Z; bounding-box test, then every edge
+  (y − sy_i)(sx_{i+1} − sx_i) + (x − sx_i)(sy_i − sy_{i+1}) ≤ 0; depth
+  d = (m · v0) / (m · ((x − cx)/fx, (cy − y)/fy, 1)), m the unit normal. The smallest d
+  wins; the reported object is the base object, not its LOD. The EXE passes client pixel
+  coordinates as floats (`Scene_PickHover`, `0x0041b540`).
+- **Method:** MCP decompile of the functions named; `X3d_Scene_Init_Resolution` decompile.
+- **Confidence:** proven for the traversal, tests and depth. Face `+0x38` and which face
+  variant is installed are open (Q-0040).
+
+### E-0071 — `#ACTIONS#` (INFOACT.BIN) is `u32 count` + 0x440-byte action records; 9/9 parse, 198 records
+- **Binary/file:** `MissionMonet.exe`; `Data/U##/INFOACT.BIN` (9 files).
+- **Evidence:** `Scene_LoadActions` (`0x0041da90`, was `FUN_0041da90`) opens
+  `%s%s` of the unit path and `INFOACT.BIN` (`0x00441c1c`), seeks `ACTIONS`
+  (`0x00441c14`), reads a u32 count and `count * 0x440` bytes, and per record (base r)
+  looks up hotspots named at r + 0x150 and r + 0x174 in the list (scene `+0x1a0`, vtable
+  `+0x14`), then `FUN_0041e020(10, id r+0, name r+4, trigger r+0x128, item r+0x12c,
+  hotspot_type r+0x14c, hotspot, target_type r+0x170, target, condition r+0x22,
+  max_runs r+0x124, step_count r+0x194, steps r+0x198)`; the constructor copies
+  `step_count` steps of `u32` + string, stride 0x44. So 30 bytes of name, 258 of
+  condition, 10 steps of 68 bytes (0x198 + 0x2a8 = 0x440).
+- **Method:** MCP decompile; `python tools/parsers/infoact.py` → 9/9 files, 198 records,
+  every byte consumed, `--selftest` (truncated chunk, step count 11 rejected).
+- **Confidence:** proven for the layout. Resolves the `#ACTIONS#` part of the open
+  `.BIN` payloads.
+
+### E-0072 — INFOOBJ.BIN entries are the unit's hotspots: name[40], type, cursor, visible, animation frame/paused/fps/loop; the hover marker is `*`
+- **Binary/file:** `MissionMonet.exe`; `Data/U##/INFOOBJ.BIN`.
+- **Evidence:** the unit vtable `+8` (U01 `0x00402a30`) calls `FUN_0041d490`, which with
+  no reader opens INFOOBJ.BIN, calls `Scene_LoadObjectInfo` (`0x0041d8e0`) and
+  `Scene_LoadActions`. `Scene_LoadObjectInfo` reads `OBJECTS`, and per 0x44-byte entry
+  finds the object named by the entry (`FUN_0041b440`, exact: `X3d_Scene_Get_Object`, then
+  depth-first `_stricmp`), copies the entry name over the object name (a full C string,
+  so the name field is 40 bytes up to `+0x28`), finds or creates the hotspot
+  (`FUN_00420b40(type = entry +0x28, ++scene +0x19c, object)`, added to list `+0x1a0`;
+  the only caller of `FUN_00420b40`), and applies the entry with `FUN_004210d0`:
+  object `+0x128` → cursor kind = `+0x2c`; `+0x30` = 0 → hide (hotspot vtable `+0x28`);
+  the animation node named like the hotspot (list scene `+0x158`): `+0x38` = 0 →
+  `FUN_004200c0(frame +0x34)` (set frame, clamped to the animation's first/last), else
+  `FUN_00420100(frame, 0)` (paused, frame); node `+0x78` = (float) `+0x3c`; node `+0x68` =
+  `+0x40`. `FUN_0041d6f0` writes the same fields back into a save's `OBJECTS` chunk
+  (`FUN_00421170`). Hover `Scene_FindHotspotForObject` (`0x0041b6a0`, was `FUN_0041b6a0`)
+  walks parents (`+0x20`) to a name containing `0x004417b8` = `"*"` and looks up the
+  substring from `*` with `(name, 0)`: the list's find (`FUN_0041dea0`) matches by
+  `FUN_00416180(node name, key, 0)` = `_stricmp` equal or upper-cased `strstr`, walking
+  `+0x50`/`+0x5c`; on no match it continues from the parent. Op 1 treats target type 6 as
+  a character (`Action_RunStep`, case 1). Corpus: U01 `*U01_03` has anim_paused = 1,
+  `*U01_10` and `*Ernest` visible = 0.
+- **Method:** MCP decompile of the functions named; `python tools/parsers/infoobj.py`
+  (9/9, 183 entries, field names updated).
+- **Confidence:** proven for the fields. The meaning of types 4 and 5 is only observed
+  (takeables / fixtures in U01). Supersedes E-0026's opaque fields and the "reserved
+  32 bytes overwritten by a pointer" reading, and E-0051's `$` marker (it is `*`).
+
+### E-0073 — A click triggers the hotspot's first runnable INFOACT action; steps are data, op 10 hands a name to the unit's C++
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `FUN_0041b700` (after hover) calls `Actions_TriggerForHotspot`
+  (`0x0041e3f0`, was `FUN_0041e3f0`) when a hotspot is hovered and scene `+0x13c` ≠ 0
+  (`U01_Start` writes 0 at `0x004014ac`, 1 at `0x00401767` right after the hand-over).
+  Kind = 7 with the held item's name when the cursor mode is 1 or 2, else 8.
+  `FUN_0041e180` → `FUN_0041e240` walks the action list (`+0x50`) for the first action with
+  `+0x64` (hotspot_type) = hotspot `+4` and hotspot name equal to / containing the clicked
+  one, then that action's `+0x5c` chain (same hotspot, appended in file order by
+  `FUN_0041dfe0` via `FUN_0041e900`) for `+0x60` = kind, runnable (`FUN_0041e2e0`:
+  exhausted flag table `+0x410[id]` = 0 and `EvalActionCondition` (`0x00415b80`) true)
+  and, for 7, `_stricmp(item, held)` = 0. `FUN_0041e4b0` runs each step
+  (`Action_RunStep`, `0x0041e500`) then `FUN_0041e320`: run count `+0x810[id]` += 1;
+  if `max_runs` < 100 and count ≥ max_runs, `FUN_0041e3a0` sets exhausted `+0x410[id]` = 1.
+  `EvalActionCondition` lower-cases; `t` → 1, `f` → 0, `m`/digits/`!m` read an index
+  (`FUN_00415ad0`) into the exhausted table, `&`, `|`, `(`…`)` combine. Steps: 1 voice
+  (`FUN_004215f0` for a type-6 target found in scene `+0x164`, else scene vtable `+0x48`
+  at the hotspot position, `%sSound/%s.WAV` or `%sSound/%s` if the name has `.wav`); 2
+  `FUN_004211d0` (cursor kind 0, hide, cursor item = name chars 1..6 + `C`,
+  `FUN_00414540(cursor, 1, …)`); 3 `FUN_004212b0`; 4 node `FUN_00420060(node, 0)`;
+  6 `Scene_RunFor(atoi)`; 7 `FUN_00421300` (cursor kind = atoi); 9 hotspot vtable
+  `+0x28(…, atoi == 0, 1)`; 10 `FUN_0041ebb0` (queue slot, 10 max, message "Cannot to add
+  action into queue"); 12 vtable `+0x4c` (`FUN_0041bc00`, sound channel 1, assert
+  `XScene.cpp:609`); 13 vtable `+0x50` (`FUN_0041bcf0`, positional, `XScene.cpp:628`);
+  14 find by name and run if runnable; 15/16 condition := `TRUE`/`FALSE`
+  (`FUN_0041e2a0`); 101 vtable `+0x54` (`FUN_0041be00`, channel 2 after stopping it,
+  `XScene.cpp:651`). The unit's click handler drains the queue and matches names with
+  `FUN_0041e940` (`_stricmp` against each step argument).
+- **Method:** MCP decompile; functions created at `0x0041baf0`, `0x0041bc00`,
+  `0x0041bcf0`, `0x0041be00`, `0x0041dfe0`, `0x0041df60`; U01 action list from
+  `infoact.py --file Data/U01/INFOACT.BIN`.
+- **Confidence:** proven. Resolves Q-0024 with E-0070, E-0072, E-0074.
+
+### E-0074 — Cursors are 20×20 bitmap resources of the EXE, white-keyed, with per-kind hotspots; held items blink over "use" hotspots
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `XCursor_LoadCursors` (`0x00414250`) calls `XCursor::XCursor_63`
+  (assert `XCursor.cpp:63`) for kinds 0..13: `Cur_default.BMP` (0, 0), `CUR_WAIT` (9, 2),
+  `CUR_CLIC` (9, 2), `CUR_VOICE` (10, 10), `CUR_TAKE` (10, 4), `CUR_USE` (10, 10), then
+  `LOUPEB`, `LOUPED`, `LOUPEDB`, `LOUPEDH`, `LOUPEG`, `LOUPEGB`, `LOUPEGH`, `LOUPEH`
+  (10, 10), stored at cursor `+0x84 + 0x30·i` with the pair at `+0xa4/+0xa8`. The loader
+  `FUN_004156a0` uses `LoadImageA` on the EXE module first (file only as fallback), and
+  `pefile` lists these names as `RT_BITMAP` resources (plus unused `CUR_DROP.BMP`), all
+  20×20 24-bit. Surfaces get colour key 0xFFFFFF (`FUN_004159c0`); `FUN_00414670` draws
+  mode 0 as a 20×20 color-keyed blit at (`+0x70`, `+0x74`) = cursor − pair
+  (`FUN_00414890`), mode 1 a 32×32 item image at cursor − (16, 16). Hover
+  (`FUN_0041b600`): mode 0 → kind = hotspot object `+0x128` or 0; mode 1 over a hotspot
+  of kind 5 → two animation frames (item, none) at 6 per second (`FUN_00414a30`,
+  `FUN_00414b60(…, 6)`, mode 2); mode 2 off such a hotspot → back to mode 1
+  (`FUN_00414ba0`). Corpus: `Data/2dbit/` has `U01_04C/05C/08C/12C/19C.BMP` (32×32, white
+  background) for U01's five take targets.
+- **Method:** MCP decompile; `pefile` resource walk.
+- **Confidence:** proven for the table, resources and drawing; the item image's loader
+  (cursor manager `DAT_0046edc8` vtable `+0x18`) is not read (Q-0041).
+
+### E-0075 — Unit classes come from a switch on the unit number; U01's vtable is `0x004393d0`, and `0x00403340` / `0x00402f70` belong to U02
+- **Binary/file:** `MissionMonet.exe`; `Data/U02/INFOACT.BIN`.
+- **Evidence:** `CreateUnitScene` (`0x00417f10`..) indexes byte table `0x004181d0` by the
+  unit number (0..50) into jump table `0x004181a4`: 0 → `FUN_004097e0`, 1 →
+  `FUN_00401000` (stores vtable `0x004393d0`), 2 → `FUN_00402af0` (vtable `0x00439468`),
+  3 → `0x00404e70`, 4 → `0x0040a720`, 5 → `0x0040ece0`, 6 → `0x00410940`,
+  7 → `0x004112b0`, 33 → `0x00407090`, 50 → `0x004123c0`, others `0x0041a890`.
+  U01's vtable: `+0x8` `0x00402a30`, `+0x14` `U01_Start` (`0x00401230`), `+0x1c`
+  `0x004017a0` (calls `Scene_RenderFrame` first), `+0x30` `U01_DispatchClickActions`
+  (`0x00401d30`, function created), `+0x40` `0x00401940` (calls `Scene_HandleInput`
+  `0x0041b7f0`), `+0x44` `Scene_PickHover`, `+0x48..+0x54` the sound methods of E-0073.
+  `0x00401d30` compares `TakeCard`, `ClickMaire`, `OpenDoor`, `CloseDoor`,
+  `TakeCarteHorloge`, `OpenBoitier`, `BaisserManette`, `ClicTel`, `OpenTiroir1`,
+  `OpenTiroir2`, `MonterSurToit`, `DoInterrupteur` (the op-10 names of U01's INFOACT),
+  while `0x00403340` compares `ClickControleur` … `MonterDansTrain`, the op-10 names of
+  `U02/INFOACT.BIN`. Renamed `U02_DispatchClickActions` and `U02_UpdateFrameLogic`.
+- **Method:** capstone of `CreateUnitScene`, MCP xrefs, `infoact.py --file`.
+- **Confidence:** proven. Supersedes the U01 attribution of `0x00439468`, `0x00402f70` and
+  `0x00403340` in E-0046 and E-0051; the loop structure they describe holds for U01 with
+  the addresses above.
