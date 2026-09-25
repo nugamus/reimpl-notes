@@ -223,12 +223,29 @@ void missing_export(int index)
 typedef int (__cdecl *h3d_wndproc_t)(void *, HWND, UINT, WPARAM, LPARAM, int *, LRESULT *);
 static h3d_wndproc_t g_real_wndproc;
 
-/* Background mode also lets posted keys reach GetAsyncKeyState. Videos and scripted waits
-   poll the physical key state (Enter/Escape, E-0043), which posted WM_KEYDOWNs never set,
-   so a test driver could not skip them. The exe's GetAsyncKeyState import is redirected
-   to report a key as down while a posted WM_KEYDOWN has not been followed by WM_KEYUP. */
+/* Background mode also lets posted input reach the calls that bypass window messages.
+   Videos and scripted waits poll the physical key state (Enter/Escape, E-0043), and
+   picking reads the real cursor (GetCursorPos + ScreenToClient). So the exe's imports are
+   redirected: GetAsyncKeyState reports a key as down while a posted WM_KEYDOWN has not
+   been followed by WM_KEYUP; GetCursorPos returns the last posted mouse position once one
+   has been posted; SetCursorPos moves that virtual cursor instead of the user's. */
 static volatile LONG g_posted_down[256];
 static SHORT (WINAPI *g_real_gaks)(int);
+static BOOL (WINAPI *g_real_gcp)(LPPOINT);
+static POINT g_cursor; /* client coordinates of g_cursor_hwnd */
+static HWND g_cursor_hwnd;
+static int g_cursor_posted;
+
+/* Client <-> screen through ScreenToClient only, the call the game itself uses: with
+   display scaling, ClientToScreen in this DPI-unaware process is not its inverse. */
+static POINT screen_origin(void)
+{
+    POINT o = { 0, 0 };
+    ScreenToClient(g_cursor_hwnd, &o);
+    o.x = -o.x;
+    o.y = -o.y;
+    return o;
+}
 
 static SHORT WINAPI background_gaks(int vk)
 {
@@ -236,15 +253,36 @@ static SHORT WINAPI background_gaks(int vk)
     return (vk >= 0 && vk < 256 && g_posted_down[vk]) ? (SHORT)(real | 0x8000) : real;
 }
 
-/* Rewrites the exe's IAT slot. Done on the first window message, when the exe's imports
-   are certainly bound. */
-static void hook_get_async_key_state(void)
+static BOOL WINAPI background_gcp(LPPOINT p)
+{
+    if (!g_cursor_posted)
+        return g_real_gcp(p);
+    {
+        POINT o = screen_origin();
+        p->x = g_cursor.x + o.x;
+        p->y = g_cursor.y + o.y;
+    }
+    return TRUE;
+}
+
+static BOOL WINAPI background_scp(int x, int y)
+{
+    POINT o = screen_origin();
+    g_cursor.x = x - o.x;
+    g_cursor.y = y - o.y;
+    g_cursor_posted = 1;
+    return TRUE;
+}
+
+/* Rewrites the exe's IAT slot for a user32 import and returns the original. Done on the
+   first window message, when the exe's imports are certainly bound. */
+static FARPROC hook_import(const char *name, FARPROC replacement)
 {
     BYTE *base = (BYTE *)GetModuleHandleA(NULL);
     IMAGE_NT_HEADERS *nt = (IMAGE_NT_HEADERS *)(base + ((IMAGE_DOS_HEADER *)base)->e_lfanew);
     IMAGE_DATA_DIRECTORY dir = nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
     IMAGE_IMPORT_DESCRIPTOR *d = (IMAGE_IMPORT_DESCRIPTOR *)(base + dir.VirtualAddress);
-    FARPROC target = GetProcAddress(GetModuleHandleA("user32.dll"), "GetAsyncKeyState");
+    FARPROC target = GetProcAddress(GetModuleHandleA("user32.dll"), name);
 
     for (; d->Name; d++) {
         IMAGE_THUNK_DATA *t = (IMAGE_THUNK_DATA *)(base + d->FirstThunk);
@@ -252,15 +290,15 @@ static void hook_get_async_key_state(void)
             if ((FARPROC)t->u1.Function == target) {
                 DWORD old;
                 VirtualProtect(&t->u1.Function, sizeof(t->u1.Function), PAGE_READWRITE, &old);
-                g_real_gaks = (SHORT (WINAPI *)(int))target;
-                t->u1.Function = (DWORD)(DWORD_PTR)background_gaks;
+                t->u1.Function = (DWORD)(DWORD_PTR)replacement;
                 VirtualProtect(&t->u1.Function, sizeof(t->u1.Function), old, &old);
                 if (g_log)
-                    fprintf(g_log, "# background mode: posted keys reach GetAsyncKeyState\n");
-                return;
+                    fprintf(g_log, "# background mode: %%s redirected\n", name);
+                return target;
             }
         }
     }
+    return target;
 }
 
 static int __cdecl background_wndproc(void *ctx, HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
@@ -269,10 +307,19 @@ static int __cdecl background_wndproc(void *ctx, HWND hwnd, UINT msg, WPARAM wp,
     static int hooked;
     if (!hooked) {
         hooked = 1;
-        hook_get_async_key_state();
+        g_cursor_hwnd = hwnd;
+        g_real_gaks = (SHORT (WINAPI *)(int))hook_import("GetAsyncKeyState", (FARPROC)background_gaks);
+        g_real_gcp = (BOOL (WINAPI *)(LPPOINT))hook_import("GetCursorPos", (FARPROC)background_gcp);
+        hook_import("SetCursorPos", (FARPROC)background_scp);
     }
     if ((msg == WM_KEYDOWN || msg == WM_KEYUP) && wp < 256)
         g_posted_down[wp] = (msg == WM_KEYDOWN);
+    if (msg == WM_MOUSEMOVE || msg == WM_LBUTTONDOWN || msg == WM_LBUTTONUP) {
+        g_cursor.x = (short)LOWORD(lp);
+        g_cursor.y = (short)HIWORD(lp);
+        g_cursor_hwnd = hwnd;
+        g_cursor_posted = 1;
+    }
     if ((msg == WM_ACTIVATEAPP && !wp) || (msg == WM_ACTIVATE && LOWORD(wp) == WA_INACTIVE)) {
         *handled = 1;
         *result = 0;
