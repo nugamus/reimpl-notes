@@ -22,12 +22,28 @@ A format is done only when its validator passes 100% of the corpus, every byte c
 | `#APP#` (App.bin) | 1 | — | — | — | open |
 | `.X3D` scene script | 24 | `x3d.py` | this file (text) | E-0036 | done |
 | `.DMF` texture | 518 | `dmf.py` | `dmf.ksy` | E-0038 | done (`fb22`/`fb23` opaque) |
-| `.FRA` | 25 | — | — | Q-0016 | open |
-| `.CFG` | 38 | — | — | Q-0016 | open |
+| `.FRA` 2D frame | 25 | `fra.py` | `fra.ksy` | E-0100 | done (view `unk_7`/`unk_8`, list fields opaque) |
+| `.CFG` (`x3dcfg.cfg`) | 38 | `cfg.py` | `cfg.ksy` | E-0103 | done; not read by the game |
 
 Loader rule learned the hard way: the engine formats (`.O3D`/`.A3D`/`.L3D`/`.C3D`/`.S3D`,
 and `.DMF` through the host's file callbacks, E-0038) are read by `x3d.dll`; the
 game-specific ones (`.BIN`, `.X3D`, `.FRA`) by `MissionMonet.exe`.
+
+## `.FRA` — 2D frame (E-0100)
+
+`u32 count`, then per object: a 4-byte class tag, a 36-byte view (`id, x, y, w, h,
+visible, parent, unk_7, unk_8`), a class body of fixed size, and properties (4-byte tag +
+fixed body) up to a 0 tag. Tags are MSVC multi-character constants, so `'#BIT'` reads
+`TIB#` in the file. Class and property sizes are the read lengths of their constructors in
+`MissionMonet.exe`; see `fra.ksy`. Corpus: 106 objects, 196 properties (65 `ucg@`, 58
+`RCS@`, 53 `LIH@`, 20 `GIH@`). `nCC#` / `nIC#` (7 video frames) are unknown to both EXEs.
+Behaviour: `docs/engine-spec/ui.md`.
+
+## `.CFG` — `x3dcfg.cfg` (E-0103)
+
+Authoring-tool settings in `Anim/`, `Static/` and `cinematiques/` folders: 3 f32, 6 u32,
+`u32 n`, `n` × 260-byte paths on the authors' machine (`D:\MissionD\Data\U01\maps`).
+Nothing in the shipped binaries reads them; the engine ignores them.
 
 ## `.X3D` — scene script (E-0036)
 

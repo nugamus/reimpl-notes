@@ -1670,3 +1670,182 @@ An entry at `tentative` confidence must also have a matching line in
   `+0x58` = 0 (clamp).
 - **Method:** script over `o3d.py` / `l3d.py` output.
 - **Confidence:** proven for the lighting result.
+
+### E-0100 — `.FRA` is a tagged object list read by `LFrameReader` and built by `LClassCreator`; 25/25 parse
+- **Binary/file:** `MissionMonet.exe`; `Data/2DFRA/*.fra`.
+- **Evidence:** `LFrameReader::LFrameReader_97` (`0x0042d290`, assert `LFrameReader.cpp:97`)
+  opens `<root>2DFRA/<name>` with `.fra` appended when the name has no `.` (`0x0042d250`;
+  strings `2DFRA/` `0x004424a4`, `.fra` `0x004424ac`, set by the constructor `0x0042d130`),
+  reads the whole file (size masked to 16 bits) and returns the first u32.
+  `LClassCreator::LClassCreator_128` (`0x0042e4e0`) loops that many times: read a u32 tag
+  (`0x0042d3f0`), construct the class registered for it (`0x0042e610`: tag → index →
+  factory), call its `+0x24`, then read u32 tags until 0 (`0x0042d410`), constructing each
+  as a property (`0x0042e6a0`) and calling its `+8`, then the object's `+0x108`.
+  `RegisterFrameClassTags` (`0x0042aab0`) pairs tags with factories: `#VIE` (`0x23564945`)
+  `0x004341b0`, `#BIT` `0x00423e40`, `#SCR` `0x00432570`, `@CUR` `0x0042e850`, `@ARF`
+  `0x0042d010`, `@HIL` `0x0042ec30`, `@DRA` `0x0042e9d0`, `@SCR` `0x00432290`, `@ANI`
+  `0x0042d490`, `@HIG` `0x0042ef30`, `#pov` `0x0042ad00`, `#pob` `0x0042aca0`, `#LOP`
+  `0x0042f2b0`, `#LOA` `0x00427fb0`, `#SAV` `0x00428250`, `#Edi` `0x004284d0`, `#Vol`
+  `0x00434cd0`, `#VoB` `0x00435340`, `#VoA` `0x00435200`, `#UEd` `0x00429290`, `#SEd`
+  `0x00429100`, `#USc` `0x004294b0`, `@gcu` `0x00426a60`; and frame classes by name:
+  `PorteF` `0x00431680`, `Tableau` `0x00426090`, `Loupe` `0x004262c0`, `Taille`
+  `0x00426400`. Constructors read their body with `FUN_0042d3c0(reader, dst, n)`: view
+  `0x004342f0` 0x24 (id → `+0x10`, rect → `+0x14..+0x20`, `+0x38`, parent id → attach to
+  that view, `+0x3c`, `+0x40`); `#BIT` `0x00423ea0` +0x2c (two s32 → `+0x24/+0x28`, name →
+  `+0x74`, s32 → `+0x70`); `#LOP` `0x0042f310` #BIT + 8; `#SCR` `0x004325d0` +0x6c (three
+  names at `+0xb8/+0xd8/+0xf8`); `#Vol` `0x00434d30` +0x24; `#pov`, `#pob`, `#Edi` and its
+  subclasses, `#LOA`/`#SAV` (through `0x004275e0` → `#SCR`) and `#USc` (→ `#SCR`) read
+  nothing more. Properties (base `0x0042e210` reads nothing): `@gcu` 4, `@CUR` 4, `@DRA` 4,
+  `@ARF` 0x20, `@SCR` 0x20, `@HIL` 0x28 (`@HIG` = the `@HIL` constructor + enabled = 0),
+  `@ANI` 0x38. With these sizes `tools/parsers/fra.py` consumes every byte of 25/25 files
+  (106 objects, 196 properties). `nCC#` / `nIC#` (7 files: `Prologue`, `Epilogue`,
+  `GivParis`, `LeHavRou`, `RouGiv`, `V33_01/02`) are not registered and their bytes occur
+  in neither EXE; their layout (view + u32 + name[32]) is from the corpus. Of 128
+  bitmap-name fields all but `Intro`, `FondNoir` and three `SCR.BitmapScroll` exist in
+  `Data/2dbit/`.
+- **Method:** MCP decompile; capstone for the tag/factory pushes and constructor read
+  sizes; `fra.py` over the corpus.
+- **Confidence:** proven. Resolves the `.FRA` half of Q-0016.
+
+### E-0101 — Frame manager: input first, hit test from the last view, a 50 ms timer, frames drawn after the 3D scene
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** the manager (constructor chain `0x00426540` → `0x0042b6e0`, vtable
+  `0x00439e5c`; `DAT_0046ec1c` and `DAT_0046edb0` hold the same object) gets each window
+  message first (window procedure `0x00416650`, call at `0x00416680` to `+0x68` =
+  `0x0042bc00`, which forwards only while its open-frame list is non-empty).
+  `FrameManager_OnMessage` (`0x0042bcc0`): `WM_KEYDOWN` → `+0xc(15, 0, &vk)`, then each
+  open frame's `+0x1c` until one returns nonzero; `WM_CHAR` → frames' `+0x38`;
+  `WM_MOUSEMOVE` (`0x0042c1c0`) → frames' `+0x14`; `WM_LBUTTONDOWN` (`0x0042c140`) →
+  `+0xc(4)`, frames' `+0x18`; `WM_LBUTTONUP` (`0x0042c0d0`) → `+0x30`; `WM_RBUTTONDOWN`
+  (`0x0042c050`); `WM_TIMER` → `+0x74`. Frame base: press (`0x0042cba0`) walks the view
+  list from the last index to 0, needs the view's `+0x38` (`0x00426a00`) and `PtInRect`
+  (`0x004349b0`), remembers the view (`+0x30`) and calls its `+0x50` (event 4,
+  `0x00434a80`); release (`0x0042ced0`) calls the remembered view's `+0x64` (event 13,
+  `0x00434bc0`); move (`0x0042cab0`) calls `+0x44` (event 1, `0x00434a10`) on the old
+  view, `+0x48` (event 2) on the new, `+0x4c` (event 3) while inside. A view offers each
+  event to its properties first (`+0xc`). When the manager consumed a message in app mode
+  0 the window procedure calls scene `+0x3c` and sets app `+0x48c` = 2.
+  `SetTimer(hwnd, 0, 50, NULL)` at `0x0042ba99`. Draw: in app mode 0 `Scene_RenderFrame`
+  (`0x0041b130`) runs `X3d_Render`, manager `+0x70(1)` (`0x0042bc50`: `+0x7c`, `+0x84`),
+  the cursor (`FUN_00414630`), the help panel (`FUN_0041a5d0`), then presents; in app mode
+  2 the main loop (`0x00416de1`..`0x00416e2a`) restores under the cursor, calls
+  `+0x70(1)`, draws the cursor and presents without rendering the scene. A view moves with
+  its children (`+0xc0`, `0x00434670`).
+- **Method:** MCP decompile; capstone.
+- **Confidence:** proven for routing and order; event 7's sender and scene `+0x3c` are open
+  (Q-0060).
+
+### E-0102 — Properties: `@gcu` cursor kind on hover, `@HIL` hover bitmap, `@SCR` named command on press; 37 commands
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** property event handlers (vtable `+4`, called with event, view, data):
+  `@gcu` `0x00426b70`: event 2 → `FUN_004144b0(cursor, 0, value, 0)` unless cursor mode
+  (`DAT_0046ec14 +4`) is 1 or 2; event 1 → kind 0. `@HIL`/`@HIG` `0x0042ede0`: 1 →
+  hovered = 0 and redraw, 2 → hovered = 1 and redraw, 7 → `+0x2c` while hovered; the draw
+  (`0x0042ee50`) blits the named bitmap at view position + (dx, dy). `@SCR` `0x004323a0`:
+  when enabled, look the name up in the command registry `DAT_0046edd0` (`0x00432540`) and
+  call it with (event, view, data). `@ARF` `0x0042d110`: event 4 → manager `+0x88(name)`.
+  `@CUR` `0x0042e9a0`: event 2 → `SetCursor`. `RegisterFrameCommands` (`0x0042ad60`) maps
+  37 names to handlers `0x0042b070`..`0x0042b650`; all act on event 4 only, except
+  `MoveCredit` (15 → leave the credits, 4 → next page) and `SaveOui`/`SaveNon` (also 15
+  with Escape down → close `Save`). Handlers call the option screen `DAT_0046ec6c` (vtable
+  `0x00439f7c`): `OptionNouvelleP` `+0x1c` (`0x00427110`), `OptionQuitter` `+0x20`,
+  `OptionCredits` `+0x24`, `OptionLoad` `+0x2c`, `OptionSave` `+0x30`, `OptionScreen`
+  `+0x38`, `OptionReglage` `+0x48`; `SelectUser` → `DAT_0046ec78 +0x134`
+  (`LUser_SelectUser`, `0x00429600`); `QuitterOK` → `PostQuitMessage(0)`;
+  `OptionEntrenement` (`0x0042b4d0`) closes the menu, destroys the option screen, calls
+  game `+4(0)` and sets `0x0046ed88` = 1; gallery and magnifier commands go to
+  `DAT_0046ec64`.
+- **Method:** capstone of the handlers; MCP decompile.
+- **Confidence:** proven. Corpus frames use only `ucg@`, `RCS@`, `LIH@`, `GIH@`.
+
+### E-0103 — `x3dcfg.cfg` is authoring residue: no shipped binary reads it; 38/38 parse
+- **Binary/file:** all of `INSTALL/02_PR`; `Data/**/x3dcfg.cfg`.
+- **Evidence:** a case-insensitive byte search for `cfg` finds only `APP.CFG` in
+  `MissionD.exe` (offset `0x75e80`), nothing in `MissionMonet.exe`, `x3d.dll` or
+  `x3dsdk.dll`. All 38 files: 36 header bytes (3 f32, 6 u32), u32 n ∈ {0, 1, 2}, then
+  n × 260 bytes of NUL-padded paths (`D:\MissionD\Data\U01\maps`); the sizes 40, 300 and
+  560 match exactly. `tools/parsers/cfg.py`: 38/38.
+- **Method:** Python byte search; parser.
+- **Confidence:** proven for the layout; the header's meaning is unknown and not needed.
+  Resolves the `.CFG` half of Q-0016.
+
+### E-0104 — The inventory bar is the frame `PorteF`: 4 px per 50 ms tick, items at 86 + 70·i, `P`/`C` image names
+- **Binary/file:** `MissionMonet.exe`; `Data/2DFRA/PorteF.fra`, `Data/2dbit/*P.BMP`.
+- **Evidence:** `PorteF` constructor `0x004316e0` (frame base `0x0042c860`, vtable
+  `0x0043ae9c`, slide timer at `+0x38` with vtable `0x0043ae88`). `PorteF_OnKeyDown`
+  (`0x00431800`, vtable `+0x1c`): only key `0x20` and app `+0x488` ≠ 0; timer running →
+  `+0x98` if shown (`+0x48`) else `+0x94`; otherwise `+0x94` when the root's y is `0x1e0`,
+  else `+0x98`. Show (`0x00431990`): step `+0x44` = −4, count `+0x46` = (y − 420)/4, start
+  the timer, shown = 1. Hide (`0x00431a50`): step 4, count (480 − y)/4, shown = 0. Tick
+  (`0x004318c0`): move the root by (0, step), count − 1 and stop at 0, clamp to 420 / 480
+  and stop. `+0x80(1)` (`0x00431a10`) stops and parks the root at (0, 480). Strip `vop#`
+  (id 200): add `0x00431cf0` (item = bitmap view `0x004320e0`, 51×51 at
+  x = `0x9c` + 70 · last index, y = strip y + strip h/2 − 25, cursor property kind 4
+  (`0x00426b40`), bitmap = the given name; count + 1), remove `0x00431ed0` (`_stricmp`,
+  later items `+0xc0(−70, 0)`), has `0x00431e70` (first 7 characters), scroll
+  `0x00431f80`, save / load `0x00431fc0` / `0x00432070` (chunk `PORTEF`: u32 last index,
+  30-byte names), clear `0x00432030`. Arrows `bop#` `+0x50` (`0x00431be0`): id 100 →
+  scroll(−1), else scroll(1). Strip press (`0x00431cb0`): cursor mode 1 → add the name at
+  cursor `+0x4a`, hide the bar. Item press (`0x004321e0`): forward to the strip, copy the
+  item name, set byte 6 to `C` (`0x00432239`), cursor mode 1 with it (`FUN_00414540`,
+  which keeps the name with byte 6 = `P` at cursor `+0x4a`), remove the item, hide the bar.
+  INFOACT op 2 (`0x00421270`) shows the bar after setting the cursor; op 3 (`0x004212b0`)
+  hides it; clearing app `+0x488` (`0x00417da0`) hides it; `FUN_004149e0` (on Escape)
+  adds a held item back. `U01_Start` adds `U02_01P` (`0x0043f0b8`) when `+0x90` reports
+  it absent (`0x00401429`..`0x00401459`). Runtime (2026-09-25, `snap.ps1`): after Space at
+  the U01 hand-over the bar is at y = 420 with a banknote at x ≈ 86 and empty circles
+  every 70 px; Space again hides it. `2dbit`: `…P` item images are 50×50, `PorteF.bmp`
+  640×60.
+- **Method:** capstone and MCP decompile; one live run.
+- **Confidence:** proven for logic and layout. The 750 ms slide follows from the 50 ms
+  timer (E-0101) but was not timed live (a capture takes longer than the slide). Answers
+  Q-0046 and the inventory half of Q-0041.
+
+### E-0105 — Players screen to U01: `SelectUser`, U00's tutorial, Escape → Option, New game reads `App.bin`
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `LUser_SelectUser` (`0x00429600`): text of view 11 (`+0x128`); empty →
+  return; index = `+0x138(name)`, −1 → add to the player list `DAT_0046ec10`
+  (`FUN_00413b40`); `PorteF` = manager `+0x94("PorteF", 100)`, kept at manager `+0x18c`,
+  `+0x80(1)`; select (`FUN_004140b0`); close the current frame; new player →
+  `SetAppMode(0)`, else manager `+0xc0(0)` (`0x004266c0`: create the option screen, which
+  opens `Option`, `0x00426f90`). `App_OnEscape` (`0x00416400`), gated by app `+0x484`:
+  held item back to the bar; mode 0: game `+0x170` ≠ 0 → gallery; game `+0x160` = 0 →
+  stop sound group 1 and open the option screen; else manager `+0xd4` (`0x00426970`: open
+  frame `Save` modal, app `+0x480` = 1); mode 2: last opened frame `OptionUser` →
+  `SendMessage(WM_DESTROY)`, else if manager `+0xd0` ≠ 1 (not on `Option`) → reopen
+  `Option`. The main loop calls it for Escape or F5 (key slots `0x0046e84c`,
+  `0x0046e9b0`). `Game_NewGame` (`0x00412b80`, game vtable `0x00439894 +8`): chunk `GAME`
+  of `%sAPP.BIN` (30 bytes) → game `+0x14c`, default `U01.X3D`; `+0x164` = 1, `+0x160` = 1,
+  name `NoName`; `SetAppMode(1)`; `PorteF +0xa4` (clear the strip). Game `+4(n)`
+  (`0x00412fb0`) sets `+0x160` = n and loads `U<nn>.x3d`. `U00_Start` (`0x0040a1e0`) opens
+  `OptionUser` only when `0x0046ed88` = 0 (after line `sb01`); U00's frame logic
+  (`0x00409850`) starts with line `sb03_bis` instead of its normal first line when it is
+  1, then runs the tutorial steps (help names `deplace`, `Sauter`, `Take2`). Runtime: `to_u01.sh` (type a
+  name, Enter, hold Escape ~70 s, click (376, 37)) reaches U01; snaps show "The players"
+  with the edit text "Player's name" at (306, 91) and the Option menu with Load and
+  Gallery dimmed; Escape at the U01 hand-over shows "Do you want to save?" over the scene.
+- **Method:** MCP decompile; capstone; live run.
+- **Confidence:** proven. Answers Q-0018.
+
+### E-0106 — The Option menu: seven items over `SomFond`; Load and Gallery greyed by a bitmap swap
+- **Binary/file:** `MissionMonet.exe`; `Data/2DFRA/Option.fra`.
+- **Evidence:** `fra.py --file Option.fra`: ids 2, 3, 9, 6, 5, 7, 8 with the rects, hover
+  bitmaps and commands listed in `ui.md`. `0x00426f90` / `0x00427210` open `Option` and,
+  when `DAT_00442648 +0xc` = 0, set view 3's bitmap to `SomB2` (`+0x114`); when the
+  gallery list (`DAT_0046ec64[6]`) is empty, view 6's to `SomE2`. Credits (`0x00427140`)
+  stores the time and opens `Credits`; the option screen's tick (`0x00426e60`) calls its
+  `MoveCredit` method after 6000 ms. Runtime snap: the seven labels at those rects, Load
+  and Gallery dark.
+- **Method:** parser dump; MCP decompile; live run.
+- **Confidence:** proven.
+
+### E-0107 — Frame text is GDI Arial 12 pt; labels are bitmaps
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** the edit class (`LOptionScreen::LOptionScreen_1144`, `0x00428a20`, assert
+  `LOptionScreen.cpp:1144`) takes a DC from the manager (`+0x20`), builds a `LOGFONT` with
+  height −`MulDiv(size, GetDeviceCaps(LOGPIXELSY), 72)` and face `Arial` (`0x00442260`),
+  then `CreateFontIndirectA` and `SelectObject`; size `+0x28c` = 12 (`0x004285c2`). Max
+  length `+0x290`: 40 for `#SEd` (`0x0042919e`), 30 for `#UEd` (`0x0042932f`). No font file
+  is in the data; every menu label in the corpus frames is part of a bitmap.
+- **Method:** MCP decompile; capstone.
+- **Confidence:** proven for the edits; the lists' text drawing is not read (Q-0061).

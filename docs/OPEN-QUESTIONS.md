@@ -249,7 +249,9 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Status:** `.BIN` resolved at the container layer (E-0025): the reader is
   `FUN_00415420` / `FUN_00415190` in `MissionMonet.exe`, and all 109 files share one
   chunk container. Per-chunk payloads (`#INDEX#`, `#ACTIONS#`, `#SCENE#`, `#CAMERA#`,
-  `#APP#`, `#GAME#`) and `.FRA` / `.CFG` remain open.
+  `#APP#`, `#GAME#`) and `.FRA` / `.CFG` remain open. `.FRA` resolved (E-0100: read by
+  `LFrameReader` in `MissionMonet.exe`, 25/25 parse); `.CFG` resolved (E-0103: read by
+  nothing shipped, 38/38 parse).
 
 ### Q-0017 — Can the original game run unfocused, behind other windows, for unattended tracing?
 - **Context:** the user wants traces captured while they keep using the PC.
@@ -280,6 +282,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   intro bitmaps straight to U01 with flag 1 (documented in `docs/engine-spec/boot.md`).
 - **Next to try:** xrefs to `LoadUnitScene` and to the scene-name slot game `+0x14c`; a
   trace of entering a name and pressing OK.
+- **Status:** RESOLVED (E-0105, `docs/engine-spec/ui.md` "Boot to U01"). `0x0046ed88` is
+  the practice flag set by the Option menu's Practice item.
 
 ### Q-0019 — How does X3D light a face?
 - **Context:** `docs/engine-spec/scene.md`. `#SCENE#` sets an ambient colour, `.L3D` adds
@@ -411,7 +415,10 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   `DAT_0046ec1c` vtable `+0xb8` → `+0x94` / `+0x98` (inventory add/remove, by the look).
 - **What we checked:** file names and sizes only.
 - **Blocks:** the exact file path and colour key of the item cursor; the inventory screen.
-- **Status:** open
+- **Status:** mostly RESOLVED (E-0104, `docs/engine-spec/ui.md`): `+0xb8` is the inventory
+  bar `PorteF`, `+0x94`/`+0x98` show/hide it; item images are `Data/2DBIT/<name>.bmp`
+  through the frame media manager (`.bmp` appended). The item cursor's colour key is not
+  read.
 
 ### Q-0042 — What is the action queue's `+0x460` flag in U01's click handler?
 - **Context:** `U01_DispatchClickActions` (`0x00401d30`) ends by running `MonterSurToit`
@@ -480,4 +487,39 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** the call site only.
 - **Blocks:** the starting inventory (probably "add the item if missing").
 - **Next to try:** decompile the object returned by `0x00426a40` and its `+0x90`, `+0xa8`.
+- **Status:** RESOLVED (E-0104): `+0x90` = the bar has the item, `+0xa8` = add it; U01's
+  entry gives `U02_01P` once.
+
+### Q-0060 — Frame event 7, and what the scene does when a frame consumes input
+- **Context:** E-0101/E-0102. `@HIL` redraws on event 7; the window procedure calls scene
+  `+0x3c` and sets app `+0x48c` = 2 when the frame manager consumed a message in app mode 0.
+- **What we checked:** the property handlers and the window procedure.
+- **Blocks:** nothing for U01 as long as highlights are drawn every frame while hovered and
+  clicks on the bar do not reach the scene.
+- **Next to try:** callers of view `+0xc` with 7; scene vtable `+0x3c` (`0x0041b760`).
+- **Status:** open
+
+### Q-0061 — How do the list views (`cSU#`, `AOL#`, `VAS#`) draw and scroll?
+- **Context:** `fra.ksy` `scroll`: three names (`UserASC`, `UserBoule`, `SCR.BitmapScroll`),
+  two s32 (33, 33) and one s32 (32 or 20). The players list on `OptionUser` is one.
+- **What we checked:** the constructor `0x004325d0` only.
+- **Blocks:** drawing the players list and the save/load lists; selecting an existing
+  player by clicking the list.
+- **Next to try:** the `#SCR` vtable `0x0043b340` draw and event methods; `XGameList`
+  (`DAT_0046ec10`, `%sUser_%i` folders).
+- **Status:** open
+
+### Q-0062 — Are inventory items outside the strip clipped?
+- **Context:** E-0104: items sit at 86 + 70·i and scroll by 70; with more than 7 items some
+  lie beyond the strip's 535 px.
+- **What we checked:** layout and scroll code; not the item draw clip.
+- **Blocks:** nothing in U01 (at most a few items).
+- **Next to try:** the strip's draw (`vop#` vtable `0x0043b058`) and the manager `+0x7c`.
+- **Status:** open
+
+### Q-0063 — Does a greyed Option item (Load, Gallery) still react to clicks?
+- **Context:** E-0106: greying swaps the bitmap of views 3 and 6; their `RCS@` stays.
+- **What we checked:** the greying code only.
+- **Blocks:** menu fidelity, not U01.
+- **Next to try:** `OptionLoad` / `OptionGalerie` handlers with an empty list; a live click.
 - **Status:** open

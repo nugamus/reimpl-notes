@@ -29,7 +29,9 @@ The window title of this release is "Monet - The Mystery of the Orangerie Museum
    `OptionUser`: the "The players" screen (new player name, player list, OK). The 3D
    garden shows briefly before the frame covers it (runtime snap at 6 s). It stays
    there until the user acts.
-3. **Players screen to U01**: unknown (Q-0018).
+3. **Players screen to U01** (E-0105): name + OK; a new player gets U00's tutorial, then
+   Escape opens the Option menu; a known player gets the menu at once; New game reads
+   `App.bin` and enters U01 with `a = 1`. Details in `ui.md` "Boot to U01".
 4. **U01 entry** (E-0035). Entering U01 normally (`a = 1`) first plays the prologue:
    `Video/Prologue.avi` (IV50, 640×480, 10 fps, 652 frames) at (0,0) together with
    `Video/prologue.wav` (22,050 Hz mono 8-bit, separate file, started right after the
@@ -52,10 +54,10 @@ under a 2D frame, 3 video playing.
 The intro waits are wall-clock milliseconds. Video pacing belongs to the AVI's own frame
 rate (`AviPlayMovie`), not to the game loop.
 
-## Engine deviations (until Q-0018 is answered)
+## Engine deviations
 
-- After step 1 the engine goes straight to step 4 (U01, `a = 1`). U00 and the
-  `OptionUser` frame need the `.FRA` format (Q-0016) and are not implemented.
+- After step 1 the engine goes straight to step 4 (U01, `a = 1`). U00 and the frames of
+  step 3 are specified (`ui.md`) but not implemented yet.
 - The engine pumps events during the intro waits so the ScummVM quit and menu keys work.
   The original cannot be interrupted there.
 
