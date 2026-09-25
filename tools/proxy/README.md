@@ -47,18 +47,21 @@ What it does, and why:
   skip the "set your screen to 16 bits" check, and show the game window without
   activating it.
 
-### 2. Video codecs (Indeo 4 and 5)
+### 2. Video codecs (Indeo 4 and 5) — installed on the capture machine 2026-09-25
 
-The cutscene AVIs are `IV50` and `IV41`. The game CD's own installer has both (`ir50_32.dll`,
-`ir41_32.ax`; Intel, 2000). It needs admin rights and a few clicks:
+The cutscene AVIs are video-only `IV50` and `IV41` (sound is separate WAVs). The two
+decoders come from the game CD's own installer (`Indeo\iv5setup.exe`, Ligos), extracted with
+unshield (`third_party/unshield`, built from source with `third_party/zlib`) into
+`C:\MonetRun\codecs`. Windows Defender reported no threats. The install script checks their
+SHA-256 hashes, copies them to `SysWOW64` and registers `vidc.iv41` / `vidc.iv50`. It needs one
+UAC prompt:
 
 ```sh
-powershell -Command "Start-Process 'V:\Indeo\iv5setup.exe' -Verb RunAs"
+powershell -Command "Start-Process powershell -Verb RunAs -Wait -ArgumentList '-ExecutionPolicy','Bypass','-File','<repo>	ools\proxy\install_indeo.ps1'"
 ```
 
-(or `Original Game Files\Indeo\iv5setup.exe` if the disc is not mounted). Accept the
-defaults. The game runs without them; videos are just skipped or black. Do **not** run
-the DirectX 7 installer.
+`-Uninstall` removes them. Verified: all 8 AVIs in `Data/Video` decode a frame through
+Video for Windows in a 32-bit process.
 
 ### 3. Launch
 
