@@ -104,21 +104,26 @@ it triggers that hotspot:
 3. Run the first candidate whose `trigger` is the kind, whose condition holds, which is not
    exhausted, and (kind 7) whose `item` is the held item's name.
 
+No candidate runs: nothing happens, and a held item stays on the cursor. The hotspot's
+cursor kind does not gate the click: a kind-0 hotspot still triggers its actions (E-0251).
+
 **Condition** (lower-cased, left to right): `true` → true, `false` → false; `mNN` or `NN` →
 action NN is exhausted; `!mNN` → it is not; `&` and `|` combine, `( )` group. Action ids
 are the records' `id`s.
 
 **Run:** execute the steps in order, then count the run; when `max_runs` < 100 and the
 count reaches it, the action is exhausted (never runs again, satisfies conditions naming
-it). `max_runs` ≥ 100: unlimited.
+it). `max_runs` ≥ 100: unlimited. Counts and exhausted flags belong to the id, not the
+record: records sharing an id (U01 has two `M20` and two `M22`) share them, so exhausting
+one blocks the other (E-0250).
 
 **Steps** (`op`, `arg`; "hotspot" = the action's hotspot, "target" = its target):
 
 | op | Effect |
 |---:|---|
 | 1 | Voice `arg`: if the target is a character (type 6), it says `Sound/<arg>.wav` (lip data `Sound/<arg>.bin` if present); else play it at the hotspot's position. |
-| 2 | Take the target: its cursor kind = 0, hide it, cursor holds item `<n>C`, `n` = 6 characters of the target's name after its first (`*U02_09a` → `U02_09`, E-0204). `arg` unused. |
-| 3 | Use up the held item: cursor back to normal kind 0, target's cursor kind = 0. |
+| 2 | Take the target: its cursor kind = 0, hide it and take it out of collision (E-0252), cursor holds item `<n>C`, `n` = 6 characters of the target's name after its first (`*U02_09a` → `U02_09`, E-0204), show the bar. `arg` unused. |
+| 3 | Use up the held item: it is gone (not stored), cursor back to normal kind 0, target's cursor kind = 0, hide the bar (E-0252). |
 | 4 | Start (unpause) the animation node named `arg`. |
 | 6 | Wait `arg` ms (blocking, as `RunFor`). Not in the corpus. |
 | 7 | Set the target's cursor kind to `arg`. |
@@ -150,6 +155,6 @@ matching script. U01 (`U01_DispatchClickActions`, `0x00401d30`):
 | `MonterSurToit` | M20, use `U01_08` on `*U01_09` (and M20's repeat) | unhide `*U01_10`, scripted camera climb onto the roof |
 | `DoInterrupteur` | M21, switch `*U01_21` | switch animation, `s1_13`, camera looks at the lamp and back |
 
-Also, after the queue: hovering `*U01_09` with the camera below z = 100 while the queue's
-`+0x460` flag is set runs `MonterSurToit` (flag meaning open, Q-0042). `Light255` (M09)
+Also, after the queue: hovering `*U01_09` with the camera below z = 100 while id 20 is
+exhausted runs `MonterSurToit` (`u01.md`, E-0250). `Light255` (M09)
 has no U01 handler. Each script's details belong in a later spec.

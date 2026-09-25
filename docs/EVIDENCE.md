@@ -2323,3 +2323,61 @@ An entry at `tentative` confidence must also have a matching line in
 - **Method:** Ghidra decompile and disassembly of `0x004211d0`; engine run.
 - **Confidence:** proven for the substring; the appended suffix is the cursor-image `C`
   of `interaction.md` (not re-read here).
+
+### E-0250 — Action run counts and exhausted flags are per id, so U01's second `M20` record and `M11`/`M22`-on-`*U01_01` never run; the climb repeat is the click handler's post-queue check
+- **Binary/file:** `MissionMonet.exe`; `Data/U01/INFOACT.BIN`.
+- **Evidence:** `FUN_0041e2e0` (runnable) reads the exhausted flag at action manager
+  `+0x410 + id·4` (`id` = record `+8`) before `EvalActionCondition`; `FUN_0041e320` counts
+  at `+0x810 + id·4` (E-0073). U01's INFOACT has two records with id 20 and two with id 22
+  (`infoact.py --file Data/U01/INFOACT.BIN`). The first `M20` (trigger 7, `max_runs` 1)
+  exhausts id 20, which also blocks the second `M20` (trigger 8 on `*U01_09`, condition
+  `M20`). `M11` needs `M10` exhausted, but `M10` has `max_runs` 100 (never exhausted);
+  `M22` on `*U01_01` needs `M11`. U01 vtable `+0x30` is `U01_DispatchClickActions`
+  (`0x00401d30`), the click handler: `FUN_0041b700` (hover, then trigger when scene
+  `+0x13c` ≠ 0), drain the queue, then with a hovered hotspot the check of E-0084
+  (id 20 exhausted, hovered `*U01_09`, camera `+0x1c` < 100) → `MonterSurToit`. So the
+  check runs on every click on `*U01_09`, whatever the click triggered; after the first
+  climb the eye is at z 139, so it does not repeat at once. Vtable `+0x34` is
+  `FUN_00412aa0` (returns 1) and `+0x44` the generic `Scene_PickHover` (`0x0041b540`): U01
+  has no hover hook of its own.
+- **Method:** MCP decompile of the functions named; `infoact.py`.
+- **Confidence:** proven.
+
+### E-0251 — A held item goes back to the bar on a unit change and on the load screen; a click with no matching action keeps it; cursor kind 0 does not stop a click
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `FUN_004149e0` (cursor mode 1 or 2: stop the blink, strip `+0xa8(cursor
+  +0x4a)` = add the `…P` name, cursor mode 0 kind 0) is called from `App_OnEscape`
+  (`0x00416559`), from game vtable `+4` "go to unit n" (`0x00412ffa`, after the
+  load-pending test at `0x00412fd4`) and from game vtable `+0x14` `FUN_004135b0`
+  (`0x004135c6`, the "caught" exit to `OptionLoad`, E-0082), which then sets game `+0x168`
+  = 0, cursor kind 0 and resumes if cursor `+0x448` = 0. `Actions_TriggerForHotspot`
+  (`0x0041e3f0`) does nothing when `FUN_0041e180` finds no runnable action: the cursor and
+  a held item stay as they are. Neither it nor `FUN_0041b700` reads the hotspot's cursor
+  kind: a hotspot with kind 0 (e.g. `*U01_18`, `*U01_01` after the first phone call)
+  still triggers its actions. `FUN_0041e900` chains records with the same hotspot type
+  and hotspot (by `FUN_0041e240`, name equal or contained) in file order.
+- **Method:** MCP decompile and disassembly of the functions named.
+- **Confidence:** proven.
+
+### E-0252 — The take step hides its target without collision; take and use-up act on the action's target
+- **Binary/file:** `MissionMonet.exe`; `Data/U01/INFOACT.BIN`.
+- **Evidence:** `Action_RunStep` case 2 calls `FUN_004211d0(action +0xb0, "")` and case 3
+  `FUN_004212b0(action +0xb0)`; `+0xb0` is the target hotspot (`+0xac` the hotspot,
+  used for positions by ops 1 and 13). `FUN_004211d0`: cursor kind 0 (`FUN_00421300`),
+  hotspot vtable `+0x28("", 0, 1)` = `0x00421050` hide with `+0x118` = 1 (no collision,
+  E-0088), cursor mode 1 with the item name (E-0204), manager `+0xb8()` `+0x94` (show the
+  bar). `FUN_004212b0`: stop the blink (`FUN_00414ba0`), cursor mode 0 kind 0 (the item
+  is gone, not stored), target cursor kind 0, hide the bar (`+0x98`). In U01 only `M20`
+  has a target other than its hotspot: use-up clears `*U01_10`'s kind, `*U01_09` keeps 5.
+- **Method:** MCP decompile; `infoact.py`.
+- **Confidence:** proven.
+
+### E-0253 — U01's items: three are used up in U01, three leave for later units
+- **Binary/file:** `Data/U0*/INFOACT.BIN`, `Data/2dbit`.
+- **Evidence:** `infoact.py` over every unit: U01 takes (op 2) `*U01_04` (M02), `*U01_05`
+  (M07), `*U01_12` (M14), `*U01_19` (M18), `*U01_08` (M19). Trigger-7 actions with these
+  items: `U01_05` U01 M08 (door), `U01_12` U01 M15 (fuse box), `U01_08` U01 M20 (climb),
+  each with op 3; `U01_19` U03 M30 (`*U03_09`), `U01_04` U04 M03 (`*U04_03`); the
+  banknote `U02_01` U02 M03 / M05. `2dbit` has `…C` and `…P` images for all six.
+- **Method:** `infoact.py --file` on each unit; directory listing.
+- **Confidence:** proven.
