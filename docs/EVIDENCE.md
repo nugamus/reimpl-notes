@@ -2707,3 +2707,158 @@ An entry at `tentative` confidence must also have a matching line in
   capture.
 - **Confidence:** proven for the state scan; the U01 comparison is visual. Q-0021's faint
   buildings and the engine's birds remain unexplained.
+
+### E-0360 — U05's vtable and state: no load hook, no input hook, no save chunk; three timers/flags
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** constructor `0x0040ece0` (`U05_ConstructUnitScene`): `FUN_0041a890`, vtable
+  `0x004396d4`, `+0x6e0` = `+0x6e4` = `+0x6cc` = `+0x6c8` = 0. Vtable: `+8` `0x0041d490`,
+  `+0xc` `0x0041d650`, `+0x10` `0x0041acf0` (all generic), `+0x14` `U05_StartUnit`
+  (`0x0040ed40`, function created), `+0x1c` `U05_UpdateFrameLogic` (`0x0040f160`,
+  created), `+0x24` `0x0041c350` (talkers, nodes, hotspots tick), `+0x30`
+  `U05_DispatchClickActions` (`0x0040f3a0`, created), `+0x40` `0x0041b7f0`
+  (`Scene_HandleInput`). U05 code reads/writes `+0x6e0` (dog wait, then chatter clock),
+  `+0x6e4` (bark time), `+0x6c8` (exit latch); `+0x6d0` is written once
+  (`X3d_Camera_Get_Position` at the end of the start) and never read.
+- **Method:** MCP decompile, vtable bytes, capstone of `0x0040ece0..0x00410940`.
+- **Confidence:** proven.
+
+### E-0361 — `U05_StartUnit`: renames, collision and pick fix-ups, two talkers, the dog's and Mazout's start clips, camera cut, autosave, ambient `s4_01a`
+- **Binary/file:** `MissionMonet.exe`; `Data/U05/U05.x3d`, `anim/*.A3D`.
+- **Evidence:** `0x0040ed40`: `X3d_Scene_Get_Object("fil")` → strcpy `*Fil`,
+  `Object_SetNoCollisionTree(obj, 1)` (`0x00421020`: `+0x118` := v, recurse `+0x24`, loop
+  `+0x28`); node list `+0x158` `+0x14("fil", 1)` name `+0xc` := `*Fil`;
+  `+0x14("Object02", 1)` → `*U05_10`; `FUN_0041b440(name, 0)` (exact, then contains)
+  `battant02`, `battant`, `col103` → `+0x118` = 1; `FUN_0041ae10(a, stream)`; camera
+  `FUN_00419ce0(32.0)`, `FUN_00419d00(0.0)`; hotspots `+0x1a0` `*U05_05`, `*U04_04` →
+  `0x00421020(hotspot +0x60, 1)`; `Box17` `+0x114` = 1; vtable `+0x28("U05_02", "",
+  "$$$DUMMY.*visage", 0, 8, 0)` and `("U04_04", …)`; actions `+0x434` (M09) →
+  `ColPorte2` `+0x118` = 1, `+0x43c` (M11) → `ColPorte1`; if `a`: node `*U05_05`
+  `FUN_00420080(0)`, `FUN_00420220(node, "…Anim/U05_05/Attente.A3D", "ChienTourne", 1,
+  1)`, slot `+0x68` = 1, `+0x78` = 15.0, `FUN_00420060(1)`, `FUN_004200c0(245.0)`; node
+  `*U04_04` `MazoutAttente` (`Anim/U04_04/Attente.A3D`) slot 1, `+0x68` = 1, 15.0,
+  `FUN_00420060(0)`; `FUN_00419520(0xc23e6666, 0x429a8a3d, 0x42378f5c)` (−47.6, 77.27,
+  45.89), `FUN_00419550(0xc0c9eb85, π/2)` (−6.31); game `+0x10(FUN_0042a3c0(0x3eb), 0)`;
+  always `X3d_Camera_Get_Position(→ +0x6d0)`, `+0x4c("s4_01a", 1)`. Corpus (`o3d.py`,
+  `a3d.py`): `fil` and `*U05_08` in `anim/Lampes.O3D`, animation `fil` in `lustre.A3D`
+  (1..100); no animation named `Object02` in any U05 `.A3D`; `battant`, `battant02`,
+  `Box17` in `static/st-laz.o3d`, `col103` in `colTotal.O3D`, `ColPorte1/2` in
+  `colPorte.O3D`; `U05_05/Attente.A3D` 1..356, `U04_04/Attente.A3D` 1..100.
+  `X3d_Object_Hide(obj, 0)` sets only the object's `+0x5c`; with 1 also its subtree
+  (`x3d.dll`); `Unhide` mirrors it.
+- **Method:** capstone (strings, floats), MCP decompile of `0x00421020`, `0x0041b440`,
+  `0x00420080`, `0x00420060`, `X3d_Object_Hide`/`Unhide`.
+- **Confidence:** proven.
+
+### E-0362 — U05's frame hook: the dog's three steps, Mazout, the 15-s gauge, M23, chatter, the exit, and a dead bark timer
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `0x0040f160` (actions `+0x198`: exhausted `+0x410[id]`, records
+  `+0x10[id]`): `+0x414` ∧ ¬`+0x428` → `+0x6e0` ?= GetTickCount; ¬`+0x420`: now >
+  `+0x6e0` + 4000 ∧ `U05_DogBarkThenSit` (`0x004101f0`) → `FUN_0041e3a0(M04)`; else
+  ¬`+0x424`: `U05_DogWaitLoop` (`0x004102e0`) → exhaust M05; else `U05_ChefNoticesDog`
+  (`0x004103c0`) → `FUN_0041e4b0(M06)`, inventory `+0x90`/`+0xa8("U04_44P")`. `+0x43c` ∧
+  ¬`+0x440` → `U05_MazoutConfronts` (`0x0040fc40`) → exhaust M12; `+0x444` ∧ ¬`+0x448` →
+  `U05_MazoutGaugeExpired` (`0x0040fa60`); `+0x45c` ∧ ¬`+0x46c` → `U05_ChefCallsNear`
+  (`0x0040f660`: distance(eye, `*U05_02` local) ≤ 220 → run M23); `+0x470` ∧ ¬`+0x474` →
+  `U05_ChefChatter` (`0x0040f560`: timer init, voice group 2 silent, now ≥ `+0x6e0` +
+  20000, ≤ 220 → `+0x6e0` = now, `fmod(rand, 2.0)` = 1.0 → run M26 else M27); `+0x470` ∧
+  `+0x6c8` = 0 → `U05_ExitToU06` (`0x004106f0`); `+0x438` (M10) → `+0x6e4` ?= now +
+  28000, now > it → run M82, `+0x6e4` = rand·40000/0x7fff + now; last
+  `Scene_RenderFrame`. `0x004101f0`: node `*U05_05` active slot (`+0x188[+0x1ca]`)
+  `+0x68` = 0, `+0x60` = 0 → return 0; run M82, `ChienAttente`
+  (`Anim/U05_05/ACTION01.A3D`) slot 2, `+0x68` = 0, 15.0, running. `0x004102e0`: same
+  test, `Attente2` (`ATTENTE02.A3D`) slot 3, `+0x68` = 1, 15.0, running. `0x004103c0`:
+  `LSoundManager_IsGroupPlaying(2)` → 0; distance > 220 → 0; run M06,
+  `FUN_0041e2a0(M07, 1)`, `FUN_0041e2a0(M09, 1)`. `0x0040fc40`: eye.x ≥ 1425 → 0;
+  `FUN_00414820(0, 0)`; `FUN_00419620(eye, (1306.35, −945.6, eye.z), cam yaw,
+  polar(normalise(obj − target)) yaw, cam pitch, π/2, 4000, 0)`; `MazoutA01`
+  (`Anim/U04_04/Action01.A3D`) slot 2, `+0x68` = 0, 15.0, running; run M13;
+  `Scene_RunFor(0)` while group 2 plays and not `FUN_004163b0(0xd)`;
+  `FUN_00414dc0(+0x178)`; `FUN_0041a560(15.0, 1, "", 0)`; `+0x6e0` = 0;
+  `FUN_00414820(1, 1)`. `0x0040fa60`: `FUN_0041a6c0(gauge, 1)` = 0 → return; `MazoutA03`
+  (`Anim/U04_04/Action02.A3D`) slot 3, not looping, 15.0, running; `X3d_Object_Hide(o, 1)`
+  over `X3d_Scene_Find_First/Next_Object(…, 1)`; `X3d_Object_Unhide(*U04_04, 1)`;
+  `FUN_00419520(1310, −986, eye.z)`; `FUN_00419580(that, obj local + (0, 0, 30))`;
+  `+0x50("s4_04.wav", P, 0)`; `RunFor(0)` until slot `+0x60`; `FUN_0041bfd0(2000)`; game
+  `+0x14(1)`. `0x004106f0`: eye.y > 928.0 → suspend; `*U05_13` local; dir = (170, 129,
+  obj.z − eye.z) = (1266, 1302) − (1096, 1173); `FUN_00419620(eye, (1096, 1173, eye.z),
+  cam yaw, dir yaw, cam pitch, π/2, 7000, 0)`; `+0x6c8` = 1; `FUN_0041bfd0(2000)`; game
+  `+4(6)`. `Talkers_Say` (`0x004215f0`) stops the current talker (`FUN_00421730`) before
+  playing, so M06's second run restarts `U05_04`. WalkPath argument order (eye, target,
+  yaw₀, yaw₁, pitch₀, pitch₁, ms, callback) from the stack offsets of
+  `X3d_Camera_Get_Polar(cam, &yaw, &pitch)` and `X3d_Convert_To_Polar(v, &yaw, &pitch)`,
+  as E-0161.
+- **Method:** capstone with stack-offset tracking; MCP decompile of each function named.
+- **Confidence:** proven.
+
+### E-0363 — U05's dispatcher, `TestSpeakChef` and `ChienVersPorte`
+- **Binary/file:** `MissionMonet.exe`; `Data/U05/Anim/U05_05/ACTION03.A3D`.
+- **Evidence:** `0x0040f3a0`: `FUN_0041b700`, then while `+0x1a4` the queue is compared
+  in order with `TestSpeakChef` `0x00410060`, `ChienVersPorte` `0x00410470`,
+  `MaskGrille` `0x0040fea0`, `LampeTombe` `0x0040f7e0`, `OuvrePorteConsigne`
+  `0x0040f790`, `OuvrePorteSalle` `0x0040f6d0`, `AfficheChefEtChiot` `0x00410020`,
+  `AfficheCariolle` `0x00410850`, `FermePorteConsigne` `0x0040f750`, `DoTableauA`
+  `0x0040f520`, `DoTableauB` `0x0040f540` (all renamed `U05_*`); nothing after the loop.
+  `0x00410060`: suspend; `FUN_00419620(eye, (1493, −532, eye.z), cam yaw, yaw toward
+  `*U05_02`, cam pitch, 1.45 (`0x3fb9999a`), 10000, 0)`; while group 2 plays: vtable
+  `+0x24`, `Scene_RenderFrame`; resume; dog node slot 1 (`+0x18c`) `FUN_00420060(0)`,
+  `X3d_Object_Unhide(slot +0x80, 1)`. `0x00410470`: suspend; `FUN_0041e2a0(M07, 0)`;
+  cursor 0 on hotspots `*U05_02`, `*U05_05`; nodes `*U05_05`, `*U05_01`; `Action3`
+  (`ACTION03.A3D`) slot 4, `+0x68` = 0, 15.0, running; `+0x48("U05_06A", camera +0x14)`;
+  loop while slot `+0x60` = 0: 97.0 < frame < 99.0 ∧ door `+0x60` → door `+0x68` = 0,
+  15.0, running; frame > 102.0 ∧ door `+0x60` → door `+0x70` = 1, 15.0, running,
+  `+0x48("U05_06B", eye)`, exit loop; else `+0x24`, `U05_TurnCameraToObject(slot +0x80)`
+  (`0x00410870`: `FUN_00419550` with the polar of normalise(object local − eye)),
+  `Scene_RenderFrame`, `FUN_00416990` (message pump). After: node `*U05_06`
+  `FUN_00420060(1)`, frame 20.0; node `*U05_12` running, 15.0, `+0x68` = 0, `+0x70` = 1;
+  resume; `ColPorte2` `+0x118` = 1. Corpus: `ACTION03.A3D` 1..673, `PORTES.A3D` 0..25.
+- **Method:** capstone; MCP decompile.
+- **Confidence:** proven.
+
+### E-0364 — `MaskGrille`, `LampeTombe`, the doors, `Affiche*`, `DoTableau*`
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `0x0040fea0`: suspend; `X3d_Object_Hide(*U05_07, 1)`; `FUN_00419620(eye,
+  (1489.92, −1189.56, 0.65), yaw, yaw, pitch, pitch, 4000, 0)`; then `FUN_00415ed0(v,
+  1489.92, −1134.35, z saved before)`, `FUN_00419620(eye, v, yaw, −1.55, pitch, pitch,
+  1500, 0)`; hide `*U05_02`, `*U05_05` (1); resume; `ColPorte1` `+0x118` = 1.
+  `0x0040f7e0`: suspend; `FUN_0041a680(gauge)`; `MazoutA03` (`Anim/U04_04/Action03.A3D`)
+  slot 4, not looping, 15.0, running; `X3d_Object_Hide(*U05_08, 0)`; node `*Fil` `+0x68`
+  = 0, 15.0, running; `+0x50("s4_0809.wav", eye, 0)`; `FUN_00419620(eye, (1306.35,
+  −945.6, eye.z), cam yaw, yaw toward Mazout, cam pitch, π/2, 1000, 0)`; tick and render
+  while group 2 plays; `X3d_Object_Unhide(*U05_09, 1)`; `FUN_0041e3a0(M14)`; resume.
+  `0x0040f790`: node `*U05_10` `+0x68` = 0, 15.0, running; `FUN_00421300(hotspots, 0,
+  "*U05_10", 1)`. `0x0040f750`: same node, running, then `+0x70` = 1. `0x0040f6d0`:
+  `*U05_01` and `*U05_12` `+0x68` = 0, 15.0, running, `+0x70` = 0; `FUN_0041e2a0(M83, 0)`;
+  run M84. `0x00410020`: `X3d_Object_Unhide` `*U05_02`, `*U05_05` (1). `0x00410850`:
+  unhide `*U05_13`. `0x0040f520`/`0x0040f540`: frame manager (`DAT_0046edb0`) vtable
+  `+0xc8` = `FrameManager_OpenTableauJeu` (`0x00426780`) with `"U14_02"` / `"U14_05"`:
+  frame `+0x90("TableauJeu")`, kept at `+0x188`, then its `+4`, `+0x38(1)`,
+  `+0x114(name)`; app `+0x47c` = 2, `+0x484` = 0.
+- **Method:** capstone; MCP decompile.
+- **Confidence:** proven for the calls; the `TableauJeu` frame itself is not analysed
+  (Q-0161).
+
+### E-0365 — U05 corpus: INFOACT, INFOOBJ, the dummy item `U04_111`, dead M10
+- **Binary/file:** `Data/U05/Infoact.bin`, `Infoobj.bin`, `Data/*/INFOACT.BIN`,
+  `MissionMonet.exe`.
+- **Evidence:** `infoact.py --file`: 32 records, ids 1..17, 19..27, 80..85; steps and
+  conditions as listed in `u05.md`. `U04_111` occurs only in `U05/Infoact.bin` (every
+  unit's INFOACT scanned; no take step yields it). No U05 code runs or exhausts M10
+  (record `+0x38`; the only `FUN_0041e4b0`/`FUN_0041e3a0` targets are M04, M05, M06,
+  M12, M13, M14, M23, M26, M27, M82, M84), and op 14 targets only M08, M20, M21, M80,
+  M85. `U04_44` is taken in U04 (M32, op 2 on `*U04_44`). `infoobj.py`: 15 entries as
+  listed. Sounds (Python `wave`): `U05_01` 11.80 s, `U05_02` 14.44, `U05_03` 26.29,
+  `U05_04` 5.29, `U05_05` 5.30, `U05_06A` 4.78, `U05_06B` 4.48, `U05_07` 34.50, `U05_08`
+  6.27, `U05_09` 14.48, `U05_10` 2.68, `U05_11` 2.32, `d4_12` 2.59, `s4_01a` 34.26,
+  `s4_02` 2.81, `s4_04` 2.19, `s4_06` 0.40, `s4_08` 1.69, `s4_0809` 4.64, `s4_10` 2.45;
+  no string in the EXE or INFOACT names `U05_10b`, `U05_11b`, `s4_03`, `s4_06chaise`,
+  and `U05_12`, `U05_13` occur only as hotspot names.
+- **Method:** the parsers; grep of every INFOACT dump; capstone of the action-record loads.
+- **Confidence:** proven.
+
+### E-0366 — U05's `SCENE.BIN`: scale 46, FOV 90, sphere 20 / 40 (overridden to 32 / 0)
+- **Binary/file:** `Data/U05/SCENE.BIN`.
+- **Evidence:** payload bytes: ambient 255, 255, 255; scale `0x42380000` = 46.0;
+  `#CAMERA#` FOV 90.0, radius 20.0, Z offset 40.0, speed 20.0 (overwritten, E-0039).
+  `U05_StartUnit` then sets radius 32 and Z offset 0 (E-0361).
+- **Method:** Python `struct` over the file.
+- **Confidence:** proven.

@@ -671,3 +671,25 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Next to try:** in the original after `MarronToPie`, walk to about (2830, 90) facing +y
   (`camera.ps1`), hover the cord, snap; compare with the engine at the same `start_camera`.
 - **Status:** open
+
+### Q-0160 — What does a U05 restore bring back of the dog's and Mazout's clips?
+- **Context:** E-0361. `U05_StartUnit` adds `ChienTourne` and `MazoutAttente` only on a
+  new entry; later clips (`ChienAttente`, `Attente2`, `Action3`, `MazoutA01`) are added
+  by the frame hook and handlers. U05 saves no chunk of its own, and its timers restart.
+- **What we checked:** U05's start and frame hook; not the generic `ANIMATIONS` restore of
+  node slots (`FUN_0041d490`, Q-0101).
+- **Blocks:** restore fidelity in U05 (e.g. the dog routine reading a slot that a restore
+  did not create).
+- **Next to try:** answered with Q-0101; or save in the original after the dog sits and
+  reload.
+- **Status:** open
+
+### Q-0161 — What does the `TableauJeu` frame show, and how does it close?
+- **Context:** E-0364. U05's `DoTableauA`/`B` open frame `TableauJeu` for paintings
+  `U14_02` / `U14_05` in app mode 2 with Escape off.
+- **What we checked:** the opener `0x00426780`; not the frame class, its `+0x114`, or
+  `TableauJeu.fra`.
+- **Blocks:** the painting clicks in U05 (and any other unit's `DoTableau*`).
+- **Next to try:** decompile the class created for `TableauJeu` and its `+0x114`; parse
+  `2DFRA/TableauJeu.fra` with `fra.py`; spec it in `ui.md`.
+- **Status:** open
