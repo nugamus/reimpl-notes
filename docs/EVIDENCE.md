@@ -93,7 +93,7 @@ An entry at `tentative` confidence must also have a matching line in
 - **Confidence:** proven
 - **Consequence:** the developer build carries ~1579 functions the shipping build does
   not. Whether that is debug tooling, statically-linked CRT differences, or both is the
-  subject of the `phase0-summary.md` diff.
+  subject of the Phase 0 diff (git history: notes/phase0-summary.md).
 
 ### E-0008 — Corpus is 2,393 files / 343.3 M over 18 extensions; only `.X3D` shows two genuinely distinct container prefixes
 - **Binary/file:** `Original Game Files/Data/`
@@ -217,7 +217,7 @@ An entry at `tentative` confidence must also have a matching line in
   body end in `.TGA` and none in any other extension, although the corpus holds no `.TGA`
   file (E-0008).
 - **Method:** `pathlib.Path.rglob` over the corpus with `struct.unpack_from`; counts in
-  `notes/o3d-findings.md`.
+  `docs/formats/README.md`.
 - **Confidence:** proven for the header; the body layout is **not** established — two
   fixed-stride hypotheses (112-byte materials, 192-byte objects) passed a length check
   and were then refuted by a field-level check, 541 and 18,259 failures respectively.
@@ -390,7 +390,7 @@ An entry at `tentative` confidence must also have a matching line in
   bad names, trailing bytes, zero count.
 - **Confidence:** proven for the container layer. Payloads per chunk name are separate
   specs. Supersedes the "at least seven distinct layouts" reading in Q-0016 and the
-  "terminator" reading in `notes/infoobj-findings.md` (that 32-byte block is the table).
+  "terminator" reading in `docs/formats/README.md` (that 32-byte block is the table).
 
 ### E-0026 — `#OBJECTS#` payload is `u32 count` + `count` × 68-byte entries; 9/9 INFOOBJ.BIN parse
 - **Binary/file:** `MissionMonet.exe`; `Data/U##/INFOOBJ.BIN` (9 files, 183 entries).

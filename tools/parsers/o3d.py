@@ -11,7 +11,7 @@ layout:
     FUN_1000bb20(cursor, dst)      f32,  cursor += 4
     FUN_1000bb50(cursor, dst, n)   n bytes, cursor += n
 
-That is why the fixed-stride readings in `notes/o3d-findings.md` failed: material and
+That is why the fixed-stride readings in `docs/formats/README.md` failed: material and
 object records vary in length depending on flags and counts inside them.
 
 Validation is the whole point. A parse that stops early is a failure even when it raises
