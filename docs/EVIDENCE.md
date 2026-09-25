@@ -1849,3 +1849,15 @@ An entry at `tentative` confidence must also have a matching line in
   is in the data; every menu label in the corpus frames is part of a bitmap.
 - **Method:** MCP decompile; capstone.
 - **Confidence:** proven for the edits; the lists' text drawing is not read (Q-0061).
+
+### E-0089 — The engine's scripted U01 entry ends in the original's hand-over state
+- **Binary/file:** engine `x3d` at "X3D: Run U01's unit code"; `MissionMonet.exe` (E-0053).
+- **Evidence:** run from the first shot through u01.md's entry (posted Enter cutting some
+  voice waits), the engine's camera log at the end reads −466.36, −452.495, 30.48, yaw
+  4.7, pitch 1.5708, the same values `camera.ps1` reads from the original at its
+  hand-over; the mayor holds out the card (GiveCard) and the frame matches the original's
+  (`traces/u01-entry-handover-compare.png`, local). The intermediate shots (the boatman,
+  the mayor at FOV 45) match the original's intro captures by eye.
+- **Method:** engine `-d1` log and snap.ps1; original captures from `to_u01.sh`.
+- **Confidence:** proven for the end state; the timing of the intermediate moves is not
+  compared frame by frame.

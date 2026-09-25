@@ -342,6 +342,15 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   every U01 light and the ambient is white, so X3D draws them at texture colour
   (E-0145). They are class-2 colour-keyed faces (`xd3d.dll` `FUN_100039c0`: Gouraud,
   COLORKEYENABLE, no alpha blend, no fog; E-0143) with clamped texture coordinates.
+- **Also checked (additive lead, 2026-09-25):** `xd3d.dll` has no fog render states
+  (capstone scan of every `SetRenderState` call: no FOGENABLE/FOGCOLOR/FOGTABLE*). A face
+  drawer just before `FUN_1000b840` (around `0x1000b604`..`0x1000b72x`) sets
+  COLORKEYENABLE and alpha blending ONE/ONE (ONE/INVSRCALPHA when device `+0x1d7a0` →
+  `+0x198` is set). Drawing material `+0x50` = 1 faces additively in the engine turns the
+  silhouettes white over the sky, far brighter than the original: that drawer is not the
+  one used for them, and state 3's drawer (`FUN_1000b840`) draws opaque with the colour
+  key. The faint look is still unexplained; lighting (Q-0019) is the next suspect, since
+  the drawers modulate the texture by the vertex colour.
 - **Status:** open
 
 ### Q-0022 — What frame rate did the original run at, so what are its turn and pitch rates per second?
