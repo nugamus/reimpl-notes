@@ -92,7 +92,7 @@ To undo everything, delete `C:\MonetRun` and run step 1 again.
 | "insert CD" style box and exit | `Data\App.bin` is not next to the exe; rerun step 1 |
 | "Please set your screen to 16 bits" | the exe copy is unpatched: `python tools/proxy/patch_exe.py` |
 | `run.ps1` says no dialog confirmed | the game hit an error box; look at the window, then report it |
-| crash ~1.5 s into U01 (EIP `0x40af518c`) | the x3d proxy; `X3D_PROXY=0 bash tools/proxy/setup_run.sh` installs the real `x3d.dll` (h3d tracing stays) |
+| crash ~1.5 s into U01 (EIP `0x40af518c`) | a proxy built before the data-export fix; rebuild (Build, above). `X3D_PROXY=0 bash tools/proxy/setup_run.sh` installs the real `x3d.dll` if a proxy is ever suspect |
 | crash `c0000005` in ntdll (Application log) | seen once right after an agent typed a player name too early; not reproduced. Note it in `traces/INDEX.md` |
 
 Agents can drive and watch the original without focusing it: `tools/proxy/send.ps1` posts
@@ -210,6 +210,10 @@ force-added as `traces/golden-*.log`.
 
 ## Limits
 
+- Data exports are forwarded, not traced: `x3d.dll` exports 32 variables (the math
+  function pointers `X3d_Matrice_Mult`, `X3d_Convert_To_Polar`, ..., and `X3d_Global`) that
+  the game calls through. They are `/export` forwarders to the real DLL. As code stubs
+  they crashed the game ~1.5 s into U01, the first time it called one.
 - Arguments and return values are not captured, only the call sequence and the call site.
   Recovering signatures needs per-export knowledge that does not exist yet; the sequence
   is what Phase 4 replay compares against.

@@ -365,7 +365,12 @@ __declspec(naked) void stub_%(index)d(void)
 
 
 def exports(dll: Path) -> list:
-    """(ordinal, name) for every export, in ordinal order."""
+    """(ordinal, name, is_data) for every export, in ordinal order.
+
+    x3d.dll exports its math function pointers (`X3d_Matrice_Mult`, ...) as variables in
+    .data; the game calls through them (`call [iat_value]`). A code stub in their place
+    made the game jump through the stub's bytes ~1.5 s into U01, so data exports are
+    forwarded to the real DLL instead of traced."""
     import pefile
 
     pe = pefile.PE(str(dll))
@@ -377,27 +382,36 @@ def exports(dll: Path) -> list:
             )
         if sym.forwarder:
             raise SystemExit("%s has forwarder exports; not handled" % dll.name)
-        out.append((sym.ordinal, sym.name.decode("ascii")))
+        section = pe.get_section_by_rva(sym.address)
+        is_data = not (section.Characteristics & 0x20000000)  # IMAGE_SCN_MEM_EXECUTE
+        out.append((sym.ordinal, sym.name.decode("ascii"), is_data))
     return sorted(out)
 
 
-def render_c(proxy_name: str, real_dll: str, names: list) -> str:
+def render_c(proxy_name: str, real_dll: str, names: list, forwards: list = ()) -> str:
     body = C_HEADER % {
         "real_dll": real_dll,
         "proxy_name": proxy_name,
         "count": len(names),
         "names": "".join('    "%s",\n' % n for n in names),
     }
+    body += "".join(
+        '#pragma comment(linker, "/export:%s=%s.%s,@%d")\n' % (n, real_dll[: -len(".dll")], n, o)
+        for o, n in forwards
+    )
     stubs = "".join(STUB % {"index": i, "offset": i * 4} for i in range(len(names)))
     return body + stubs
 
 
-def render_def(names_with_ordinals: list) -> str:
+def render_def(syms: list, real_dll: str) -> str:
     lines = ["EXPORTS"]
-    for index, (ordinal, name) in enumerate(names_with_ordinals):
+    for index, (ordinal, name, is_data) in enumerate(syms):
         # Ordinals are preserved: the EXEs import by name, but nothing guarantees the
         # other engine DLLs do.
-        lines.append("    %s=stub_%d @%d" % (name, index, ordinal))
+        # Data exports are forwarded by render_c's /export pragmas: link.exe rejects
+        # forwarders in this .def (LNK2001).
+        if not is_data:
+            lines.append("    %s=stub_%d @%d" % (name, index, ordinal))
     return "\n".join(lines) + "\n"
 
 
@@ -407,11 +421,12 @@ def generate(out_dir: Path) -> dict:
     for proxy_dll, real_dll in sorted(TARGETS.items()):
         stem = proxy_dll[: -len(".dll")]
         syms = exports(BIN_DIR / proxy_dll)
-        names = [n for _, n in syms]
+        names = [n for _, n, _ in syms]
         (out_dir / (stem + "_proxy.c")).write_text(
-            render_c(proxy_dll, real_dll, names), encoding="ascii"
+            render_c(proxy_dll, real_dll, names, [(o, n) for o, n, d in syms if d]),
+            encoding="ascii",
         )
-        (out_dir / (stem + ".def")).write_text(render_def(syms), encoding="ascii")
+        (out_dir / (stem + ".def")).write_text(render_def(syms, real_dll), encoding="ascii")
         written[proxy_dll] = len(names)
         print(
             "%s: %d exports -> %s_proxy.c, %s.def" % (proxy_dll, len(names), stem, stem)
@@ -422,14 +437,15 @@ def generate(out_dir: Path) -> dict:
 def selftest() -> int:
     import tempfile
 
-    syms = [(1, "X3d_Alpha"), (2, "X3d_Beta"), (3, "X3d_Gamma")]
-    d = render_def(syms)
+    syms = [(1, "X3d_Alpha", False), (2, "X3d_Beta", True), (3, "X3d_Gamma", False)]
+    d = render_def(syms, "x3d_orig.dll")
     assert d.splitlines()[0] == "EXPORTS"
     assert "    X3d_Alpha=stub_0 @1" in d
     assert "    X3d_Gamma=stub_2 @3" in d
-    assert len(d.strip().splitlines()) == len(syms) + 1
+    assert "X3d_Beta" not in d
+    assert len(d.strip().splitlines()) == len(syms)  # header, minus the data export
 
-    c = render_c("x3d.dll", "x3d_orig.dll", [n for _, n in syms])
+    c = render_c("x3d.dll", "x3d_orig.dll", [n for _, n, _ in syms])
     assert c.count("__declspec(naked)") == 3
     assert "#define EXPORT_COUNT 3" in c
     assert '"X3d_Beta",' in c
@@ -446,7 +462,9 @@ def selftest() -> int:
             counts = generate(out)
             assert counts == {"x3d.dll": 278, "h3d.dll": 52}, counts
             body = (out / "x3d.def").read_text(encoding="ascii")
-            assert len(body.strip().splitlines()) == 279
+            assert len(body.strip().splitlines()) == 279 - 32  # data exports forwarded
+            c_body = (out / "x3d_proxy.c").read_text(encoding="ascii")
+            assert "/export:X3d_Matrice_Mult=x3d_orig.X3d_Matrice_Mult,@" in c_body
         else:
             print("  (binaries absent; skipped the end-to-end generation check)")
     print("selftest ok")
