@@ -69,8 +69,7 @@ For scene file `Uxx.X3D`:
 
 ## Lighting
 
-Not specified yet (Q-0019). The static view draws textures at full brightness modulated
-by the ambient colour / 255 (U01's ambient is white).
+Per-vertex, every frame: `docs/engine-spec/lighting.md` (E-0140..E-0145).
 
 ## Camera and projection (E-0040)
 

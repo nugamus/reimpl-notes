@@ -180,6 +180,7 @@ The `extra_floats` slot is almost always `(104.8, 125.2, ±1.0)` — three value
 nearing `±1`. Consistent with one being intensity (the `X3d_Light_Set_Multiplier` export
 covers that), the others not named. The `extra_u32s` slot is almost always `(0, 1)`. Both
 slots are flagged `extra_*` in `tools/parsers/l3d.py` per CLAUDE.md rule 5.
+E-0140 names them: inner and outer radius, multiplier, hidden, attenuate (`l3d.ksy`).
 
 ### Spot branch — no corpus sample
 

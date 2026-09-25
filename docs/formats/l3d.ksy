@@ -13,16 +13,13 @@ doc: |
   four stream primitives — `FUN_1000ba90` (u32), `FUN_1000baf0` (u8), `FUN_1000bb20`
   (f32) and `FUN_1000bb50` (n bytes) — and read order *is* the layout.
 
-  Per-light record: 32-byte name, 3-f32 position, 3-u8 RGB, 3-f32 unknown, 2-u32
-  unknown, u32 is_spot. When `is_spot != 0`, a further 3-f32 spot target and 2-f32 cone
+  Per-light record: 32-byte name, 3-f32 position, 3-u8 RGB, f32 inner, f32 outer,
+  f32 multiplier, u32 hidden, u32 attenuate, u32 is_spot (E-0140). When `is_spot != 0`, a further 3-f32 spot target and 2-f32 cone
   angles follow. Spot-light data is parsed but no corpus sample exists — every `.L3D` in
   the corpus is omni.
 
   Validated by `tools/parsers/l3d.py` against all 5 `.L3D` files in the corpus: every
   file parses, every byte is consumed. Totals: 78 lights, 0 spot, 5,718 bytes.
-
-  Fields named "extra_*" are opaque on purpose (CLAUDE.md rule 5). Their width is proven;
-  their meaning is not, and no name is guessed at.
 
 seq:
   - id: signature
@@ -76,24 +73,21 @@ types:
         type: vec3
       - id: color
         type: rgb
-      - id: extra_floats
-        type: vec3
-        doc: |
-          Three f32s the loader writes into light struct offsets `+0x34`, `+0x38`, `+0x3c`.
-          Field meaning unproven; one of them is plausibly the intensity multiplier (the
-          `X3d_Light_Set_Multiplier` export covers that surface) but the others are not
-          named. Read but unnamed per CLAUDE.md rule 5.
-      - id: extra_u32s
-        size: 8
-        type:
-          seq:
-            - id: a
-              type: u4
-            - id: b
-              type: u4
-        doc: |
-          Two u32s into light struct offsets `+0x40`, `+0x44`. In the corpus they are
-          almost always `(0, 1)`. Field meaning unproven.
+      - id: inner
+        type: f4
+        doc: Light `+0x38` (`X3d_Light_Set_Inner`); full-strength radius (E-0140).
+      - id: outer
+        type: f4
+        doc: Light `+0x34` (`X3d_Light_Set_Outer`); zero-contribution radius (E-0140).
+      - id: multiplier
+        type: f4
+        doc: Light `+0x3c` (`X3d_Light_Set_Multiplier`); negative darkens (E-0140).
+      - id: hidden
+        type: u4
+        doc: Light `+0x40` (`X3d_Light_Get_Hide_State`); non-zero skips the light.
+      - id: attenuate
+        type: u4
+        doc: Light `+0x44` (`X3d_Light_Attenuate`); non-zero enables inner/outer falloff.
       - id: is_spot
         type: u4
         doc: |
@@ -114,7 +108,7 @@ types:
           seq:
             - id: theta
               type: f4
-              doc: Cone inner angle, used as `cos(theta * pi / 180 * RAD2DEG)`.
+              doc: Full cone angle in degrees, stored as `cos(theta * pi / 360)` (half angle, E-0140).
             - id: phi
               type: f4
               doc: Cone outer angle, used the same way.

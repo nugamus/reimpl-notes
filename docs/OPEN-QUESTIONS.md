@@ -290,7 +290,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** faithful brightness. The static view uses texture × ambient / 255.
 - **Next to try:** the render callback installed by `X3d_Scene_Init_Render`; compare a
   dark unit (U06, ambient 90) against the original.
-- **Status:** open
+- **Status:** RESOLVED (E-0140..E-0145, `docs/engine-spec/lighting.md`)
 
 ### Q-0020 — How are "weld" objects (faces indexing a parent's vertices) posed?
 - **Context:** 5,193 `.O3D` objects have `vertex_flag` set, no vertices of their own and
@@ -334,6 +334,10 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Also checked (2026-09-25):** E-0058: type 2 keeps the camera's pitch and fixes the yaw
   at π/2; the object's true view-space origin goes to transform `+0x164`. Not yet read:
   how `xd3d.dll` uses `+0x164` to place the object.
+- **Also checked (2026-09-25, lighting):** not lighting. The faint objects are beyond
+  every U01 light and the ambient is white, so X3D draws them at texture colour
+  (E-0145). They are class-2 colour-keyed faces (`xd3d.dll` `FUN_100039c0`: Gouraud,
+  COLORKEYENABLE, no alpha blend, no fog; E-0143) with clamped texture coordinates.
 - **Status:** open
 
 ### Q-0022 — What frame rate did the original run at, so what are its turn and pitch rates per second?

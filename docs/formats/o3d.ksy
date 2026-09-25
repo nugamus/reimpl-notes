@@ -94,8 +94,12 @@ types:
   material:
     doc: |
       `FUN_10011450`. The loader folds each RGB triple through `X3d_Rgb_To_16` into a
-      16-bit colour it caches alongside; which triple is ambient, diffuse, specular or
-      emissive is not established.
+      16-bit colour it caches alongside. Material slots and their use in lighting:
+      E-0141, `docs/engine-spec/lighting.md`. `flags` is the render class (0 unlit,
+      1 grey-lit, 2 RGB-lit); colours are ambient, diffuse, specular, light colour
+      (`+0x2c`, `+0x32`, `+0x38`, `+0x3e`); the five u32s are shininess, shininess
+      strength, transparency %, draw mode, tiling (`+0x44`, `+0x48`, `+0x4c`, `+0x50`,
+      `+0x58`).
     seq:
       - id: name
         type: strz

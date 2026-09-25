@@ -1581,3 +1581,92 @@ An entry at `tentative` confidence must also have a matching line in
 - **Method:** capstone.
 - **Confidence:** proven. Supersedes the op-9 row of `interaction.md` ("show if `arg` ≠ 0"),
   which is inverted.
+
+### E-0140 — `.L3D` light fields after the colour are inner, outer, multiplier, hidden, attenuate
+- **Binary/file:** `x3d.dll`; `Data/U0[1,3,6]/Static/*.L3D`, `U33`.
+- **Evidence:** `FUN_10014d50` stores the three f32 after the RGB at light `+0x38`, `+0x34`,
+  `+0x3c` and the two u32 at `+0x40`, `+0x44`, then `+0x4c`→`+0x30` = (`+0x34`)² and
+  `+0x34` = (`+0x38`)². The exports name the slots: `X3d_Light_Set_Inner` writes `+0x38`
+  and the squared copy `+0x34`; `X3d_Light_Set_Outer` `+0x34` and `+0x30`;
+  `X3d_Light_Set_Multiplier` `+0x3c`; `X3d_Light_Get_Hide_State` reads `+0x40`;
+  `X3d_Light_Attenuate` sets `+0x44` = 1. Spot angles are stored as
+  `cos(angle · π · 0.0027777)` = cos(angle / 2 in degrees) at spot `+0x40` (first) and
+  `+0x44` (second). Light `+0x2f` = (r + g + b) / 3. Corpus: every light has inner ≤
+  outer (e.g. U01 104.8 / 125.2, U06 32 / 80); multipliers −1, 0.3, 1, 4, 5 (U01: four
+  at −1, Omni04 at +1); hidden always 0; attenuate 1 except U06 (0).
+- **Method:** MCP decompile; `tools/parsers/l3d.py` dump of all five files.
+- **Confidence:** proven.
+
+### E-0141 — Material render class and slots: `+0` class 0/1/2, colours ambient/diffuse/specular/light, u32s shininess, strength, transparency, mode, tiling
+- **Binary/file:** `x3d.dll`, `xd3d.dll`; corpus `.O3D` (2,133 materials).
+- **Evidence:** `FUN_10011450` reads `flags` into material `+0`, which
+  `X3d_Material_Get_Default_Render_Class` returns and `xd3d.dll` `FUN_1001df90` switches on
+  (with the state bits of `FUN_1001e530`) to pick the drawer table. `x3d.dll` `FUN_1001e950`
+  (adding a material to an object) increments transform `+0x1a0` for class 1 and `+0x1a4`
+  for class 2 (`0x1001e9c6..0x1001e9e2`; `0x10018658..0x1001874f` redo it when the state
+  changes). `X3d_Material_Set_Ambient` writes `+0x2c..0x2e`, `X3d_Material_Set_Light_Color`
+  `+0x3e..0x40`. The untextured class-2 drawer (`xd3d.dll` `0x10001f76..0x10002060`)
+  multiplies the lit colour by `+0x32..0x34` (diffuse) and indexes a table built from
+  `+0x38..0x3a` (specular); `FUN_1001ddc0` builds that table from `+0x44` (shininess) and
+  `+0x48` (strength). Every drawer sets `D3DRENDERSTATE_TEXTUREADDRESSU/V` (0x2c/0x2d) to 3
+  (clamp) when material `+0x58` = 0, else 1 (wrap) (e.g. `0x100029db..0x10002a10`). Corpus:
+  class 2: 1,537, class 0: 596, class 1: 0; all class-0 materials textured; `+0x58` = 1 on
+  1,986, 0 on 147; `+0x50` ∈ {0, 1}. The order matches `.MAT`'s AMBIENT, DIFFUSE, SPECULAR,
+  LIGHT_COLOR, SHININESS, SHININESS_STRENGTH, TRANSPARENCY.
+- **Method:** MCP decompile, capstone sweep of both DLLs, `o3d.py` over the corpus.
+- **Confidence:** proven for class, ambient, light colour, diffuse/specular use, tiling;
+  the shininess names follow `.MAT` order and the table's use.
+
+### E-0142 — X3D lights class-2 objects per vertex in RGB with an overflow term; `FUN_1001aea0`
+- **Binary/file:** `x3d.dll`, `xd3d.dll`.
+- **Evidence:** `FUN_1000b690` fills the object class (`0x1002d0d8` `+0x6c`): `+0x1c` =
+  `0x10001668` → `FUN_1001a280`, `+0x20` = `0x10001064` → `FUN_1001aea0`. `xd3d.dll`
+  `FUN_10020d10` / `FUN_10020720` call `+0x1c` when transform `+0x1a0` ≠ 0 and `+0x20` when
+  `+0x1a4` ≠ 0, for the drawn (LOD-picked) object with the original object and the scene,
+  after culling. `FUN_1001aea0`: transforms the drawn object's vertex range (`+0x48`,
+  `+0x44`) and normals by the original's global matrix (`X3d_Normal_Array_Matrice_Mult`
+  with transform `+0x178`) into `DAT_10028ec4` / `DAT_10028ed4`; sets diffuse
+  `DAT_10028edc` to scene `+0x40..0x42` and specular `DAT_10028ee0` to 0; for each light of
+  the original's list (`+0x64`) with `+0x40` = 0: omni without attenuation adds
+  colour · multiplier · (L̂·N) when positive; with attenuation, rejects the light when
+  |P − sphere centre|² ≥ (outer + radius)², else per vertex uses 1, or
+  1 − (d² − inner²)/(outer² − inner²), or 0 by d²; spot uses (P−T)̂·N, then the cone on
+  L̂·(P−T)̂. Clamp: > 255 moves the excess (capped 255) into specular and sets 255; < 0 → 0.
+  `FUN_1001a280` does the same with the grey values `+0x2f` / scene `+0x43` into the w slot.
+- **Method:** MCP decompile (function created at `0x1001aea0`), capstone for the thunks.
+- **Confidence:** proven.
+
+### E-0143 — Drawers: class 2 textured sends lit RGB as diffuse and the overflow as specular; class 0 sends white, flat
+- **Binary/file:** `xd3d.dll`, `x3d.dll`.
+- **Evidence:** `x3d.dll` `0x10020f4b` passes `0x10028ec0` to `X3d_Init_Render_Dll`, so
+  `xd3d.dll`'s context `+0x1c` / `+0x20` are `DAT_10028edc` / `DAT_10028ee0`. Class 2
+  state 1 (`FUN_10002420`) packs `_ftol` of `+0x1c` R, G, B into the D3DTLVERTEX colour
+  (alpha 0) and of `+0x20` into specular (`0x10002933..0x10002996`), sets
+  SPECULARENABLE 1, SHADEMODE 2 (Gouraud), draws a triangle fan (`IDirect3DDevice2`
+  `+0x74`, type 6); class 2 state 3 (`FUN_100039c0`) does the same with COLORKEYENABLE.
+  Class 0 state 1 (`FUN_1000a740`, created) writes 0x00FFFFFF and SHADEMODE 1 (flat), no
+  specular; class 0 state 3 is `FUN_1000b840`. A sweep of every `SetRenderState` call site
+  in `xd3d.dll` finds no state 21 (TEXTUREMAPBLEND) and no 28 (FOGENABLE).
+- **Method:** MCP decompile, capstone sweep of `push` arguments before `call [reg+0x5c]`.
+- **Confidence:** proven for the vertex data and states; that the blend is modulate is
+  Direct3D 5's documented default.
+
+### E-0144 — The per-object lit-colour cache is never enabled, so lighting runs every frame
+- **Binary/file:** `x3d.dll`, `xd3d.dll`.
+- **Evidence:** `FUN_1001aea0` / `FUN_1001a280` reuse byte copies (`+0x120`, `+0x124`) only
+  when object `+0x10c` ≠ 0 (and call `FUN_1001c010` when `+0x110` ≠ 0). No instruction in
+  either DLL writes `+0x10c` or `+0x110` (disassembly sweep: only the reads at
+  `0x1001a290`, `0x1001aeb0`, `0x1001aeba`, `0x1001ba79`, `0x1001c020`, `0x1001ce0a`);
+  `X3d_Object_Create` allocates the object zeroed.
+- **Method:** capstone sweep.
+- **Confidence:** strong (a write through a computed pointer in the EXE is not excluded).
+
+### E-0145 — U01's distant buildings, boats and sun are beyond every light: lighting leaves them at texture colour
+- **Binary/file:** `Data/U01/static/U01.o3d`, `LIGHTS.L3D`, `SCENE.BIN`.
+- **Evidence:** ambient (255, 255, 255) (E-0039). World vertices (E-0042) of the objects
+  using `immgch`, `immdrt`, `barques` (class 2) and `soleil` (class 0) are 595 to 3,498
+  units from the nearest light; the largest `outer` is 164 and all U01 lights attenuate.
+  So D = (255, 255, 255), S = 0: texture × 1. `immgch`/`immdrt`/`barques` have `+0x50` = 1,
+  `+0x58` = 0 (clamp).
+- **Method:** script over `o3d.py` / `l3d.py` output.
+- **Confidence:** proven for the lighting result.
