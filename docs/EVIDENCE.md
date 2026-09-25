@@ -1238,3 +1238,157 @@ An entry at `tentative` confidence must also have a matching line in
 - **Method:** parser dump; engine `-d2` log with `dev_click=262,338,3000`.
 - **Confidence:** strong (behavioural). Supersedes the "hit is reported for the top" clause
   of E-0070; the rest of E-0070 stands.
+
+### E-0120 — The sound manager: one DirectSound device, 22,050 Hz 8-bit mono primary, groups 1..6, volume = v · G in hundredths of a dB
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** the manager constructor `FUN_00422d70` (called at `0x00426667` with
+  1, 22050, 8, 1000000, 6) stores channels/rate/bits, sets the streaming buffer size
+  `+0x2c` = 1000000 / 6 and zeroes the six group attenuations `+0x30..+0x44`; the global
+  is `0x0046ec54`. `LSoundManager_99` (`0x00423020`, assert `LSoundManager.cpp:99..154`):
+  `DirectSoundCreate`, `SetCooperativeLevel(hwnd, 2)` (priority), a primary buffer set to
+  PCM 1 channel, `+0x1c` Hz, `+0x20` bits, played looping, and `timeSetEvent(500, 300,
+  0x00423840, 0, periodic)`. `LSoundManager_290` (`0x004233a0`, `:290..311`): group ≤ 6
+  (assert `:0x122`), new `LSound` (0x17c bytes), `LSound_72` with the group's attenuation
+  `+0x2c + 4·group` and the buffer size. `LSound_72` (`0x00421e80`, `LSound.cpp:72`):
+  `+0x118` = loop, `+0x11c` = remove-when-done, `+0x120` = pan capable, `+0x10c` = group,
+  buffer = size rounded down to the block align, **static** (`+0x130` = 1, whole file)
+  when the data is smaller, caps `0x10080` (+`0x40` with pan, +2 static); then volume
+  `LSound_469`, pan `LSound_574` only if either pan value ≠ 100, and plays if asked.
+  `LSound_469` (`0x004228c0`, `:469..483`): v in 0..100 (assert), DirectSound volume =
+  −((−10000 − G) · 0.01 · v + 10000) (constants `0x00439a80` = 0.01, `0x00439a78` =
+  10000.0, capstone). `LSoundManager_413` (`0x00423620`): group volume V in 0..100 →
+  G = (V − 100) · 100 (`fsub 100.0` at `0x0042368e`, ×100 by `lea`), re-applied to every
+  sound of that group (`FUN_004229b0`); `LSoundManager_397` reads it back as 100 + G/100
+  (`0x00439ab0` = −0.01). Hence volume = v·V − 10000 hundredths of a dB. `LSound_574`
+  (`0x00422a70`): pan = 100·(R − 100) when L = 100, else |100·(L − 100)|; every call site
+  in the EXE passes 100, 100.
+- **Method:** MCP decompile; capstone for the x87 constants; `pefile` reads of the doubles.
+- **Confidence:** proven.
+
+### E-0121 — Group assignments and per-call-site sound parameters
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `SetAppMode` (`0x00417ce0`): on a change to mode 2, `LSoundManager_413`
+  groups 1, 4, 5 → 0; on any other change → 85, 80, 80. Call sites of
+  `LSoundManager_290` (path, loop, remove, pan, group, play, v, 100, 100): scene vtable
+  `+0x4c` `FUN_0041bc00` (step 12, `XScene.cpp:609`): (loop = caller, 0, 0, 1, 1, 85);
+  `Action_RunStep` (`0x0041e500`) case 12 passes loop 1. `+0x54` `FUN_0041be00` (step 101,
+  `XScene.cpp:651`): `LSoundManager_StopGroup(2)` (`0x00423360`), then (caller, 1, 1, 2,
+  1, v = caller), and zeroes the voice emitter's sound pointer; case 101 passes (0, 100).
+  `SoundEmitter_Play` (`0x00414ce0`): (loop = caller, 1, 1, emitter group, 1, 100).
+  `PlayVideo` (`0x00417030`): `FUN_004232d0` (stop all) then (0, 1, 1, 2, 1, 100).
+  U03's `FUN_00407b80`: group 4, v 85 and 90. `U01_Start` calls vtable `+0x4c("U01", 1)`
+  at `0x004013ed` (a ≠ 0, after the prologue) and `0x0040126a` (save load).
+- **Method:** MCP decompile; capstone scan of U01's vtable calls (`0x00401000..0x00403000`).
+- **Confidence:** proven.
+
+### E-0122 — Two positional emitters: voice (group 2, 50·s) and effects (group 3, 60·s); volume falls linearly with distance to the eye
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** scene load at `0x0041ac1e..0x0041accb`: two 0x128-byte emitters
+  (`FUN_00414c80(group, range)`: `+0x120` group, `+0x124` range) with range = scene
+  `+0x138` × 50.0 (`0x00439448`) for group 2 → scene `+0x178`, × 60.0 (`0x00439440`) for
+  group 3 → scene `+0x174`; they are also listed at scene `+0x17c`, `+0x180`.
+  `SoundEmitter_Play`: if `FUN_00414ed0` (group playing) and `_stricmp(last name, file)`
+  = 0 return 0; copy the position to `+8`, stop the group, play, store the handle `+4` and
+  the name `+0x18`, then `SoundEmitter_SetDistance` (`0x00414e40`) with `FUN_00415e40`
+  (Euclidean distance) to camera `+0x14`. `SoundEmitter_SetDistance`: d < range →
+  v = ftol(100 · (range − d) / range) (capstone `0x00414e60..0x00414e76`), else 0;
+  clamped 0..100; `LSound_469`. `Scene_UpdateEmitterVolumes` (`0x0041bf30`) walks the
+  (up to 7) emitters at scene `+0x17c` and, for those whose group plays and which hold a
+  handle (`FUN_00414e00`), recomputes; it is called from `FUN_00418fd0` (after each walk
+  key step, E-0047), `Camera_MoveTo` (each frame) and `FUN_00419620` (camera path, each
+  frame). Scene vtable `+0x48` `FUN_0041baf0` (`XScene.cpp:0x250`) plays on the voice
+  emitter, `+0x50` `FUN_0041bcf0` (`:628`) on the effects emitter; `Camera_Fall` plays
+  `SAUT.WAV` through the effects emitter at camera `+0x14` (`0x004194d2`).
+- **Method:** capstone of the scene loader; MCP decompile; float constants read with
+  `pefile`.
+- **Confidence:** proven.
+
+### E-0123 — "Group playing" means a sound of the group without its end flag; streamed sounds raise it up to half a buffer early; a 500 ms thread polls
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `LSoundManager_IsGroupPlaying` (`0x00423310`): any listed sound with
+  `+0x10c` = group and `+0x168` = 0. `LSound_185` (`0x00422090`, `LSound.cpp:185..254`)
+  fills one half of the buffer (the whole buffer when static) from the file
+  (`FUN_00423d70`); read 0 bytes → silence (0x80 for 8-bit, else 0) and `+0x168` = 1;
+  a short read → loop set: seek to the data start (`FUN_00423d30`) and read the rest
+  (capstone `0x00422257..0x004222e3`), else silence. `LSound_446` (`0x00422710`) is the
+  per-sound poll: streaming → refill the half not playing once the cursor has left it, or
+  stop (`LSound_378`) when `+0x168` is set; static → if not looping and remove-when-done,
+  stop when DirectSound's status is 0. `LSound_378` with remove-when-done hands the sound
+  to `FUN_00423540` (delete list). The timer callback `0x00423840` → `0x00423860` frees
+  the delete list and calls each listed sound's poll. `LSound_317`: plays looping unless
+  (not looping and static).
+- **Method:** MCP decompile; capstone for the loop branch the decompiler dropped.
+- **Confidence:** proven for the mechanism; the audible consequence is Q-0071.
+
+### E-0124 — `Sound/<name>.bin` is a `#INDEX#` chunk of (u32 ms, u16 shape, u16 pad) records; 81/81 parse
+- **Binary/file:** `MissionMonet.exe`; `Data/*/Sound/*.bin` (81).
+- **Evidence:** `Talkers_Say` (`0x004215f0`) formats `%sSound/%s.bin` (`0x00441f5c`) and,
+  if it exists, `Talker_LoadLipBin` (`0x00421960`): `FUN_00414f70` opens the container,
+  `FUN_00415190(..., "INDEX")` (`0x00441fb8`), reads 4 bytes into talker `+0x220`
+  (count; < 1 → done), allocates count·8 and reads them into `+0x224`. The lookup
+  `FUN_00421a70` compares the elapsed ms with each record's first u32 and returns the
+  previous record's second dword cast to a short. `tools/parsers/lip.py`: 81/81 files
+  (all `Uxx/Sound/*.bin`), 10,373 records, every byte consumed, only `#INDEX#`; shapes
+  1..8 (1 ×1,289, 2 ×914, 3 ×571, 4 ×1,608, 5 ×1,566, 6 ×971, 7 ×986, 8 ×2,468); pad
+  0xCDCD in every record; first time 0 in all 81; time steps min 44, median 46 ms.
+- **Method:** MCP decompile; validator.
+- **Confidence:** proven.
+
+### E-0125 — Talkers: eight mouth clips on the face dummy at 15 fps; lip mode follows the table with 200 ms spacing and random open shapes; random mode without a table
+- **Binary/file:** `MissionMonet.exe`; `Data/U01/Anim/U01_01/*.A3D`.
+- **Evidence:** `U01_Start` calls scene vtable `+0x28` (`XSceneAnim_157`, `0x0041c400`)
+  at `0x004012a4` / `0x004012be` with `U01_01` / `$$$DUMMY.*01SParle` and `U01_02` /
+  `$$$DUMMY.*02SParle`, count 8; it builds a talker (`FUN_00421360`: type-6 hotspot,
+  face name `+0x174`, slots `+0x1b4`×9 = 0, current `+0x1dc` = 0) with anim dir
+  `%sAnim/%s/` (`0x0043fee0`) and `FUN_00421480`: face object `+0x170` (under the
+  character's object, else by scene name), then `FUN_004217b0` for `A` (slot 8), `B` 4,
+  `Ch` 2, `Ch_yeux` 3, `E` 5, `F` 6, `O` 7, `Yeux` 1 (`0x00441f34..0x00441f58`): load
+  `%s%s.A3D`, take the sub-animation named like the face (`FUN_0041c380`), make a node
+  `<char>VISAGE` (`0x00441f6c`) bound to the face object at 15.0 fps (`0x41700000`),
+  loop 1, running, then `+0x64` = 0, and append it to scene `+0x158`; empty slots and
+  slot 0 get the first non-empty; `FUN_00421780` disables and pauses all. The A3D shows
+  `$$$DUMMY.*01SParle` under `TETE` with the mouth, cheek, brow and eye objects below it.
+  `Talkers_Say`: stop the current talker (`FUN_00421730`: all slots `+0x64` = 0, free the
+  table, `+0x60` = 0, scene `+0x168` = 0); face global position → scene `+0x48`; if it
+  started: scene `+0x168` = talker, load the table (`+0x1e4` = 1) or not, `+0x1e0` =
+  `timeGetTime()`, `+0x60` = 1. `Action_RunStep` case 1 calls it for a type-6 target found
+  in the talker list; `U01_Start` at `0x004014ce` for `U01_01` / `d1_01`. The animation
+  tick (`FUN_0041c350`) runs `Talker_Tick` (`0x00421b90`) for scene `+0x168`: voice
+  emitter's group not playing → `FUN_00421730`; table → `FUN_00421bd0`, else
+  `FUN_00421d20`. `FUN_00421bd0`: t = `timeGetTime` − `+0x1e0`; `FUN_00421a70` past the
+  last record → `FUN_00421730`; 1 → `FUN_00421b20` (current slot `+0x64` = 0, `+0x60` = 1,
+  current = 0; slot 8: `FUN_00420080(1)` enabled, paused, frame 0.0), `DAT_0046ec48` = 0;
+  2/3 → if t − `DAT_0046ec48` > 199 select it; other → if > 199: r = rand·4/0x7fff + 4,
+  while r = current r = rand·4/0x7fff + 1; select; slot `+0x78` (fps) = rand·2/0x7fff + 1.
+  `FUN_00421d20`: every > 199 ms of `timeGetTime` (`DAT_0046ec4c`): r = rand·9/0x7fff + 1;
+  9 → current slot `+0x64` = 0, `+0x60` = 1; else select; current slot fps =
+  rand·4/0x7fff. Select `FUN_00421ac0`: old slot `+0x64` = 0; new `+0x64` = 1, `+0x60` = 0.
+  Node fields per E-0056: `+0x64` enabled, `+0x60` paused, `+0x78` fps.
+- **Method:** MCP decompile; capstone around the talker declarations; `a3d.py` dump of
+  `U01_01/A.A3D`.
+- **Confidence:** proven for the rules; the override order against the body animation is
+  Q-0072. Partly answers Q-0026 (scene `+0x168` is the current talker, not a camera path).
+
+### E-0126 — Lip tables do not match their voice lengths
+- **Binary/file:** `Data/*/Sound/*.bin`, `.wav`.
+- **Evidence:** `lip.py -v`: every `.bin` has a `.wav` of the same name; the last record
+  lies after the `.wav`'s end in 28 of 81 (`D1_02` 49.8 s vs 41.6 s; `U05_06` 14.4 s vs
+  5.7 s) and well before it in others (`d1_08` 11.8 s vs 15.4 s).
+- **Method:** validator statistics (Python `wave` durations).
+- **Confidence:** corpus fact; the reason is Q-0070.
+
+### E-0127 — WAV corpus formats and U01's sound users
+- **Binary/file:** `Data/**/*.wav` (244); `MissionMonet.exe`.
+- **Evidence:** all RIFF/WAVE PCM mono: 22,050 Hz 8-bit ×235, 44,100 Hz 16-bit ×7 (U01:
+  `s1_03`, `s1_08b`, `s1_10`, `s1_11`, `s1_12`, `s1_13`, `u01`), 22,050 Hz 16-bit ×1
+  (`U03/Sound/s2_03`), 11,025 Hz 8-bit ×1 (`U07/Sound/Couper`); chunks `fmt `+`data` ×168,
+  plus a trailing `LIST` ×76. `Data/U01/Sound`: 23 `.wav`, 8 `.BIN`. INFOACT U01: op 1
+  `d1_02`, `D1_03`, `D1_06`..`D1_10`; op 13 `Marsaillaise`, `s1_03`, `s1_07` ×2,
+  `s1_08b`. U01 code (capstone scan of vtable `+0x48..+0x54` calls): `+0x50` `S1_10`
+  (`0x004017f3`), `s1_12` (`0x00401ab2`, `0x00401c01`), `OpenDoor`, `CloseDoor.wav`,
+  `TelGrisi` ×2, `CloseDoor`, `s1_05` ×2, `s1_13`; `+0x48` `s1_11` (`0x0040188f`);
+  `+0x4c` `U01`. The train handler `0x00401b90`: `+0x50("s1_12", camera, 1)`,
+  `LSoundManager_StopGroup(1)`, then d += 10 while d < scale·60: `SoundEmitter_SetDistance`
+  on scene `+0x174`, `Scene_RunFor(20)`.
+- **Method:** Python RIFF walk over the corpus; `infoact.py --file`; capstone.
+- **Confidence:** proven.

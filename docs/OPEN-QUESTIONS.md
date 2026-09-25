@@ -416,3 +416,44 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** the handler only.
 - **Blocks:** one alternate way onto U01's roof.
 - **Status:** open
+
+### Q-0070 — Why do the lip tables not match their voices' lengths?
+- **Context:** E-0126: 28 of 81 tables run past the `.wav`, others stop seconds early.
+  Talk ends at whichever comes first, so the mouth may stop mid-sentence.
+- **What we checked:** durations only; not whether the tables fit another language's
+  recording or a different time scale.
+- **Blocks:** nothing (the engine follows the original rule); it decides whether an
+  improved lip sync is worth doing.
+- **Next to try:** a capture of `U01_02` saying `d1_02` against the table; compare the
+  tables with the `.wav` envelopes.
+- **Status:** open
+
+### Q-0071 — Does the early "not playing" of streamed voices show in play?
+- **Context:** E-0123: for sounds of more than 166,666 data bytes, "group playing" turns
+  false up to 83,333 data bytes before the sound ends; scripted waits and lip sync end
+  then.
+- **What we checked:** the code path only.
+- **Blocks:** exact timing of U01's hand-over (`d1_01`, 23.4 s) and of talk animations.
+- **Next to try:** a trace of the hand-over: when the camera resumes vs. the end of
+  `d1_01`.
+- **Status:** open
+
+### Q-0072 — In which order do mouth nodes and the body animation pose the face?
+- **Context:** E-0125: the mouth clips are nodes appended to scene `+0x158` after the
+  character's nodes and drive the face dummy the body animation also drives; closing
+  leaves slot 8 enabled while another slot may be enabled later.
+- **What we checked:** the append call, not the list's insertion order or the tick's
+  traversal order.
+- **Blocks:** whether the mouth pose wins over the body idle; which of two enabled slots
+  shows.
+- **Next to try:** `FUN_0041fe90`'s traversal and the list's `+4` method; a capture of a
+  talking character.
+- **Status:** open
+
+### Q-0073 — Which U01 code plays `d1_04`, `d1_05`, `telgrisi2`, `s1_11`, `S1_10`?
+- **Context:** E-0127: `d1_04`/`d1_05` are in U01's string area (`0x0043f238`,
+  `0x0043f230`); `s1_11` and `S1_10` are played at `0x0040188f` / `0x004017f3`;
+  `telgrisi2.wav` has no reference found. Their triggers were not followed.
+- **Blocks:** U01's sound completeness, not the sound system.
+- **Next to try:** xrefs to those strings; the handlers owning `0x004017f3`, `0x0040188f`.
+- **Status:** open
