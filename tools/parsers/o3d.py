@@ -149,9 +149,9 @@ def read_object(r: Reader) -> dict:
     obj["bounds"] = r.floats(10)
     obj["lights"] = r.u32s(r.u32())
     obj["unknown"] = r.u32()
-    obj["position"] = r.floats(3)
-    obj["scale"] = r.floats(3)
-    obj["rotation"] = r.floats(3)
+    obj["pivot"] = r.floats(3)  # E-0042
+    obj["local_position"] = r.floats(3)
+    obj["local_scale"] = r.floats(3)
     obj["matrix"] = r.floats(16)
     return obj
 

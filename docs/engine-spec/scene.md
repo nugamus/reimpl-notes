@@ -34,9 +34,17 @@ For scene file `Uxx.X3D`:
 - A face is a polygon of `num_vertices` indices into its object's vertex array (or its
   parent's, when the object has none of its own). Draw it as a triangle fan.
 - Per-face-vertex UVs when `has_uv`; the face's material index selects the file's material.
-- Vertex positions are used as stored: world space, Z up. The object's position, scale,
-  rotation and matrix fields are not applied. This is taken from the render comparison
-  below; the X3D transform pipeline itself has not been decompiled.
+- Vertices are object-local (E-0042). World position of a vertex v (a row vector) is
+  v · W, with the object's world matrix
+  - root: W = Tr(−pivot) · diag(local_scale) · M · Tr(local_position)
+  - child: W = Tr(−pivot) · diag(local_scale) · M · Tr(parent.pivot) · Tr(local_position) · W(parent)
+
+  where Tr(t) is the identity with t in row 3 and M the object's stored 4×4 (row-vector
+  form, translation in elements 12..14). The parent is the named object loaded earlier in
+  the same file. World space is Z up.
+- Objects whose faces index their parent's vertices ("weld" objects, the characters) are
+  drawn with the vertex owner's W: the bind pose (Q-0020).
+- Faceless objects (splines, helpers) are not drawn; some carry garbage coordinates.
 
 ## Materials and textures (E-0038)
 

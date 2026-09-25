@@ -655,3 +655,49 @@ An entry at `tentative` confidence must also have a matching line in
   Python.
 - **Confidence:** proven for the values. The following camera moves and what
   `FUN_0041bf70`'s argument measures belong to the main-loop spec (next milestone).
+
+### E-0042 — An `.O3D` object's world matrix is Tr(−pivot)·Scale·M·Tr(parent pivot + position)·parent; its vertices are local
+- **Binary/file:** `x3d.dll`, `x3dmp5.dll`; `Data/U01/**/*.O3D`.
+- **Evidence:** `FUN_10011ea0` (`x3d.dll`) reads the three vec3s after the object's light
+  list into transform block (object `+0xfc`) `+0x14`, `+0x44`, `+0x64` and the 16 floats
+  into `+0xb4`, copied to `+0x74` (`X3d_Matrice_Copy`). The getters name them:
+  `X3d_Object_Get_Init_Pivot_Position` reads `+0x14`, `X3d_Object_Get_Local_Init_Position`
+  `+0x44`, `X3d_Object_Get_Local_Init_Scale` `+0x64`, `X3d_Object_Get_Local_Init_Matrice`
+  `+0xb4`. So the `.ksy` names `position`/`scale`/`rotation` were off by one slot: they are
+  pivot, local position, local scale (supersedes those three names in `o3d.ksy`). The
+  parent name is resolved to an object loaded earlier in the same file and stored at
+  object `+0x20`. `FUN_1001dd30` (called via `X3d_Object_Get_Global_Matrice` /
+  `_Position`, parents first through `FUN_1001dd00`) builds the global matrix `+0xf4` as
+  `Tr(−pivot) · diag(scale) · M · Tr(position + user)` for a root and
+  `Tr(−pivot) · diag(scale) · M · Tr(parent pivot) · Tr(position + user) · parent global`
+  for a child, where `user` is `+0x24` (zero at load). `X3d_Matrice_Mult(dst, a, b)`
+  (`x3dmp5.dll` `0x10001087`) computes dst = a·b; `X3d_Vecteur_Array_Matrice_Mult`
+  computes v·M with the translation in row 3 (elements 12..14), so vertices are row
+  vectors. Corpus: `U01/static/PTITRAIN.O3D` object `A154` has vertices spanning
+  ±124.8 / ±93.4 / ±38.4 around 0 and local position (1124.8, 930.1, −1309.9): vertices
+  are object-local, which supersedes "used as stored" in `docs/engine-spec/scene.md`.
+- **Method:** MCP decompile of `FUN_10011ea0`, the getters, `FUN_1001dd00`,
+  `FUN_1001dd30`, and the two `x3dmp5.dll` functions.
+- **Confidence:** proven for the load-time pose. Animation (`.A3D`) overrides and the
+  "weld" objects whose faces index a parent's vertices (Q-0020) are not covered.
+
+### E-0043 — Only Enter (and Escape for videos) skips, through `GetAsyncKeyState`; U00's talk is unskippable
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `PlayVideo` stops on `GetAsyncKeyState` of Enter or Escape
+  (`0x0041713f`, `0x0041714d`) or `AviGetStatus() == 4` (`0x0041716a`); Space and clicks do
+  not skip. Unit scripts run sequences as blocking loops around `FUN_0041bf70(scene, ms)`;
+  a typical wait loops while the voice channel plays (`FUN_00414ed0(scene[0x5e])`) or the
+  camera moves (`DAT_00442640 + 0x168`) and exits early when `FUN_004163b0(0x0D)`
+  (`GetAsyncKeyState(vk) & 0x8000`) is down: `U01_Start` `0x0040158d`, `0x0040169c`;
+  `FUN_00402380` `0x00402434`; `U04::U04_1066` `0x0040da31` (`U04.cpp:1066`). Enter ends only
+  the current wait; fixed `Wait(ms)` calls and animation-frame waits are not skippable.
+  U00's talk helper `FUN_0040a5c0` loops only while the voice plays (no key check).
+  Escape in play goes through the main loop's key table (`0x0046e7e0 + vk*4`, set by
+  WM_KEYDOWN in the window procedure `0x00416650`) to `FUN_00416400`, gated by
+  `app+0x484` ("Escape allowed", cleared by `U01_Start` at `0x004014c2`, set again at
+  `0x00401752`). Space (`0x00431800`, gated by `app+0x488`) toggles a 2D bar parked at
+  y = 480.
+- **Method:** capstone read of the window procedure; MCP decompile of the functions named
+  (background agent, 2026-09-25).
+- **Confidence:** proven for the checks and addresses; that Space's bar is the inventory
+  is the user's observation.

@@ -291,3 +291,14 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Next to try:** the render callback installed by `X3d_Scene_Init_Render`; compare a
   dark unit (U06, ambient 90) against the original.
 - **Status:** open
+
+### Q-0020 — How are "weld" objects (faces indexing a parent's vertices) posed?
+- **Context:** 5,193 `.O3D` objects have `vertex_flag` set, no vertices of their own and
+  faces that index their parent's vertices; in U01 they are the characters (`U01_01`,
+  `U01_02`, `U01ernest/U01_E`). `X3d_Object_Get_Number_Weld` exists.
+- **What we checked:** the loader (E-0042) only; not the render path or `.A3D` playback.
+- **Blocks:** correct character shapes. The static view draws those faces with the
+  vertex owner's matrix (bind pose).
+- **Next to try:** `X3d_Object_Get_Number_Weld` and the per-object transform in the render
+  callback; render comparison of a character.
+- **Status:** open

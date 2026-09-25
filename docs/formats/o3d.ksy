@@ -199,17 +199,22 @@ types:
         doc: Scene light indices; each is passed to `X3d_Light_Include_Object`.
       - id: unknown
         type: u4
-      - id: position
+      - id: pivot
         type: vec3
-      - id: scale
+        doc: Transform block `+0x14` (`X3d_Object_Get_Init_Pivot_Position`, E-0042).
+      - id: local_position
         type: vec3
-      - id: rotation
+        doc: '`+0x44` (`X3d_Object_Get_Local_Init_Position`), relative to the parent''s pivot.'
+      - id: local_scale
         type: vec3
+        doc: '`+0x64` (`X3d_Object_Get_Local_Init_Scale`).'
       - id: matrix
         type: f4
         repeat: expr
         repeat-expr: 16
-        doc: 4x4, copied to the object's live transform by `X3d_Matrice_Copy`.
+        doc: |
+          4x4 row-vector matrix (translation in elements 12..14), copied to the object's
+          live transform by `X3d_Matrice_Copy`. World matrix: E-0042.
     instances:
       vertex_count:
         value: "vertex_flag != 0 ? vertex_count_b : vertex_count_a"

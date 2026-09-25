@@ -58,3 +58,12 @@ rate (`AviPlayMovie`), not to the game loop.
   `OptionUser` frame need the `.FRA` format (Q-0016) and are not implemented.
 - The engine pumps events during the intro waits so the ScummVM quit and menu keys work.
   The original cannot be interrupted there.
+
+## Skipping (E-0043)
+
+- Videos: Enter or Escape, read as the key's current state (held), not as a key event.
+- Scripted sequences: only the waits whose unit code checks it end early on Enter held;
+  the script then continues with its next step. Fixed-length waits and waits for an
+  animation frame run to the end. U00's talk has no check.
+- Escape (menu) and Space (inventory bar) are read by the main loop only, so neither works
+  during a blocking sequence; U01's entry clears the "Escape allowed" flag around it.
