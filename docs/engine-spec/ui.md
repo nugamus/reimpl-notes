@@ -4,7 +4,7 @@ Everything 2D that is not the cursor (`interaction.md`) or a video (`boot.md`): 
 system, the Space inventory bar, the players screen, the Option menu and the path from the
 players screen to U01. All 2D coordinates are absolute pixels of the 640×480 frame; nothing
 here scales, so a widescreen engine must place the whole 640×480 2D layer (for example
-centred) rather than stretch rects. Evidence E-0100..E-0107.
+centred) rather than stretch rects. Evidence E-0100..E-0107, E-0450..E-0457.
 
 ## Frames (E-0100, E-0101)
 
@@ -16,11 +16,11 @@ with their parent). The game finds views by id. A view is a rect plus:
 |---|---|
 | `EIV#` | plain view: draws nothing, carries properties (most buttons are this: a hit rect over the background) |
 | `TIB#` | bitmap view: draws `Data/2DBIT/<bitmap>` (`.bmp` appended when the name has no `.`) at view position + (`bmp_dx`, `bmp_dy`); name `0` = no bitmap; `w`/`h` 0 take the bitmap's size |
-| `POL#` | bitmap view of the magnifier (not U01) |
+| `POL#` | bitmap view of the magnifier: pans its bitmap near the edges (Gallery, below) |
 | `cSU#` `AOL#` `VAS#` `RCS#` | list with scroll bar: players (`cSU#`), saves to load / to overwrite (Q-0061) |
 | `dEU#` `dES#` `idE#` | one-line text edit: player name (max 30 chars), save name (max 40) |
 | `vop#` `bop#` | inventory strip and its arrows (below) |
-| `loV#` `AoV#` `BoV#` | settings sliders (not specified) |
+| `loV#` `AoV#` `BoV#` | volume slider base; music slider (group 1); voice slider (groups 2 + 3) (Settings, below) |
 | `nCC#` `nIC#` | video frames: unknown to the game (E-0100), never loaded |
 
 A view is drawn and hit-tested only while `visible` ≠ 0 (all corpus views start visible).
@@ -175,18 +175,167 @@ is a view over its label with a hover bitmap, cursor kind 2, and a command:
 | 2 | 322, 20, 164, 30 | New game | `SomA3` | `OptionNouvelleP` | close the menu; new game (below) |
 | 3 | 324, 92, 198, 31 | Load a game | `SomB3` | `OptionLoad` | open `OptionLoad`; greyed with `SomB2` when a save-list flag is 0 (runtime: no saves) |
 | 9 | 323, 156, 144, 35 | Practice | `SomH3` | `OptionEntrenement` | close the menu; load `U00.X3D` with the players screen skipped (the tutorial) |
-| 6 | 323, 225, 85, 28 | Gallery | `SomE3` | `OptionGalerie` | the painting gallery; greyed with `SomE2` when empty |
-| 5 | 321, 292, 98, 32 | Settings | `SomD3` | `OptionReglage` | open `OptionReglages` |
-| 7 | 324, 362, 84, 31 | Credits | `SomF3` | `OptionCredits` | open `Credits` (`Credit01..05`); a click or 6 s → next page, a key → leave |
+| 6 | 323, 225, 85, 28 | Gallery | `SomE3` | `OptionGalerie` | open the gallery (below); greyed with `SomE2` when no painting is unlocked |
+| 5 | 321, 292, 98, 32 | Settings | `SomD3` | `OptionReglage` | open `OptionReglages` (below) |
+| 7 | 324, 362, 84, 31 | Credits | `SomF3` | `OptionCredits` | open `Credits` (below) |
 | 8 | 322, 433, 84, 27 | Quit | `SomG3` | `OptionQuitter` | open `OptionQuitter` (OK quits, No returns) |
 
 The greyed look is the id's bitmap replaced by `SomB2` / `SomE2` (ids 3 and 6 are `TIB#`
-with no bitmap otherwise). Whether a greyed item still reacts: Q-0063.
+with no bitmap otherwise). A greyed item still reacts: Load opens `OptionLoad` and Gallery
+opens the gallery with every thumbnail removed (E-0456).
+
+Settings and Credits leave the same way ("back to the menu", option screen `+0x4c`,
+E-0450): clear the credits flag, close the submenu's frame and reopen `Option`, which
+recomputes the greying and the gallery's unlock list.
 
 **New game** (`OptionNouvelleP`): close the menu, then read `App.bin` `#GAME#` (the start
 scene, `U01.X3D`, E-0037; `U01.X3D` if the chunk is missing), mark a game as started,
 name the game `NoName`, app mode 1, and empty the inventory strip. The main loop then loads
 U01 normally (`a = 1`), which plays the prologue (`boot.md` step 4).
+
+## Settings: frame `OptionReglages` (E-0450)
+
+Background `ReglageFond`; two sliders, OK and Cancel. There is nothing else: no texture
+filter (`FILTER` in `InfoPara.bin`, `save.md`, has no control in any frame), no other
+option.
+
+| id | Class | Rect | Role |
+|---:|---|---|---|
+| 2 | `EIV#` | 473, 445, 30, 19 | OK: hover `ReglageOK`, command `ReglageOK` |
+| 3 | `EIV#` | 193, 444, 66, 20 | Cancel: hover `ReglageAnnuler`, command `ReglageAnnuler` |
+| 4 | `AoV#` | 182, 179, 311, 29 | music slider, sound group 1 |
+| 5 | `BoV#` | 182, 289, 311, 29 | voice slider, sound groups 2 and 3 |
+
+**Slider.** Margin m = 30 (the view's `unk_a`), knob bitmap `ReglageCabine` (8×29).
+Position p is an integer 0..max, max = view width − 2m = 251. On open, p = ⌊max · 0.01 ·
+G⌋ with G the group's current volume (group 1 for the music slider, group 2 for the voice
+slider, `sound.md`). Draw the knob at x = view x + m + p − 4, y = view y. Press (event 4)
+inside the left margin (view x .. x + m): p −= 5 (not below 0); inside the right margin
+(right − m .. right): p += 5 (not above max); on the knob: start dragging. While dragging,
+each move sets p = mouse x − m − view x, clamped to 0..max; release stops. A press on the
+track outside the knob and margins does nothing.
+
+**OK** (`ReglageOK`): G₁ := ⌊p₄ · 100 / max⌋ from the music slider, G₂ := G₃ := the same
+from the voice slider, applied at once to playing sounds (`sound.md`); then back to the
+menu. **Cancel** (`ReglageAnnuler`): back to the menu, volumes unchanged.
+
+**Persistence.** None: no file stores a volume. G₂ and G₃ keep the value until the game
+exits (nothing else changes them). G₁ does not survive: every app-mode change sets it (0
+in mode 2, 85 otherwise, `sound.md`), so in the menu the music slider opens at 0 and the
+next change out of mode 2 replaces OK's value with 85 (Q-0190). An engine that wants a
+working music volume should keep it as a user setting and scale the mode rule by it
+(beyond parity).
+
+## Credits: frame `Credits` (E-0451)
+
+One full-screen bitmap view (id 1) with command `MoveCredit`; pages are `Credit01.bmp`
+.. `Credit05.bmp` (640×480).
+
+- Open (`OptionCredits`): close the menu, open `Credits` showing `Credit01`, start the
+  page clock (credits flag on, time = now).
+- Next page: on a click anywhere (event 4) or when 6000 ms have passed since the last
+  page change. The page number is parsed from the current bitmap name (the two characters
+  before `.bmp`); the frame's initial name `Credit01` has no extension, so the first step
+  shows `Credit01` again: page 1 stays up for two steps (12 s untouched), then 2, 3, 4, 5.
+  A step from page 5 leaves.
+- Any key (event 15 reaches the command) leaves at once.
+- Leave: back to the menu (`Option`).
+
+Keep the 6 s clock in real time (it is `GetTickCount`, not the frame timer).
+
+## Gallery (E-0452..E-0455)
+
+Twenty of Monet's paintings, unlocked by the player's progress, each viewable full
+screen, at real size, through a magnifier, and as a 3D scene.
+
+**Unlock state** is per player and is not a gallery file: it is the u16 unit number in
+the player's `User_<i>/Info.bin` `USERINFO` (`save.md`), written with the current unit on
+every save (so the last save wins, not the furthest). Each time the Option menu opens, the
+unlocked list is rebuilt from it:
+
+| Saved unit | Unlocked (list order; each row adds to the previous) | Count |
+|---|---|---:|
+| 0, 8..32, 34+ | none | 0 |
+| 1 | `U11_01` | 1 |
+| 2 | `U11_02`, `U11_03` | 3 |
+| 3 | `U12_03` | 4 |
+| 33 | `U12_04` | 5 |
+| 4 | `U13_14`, `U13_05`, `U13_13`, `U13_03`, `U13_01`, `U13_12`, `U13_11`, `U13_06`, `U13_04` | 14 |
+| 5, 6, 7 | `U14_01`, `U13_15`, `U14_02`, `U14_05`, `U14_03`, `U14_07` | 20 |
+
+(Whether unit 33 can be saved as 33: Q-0193.) The menu greys Gallery when the list is
+empty.
+
+**`Galerie`** (opened by `OptionGalerie`; the Option frame is hidden, not closed):
+background `GalerieFond`, a bar `GalerieBarre` at (73, 441) with the back button (id 3,
+(81, 442, 33, 25), hover `RetourTAB`, `GoBack`), and 20 thumbnails, each a `TIB#` showing
+`<p>IndexB`, hover `<p>IndexC`, cursor kind 2, command `GoToTableau`:
+
+| id | Painting | Rect | id | Painting | Rect |
+|---:|---|---|---:|---|---|
+| 5 | `U11_01` | 54, 83, 79, 63 | 13 | `U13_11` | 554, 165, 54, 83 |
+| 22 | `U11_02` | 151, 83, 82, 63 | 14 | `U13_12` | 453, 169, 77, 79 |
+| 6 | `U11_03` | 247, 83, 89, 61 | 15 | `U13_13` | 160, 166, 73, 87 |
+| 7 | `U12_03` | 368, 76, 55, 77 | 30 | `U13_14` | 540, 80, 81, 67 |
+| 40 | `U12_04` | 459, 75, 50, 77 | 16 | `U14_01` | 450, 270, 80, 63 |
+| 8 | `U13_01` | 349, 176, 87, 67 | 17 | `U13_15` | 543, 269, 80, 63 |
+| 9 | `U13_03` | 255, 168, 79, 77 | 18 | `U14_02` | 267, 353, 59, 79 |
+| 10 | `U13_04` | 351, 269, 82, 63 | 19 | `U14_03` | 461, 352, 55, 79 |
+| 11 | `U13_05` | 65, 169, 67, 81 | 20 | `U14_05` | 352, 361, 80, 62 |
+| 12 | `U13_06` | 262, 260, 64, 82 | 21 | `U14_07` | 544, 362, 79, 58 |
+
+A locked painting's thumbnail gets no bitmap and a zero size: not drawn, not clickable.
+Each thumbnail also carries a disabled `GIH@` (`<p>IndexA`, 194×111, at +49, +292); no code
+that enables it has been found, so draw nothing for it (Q-0191). Every screen change below shows the wait cursor (kind 1) while
+the frame loads, and each opens replacing the current frame.
+
+**`Tableau`** (the painting; `GoToTableau` takes the painting as the first 6 characters of
+the clicked thumbnail's bitmap name): view 1 full screen `<p>TAB`; bottom bar
+`BarreBasTAB` (76, 442); buttons (each hover bitmap, cursor 2): back (81, 442, 33, 25)
+`RetourTAB` `GoBack`, previous (132, 442) `PrevTAB` `GoPrev`, next (175, 442) `NextTAB`
+`GoNext`, real size (499, 442) `TailleTAB` `GoTaille`, magnifier (537, 442) `LoupeTab`
+`GoLoupe`; view 30 (228, 99, 406, 308), cursor 2, `GotoScene3D`, hidden for `U14_02`
+and `U14_05`.
+
+**`Taille`** (real size): view 1 `<p>_Size`; bars `BarreTAILLEB` (76, 442) and
+`BarreTAILLEA` (501, 442); back, previous, next and magnifier as in `Tableau`, and
+(500, 442, 27, 26) `GOTableauSize` `GoEcranTableau` → `Tableau` of the same painting.
+
+**Navigation.** Previous / next step through the *unlocked list* (table order above, not
+the thumbnail layout), wrapping at both ends, and reopen the same kind of screen
+(`Tableau` or `Taille`) for the new painting. Back from `Tableau` or `Taille` → `Galerie`;
+back from `Galerie` → the Option menu shown again and the gallery discarded. Escape
+follows the generic rule (`OptionUser` quits, any other submenu reopens `Option`, E-0105).
+
+**`Loupe`** (magnifier): one full-screen `POL#` view showing `<p>Loupe`, a multi-part
+image listed in `Data/2dbit/Media.txt` (`name;id;cols,rows;file;;;`): parts
+`<p>Loupe1.BMP` .. `<p>Loupe<cols·rows>.BMP`, row-major, every part 640×480 except the
+last column and row; total ((cols − 1)·640 + last width) × ((rows − 1)·480 + last height)
+(e.g. `U11_01` 2×2, 1200×928). The image starts at offset (0, 0) (top-left). While the
+pointer moves inside the view, at most every 80 ms: within 30 px (edge zone) of the left
+edge, pan by dx = ⌊(30 − d)/30 · 5 · 10⌋ (d = distance to the edge, so up to 50 px) to show
+more of the left, cursor kind 10 (`LOUPEG`); right edge the same towards the right, kind
+7; top edge, kind 13 (12 with left, 9 with right); bottom edge, kind 6 (11 with left, 8
+with right); elsewhere kind 0. The offset is clamped so the image always covers the view.
+A click anywhere (`FinLoupe`) returns to `Tableau`. The pan is event-driven in the
+original (no movement, no pan); an engine may pan per logic tick while the pointer rests in
+a zone, at the same 80 ms rate.
+
+**3D view** (`GotoScene3D` on `Tableau`): discard the gallery, load the painting's scene as
+unit class 50: `U01D.X3D` (`U11_01`), `U02D.X3D` (`U11_02`, `U11_03`), `U03D.X3D`
+(`U12_03`), `U33D.X3D` (`U12_04`), `U04D.X3D` (the nine `U13_0x/1x` except `U13_15`),
+`U05D.X3D` (`U13_15`, `U14_01`), `U06D.X3D` (`U14_02/03/05/07`); app mode 0. What the
+scene does: Q-0192. Escape there: stop group 1, open the Option menu, open `Galerie` then
+`Tableau` of the same painting, app mode 2.
+
+## Other frames (E-0457)
+
+| Frame | Opened by | Behaviour |
+|---|---|---|
+| `TableauJeu` | unit code: U04 (`U13_01`, `U13_99`, `U13_04`, `U13_06`, `U16_02`, `U16_01`, `U14_01`, `U13_11`, `U13_14`), U05 `DoTableauA` / `DoTableauB` (`U14_02` / `U14_05`) | full-screen `<name>.bmp`, cursor 2; app mode 2 without the sound change and Escape blocked; a click (`FinTableauJeu`) closes it, app mode 0, Escape allowed, stop sound group 2 |
+| `OptionQuitter`, `Save`, `OptionSave`, `OptionLoad`, `OptionUser`, `Option`, `PorteF` | see above and `save.md` | |
+| `Intro`, `InsertCD`, `Temp`, `PorteFD` | nothing (names absent from both EXEs) | skip; the missing-CD prompt is a message box (`Message.txt` 952) |
+| `Prologue`, `Epilogue`, `GivParis`, `LeHavRou`, `RouGiv`, `V33_01`, `V33_02` | never loaded as frames (E-0100) | the AVIs play through the video path (`boot.md`) |
 
 ## Boot to U01 (answers Q-0018)
 

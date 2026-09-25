@@ -31,7 +31,8 @@ player folder (uninstaller bookkeeping; skip).
 the last `_`, and the name comes from its `USERINFO`. Up to 99 players. `CURRENT` from
 `Info.bin` names the player whose save list is loaded before the players screen. A new
 player gets index = the current number of players (not the first free index), a folder,
-and `USERINFO` with unit 0. The unit number is read only by `0x00425c10` (Q-0102).
+and `USERINFO` with unit 0. The unit number is read only by the gallery, which unlocks paintings
+from it (`ui.md`, E-0452).
 
 **Saves of a player.** Slots 0..99 exist in the file name (a slot above 99 is saved as 0);
 the lists handle 0..98. The save list is rebuilt by scanning `Gamesave.*` in the player's

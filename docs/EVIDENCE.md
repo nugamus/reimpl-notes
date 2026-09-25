@@ -3841,3 +3841,172 @@ An entry at `tentative` confidence must also have a matching line in
   `scene.md`, camera E-0041, 640×480, FOV 90); numpy over the captures.
 - **Confidence:** proven for the objects and the formula; the blend fit is a measurement
   on edges (noisy).
+
+### E-0450 — Settings (`OptionReglages`): two volume sliders, OK writes group 1 and groups 2 + 3, nothing is saved
+- **Binary/file:** `MissionMonet.exe`; `Data/2DFRA/OptionReglages.fra`; `Data/2dbit/ReglageCabine.BMP`.
+- **Evidence:** `fra.py`: background `ReglageFond`, OK id 2 (473, 445, 30, 19) `ReglageOK`,
+  Cancel id 3 (193, 444, 66, 20) `ReglageAnnuler`, `AoV#` id 4 (182, 179, 311, 29) and
+  `BoV#` id 5 (182, 289, 311, 29), both `unk_a` 30, knob `ReglageCabine` (8×29).
+  `RegisterFrameCommands` (capstone of its pushes): `OptionReglage` → `0x0042b410` (option
+  screen `+0x48`, `OptionScreen_OpenReglages` `0x004272f0`: close the menu frame, open
+  `OptionReglages`), `ReglageAnnuler` and `QuitCredit` → `0x0042b430` (`+0x4c`,
+  `OptionScreen_LeaveSubmenu` `0x00427340`), `ReglageOK` → `0x0042b450` (`+0x50`,
+  `OptionScreen_ReglageOK` `0x00427380`). Slider class `#Vol` (`0x00434d30`, vtable
+  `0x0043b698`): margin `+0x54` = `unk_a`, knob name `+0x78`; `#VoA`/`#VoB` (vtables
+  `0x0043b7b4`/`0x0043b8d4`) differ only in `+0x24` (`MusicSlider_Init` `0x004352b0`,
+  `VoiceSlider_Init` `0x004353f0`): min 0, max = view width − 2·margin, position =
+  ftol(max · 0.01 · `LSoundManager::GetGroupVolume`(1 resp. 2)) (`0x00423580`,
+  `LSoundManager.cpp:397`; `0x0043b8d0` = 0.01f). Draw `0x00434ea0`: knob at
+  x + margin + position − knob width/2, view top. Press `0x00434f40` tries the left
+  margin rect (`0x00434fa0`: position − 5, not below 0), the right margin rect
+  (`0x00435040`: + 5, not above max), then the knob rect (`0x004350e0`: dragging `+0x58`
+  = 1); move `0x00435160` while dragging: position = mouse x − margin − view x, clamped;
+  `0x004351f0` clears dragging. `ReglageOK`: view 4 → `LSoundManager::SetGroupVolume`
+  (`0x00423620`, `LSoundManager.cpp:413`) group 1 = ftol(position · (100.0 / max)); view
+  5 → the same value to groups 2 and 3; then `+0x4c`. `+0x4c`: credits flag `+0xc` = 0;
+  with the menu frame `+0x14` open, close it and call `+0x54` (`OptionScreen_OpenOptionMenu`
+  `0x00426f90`); otherwise close the top frame and `SetAppMode(0)`. `SetAppMode`
+  (`0x00417ce0`) sets group 1 to 0 on mode 2 and to 85 on any other mode, so the Option
+  menu (mode 2) shows the music slider at 0 and a return to the game overwrites what OK
+  wrote. No settings file holds a volume: `InfoPara.bin` has only `FILTER` (E-0181), and
+  no frame in the corpus sets `FILTER`.
+- **Method:** `fra.py`; capstone; MCP decompile; BMP header read.
+- **Confidence:** proven statically; the audible result of the music slider is Q-0190.
+
+### E-0451 — Credits: five pages, click or 6 s → next, any key → back to the Option menu; page 1 is shown twice
+- **Binary/file:** `MissionMonet.exe`; `Data/2DFRA/Credits.fra`; `Data/2dbit/Credit01..05.bmp`.
+- **Evidence:** `Credits.fra`: one full-screen `TIB#` `Credit01` with `RCS@` `MoveCredit`.
+  `OptionScreen_OpenCredits` (`0x00427140`): `+0xc` = 1, `+0x10` = `GetTickCount`, close
+  the menu frame, open `Credits`. `MoveCredit` handler `0x0042b0e0`: event 15 (key) →
+  option screen `+0x4c` (leave, E-0450); event 4 (press) → `+0x28(view)` =
+  `OptionScreen_MoveCredit` (`0x00426cf0`): n = `atoi` of the two characters at
+  len − 6 and len − 5 of the view's bitmap name; n + 1 > 5 → `+0xc` = 0 and `+0x4c`;
+  else name = `Credit` + (`0` if one digit) + (n + 1) + `.bmp`, set it, `+0x10` =
+  `GetTickCount`. The frame stores the name as read (`Credit01`, no extension: the `#BIT`
+  constructor `0x00423ea0` copies it to `+0x74` unchanged), so the first step parses
+  `ed` = 0 and sets `Credit01.bmp` again; later steps read `01`…`05`. Tick
+  `OptionScreen_TickCredits` (`0x00426e60`): while `+0xc`, when `GetTickCount` >
+  `+0x10` + 6000, `+0x28` with view 1 of the open frame. `QuitCredit` is registered but no
+  corpus frame uses it. 2dbit has `Credit01..05.bmp`, each 640×480.
+- **Method:** `fra.py`; capstone; MCP decompile.
+- **Confidence:** proven statically.
+
+### E-0452 — The gallery's paintings unlock from the player's saved unit number; per player, last save wins
+- **Binary/file:** `MissionMonet.exe`; `Data/2DFRA/Galerie.fra`.
+- **Evidence:** `Gallery_Create` (`0x00425650`, `DAT_0046ec64`, vtable `0x00439c5c`):
+  name list `+0x18`, id list `+0x1c`. `OptionScreen_OpenOptionMenu` creates it if absent
+  and calls `+0x38` = `Gallery_ComputeUnlocked` (`0x00425c10`) every time the menu opens:
+  u = `FUN_00414150(player list, current player)` (the `USERINFO` u16, E-0181), clear both
+  lists, add view ids 5, 22, 6, 7, 40, 8, 9, 10, 11, 12, 13, 14, 15, 30, 16, 17, 18, 19,
+  20, 21 to `+0x1c` (the loop runs 21 times over a 20-entry array; the 21st value is the
+  stack word after it), then by u (byte table `0x0042606c`, jump table `0x00426050`) add
+  names to `+0x18` and remove as many ids from the head of `+0x1c`: u 1: `U11_01`;
+  2: + `U11_02`, `U11_03`; 3: + `U12_03`; 33: + `U12_04`; 4: + `U13_14`, `U13_05`,
+  `U13_13`, `U13_03`, `U13_01`, `U13_12`, `U13_11`, `U13_06`, `U13_04`; 5, 6, 7: +
+  `U14_01`, `U13_15`, `U14_02`, `U14_05`, `U14_03`, `U14_07` (each case adds the full list
+  up to it: 1, 3, 4, 5, 14, 20 names); 0 and every other value: none. In `Galerie.fra`
+  those ids are the views whose `IndexB` bitmap names those paintings, in the same order.
+  `Game_WriteSave` passes game `+0x160` (the current unit) to `FUN_00413d70`
+  unconditionally (`0x00412f66`), so the value is the unit of the player's last save, not
+  the furthest. The menu greys Gallery when `+0x18` is empty (E-0106).
+- **Method:** capstone; MCP decompile; `fra.py`.
+- **Confidence:** proven statically. Answers the gallery half of Q-0102.
+
+### E-0453 — Gallery screens: `Galerie`, `Tableau`, `Taille`, `Loupe`; commands and bitmap names
+- **Binary/file:** `MissionMonet.exe`; `Data/2DFRA/Galerie.fra`, `Tableau.fra`, `Taille.fra`, `Loupe.fra`; `Data/2dbit/`.
+- **Evidence:** handlers (capstone of `0x0042b240`..`0x0042b4cf`) call the gallery's
+  vtable: `GoToTableau` `+0xc(view)` (`Gallery_GoToTableau` `0x004258e0`: painting = first
+  6 characters of the view's bitmap name, `+0x20("Tableau", painting, 1)`), `GoBack`
+  `+0x28` (`Gallery_GoBack` `0x00425a20`), `GoLoupe` `+0x10` (`0x00425b00`: `Loupe`),
+  `GoTaille` `+0x14` (`0x00425b10`: `Taille`), `FinLoupe` `+0x18(view)` (`0x00425b20`:
+  painting from the view's bitmap name, `Tableau`), `GoEcranTableau` `+0x1c(view)`
+  (`0x004259b0`: root view's bitmap name, `Tableau`), `GoNext` `+0x2c` → `+0x34(1)`,
+  `GoPrev` `+0x30` → `+0x34(−1)`; `OptionGalerie` `0x0042b2a0` creates the gallery if
+  needed and calls `+4(0)`. `Gallery_Open` (`0x004257f0`): `+0x38`, hide every open frame
+  (`FUN_0042c7a0`: visible frames `+0x80(0)`), open `Galerie` (manager `+0x90`, replacing
+  the current frame), then each id still in `+0x1c`: bitmap `NULL` (`0x00441780`) and
+  `+0x18(0, 0)`. `Gallery_OpenFrame` (`0x00425930`): cursor kind 1 while loading, copy
+  the painting to `+0x10`, manager `+0x90(frame)`. Frame classes (E-0100) override only
+  `+0x68`: `TableauFrame_Init` (`0x004261b0`) sets view 1 to `<painting>TAB` and hides
+  view 30 when the painting is `U14_02` or `U14_05`; `TailleFrame_Init` (`0x004264b0`)
+  `<painting>_Size`; `LoupeFrame_Init` (`0x00426370`) `<painting>Loupe`.
+  `Gallery_StepPainting` (`0x00425b80`): index of `+0x10` in `+0x18` + step, past the end
+  → 0, below 0 → last; reopen the current frame's kind (its name) with that painting.
+  `Gallery_GoBack`: on `Tableau` or `Taille` → open `Galerie`; otherwise (on `Galerie`)
+  show the Option menu frame again (option screen `+0x58`, `+0x80(1)`), close the current
+  frame and delete the gallery. Corpus: each of the 20 paintings has `<p>IndexA/B/C`,
+  `<p>TAB`, `<p>_Size` (640×480) and `<p>LOUPE1..n` in 2dbit.
+- **Method:** capstone; MCP decompile; `fra.py`; directory listing.
+- **Confidence:** proven statically.
+
+### E-0454 — The magnifier: `POL#` pans a tiled bitmap from `Media.txt` while the pointer is near an edge
+- **Binary/file:** `MissionMonet.exe`; `Data/2dbit/Media.txt`, `Data/2dbit/*LOUPE*.BMP`.
+- **Evidence:** `#LOP` (`0x0042f310`, vtable `0x0043aca4`) reads `#BIT` + 8 bytes: speed
+  `+0x94` (`unk_a` 10), edge zone `+0x98` (`unk_b` 30). The view base (`0x00434a50`)
+  forwards event 3 (move inside) to `+0x7c(point)` when no property takes it;
+  `LoupeView_PanAtEdge` (`0x0042f3c0`) acts at most every 80 ms (`GetTickCount` vs
+  `+0x9c` + 0x50): for pointer x within the zone of the left edge, dx = ftol((zone −
+  (x − left)) / zone · 5.0 · speed) (`0x00439900` = 5.0), cursor kind 10; right edge the
+  same negated, kind 7; top edge dy, kind 13 (12 with left, 9 with right); bottom −dy,
+  kind 6 (11 with left, 8 with right); elsewhere kind 0. `LoupeView_Scroll`
+  (`0x0042f5a0`) adds (dx, dy) to the bitmap offset (`+0x24`, `+0x28`) clamped to
+  [view size − bitmap size, 0]. Cursor kinds 6..13 are `LOUPEB`..`LOUPEH` (E-0074). The
+  bitmap `<p>Loupe` is not a file: the media manager (`DAT_0046edc8`, reads `Media.txt`,
+  `0x0042fd87`) builds a multi-part image (`FUN_00430b90`,
+  `LMultipleMediaObject::LMultipleMediaObject_118` `0x00430d90`) of cols × rows files named
+  by inserting the part number 1..cols·rows before the 4-character extension
+  (`FUN_00430ff0`), size ((cols − 1)·640 + last width, (rows − 1)·480 + last height).
+  `Media.txt`: 20 lines `name;id;cols,rows;file;;;`, all `<p>Loupe`, 2×2 or 2×3. Script
+  over the corpus: 20/20 part sets exist and are row-major (every part not in the last
+  column is 640 wide, not in the last row 480 high); images 796..1280 × 758..1315.
+  `Loupe.fra`'s only view has `RCS@ FinLoupe` (a click anywhere returns to `Tableau`).
+- **Method:** capstone; MCP decompile; Python over `Media.txt` and BMP headers.
+- **Confidence:** proven statically.
+
+### E-0455 — `GotoScene3D` loads the painting's `U##D.X3D` as unit class 50; Escape there returns to the painting
+- **Binary/file:** `MissionMonet.exe`; `Data/2DFRA/Tableau.fra`.
+- **Evidence:** handler `0x0042b650` (event 4): root view of the frame, cursor kind 1,
+  manager `+0x70(1)` (draw), delete the gallery, `Game_OpenGalleryView` (`0x004131e0`)
+  with the root bitmap name (`<p>TAB`): the first 6 characters select `U01D.X3D`
+  (`U11_01`), `U02D.X3D` (`U11_02`, `U11_03`), `U03D.X3D` (`U12_03`), `U33D.X3D`
+  (`U12_04`), `U04D.X3D` (`U13_01/03/04/05/06/11/12/13/14`), `U05D.X3D` (`U13_15`,
+  `U14_01`), `U06D.X3D` (`U14_02/03/05/07`); game `+0x174` = the 6 characters; the
+  previous unit scene is deleted, `CreateUnitScene(0x32)`, load, `SetAppMode(0)`, scene
+  `+0x10(name)`, `+0x14(0)`; game `+0x14c` = scene name, `+0x168` = 1, app `+0x488` = 1,
+  game `+0x170` = 1. `App_OnEscape` (`0x00416400`) with game `+0x170` ≠ 0: stop group 1,
+  manager `+0xc0(0)` (the option screen and `Option`), a new gallery, `+4(1)` (`Galerie`,
+  then `Tableau` for game `+0x174`; `DAT_0046ec68` = 1, which skips the manager's next
+  input and draw pass, `0x0042bc00`/`0x0042bc50`), game `+0x170` = 0, `SetAppMode(2)`.
+  `Tableau.fra` view 30 (228, 99, 406, 308) carries `GotoScene3D`; it is hidden for
+  `U14_02` and `U14_05` (E-0453).
+- **Method:** capstone; MCP decompile.
+- **Confidence:** proven statically; what unit class 50 does in the scene is Q-0192.
+
+### E-0456 — Greyed Load and Gallery items still open their screens
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `OptionLoad` → option `+0x2c` (`0x004271b0`): close the menu frame, open
+  `OptionLoad`, no test. `OptionGalerie` (`0x0042b2a0`) creates or reuses the gallery and
+  calls `+4(0)` without testing the list. Greying (E-0106) only swaps the view's bitmap.
+  With no unlocked painting the gallery opens with all 20 thumbnails removed.
+- **Method:** capstone.
+- **Confidence:** proven statically. Answers Q-0063.
+
+### E-0457 — Other frames: in-game full-screen paintings (`TableauJeu`), and frames nothing opens
+- **Binary/file:** `MissionMonet.exe`; `Data/2DFRA/*.fra`; `INSTALL/02_PR/MissionD.exe`.
+- **Evidence:** `FrameManager_OpenTableauJeu` (manager `+0xc8`, `0x00426780`): open
+  `TableauJeu` (replacing the current frame), view 1 bitmap = the argument, app mode
+  field `+0x47c` = 2 written directly (no `SetAppMode`, so no group volume change),
+  Escape allowed `+0x484` = 0. `TableauJeu.fra`: one full-screen `TIB#` with `RCS@
+  FinTableauJeu` and cursor kind 2; `FinTableauJeu` (`0x0042b3e0`) →
+  `FrameManager_CloseTableauJeu` (`0x004267e0`: close, `SetAppMode(0)`, Escape allowed)
+  then `LSoundManager_StopGroup(2)` (`0x00423360`). Callers: U04's code (`0x0040c2e2`..
+  `0x0040c382`, a 9-way switch) with `U13_01`, `U13_99`, `U13_04`, `U13_06`, `U16_02`,
+  `U16_01`, `U14_01`, `U13_11`, `U13_14`; U05's `DoTableauA` / `DoTableauB`
+  (`0x0040f520` / `0x0040f540`) with `U14_02` / `U14_05`; all exist as 640×480 bitmaps.
+  `tools/ptr_scan.py`: the names `Intro`, `InsertCD`, `Temp` occur in neither EXE, so the
+  frames `Intro` (`FinIntro` → close, game `+8`), `InsertCD` (`InserCDOK` / `InserCDAnnuler`
+  set `0x0046ed8c` = 1 / 2) and `Temp` are never opened; the missing-CD path
+  (`0x00417b30`) resets `0x0046ed8c` and shows `Message.txt` 952 in a message box.
+  `PorteFD` is unused (E-0104); the `nCC#`/`nIC#` frames are never loaded (E-0100).
+- **Method:** capstone; `ptr_scan.py`; `fra.py`.
+- **Confidence:** proven statically.

@@ -540,7 +540,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** the greying code only.
 - **Blocks:** menu fidelity, not U01.
 - **Next to try:** `OptionLoad` / `OptionGalerie` handlers with an empty list; a live click.
-- **Status:** open
+- **Status:** RESOLVED (E-0456: both still open their screens)
 
 ### Q-0047 — How does the player get from the booth roof onto the handcar?
 - **Context:** u01.md says the climb (`MonterSurToit`) leaves the player "on the train
@@ -661,7 +661,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** nothing for U01; the gallery (if that is the reader) and list fidelity.
 - **Next to try:** decompile `0x00425c10`; snap `OptionUser` with two players, one with a
   gap in the `User_<i>` indices.
-- **Status:** open
+- **Status:** partly answered (E-0452: it drives the gallery's unlocked paintings); the list
+  label is open
 
 ### Q-0103 — What do U04's `PARAMS` and U07's `PLANCHE` save?
 - **Context:** E-0182: U04 unit `+0x6ec`, `+0x6e8`, `+0x6e4`; U07 unit `+0x6c8`.
@@ -845,4 +846,40 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** whether other top-level objects (the `COL*` meshes) lose collision in U33.
 - **Next to try:** decompile the object constructor in `x3d.dll` (`FUN_10011ea0`'s
   allocation) for `+0x28`.
+- **Status:** open
+
+### Q-0190 — Does the Settings music slider have any lasting effect?
+- **Context:** E-0450. The slider reads group 1, which `SetAppMode(2)` has set to 0 in the
+  Option menu, and OK's value is replaced by 85 at the next mode change out of the menu.
+- **What we checked:** the slider, OK handler and `SetAppMode` statically.
+- **Blocks:** Settings fidelity (whether the engine should keep the music value at all).
+- **Next to try:** in the original, open Settings from the menu, snap the music knob, move
+  it, OK, start a game and compare U01's ambient loudness with a default run.
+- **Status:** open
+
+### Q-0191 — Who enables the gallery thumbnails' `GIH@` captions (`<p>IndexA`, drawn at +49, +292)?
+- **Context:** E-0453. Every `Galerie.fra` thumbnail has a `GIH@` (starts disabled) with
+  `<p>IndexA` (194×111) at (49, 292) from the view, besides its `LIH@` hover `<p>IndexC`.
+- **What we checked:** the gallery's methods and the commands; none enables a highlight.
+- **Blocks:** the gallery's hover look.
+- **Next to try:** xrefs to the `@HIG` enabled field (`@HIL` `+0x24` family, E-0102); a
+  live hover over an unlocked thumbnail.
+- **Status:** open
+
+### Q-0192 — What does unit class 50 do with a painting's `U##D.X3D` scene?
+- **Context:** E-0455. `GotoScene3D` loads `U01D`..`U06D`, `U33D` with
+  `CreateUnitScene(0x32)` (`0x004123c0`, E-0075) and game `+0x174` = the painting.
+- **What we checked:** the loader and the Escape path back to the painting.
+- **Blocks:** the gallery's "3D" button.
+- **Next to try:** decompile the class-50 vtable (`0x004123c0`): start, input, camera, and
+  whether it shows the painting's viewpoint.
+- **Status:** open
+
+### Q-0193 — Which saved unit numbers can reach the gallery's case 33?
+- **Context:** E-0452 unlocks 5 paintings for unit 33, but loading `U33.X3D` sets game
+  `+0x160` = 3 (E-0087), which unlocks 4.
+- **What we checked:** `Gallery_ComputeUnlocked`, `Game_WriteSave`'s argument.
+- **Blocks:** the exact unlock count after a save in U33.
+- **Next to try:** every write of game `+0x160`; a save in U33 in the original and the
+  `USERINFO` u16 it writes (`savegame.py`).
 - **Status:** open
