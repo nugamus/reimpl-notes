@@ -376,3 +376,26 @@ An entry at `tentative` confidence must also have a matching line in
   DIB-header mismatch, truncation, palette handling, declared-size drift.
 - **Confidence:** proven for the corpus (381/381 parse). No `BITMAPV4`/`V5`,
   `BI_BITFIELDS`, `BI_RLE4`/`8`, `BI_JPEG`, `BI_PNG` exist in the corpus.
+
+### E-0025 — Every `.BIN` is one chunk container: trailing `#NAME#` table + `u32 count`; 109/109 parse
+- **Binary/file:** `MissionMonet.exe`; `Original Game Files/Data/**/*.BIN` (109 files).
+- **Evidence:** `FUN_00415420` (`0x00415420`) does `fseek(f, -4, SEEK_END)` for the count,
+  then `fseek(f, -(count*0x1c + 4), SEEK_END)` for the table
+  (`notes/decomp/MissionMonet.exe__FUN_00415420.c:21,29-30`). `FUN_00415190` finds a chunk
+  by name via `sprintf` of the tag (`notes/decomp/MissionMonet.exe__FUN_00415190.c:26`).
+  Table entry = `char name[20]`, `u32 offset`, `u32 size`. In all 109 files the chunks
+  tile `[0, table)` exactly, no gaps, no overlap. Chunk names seen: `#INDEX#` ×81,
+  `#ACTIONS#`/`#OBJECTS#`/`#SCENE#`/`#CAMERA#` ×9, `#APP#`/`#GAME#` ×1.
+- **Method:** `python tools/parsers/binchunk.py` → 109/109, `--selftest` covers truncation,
+  bad names, trailing bytes, zero count.
+- **Confidence:** proven for the container layer. Payloads per chunk name are separate
+  specs. Supersedes the "at least seven distinct layouts" reading in Q-0016 and the
+  "terminator" reading in `notes/infoobj-findings.md` (that 32-byte block is the table).
+
+### E-0026 — `#OBJECTS#` payload is `u32 count` + `count` × 68-byte entries; 9/9 INFOOBJ.BIN parse
+- **Binary/file:** `MissionMonet.exe`; `Data/U##/INFOOBJ.BIN` (9 files, 183 entries).
+- **Evidence:** `FUN_0041d6f0` (`0x0041d6f0`) seeks `OBJECTS`, reads a `u32` count, then
+  `count * 0x44` bytes in one read (`notes/decomp/MissionMonet.exe__FUN_0041d6f0.c:64-79`).
+- **Method:** `python tools/parsers/infoobj.py` → 9/9, every byte consumed.
+- **Confidence:** proven for layout; the seven numeric fields per entry are opaque until
+  `FUN_0041b440` (per-entry consumer) is decompiled.

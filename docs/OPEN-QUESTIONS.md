@@ -240,4 +240,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   `MissionD.exe` (decompiling the function(s) that own the indirect pointer
   table to `App.bin`, `SCENE.BIN`, `INFOACT.BIN`, `INFOOBJ.BIN`, etc.) before
   any of these three formats can be parsed.
-- **Status:** open
+- **Status:** `.BIN` resolved at the container layer (E-0025): the reader is
+  `FUN_00415420` / `FUN_00415190` in `MissionMonet.exe`, and all 109 files share one
+  chunk container. Per-chunk payloads (`#INDEX#`, `#ACTIONS#`, `#SCENE#`, `#CAMERA#`,
+  `#APP#`, `#GAME#`) and `.FRA` / `.CFG` remain open.
