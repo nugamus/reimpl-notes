@@ -2309,3 +2309,17 @@ An entry at `tentative` confidence must also have a matching line in
 - **Confidence:** proven for the logic; the number printed before the name (the counter
   passed to `sprintf` at `0x00429d72`) is not traced (Q-0102). Answers Q-0061 except the
   scroll bar.
+
+### E-0204 — The take step's item is six characters of the hotspot name after its first
+- **Binary/file:** `MissionMonet.exe`; `Data/U02/INFOACT.BIN`.
+- **Evidence:** the take routine `FUN_004211d0` (called by INFOACT op 2 at `0x00421270`)
+  looks the hotspot up by name (vtable `+0x14`), hides it (`+0x28`), then
+  `FUN_00416140(hotspot + 0xc, 1, 6, buf)` copies 6 characters of the hotspot's name from
+  index 1 and appends the string at `0x004414cc` before setting the cursor
+  (`FUN_00414540`). U02's M18 takes from `*U02_09a` (op 2 arg `U02_09`) and M13 then
+  expects item `U02_09`; the engine, using the whole name, looked for a cursor image
+  `U02_09a` that the EXE resources lack. Every other op 2 in the corpus has a
+  7-character hotspot name, so the truncation only shows here.
+- **Method:** Ghidra decompile and disassembly of `0x004211d0`; engine run.
+- **Confidence:** proven for the substring; the appended suffix is the cursor-image `C`
+  of `interaction.md` (not re-read here).

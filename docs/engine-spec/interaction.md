@@ -117,7 +117,7 @@ it). `max_runs` ≥ 100: unlimited.
 | op | Effect |
 |---:|---|
 | 1 | Voice `arg`: if the target is a character (type 6), it says `Sound/<arg>.wav` (lip data `Sound/<arg>.bin` if present); else play it at the hotspot's position. |
-| 2 | Take the target: its cursor kind = 0, hide it, cursor holds item `<target>C`. `arg` unused. |
+| 2 | Take the target: its cursor kind = 0, hide it, cursor holds item `<n>C`, `n` = 6 characters of the target's name after its first (`*U02_09a` → `U02_09`, E-0204). `arg` unused. |
 | 3 | Use up the held item: cursor back to normal kind 0, target's cursor kind = 0. |
 | 4 | Start (unpause) the animation node named `arg`. |
 | 6 | Wait `arg` ms (blocking, as `RunFor`). Not in the corpus. |
