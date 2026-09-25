@@ -24,6 +24,26 @@ being transparent, that is where it shows.
 
 ## Capturing traces: step-by-step
 
+**Status on the capture machine (2026-09-25):** steps 1, 3, 4 and 5 are done. `C:\MonetRun`
+has the binaries, `Data/`, dgVoodoo2 (windowed, 2x, no watermark) and the proxies. The
+baseline ran, and the proxy was verified to trace. Indeo (step 2) is **not** installed.
+Start at step 6.
+
+Launch with the helper instead of double-clicking (foreground; see Q-0017 for why it cannot run behind other windows yet):
+
+```sh
+powershell -ExecutionPolicy Bypass -File tools/proxy/run.ps1            # MissionMonet.exe
+powershell -ExecutionPolicy Bypass -File tools/proxy/run.ps1 -Exe MissionD.exe
+```
+
+Every launch shows a startup dialog (Monet portrait, **OK / Exit**). The script focuses it
+and clicks OK. Two things it works around, both seen on this machine:
+
+- the game **minimises itself and stops its loop when it loses focus**. Don't alt-tab
+  during a scenario, because the pause ends up in the trace;
+- if OK is clicked while the game is in the background, dgVoodoo's `DDraw.dll` crashes
+  (`c000041d`, Windows Application log) during Direct3D setup.
+
 This is the part only a human can do: play the game with the proxies in place. Budget
 about two hours the first time. Commands are Git Bash; `!` in front runs them from the
 Claude Code prompt.
@@ -130,14 +150,14 @@ a short, clean trace is worth more than a long mixed one.
 For scenarios 04 onward it helps to keep one save in the right spot and load it
 first. Say so in the notes, because loading is part of that trace.
 
-After each run, move the files into the repo with scenario names:
+After each run, from the repo root:
 
 ```sh
-cd /c/MonetRun
-mv monet-trace-x3d.dll-*.log "<repo>/traces/03-walk-x3d.log"
-mv monet-trace-h3d.dll-*.log "<repo>/traces/03-walk-h3d.log"
-cp Save/DbgInfo.txt "<repo>/traces/03-walk-dbginfo.log"   # the game's own log, if present
+bash tools/proxy/collect.sh 03-walk
 ```
+
+It moves the newest x3d/h3d traces to `traces/03-walk-x3d.log` / `-h3d.log`, copies the
+game's `Save/DbgInfo.txt` as `-dbginfo.log`, and warns if a trace has no end marker.
 
 Then add a row to `traces/INDEX.md` saying what you actually did, including any
 deviations. The notes matter as much as the logs.
@@ -166,14 +186,20 @@ the next agent the traces are in, and it reads `traces/INDEX.md` first.
 
 ## Traces
 
-One line per call:
+One line per run of calls:
 
 ```
 # monet proxy trace: x3d.dll, 278 exports
-1 x3d.dll!X3d_Init ret=0x004012a7
-2 x3d.dll!X3d_Scene_Create ret=0x00415b30
-# 2 calls
+1 t=658601400.285 x3d.dll!X3d_Init_Mathlib ret=0x004182cb
+5 t=658601412.901 x3d.dll!X3d_Object_Animate_Spline ret=0x0041c2a0 x33
+# 38 calls
 ```
+
+The first number is the sequence number of the first call in the run. `t=` is
+`QueryPerformanceCounter` in ms, a machine-wide clock, so the x3d and h3d files of one
+run merge by time. ` xN` means N consecutive calls to the same export from the same call
+site. Without it the game's uncapped render loop wrote about 130 MB a minute. The log is
+flushed at least once a second, so a killed game loses at most the last second.
 
 `ret` is the return address at the call site, which identifies the calling function and
 joins straight back to `notes/function-map.csv`.

@@ -250,3 +250,18 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   `FUN_00415420` / `FUN_00415190` in `MissionMonet.exe`, and all 109 files share one
   chunk container. Per-chunk payloads (`#INDEX#`, `#ACTIONS#`, `#SCENE#`, `#CAMERA#`,
   `#APP#`, `#GAME#`) and `.FRA` / `.CFG` remain open.
+
+### Q-0017 — Can the original game run unfocused, behind other windows, for unattended tracing?
+- **Context:** the user wants traces captured while they keep using the PC.
+- **What we checked:** the game's window procedure (`0x00416650`) clears its active flag
+  `0x0046ec08` on `WM_ACTIVATE` inactive / `WM_ACTIVATEAPP` false, and the main loop spins
+  until it is set again. It offers every message to `H3d_WindowProc` first (`0x004166d5`) and
+  skips its own handling if that reports it handled. The h3d proxy's `MONET_BACKGROUND=1`
+  swallows those messages, and the game then keeps running, but under dgVoodoo2 2.87.3
+  (windowed) its surfaces are lost once it is not the active window:
+  `DDERR_SURFACELOST` (`0x887601C2`) reloading `UserFond.bmp`, then hundreds of failing
+  `H3d_Lock_BackBuffer` calls and an access violation. Clicking the startup dialog's OK
+  while the game is in the background also crashes dgVoodoo's `DDraw.dll` (`c000041d`).
+- **Next to try:** run the game on its own desktop (`CreateDesktop`) or in a VM, or find the
+  dgVoodoo or h3d path that reports loss while inactive.
+- **Status:** open. Until then traces are captured in the foreground (tools/proxy/README.md).

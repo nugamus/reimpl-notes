@@ -5,11 +5,11 @@ Logs (`*.log`) are gitignored and stay on the capture machine; this index is com
 
 ## Setup (fill in once, update if it changes)
 
-- Windows version:
+- Windows version: Windows 11 Pro 10.0.26200
 - GPU, monitor refresh rate:
-- dgVoodoo2 settings changed from the guide:
-- Indeo 5 installed: yes / no
-- Compatibility mode used: none / ...
+- dgVoodoo2: 2.87.3, windowed, stretched_ar, DirectX Resolution 2x, watermark off
+- Indeo 5 installed: no (videos are IV50 and IV41)
+- Compatibility mode used: none. Run folder `C:\MonetRun`, launched via `tools/proxy/run.ps1`
 - Engine DLLs loaded (`modules.log`):
 
 ## Scenarios

@@ -46,7 +46,7 @@ int main(void)
     fn_stdcall8 matrix;
     fn_double polar;
     FILE *fh;
-    int seen_fov = 0, seen_name = 0, seen_matrix = 0, seen_polar = 0, calls = 0;
+    int seen_fov = 0, seen_name = 0, seen_matrix = 0, seen_polar = 0, calls = 0, seen_run = 0, i;
     volatile int guard_before = 0x5a5a5a5a;
     volatile int guard_after = (int)0xa5a5a5a5;
     double d;
@@ -88,6 +88,10 @@ int main(void)
     d = polar(2.25);
     check(d == 5.0, "double argument and ST(0) return survive the thunk");
 
+    /* Same export, same call site, three times: the trace must collapse it to one line. */
+    for (i = 0; i < 3; i++)
+        fov(11, 22, 33, 44);
+
     /* If a __stdcall thunk mismatched the stack cleanup, these locals would have been
        clobbered by the calls above. */
     check(guard_before == 0x5a5a5a5a && guard_after == (int)0xa5a5a5a5,
@@ -107,6 +111,8 @@ int main(void)
         calls++;
         if (strstr(line, "x3d.dll!X3d_Camera_Get_Fov"))
             seen_fov = 1;
+        if (strstr(line, "X3d_Camera_Get_Fov") && strstr(line, " x3\n"))
+            seen_run = 1;
         if (strstr(line, "x3d.dll!X3d_Camera_Get_Name"))
             seen_name = 1;
         if (strstr(line, "x3d.dll!X3d_Camera_Get_Matrix"))
@@ -120,7 +126,8 @@ int main(void)
     }
     fclose(fh);
 
-    check(calls == 4, "trace holds exactly one line per call");
+    check(calls == 5, "one line per call, repeated calls collapsed into one");
+    check(seen_run, "three calls from one site logged as a single ' x3' line");
     check(seen_fov && seen_name && seen_matrix && seen_polar,
           "each call logged under its own export name");
 
