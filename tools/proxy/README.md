@@ -22,18 +22,147 @@ stand-in DLL under `__cdecl`, `__stdcall` with 4 and 8 arguments, and a `double`
 in ST(0), then checks the caller's frame and the trace contents. If the thunks ever stop
 being transparent, that is where it shows.
 
-## Deploy
+## Capturing traces: step-by-step
 
-**Never modify the original binaries or the CD (CLAUDE.md rule 7).** Work on a copy of an
-installed game directory.
+This is the part only a human can do: play the game with the proxies in place. Budget
+about two hours the first time. Commands are Git Bash; `!` in front runs them from the
+Claude Code prompt.
 
-1. Install the game, then copy the whole install directory somewhere writable.
-2. In the copy, rename `x3d.dll` to `x3d_orig.dll`, and `h3d.dll` to `h3d_orig.dll`.
-3. Copy `build/proxy/Release/x3d.dll` and `h3d.dll` into the copy.
-4. Run the game from that directory.
+### 1. Make a runnable copy (no CD, no installer)
 
-The proxy resolves `x3d_orig.dll` from its own directory, not by search order — it shares
-a name with the DLL it replaces, so a plain `LoadLibrary` would risk finding itself.
+The game reads `<exe folder>\Data\` whenever `Data\APP.BIN` exists there, and only
+otherwise hunts for the CD by volume label (E-0027). So a plain folder works:
+
+```sh
+mkdir -p /c/MonetRun
+cp -r "Original Game Files/INSTALL/02_PR/." /c/MonetRun/
+cp -r "Original Game Files/Data" /c/MonetRun/Data        # 350 MB
+ls /c/MonetRun/Data/App.bin /c/MonetRun/Save             # both must exist
+```
+
+Use a path without spaces, outside the repo and never inside `Original Game Files/`
+(rule 7). Everything below happens in `C:\MonetRun`.
+
+### 2. Video codec (Indeo 5)
+
+Cutscenes are AVI files decoded by the system's Indeo 5 codec. Run
+`Original Game Files\Indeo\iv5setup.exe` as administrator. If it refuses on Windows 11,
+carry on and write "no Indeo" in `traces/INDEX.md`, because videos will then fail or show black.
+Do **not** run the DirectX 7 installer; dgVoodoo2 replaces it.
+
+### 3. dgVoodoo2 (Direct3D 5 on a modern GPU)
+
+`h3d.dll` draws through DirectDraw/Direct3D. dgVoodoo2 replaces those with a D3D11
+back end, so it runs correctly on Windows 11.
+
+```sh
+cp third_party/dgVoodoo2_87_3/MS/x86/DDraw.dll \
+   third_party/dgVoodoo2_87_3/MS/x86/D3DImm.dll \
+   third_party/dgVoodoo2_87_3/dgVoodoo.conf \
+   third_party/dgVoodoo2_87_3/dgVoodooCpl.exe /c/MonetRun/
+```
+
+Use the `MS/x86` DLLs, not `x64`. The game is 32-bit. Then run
+`C:\MonetRun\dgVoodooCpl.exe`, make sure the config folder at the top is `C:\MonetRun`, and set:
+
+- **General:** Appearance *Windowed*; Scaling mode *Stretched, keep aspect ratio*.
+- **DirectX:** Videocard *dgVoodoo Virtual 3D Accelerated Card*; VRAM 256 MB;
+  untick *dgVoodoo Watermark*; Resolution *Unforced*.
+- Apply, close.
+
+Windowed mode makes it easy to watch the trace files and to quit cleanly.
+
+### 4. Baseline run, without the proxy
+
+Double-click `C:\MonetRun\MissionMonet.exe`. Get to the main menu, start a game, walk a
+few steps, quit through the game's own menu. **Do not continue until this works.** A
+crash here is a setup problem, not a proxy problem:
+
+| Symptom | Fix |
+|---|---|
+| "needs Direct3D acceleration" (message 950) | dgVoodoo DLLs missing or the x64 ones; redo step 3 |
+| "insert CD" style box and exit | `Data\App.bin` is not next to the exe; redo step 1 |
+| `MSVCRTD.DLL` missing | it ships in `02_PR`; the copy in step 1 was incomplete |
+| crash at start | right-click exe, Properties, Compatibility: *Windows XP (SP3)*, retry |
+| black video, game continues | Indeo missing (step 2), note it and move on |
+
+Write down any setting you had to change. It goes in the header of `traces/INDEX.md`.
+
+### 5. Install the proxies
+
+```sh
+cd /c/MonetRun
+mv x3d.dll x3d_orig.dll
+mv h3d.dll h3d_orig.dll
+cp "<repo>/build/proxy/Release/x3d.dll" "<repo>/build/proxy/Release/h3d.dll" .
+```
+
+Copy **only** those two. `build/proxy/Release/x3d_orig.dll` is the self-test stand-in,
+not the game's DLL; copying it would break the game. If the build folder is missing,
+run the Build section above first. To undo: delete the two proxies and rename the
+`_orig` files back.
+
+Leave `MONET_TRACE` unset. Each proxy then writes `monet-trace-<dll>-<pid>.log` into
+`C:\MonetRun`, one file per DLL per run.
+
+### 6. Play the scenarios
+
+**One scenario per launch.** Start the game, do exactly the scenario, quit through the
+game's menu. Quitting properly writes the final `# N calls` line; Alt+F4 or killing
+the process loses it, although the trace is still usable. Go slowly and don't wander:
+a short, clean trace is worth more than a long mixed one.
+
+| # | Name | Do exactly this |
+|---|---|---|
+| 01 | `boot` | Launch, let the intro play without skipping, reach the main menu, wait 10 s, quit. |
+| 02 | `idle` | New game. Touch nothing for 30 s. Quit. (One frame's worth of calls, repeated.) |
+| 03 | `walk` | New game. Forward 5 s, turn left 3 s, turn right 3 s, back 3 s, walk into a wall and keep pushing 3 s. Quit. |
+| 04 | `hover-click` | New game. Move the mouse over a few things, click one interactive object. Quit. |
+| 05 | `inventory` | Pick up an item, open the inventory, select it, use or combine it if you can. Quit. |
+| 06 | `dialogue` | Talk to a character through one full conversation. Quit. |
+| 07 | `transition` | Walk through a door or passage until a new area loads. Walk 3 s. Quit. |
+| 08 | `save-load` | Play briefly, save to a slot with a name, quit to the menu, load it, walk 3 s. Quit. |
+| 09 | `options` | Open the options screen, change volume, go back to the game. Quit. |
+| 10 | `cutscene` | Trigger any video other than the intro (skip this one if you can't reach one). |
+| 11 | `skip` | Launch and skip the intro at every chance (Esc, click). Quit at the menu. |
+| 12 | `long` | Optional: play normally for 10–15 minutes, noting what you did with rough times. |
+
+For scenarios 04 onward it helps to keep one save in the right spot and load it
+first. Say so in the notes, because loading is part of that trace.
+
+After each run, move the files into the repo with scenario names:
+
+```sh
+cd /c/MonetRun
+mv monet-trace-x3d.dll-*.log "<repo>/traces/03-walk-x3d.log"
+mv monet-trace-h3d.dll-*.log "<repo>/traces/03-walk-h3d.log"
+cp Save/DbgInfo.txt "<repo>/traces/03-walk-dbginfo.log"   # the game's own log, if present
+```
+
+Then add a row to `traces/INDEX.md` saying what you actually did, including any
+deviations. The notes matter as much as the logs.
+
+### 7. Which engine DLLs actually load (Q-0001)
+
+During any run, while the game is open, run this from a normal Command Prompt:
+
+```
+tasklist /m /fi "imagename eq MissionMonet.exe" > C:\MonetRun\modules.log
+```
+
+and copy `modules.log` into `traces/`. If it lists nothing useful, Sysinternals
+Process Explorer (View, Lower Pane View, DLLs) shows the same thing. We want to know
+which of `xd3d`/`xs3d` and `x3dmp5/6/6k` the game picked.
+
+### 8. Optional: the developer build
+
+Repeat scenario 02 with `MissionD.exe` from the same folder, named `02-idle-D-*.log`.
+It is a superset of the shipping build (E-0012) and may log more.
+
+### 9. Hand-off
+
+`traces/*.log` stays on this machine (gitignored); commit only `traces/INDEX.md`. Tell
+the next agent the traces are in, and it reads `traces/INDEX.md` first.
 
 ## Traces
 

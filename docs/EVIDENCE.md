@@ -399,3 +399,30 @@ An entry at `tentative` confidence must also have a matching line in
 - **Method:** `python tools/parsers/infoobj.py` → 9/9, every byte consumed.
 - **Confidence:** proven for layout; the seven numeric fields per entry are opaque until
   `FUN_0041b440` (per-entry consumer) is decompiled.
+
+### E-0027 — The game reads `<exe dir>\Data\` if `APP.BIN` is there, and only otherwise searches for the CD
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `resolveDataPaths` (`0x004179b0`, was `FUN_004179b0`) takes the exe
+  directory from `GetModuleFileNameA`, builds `<dir>\Data\` (data root, app `+0x26a`) and
+  `<dir>\Save\` (app `+0x36e`, also where `DbgInfo.txt` is written), then calls
+  `fileExists` (`0x00416370`, `CreateFileA` probe) on `<dir>\Data\APP.BIN`. Only if that
+  fails does it set app `+0x474 = 1`. The startup function at `0x00416b40` (auto-named
+  `MessageToUser_34`, is the WinMain body) calls `findCdDriveByVolumeLabel` (`0x00417b30`)
+  only when that flag is set. That function walks drives `C:`..`Z:`, reads each volume label
+  with `getDriveVolumeLabel` (`0x004160b0`, `GetVolumeInformationA`), compares the first 8
+  chars case-insensitively (`_strnicmp`) against a string at app `+0x108`, and on a match
+  sets the data root to `%s:/Data/` (`0x00441628`). No match → message box `0x3b8`, exit.
+- **Method:** MCP decompile of the four functions; string bytes read with `pefile`.
+- **Confidence:** proven for the control flow. The expected label at app `+0x108` is not
+  traced (Q-0002). Practical consequence: a folder holding the `02_PR` binaries plus a
+  copy of `Data/` runs without a CD or the installer.
+
+### E-0028 — `x3d.dll` names the rasteriser and math DLLs as strings, so it loads them itself
+- **Binary/file:** `x3d.dll`, `xd3d.dll`, `4xvideo.dll`.
+- **Evidence:** `x3d.dll` imports only `KERNEL32`/`MSVCRT`, yet contains the strings
+  `xd3d.dll`, `xs3d.dll`, `xf3d.dll`, `xvr3d.dll`, `x3dmp5.dll`, `x3dmp6.dll`,
+  `x3dmp6k.dll`. `xd3d.dll` and `4xvideo.dll` statically import `h3d.dll`; `h3d.dll`
+  imports `DDRAW.dll`.
+- **Method:** `pefile` import tables plus a byte scan for `*.dll` strings.
+- **Confidence:** strong. It shows the names exist, not which one is picked at runtime (Q-0001).
+  `xf3d.dll` and `xvr3d.dll` are not in the install payload.

@@ -27,7 +27,10 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** nothing yet — noted at bootstrap, before any analysis.
 - **Blocks:** the Phase 1 proxy plan assumes `x3d.dll` and `h3d.dll` are the whole engine
   surface. If the game loads any of these at runtime, the proxy misses those calls.
-- **Status:** open
+- **Status:** partly answered (E-0028). `x3d.dll` loads a rasteriser (`xd3d`/`xs3d`) and a
+  math DLL (`x3dmp*`) by name at runtime. `xd3d` calls into `h3d.dll`, so the h3d proxy
+  sees its calls. Open: which variants are picked on a modern machine. Check the loaded
+  modules while tracing (tools/proxy/README.md).
 
 ### Q-0002 — Which data root does the shipping build actually use?
 - **Context:** CLAUDE.md says `<drive>:/Data/`. The repo has an extracted CD image at
@@ -36,7 +39,10 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** nothing yet — noted at bootstrap.
 - **Blocks:** corpus completeness. A format validator that passes 100% of the CD corpus
   proves nothing if the game reads different files at runtime.
-- **Status:** open
+- **Status:** mostly answered (E-0027). The root is `<exe dir>\Data\` when `APP.BIN` exists
+  there, otherwise `<drive>:/Data/` on the drive whose volume label matches app `+0x108`.
+  The installer copies only binaries, so an installed game reads the CD, and the CD copy is
+  the corpus. Open: the expected label string.
 
 ### Q-0003 — Is `flc.dll` / `SMACKW32.DLL` used, or dead weight from a middleware bundle?
 - **Context:** both present in the install payload. Smacker and Autodesk FLIC are video
