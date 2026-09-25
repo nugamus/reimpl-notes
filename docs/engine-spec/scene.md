@@ -99,8 +99,19 @@ U01's scripted entry, right after the prologue video.
 Objects whose names contain `$XYZ$`, `$Z$` or `$XZ$` get camera types 1, 2, 3 (E-0045).
 Type 2 (the only one in U01) is drawn with the view rotation of yaw π/2 and the camera's
 pitch (E-0058) while its origin (row 3 of W) keeps its place in the true view: a vertex
-at offset d from the origin is drawn at origin + d · R(π/2, e) · R(a, e)ᵀ (E-0062). Types
-1 and 3 (fixed yaw −π/2, level; type 3 with roll) are not needed for U01.
+at offset d from the origin is drawn at origin + d · R(π/2, e) · R(a, e)ᵀ (E-0062, E-0270).
+Types 1 and 3 (fixed yaw −π/2, level; type 3 with roll) are not needed for U01.
+
+- The type is per object, and welded objects too: each object turns its own vertex range
+  of the shared array about its own origin (E-0270). A `$Z$` parent does not move its
+  children's origins (W does not involve the camera type).
+- Picking uses the same camera-facing vertices, so back-face culling in the pick sees
+  the faces the player sees (E-0270).
+- After setting the type, a name containing `*` is cut to start at the `*`
+  (`$Z$*U02_10` → `*U02_10`); names without `*` stay (`$Z$chaine`). Animation nodes keep
+  the `.A3D` names (`$Z$*U02_10`); a lookup by `*U02_10` finds the node because node
+  lookups are "equal or contains" (E-0271, E-0072). The engine should keep the camera type
+  as a field set before the cut, not test the name at draw time.
 
 ## Validation
 

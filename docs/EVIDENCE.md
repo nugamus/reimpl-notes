@@ -2457,3 +2457,121 @@ An entry at `tentative` confidence must also have a matching line in
   `DonnerLunettes`), and the near-Monet line `sb10` needs it clear.
 - **Method:** parsers; vtable dump with `pefile`; E-0201/E-0202 functions.
 - **Confidence:** proven for the data and code; what the lines say is not checked (Q-0120).
+
+### E-0270 — Camera-facing objects: `+0x164` is row 3 of the object's model-view, and every welded object gets its own camera type's model-view
+- **Binary/file:** `x3d.dll`, `xd3d.dll`.
+- **Evidence:** `FUN_10019730` (x3d) builds the model-view at transform `+0x134` (a 4×4,
+  row 3 at `+0x134 + 0x30` = `+0x164`). Case 2: `+0x134` = global `+0xf4` ×
+  Tr(−camera position `+0x2c..+0x34`) × R(yaw π/2, camera pitch `+0x58`) × roll ×
+  projection; then `auStack_10c` = global × the true view (camera `+0x5c` `+0x80`), and
+  its row 3 (`uStack_dc..d4`) is written to `+0x164..+0x16c`, i.e. over the model-view's
+  translation row. So a vertex v is drawn at v · (global rotation) · R(π/2, e) · P plus the
+  object origin projected by the true view: the offsets turn, the origin stays. Nothing
+  else reads `+0x164` in `x3d.dll` or `xd3d.dll` (instruction search for `+ 0x164]`: only
+  stack locals and this store). `FUN_1001d440` (the `+0x24` transform) runs
+  `X3d_Vertex_Transformation` over the object's own range (`+0x48`, `+0x44`) with that
+  object's `+0x134`. The renderer `FUN_10020720` (xd3d) and the pick `FUN_100213f0`
+  (xd3d, E-0070) both call class `+0x10` with the object's own `+0x108` for the object
+  and for each weld child (`+0` = 0, `+0x40` ≠ 0) before `+0x24`, so a welded `$Z$`
+  object's range is camera-facing about its own origin, drawn and picked alike. The
+  global `+0xf4` chain does not involve the camera type: a `$Z$` parent does not move its
+  children's origins.
+- **Method:** MCP decompile of `FUN_10019730`, `FUN_1001d440`, `FUN_10020720`,
+  `FUN_100213f0`; MCP instruction search.
+- **Confidence:** proven. Resolves the "how the renderer uses `+0x164`" part of E-0058 and
+  E-0062 (the engine's origin-plus-rotated-offsets drawing was right).
+
+### E-0271 — After loading, names with a camera prefix are cut to start at their `*`; animation nodes keep the `.A3D` names
+- **Binary/file:** `MissionMonet.exe`; `Data/U02/anim/U02_10.O3D`, `U02_10.A3D`.
+- **Evidence:** `FUN_0041b010` (called from `XScene_124`, the generic load, and
+  `U00_Load`): for each scene object, after setting camera type 1/2/3 for `$XYZ$`/`$Z$`/
+  `$XZ$` (E-0045), `strstr(name, 0x004417b8)` with `0x004417b8` = `"*"` (bytes
+  `2a 00`); if found, the name is overwritten with the text from the `*` on. Only objects
+  are renamed; node lookups by `*U02_10` use the node list's contains-match
+  (`FUN_00416180(…, 0)`, E-0072, E-0164), whose node keeps `$Z$*U02_10`. `U02_10.O3D`:
+  `$$$DUMMY.Dummy01` (root, no own vertices, weld array of 10, rotation −90° about x),
+  `$Z$*U02_10` (welded, vertices 0..3), `$Z$chaine` (welded, 4..9, parent `$Z$*U02_10`);
+  so after load the objects are `$$$DUMMY.Dummy01`, `*U02_10`, `$Z$chaine`, both lower
+  ones camera type 2. INFOOBJ's hotspot `*U02_10` binds to the object by exact name
+  (E-0072), which exists only after this cut; its node state (frame 1, paused, 15 fps, not
+  looping) reaches node `$Z$*U02_10` through the contains-match (`FUN_004210d0`, list
+  `+0x158` vtable `+0x14(name, 0)`).
+- **Method:** MCP decompile of `FUN_0041b010`; `0x004417b8` read; xrefs; `o3d.py`/`a3d.py`
+  over the two files.
+- **Confidence:** proven.
+
+### E-0272 — INFOOBJ's hidden hotspots also leave collision; a script "show" puts them back
+- **Binary/file:** `MissionMonet.exe`; `Data/U02/INFOOBJ.BIN`, `Static/U02.O3d`.
+- **Evidence:** `FUN_004210d0` (applies an INFOOBJ entry) with visible (`+0x30`) = 0 calls
+  hotspot vtable `+0x28("", 0, 1)` (`0x0042110d..0x0042111a`). `+0x28` = `0x00421050`:
+  show → `X3d_Object_Unhide(obj, 1)` and object `+0x118` = 0; hide →
+  `X3d_Object_Hide(obj, 1)` and `+0x118` = third argument. `+0x118` (no collision, E-0048)
+  is set on the hotspot's object only, not its children. So every hotspot hidden at load is
+  out of collision until shown through `+0x28`; `X3d_Object_Unhide` alone (the magpie in
+  `PieVoleur`, E-0163) leaves it out. U02: hidden at start `*U02_01`, `*U02_05`,
+  `*U02_06a`, `*U02_07a`, `*U02_09`, `*U02_09a`, `*U02_11`, `*U02_14` (E-0165). In
+  `Static/U02.O3d` (world transforms per `scene.md`) `*colplanch` (→ `*U02_14`) is two
+  faces at z −6..−2 over x 416..440, y −993..−846, and `*U02_07` (→ `*U02_07a`, the laid
+  plank) spans x 424..432, y −993..−846, z −9..−2: both lie across `ruisseau.O3d`'s stream
+  `*U02_08` (x −480..2159, y −1675..−668). Hidden and without collision they are no floor,
+  so the stream cannot be crossed until `PoserPlanche` shows `*U02_07a` (`+0x28`, 1) and
+  clears `*U02_14`'s `+0x118` (E-0162).
+- **Method:** capstone of `0x004210d0..0x0042116d` and `0x00421050..0x004210c3`; Python
+  over `o3d.py` output.
+- **Confidence:** proven.
+
+### E-0273 — The "bell" is the locomotive's whistle cord, in the cab; the player clicks it from the platform's east end
+- **Binary/file:** `Data/U02/anim/U02_10.O3D`, `U02_10.A3D`, `Static/nloco2.o3d`,
+  `Static/colTotal.o3d`, `Static/U02.O3d`; `MissionMonet.exe`.
+- **Evidence:** World transforms (`scene.md`, row vectors): Dummy01 at (2842.8, 0,
+  −113.0), rotation (x, y, z) → (x, −z, y); `*U02_10`'s origin (row 3) = (2832.2, 215.7,
+  101.4) and `$Z$chaine`'s origin is the same point (−pivot + parent pivot + position =
+  0). Local y becomes world z: the cord (x width 1.8) spans z 118.5..128.5 (`*U02_10`) and
+  91.8..118.5 (`$Z$chaine`, a 3.7-wide handle at z ≈ 92). `U02_10.A3D` (1..38) moves
+  only `$Z$chaine` (19 translation keys, y −9.93 → −10.7 and back): a pull. `Sonner`
+  plays `SIREN` (E-0164). Stored normals are local (0, 0, −1) → world +y, so with camera
+  type 2 (drawn as seen from yaw π/2, i.e. looking −y, E-0058/E-0270) its faces are always
+  front faces; drawn without it, from the platform (y < 215.7, looking +y) they are back
+  faces and the pick (E-0070) skips them (checked with E-0070's test in camera space).
+  `nloco2.o3d` `loco02` spans x 2540..2967, y 122..238, z −9..168: the cord hangs inside
+  the locomotive. `colTotal.o3d` `Colision04` walls the platform off: faces
+  (2392, 110)→(2874, 124) with normal −y and (2826, −118)→(2874, 124) with normal −x
+  (ground there z ≈ 10, eye ≈ 70), so the cab is out of reach. Ray tests from eyes at
+  z 78 to cord points z 95..125 against `nloco2`, `U02`, `DIVERS`, `deco` front faces:
+  clear from x ≈ 2780..2870 over y −40..110 (except a pillar at x ≈ 2830), blocked west
+  of x ≈ 2770. Pick depth limit 4 · s = 160 (E-0051): from (2830, 100, 70) the handle is
+  ≈ 116 away, so the player clicks it standing at the wall, x ≈ 2780..2870, y ≈ 60..103,
+  facing +y (yaw ≈ −π/2).
+- **Method:** Python over `o3d.py`/`a3d.py` output (world transforms, Möller–Trumbore ray
+  tests, ground casts); no live run.
+- **Confidence:** strong (geometry; the live check is Q-0130).
+
+### E-0274 — U02's magpie and barrier: where the player stands
+- **Binary/file:** `Data/U02/anim/U02_05/*.A3D`, `U02_06A.*`, `U02_09A.*`,
+  `Static/colTotal.o3d`, `Static/U02.O3d`, `Static/ruisseau.O3d`.
+- **Evidence:** magpie root translation keys: `ACTION01` 1..370 from (1848, 604, 341) to
+  (1278.1, −563.6, −4.3) at 369; `Action02` holds (1278.1, −563.6, −4.3) to key 11
+  (the paused `PieVoleur` frame, E-0163), then flies to (461.9, −1113.2, 70.5) (key 606;
+  `ACTION03` holds (462.3, −1112.7, 70.5)). The frame hook's trigger (1280, −564, −7.15),
+  radius 240 (E-0161), is that perch; ground there z ≈ −10, eye ≈ 50, so the player comes
+  within about 233 horizontally. `U02_06A`/`U02_09A`: `$$$DUMMY.#SCENE` identity at
+  (1173.7, −103.2, −1172.3), so the chestnut and the coin end at (462.4, −1102, 15.6) and
+  (462.5, −1102.1, 14.8), on the barrier below the magpie. `Colision01` (y −1040, x
+  174..669, normal +y) keeps the player at y ≳ −1020; ground (462, −1020) z −2. From
+  there magpie and coin are ≈ 97 away (pick limit 160). That bank lies across the stream
+  (`*U02_08` y −1675..−668; the plank `*U02_07a` bridges y −846..−993 at x ≈ 428, E-0272),
+  so feeding the magpie and taking `U02_09` need the plank. `*U02_13` (`*ZonePlanc`),
+  where the plank is laid: x 360..480, y −867..−793, z −7.
+- **Method:** Python over `a3d.py`/`o3d.py` output; ground casts.
+- **Confidence:** strong (key values, not the TCB-interpolated path).
+
+### E-0275 — `U02_FallInStream` dims in float steps truncated each step: the light ends near 75, not 90
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `0x00404bfd..0x00404d3a`: N = `_ftol`(scene `+0x144`, fps) (import
+  `0x00439160` = MSVCRTD `_ftol`); per channel step = (float)(c₀ − 0x5a) / N; each of N
+  iterations: c = `_ftol`((float)c − step), or 0 when below 0.0 (`0x0043943c` = 0.0),
+  stored as a byte, then `FUN_0041b2f0(c)` and `RunFor(10)`. Truncation after every step
+  removes ⌈step⌉ each time when step is not whole: from 255, 255 − N·⌈165/N⌉ (N = 60 or
+  30: 75; 25: 80; exactly 90 only when N divides 165).
+- **Method:** capstone; PE import table.
+- **Confidence:** proven. Refines E-0161's "(c₀ − 90)/N" (`u02.md` said "toward 90").

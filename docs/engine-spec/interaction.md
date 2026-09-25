@@ -55,6 +55,14 @@ entry's state: cursor, visibility (hide the object if `visible` = 0), and, if th
 has an `animation=` node (E-0056), that node's frame, paused flag, frame rate and loop
 flag. U01 has 25 hotspots: `*U01_01` … `*U01_24`, `*Ernest`.
 
+- Object names are those after the camera-prefix cut (`scene.md`, E-0271): hotspot
+  `*U02_10` binds to the object once named `$Z$*U02_10`.
+- The node is found by "equal or contains" (case-insensitive), first in node order:
+  `*U02_10` finds node `$Z$*U02_10` (E-0271).
+- A hidden entry also takes the object out of collision (the object only, not its
+  children). Unit code that shows a hotspot through the hotspot's show (`+0x28`, 1) puts
+  it back in collision; a plain unhide does not (E-0272).
+
 Hover: from the picked object, walk up the parents to the first name containing `*`; look
 the text from the `*` on up in the hotspot list (case-insensitive equality, else the list
 name contains it). No match: keep walking up from that object's parent. No hotspot: none.

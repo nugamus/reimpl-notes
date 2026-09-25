@@ -651,3 +651,14 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** saves in U04 and U07.
 - **Next to try:** writers of those unit fields in U04's and U07's code.
 - **Status:** open
+
+### Q-0130 — From where on the platform does the original let the player click the whistle cord?
+- **Context:** E-0273. Geometry puts the cord in the locomotive's cab, visible and within
+  the 160 pick limit only from the platform's east end (x ≈ 2780..2870, y ≈ 60..103).
+- **What we checked:** world transforms, ray tests against the static meshes, collision
+  walls and ground casts; the camera-facing draw and pick (E-0270). No live run.
+- **Blocks:** confirming the engine's bell against the original (visibility through the
+  cab, hover cursor 2 after `MarronToPie`).
+- **Next to try:** in the original after `MarronToPie`, walk to about (2830, 90) facing +y
+  (`camera.ps1`), hover the cord, snap; compare with the engine at the same `start_camera`.
+- **Status:** open
