@@ -896,3 +896,135 @@ An entry at `tentative` confidence must also have a matching line in
   garbled in the engine: Q-0020.
 - **Method:** ReadProcessMemory from PowerShell; snap.ps1 of both windows.
 - **Confidence:** proven for the static geometry and the camera reader.
+
+### E-0054 — Welded objects: each owns a range of its hierarchy top's vertex array and transforms it with its own world matrix
+- **Binary/file:** `x3d.dll`, `xd3d.dll`; `Data/**/*.O3D`.
+- **Evidence:** `FUN_10011ea0` reads the object's first count into object `+0x44`, the
+  flag into `+0x40`, and when the flag is set a u32 into `+0x48` and a count into transform
+  block `+0`, which sizes `X3d_Object_Create_Vertex` (positions `+0x4c`, normals `+0x50`).
+  `X3d_Object_Get_Number_Weld` returns transform block `+0`. `FUN_10012920`, after
+  linking parents, gives every flagged object with a parent the `+0x4c`/`+0x50` arrays of
+  `X3d_Object_Get_Great_Father` (its top ancestor). The object class methods (table
+  `0x1002d144`, `FUN_1000b690`) `+0x1c` (`FUN_1001a280`, lighting) and `+0x24`
+  (`FUN_1001d440`) process exactly vertices `+0x48 .. +0x48 + +0x44 − 1` of those arrays:
+  `FUN_1001d440` calls `X3d_Vertex_Transformation` on them with the object's model-view
+  (`+0xfc` → `+0x134` = global `+0xf4` × view, `FUN_10019730` case 0) into one
+  screen-vertex buffer indexed by the same vertex numbers; `FUN_1001a280` transforms the
+  same range with the global matrix and the normals with `X3d_Normal_Array_Matrice_Mult`.
+  `xd3d.dll` `FUN_10020720` computes the matrices of an object's weld children
+  (`+0` = 0 and `+0x40` ≠ 0) and recurses into them before drawing the object's faces,
+  whose indices address the whole shared buffer. Corpus: `tools/parsers/o3d.py` now checks
+  that in every hierarchy the ranges partition the top's array: 596/596 pass, 139
+  hierarchies, 5,613 welded objects, and no welded object below the top has an array of
+  its own. Geometry check on U01's characters (`U01_01`, `U01_02`, `U01_E`): transforming
+  each vertex with its owner's load-time world matrix (E-0042) gives median / maximum face
+  edge 2.6 / 14.1, 2.5 / 13.5, 2.6 / 17.8 units; with the top object's matrix for all (the
+  static view's rule) 3.4 / 35.1, 4.4 / 40.6, 3.1 / 35.1. So stored vertices are local to
+  their owning object.
+- **Method:** MCP decompile of the functions named (functions created at `0x1001d440` and
+  `0x1001a280`, the `+0x24`/`+0x1c` thunk targets); Python over `o3d.py` output.
+- **Confidence:** proven. Resolves Q-0020; supersedes the "bind pose" rule for weld
+  objects in `docs/engine-spec/scene.md` and the `vertex_*` names in `o3d.ksy` (now
+  `own_vertex_count`, `welded`, `weld_first_vertex`, `weld_vertex_count`).
+
+### E-0055 — `.A3D` tracks: TCB-spline or linear translation, linear scale, slerped absolute quaternions, written to the object's live transform
+- **Binary/file:** `x3d.dll`, `x3dmp5.dll`; `Data/**/*.A3D`.
+- **Evidence:** `FUN_10012ee0` reads, after name and parent, the pivot into animation
+  `+0xb4..+0xbc` and three u32s into `+0x34`, `+0x38`, `+0x3c`, returned by
+  `X3d_Animation_Get_Number_Frame`, `_Get_First_Frame`, `_Get_Last_Frame`. Tracks are
+  count, flags, frame numbers, 5 f32 per key (stride `0x14`), values; allocation error
+  strings name them "translation" (`+0x40`), "scale" (`+0x54`), "rotation" (`+0x68`),
+  "Hide" (`+0xa0`, one u32 per key at `+0xb0`) and "morph" (`+0x7c`: inner count `+0x8c`,
+  then per key positions `+0x90`, normals `+0x94`, 4 f32 at `+0x98` and 6 f32 expanded to
+  8 box corners at `+0x9c`). Children are appended to their parent's `+0x24`/`+0x28` list
+  in file order. `X3d_Object_Animate(obj, anim, frame, usePivot, recurse)` and
+  `_Animate_Spline` run five samplers, then set the live pivot (transform `+4`) from the
+  animation's pivot (usePivot ≠ 0) or the object's init pivot `+0x14`, and set the dirty
+  flag `+0x174`. Translation → transform `+0x34` (linear `FUN_10003430`; spline
+  `FUN_10002d90`: Hermite with tangents from `FUN_10002410` using key floats 0..2 as
+  tension/continuity/bias, and an ease remap using key j's float 3 and key i's float 4).
+  Scale → `+0x54` (linear `FUN_100038a0`, both variants). Rotation → `X3d_Quaternion_Slerp`
+  then `X3d_Quaternion_To_Matrice` into `+0x74`, also copied to `+0xb4` (`FUN_10003ce0`,
+  both variants). Hide → object `+0x5c` = key i's u32 (`FUN_10004860`). Morph lerps the
+  object's own vertex range and bounds (`FUN_10004310`). Key lookup (`FUN_10002780`,
+  `FUN_10002870`): before the first key → key 0; at or after the last → the last key
+  unless flags & 3 and the last frame ≠ 0 (wrap); else binary search. Recursion
+  (`FUN_100031d0`, `FUN_10002940`, …) pairs the object's first child with the animation's
+  first child, and siblings with siblings, by position. `FUN_1001dd30` builds the global
+  matrix from exactly these live fields (`+4`, `+0x54`, `+0x74`, `+0x34` + `+0x24`, parent
+  `+4`). `x3dmp5.dll`: `X3d_Quaternion_Set` stores (cos θ/2, axis · sin θ/2), so w is
+  first; `X3d_Quaternion_To_Matrice` and `_Slerp` are written out in
+  `docs/engine-spec/animation.md`. Corpus (`tools/parsers/a3d.py`): every file has one
+  (frames, first, last) header shared by all its animations; all track flags are 0; no
+  hide or morph keys; of 555,288 keys only 19,046 have a non-zero parameter, always
+  float 1. In U01's 14 animated `.O3D`/`.A3D` pairs the hierarchies pair name for name;
+  key 0 of `U01_01/ATTENTE` reproduces the `.O3D` matrices exactly with this
+  quaternion-to-matrix rule, and every animation pivot equals its object's pivot. All
+  13,950 `.O3D` matrices have a zero translation row.
+- **Method:** MCP decompile of the functions named; Python over the parser output.
+- **Confidence:** proven. Supersedes the track D/E layouts of `a3d.ksy`/`a3d.py` (hide:
+  one u32 per key, not two; morph: per-key blocks with 10 floats, not 7 once); the parser
+  never met them because no corpus file has such keys.
+
+### E-0056 — The EXE binds `animation=` by name, advances frame += seconds × fps per rendered frame, and samples with `X3d_Object_Animate_Spline`
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** Scene vtable `+0x20` is `XSceneAnim::XSceneAnim_22` (`0x0041c170`, assert
+  `XSceneAnim.cpp:22`): `X3d_Load_Sdk_a3d` (first animation of the file), then if the
+  root's name contains `*` (`0x004417b8` is `"*"`, not `"$"` as E-0045 says) one node for
+  (root animation, the `object=` object); otherwise one node per direct child of the root,
+  bound to the object found by `FUN_0041b4c0` (depth-first over the object's children and
+  their siblings, `FUN_00416180` with exact = 1: `_stricmp`). `FUN_0041c280` creates the
+  node (`FUN_0041fc20`: name = object name, `+0x64` = 1, `+0x68` = 1, `+0x78` = 30.0) and
+  `FUN_0041fe60(node, anim, obj, fps, loop 1, paused 0)` sets frame `+0x74` = first frame.
+  Tick `FUN_0041c350` (vtable `+0x24`) → `FUN_0041fe90` over the node tree (`+0x50`
+  child, `+0x5c` next): for a node with an object and an animation, if sub-slot `+0x1ca`
+  is set play that slot's node instead; else if `+0x64`: advance unless paused (`+0x60`,
+  `FUN_0041ff20`), then `X3d_Object_Animate_Spline(obj, anim, frame, 0, 1)`.
+  `FUN_0041ff20`: ping-pong `+0x6c` flips direction `+0x70` at the ends; frame ±=
+  `DAT_0046ebe0 · fps`; not looping: clamp to [first, last], and without ping-pong set
+  paused; looping (`+0x68`): above last → `fmod(frame, last) + first` (capstone
+  `0x0041ff90..0x0041ffad`), below first → `last − (first − frame)`; stop target
+  (`+0x1d8`/`+0x1d4`): within 2 · dt · fps → frame = target, paused. `Scene_RenderFrame`
+  stores `DAT_0046ebe0` = (counter − previous) / frequency, the seconds between the last
+  two presents (capstone `0x0041b285..0x0041b29a`, beside the fps of E-0046). Other
+  entry points: `X3d_Object_Animate_Transition` has one caller (`FUN_00406f90`, not U01);
+  the tick also runs `FUN_00421b90` (scene `+0x168`) and `FUN_00420e00` (list `+0x1a0`,
+  multiplies an object's local matrix by a stored one when `+0x6c` is set).
+- **Method:** MCP decompile; capstone reads of the x87 code.
+- **Confidence:** proven for binding, clock and sampling call. What `+0x168` and the
+  `FUN_00420e00` list animate is open (Q-0026).
+
+### E-0057 — U01's scripted animations: `_U01_03` unpauses a node; `GiveCard` plays U01_02 `Action03` once in slot 1; `TakeCard` plays it back to frame 1
+- **Binary/file:** `MissionMonet.exe`; `Data/U01/Anim/**`.
+- **Evidence:** `U01_Start` (EBX = 0 from `0x00401240`): at `0x004015ca` finds the node
+  named `*U01_03` (`0x0043f0a0`) through node list vtable `+0x14(name, 1)` and calls
+  `FUN_00420060(node, 0)`: `+0x60` = 0 (running). At `0x00401708..0x0040172f`:
+  `FUN_00420220(unit +0x6d0, "%sAnim/U01_02/Action03.A3D", "GiveCard", 1, 1)`, then that
+  node's loop `+0x68` = 0. `FUN_00420220` makes a node (type `0x32`), loads the whole file
+  with `XAnimation::XAnimation_55` (assert `XAnimation.cpp:55`) on the parent node's
+  object with its fps, loop and paused values, and `FUN_004202f0` puts it in slot 1 of the
+  parent (`+0x188[1]`; slot 0 = the parent itself; count `+0x1c8`), running, and makes it
+  the active slot `+0x1ca`. `0x00401fb0` (TakeCard): slot 1's direction `+0x70` = 1,
+  `FUN_00420100(slot1, 1.0, 1)` (running until frame 1.0), `Scene_RunFor(0)` until
+  paused, then `FUN_004201c0(parent, 0, 1)` (active slot 0, running) and
+  `FUN_004200c0(slot 0, 1.0)` (frame := 1.0 clamped to [first, last]), then enables
+  movement (E-0050). Corpus: `U01_02/ACTION03.A3D` frames 1..25, keys 0..23;
+  `U01_02/ATTENTE.A3D` 1..100, keys 0..90; `U01_01/ATTENTE.A3D` 1..10 with keys at 0 and
+  1 only; `U01_03.A3D` 1..30.
+- **Method:** MCP decompile and disassembly of the functions named; parser output.
+- **Confidence:** proven for the calls. That unit `+0x6d0` is the node of `U01_02` is
+  inferred from the file it plays; who pauses `*U01_03` before `U01_Start` is open
+  (Q-0026).
+
+### E-0058 — Camera type 2 (`$Z$`) keeps the camera's pitch and fixes its yaw at π/2
+- **Binary/file:** `x3d.dll`.
+- **Evidence:** `FUN_10019730`'s jump table (`0x10019e30`) sends type 2 to `0x10019975`.
+  With camera `+0` = 0 (`0x100199d6..0x100199e0`), `0x100199e2..0x10019a4c` loads π/2
+  (double at `0x10024098`) as the yaw and camera `+0x58` (the pitch e of E-0040) as the
+  pitch, and fills the view rotation of E-0040 with them; with camera `+0` ≠ 0 the pitch
+  comes from `X3d_Convert_To_Polar` of the normalised target − position. Roll (`+0x4c`)
+  and projection follow as for the normal view; the object's origin in the true view
+  (global × view, row 3) is stored at transform `+0x164..+0x16c`.
+- **Method:** capstone disassembly by hand; MCP decompile.
+- **Confidence:** proven for the angles. How the renderer places the object with
+  `+0x164` is not read (Q-0021).

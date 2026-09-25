@@ -6,8 +6,8 @@ A format is done only when its validator passes 100% of the corpus, every byte c
 
 | Format | Files | Validator | Spec | Evidence | Status |
 |---|---:|---|---|---|---|
-| `.O3D` mesh | 596 | `o3d.py` | `o3d.ksy` | E-0016..18 | done |
-| `.A3D` animation | 429 | `a3d.py` | `a3d.ksy` | E-0020 | done |
+| `.O3D` mesh | 596 | `o3d.py` | `o3d.ksy` | E-0016..18, E-0054 | done |
+| `.A3D` animation | 429 | `a3d.py` | `a3d.ksy` | E-0020, E-0055 | done |
 | `.L3D` lights | 5 | `l3d.py` | `l3d.ksy` | E-0019 | done |
 | `.C3D` cameras | 6 | `c3d.py` | `c3d.ksy` | E-0021 | done (10 f32s opaque, Q-0014) |
 | `.S3D` scene | 1 | `s3d.py` | `s3d.ksy` | E-0022 | done |

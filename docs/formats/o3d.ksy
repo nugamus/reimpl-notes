@@ -146,11 +146,13 @@ types:
 
   object:
     doc: |
-      `FUN_10011ea0`. When `vertex_flag` is set the vertex array lives in a shared
-      structure rather than this object's own, and `vertex_count_b` is the count that
-      applies. In the corpus that count is frequently 0: 5,193 objects have no vertices of
-      their own yet carry faces, and every one of them names a parent whose vertices its
-      faces index. The validator resolves indices up the parent chain.
+      `FUN_10011ea0`. A welded object (`welded` set, E-0054) belongs to a hierarchy whose
+      top object holds one shared vertex array of `weld_vertex_count` vertices; every
+      other welded object has `weld_vertex_count` 0 and uses the top's array. Each
+      welded object transforms the vertices `weld_first_vertex` ..
+      `weld_first_vertex + own_vertex_count - 1` of that array with its own world
+      matrix, and faces index the whole array. The validator checks that these ranges
+      partition the array (139 hierarchies, 5,613 welded objects).
     seq:
       - id: name
         type: strz
@@ -161,16 +163,20 @@ types:
         type: strz
         size: 32
         if: has_parent != 0
-      - id: vertex_count_a
+      - id: own_vertex_count
         type: u4
-      - id: vertex_flag
+        doc: Object `+0x44`, the number of vertices this object transforms.
+      - id: welded
         type: u4
-      - id: vertex_unknown
+        doc: Object `+0x40`.
+      - id: weld_first_vertex
         type: u4
-        if: vertex_flag != 0
-      - id: vertex_count_b
+        if: welded != 0
+        doc: Object `+0x48`, first vertex of this object's range in the shared array.
+      - id: weld_vertex_count
         type: u4
-        if: vertex_flag != 0
+        if: welded != 0
+        doc: Transform block `+0`, `X3d_Object_Get_Number_Weld`; size of the array here.
       - id: positions
         type: vec3
         repeat: expr
@@ -217,4 +223,4 @@ types:
           live transform by `X3d_Matrice_Copy`. World matrix: E-0042.
     instances:
       vertex_count:
-        value: "vertex_flag != 0 ? vertex_count_b : vertex_count_a"
+        value: "welded != 0 ? weld_vertex_count : own_vertex_count"

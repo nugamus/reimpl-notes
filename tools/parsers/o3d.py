@@ -128,17 +128,20 @@ def read_object(r: Reader) -> dict:
     if r.u32():
         obj["parent"] = r.name()
 
-    # Two vertex counts with a selector between them. When the flag is set the loader
-    # reads an extra u32 and a second count and uses that one; otherwise it uses the
-    # first, and the second is never present.
-    count_a = r.u32()
-    flag = r.u32()
-    obj["vertex_flag"] = flag
-    if flag:
-        obj["vertex_extra"] = r.u32()
+    # E-0054: `own_vertex_count` (object +0x44) is how many vertices this object
+    # transforms. A welded object (+0x40 set) then gives the first of them
+    # (`weld_first_vertex`, +0x48) and the size of the shared array it owns
+    # (`weld_vertex_count`, transform block +0, X3d_Object_Get_Number_Weld); only the
+    # hierarchy's top object has a non-zero one, and the others use its array.
+    own = r.u32()
+    welded = r.u32()
+    obj["own_vertex_count"] = own
+    obj["welded"] = welded
+    if welded:
+        obj["weld_first_vertex"] = r.u32()
         count = r.u32()
     else:
-        count = count_a
+        count = own
     obj["vertex_count"] = count
     obj["positions"] = [r.floats(3) for _ in range(count)]
     obj["normals"] = [r.floats(3) for _ in range(count)]
@@ -181,7 +184,7 @@ def parse(data: bytes) -> dict:
 def effective_vertex_count(obj: dict, by_name: dict) -> int:
     """Vertices an object's faces index into, following shared geometry.
 
-    An object whose `vertex_flag` is set carries its vertex array in a shared structure
+    A welded object (`welded` set) carries its vertex array in a shared structure
     rather than its own, and the on-disk count is then 0. Every such object in the corpus
     (5,193 of them, without exception) names a parent, and its faces index the parent's
     vertices. Walk up until a real count appears.
@@ -215,6 +218,25 @@ def check_indices(doc: dict) -> list:
                     "%s face %d: material index %d of %d"
                     % (obj["name"], i, face["material"], nmat)
                 )
+    # E-0054: the welded objects under a top object own disjoint ranges that together
+    # cover its shared vertex array exactly once.
+    cover = {}
+    for obj in doc["objects"]:
+        if not obj["welded"]:
+            continue
+        top = obj
+        while top["parent"]:
+            top = by_name[top["parent"]]
+        hits = cover.setdefault(top["name"], [0] * top["vertex_count"])
+        first = obj["weld_first_vertex"]
+        for v in range(first, first + obj["own_vertex_count"]):
+            if v >= len(hits):
+                problems.append("%s: welded vertex %d out of range" % (obj["name"], v))
+                break
+            hits[v] += 1
+    for name, hits in cover.items():
+        if any(h != 1 for h in hits):
+            problems.append("%s: welded ranges do not partition its vertices" % name)
     return problems
 
 

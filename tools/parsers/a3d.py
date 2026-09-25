@@ -4,18 +4,21 @@ Same container family as `.O3D` — a 32-byte `(c) 1998 4X Tech. 0.95 (A)` signa
 a sequential stream through the identical cursor primitives. Derived from
 `X3d_Load_Sdk_a3d` (`x3d.dll` `0x10001091`), which dispatches to `FUN_10012ee0`.
 
-An animation carries five keyframe tracks. Each opens with a count and a second u32, then
-holds `count` frame ids followed by per-key data whose shape differs by track:
+An animation has a header (pivot, frame count, first and last frame: E-0055) and five
+keyframe tracks. Each opens with a count and a flags u32, then holds `count` frame
+numbers followed by per-key data whose shape differs by track (loader error strings in
+brackets):
 
-    track  count at  frame ids  per key            then
-    A      +0x40     u32        5 f32              3 f32
-    B      +0x54     u32        5 f32              3 f32
-    C      +0x68     u32        5 f32              4 f32  (stride 0x10)
-    D      +0xa0     u32        1 u32              -
-    E      +0x7c     u32        5 f32              see below
+    track        count at  per key
+    translation  +0x40     5 f32 TCB/ease, then 3 f32 position
+    scale        +0x54     5 f32 TCB/ease, then 3 f32 scale
+    rotation     +0x68     5 f32 TCB/ease, then 4 f32 quaternion (w, x, y, z)
+    hide         +0xa0     1 u32 ("Hide key info")
+    morph        +0x7c     5 f32, then (once) an inner count, then per key: inner
+                           positions, inner normals, a bounding sphere (4 f32) and a
+                           bounding box (6 f32)
 
-Track E then reads one more count and, for every one of its keys, two `inner_count`-long
-runs of vec3 plus ten trailing floats.
+No corpus file has hide or morph keys, so those two layouts are the loader's only.
 
 The loader's `if (ptr != 0)` guards around each track are null checks on the animation
 object, not file flags — every read loop is bounded by the count itself, so a zero count
@@ -55,7 +58,7 @@ def read_signature(r: Reader) -> str:
 def read_track(r: Reader, value_floats: int, extra_key_u32s: int = 0) -> dict:
     """A count, a companion u32, `count` frame ids, then per-key data."""
     count = r.u32()
-    track = {"count": count, "unknown": r.u32(), "frames": r.u32s(count)}
+    track = {"count": count, "flags": r.u32(), "frames": r.u32s(count)}
     if extra_key_u32s:
         track["keys"] = [r.u32s(extra_key_u32s) for _ in range(count)]
     else:
@@ -66,18 +69,20 @@ def read_track(r: Reader, value_floats: int, extra_key_u32s: int = 0) -> dict:
 
 def read_track_e(r: Reader) -> dict:
     count = r.u32()
-    track = {"count": count, "unknown": r.u32(), "frames": r.u32s(count)}
+    track = {"count": count, "flags": r.u32(), "frames": r.u32s(count)}
     track["keys"] = [r.floats(5) for _ in range(count)]
     if count:
         inner = r.u32()
         track["inner_count"] = inner
-        track["positions"] = [
-            [r.floats(3) for _ in range(inner)] for _ in range(count)
+        track["morphs"] = [
+            {
+                "positions": [r.floats(3) for _ in range(inner)],
+                "normals": [r.floats(3) for _ in range(inner)],
+                "sphere": r.floats(4),
+                "box": r.floats(6),
+            }
+            for _ in range(count)
         ]
-        track["normals"] = [
-            [r.floats(3) for _ in range(inner)] for _ in range(count)
-        ]
-        track["tail"] = r.floats(7)
     return track
 
 
@@ -86,12 +91,12 @@ def read_animation(r: Reader) -> dict:
     if r.u32():
         anim["parent"] = r.name()
     anim["pivot"] = r.floats(3)
-    anim["unknown"] = r.u32s(3)
+    anim["num_frames"], anim["first_frame"], anim["last_frame"] = r.u32s(3)
     anim["track_a"] = read_track(r, 3)
     anim["track_b"] = read_track(r, 3)
     anim["track_c"] = read_track(r, 4)
-    # Track D holds two u32s per key (frame time at +0xa8, key info at +0xb0).
-    anim["track_d"] = read_track(r, 0, extra_key_u32s=2)
+    # Hide: frame numbers at +0xa8, then one u32 per key at +0xb0.
+    anim["track_d"] = read_track(r, 0, extra_key_u32s=1)
     anim["track_e"] = read_track_e(r)
     return anim
 
@@ -169,20 +174,20 @@ def selftest() -> int:
         + track(2, 3)
         + track(1, 3)
         + track(1, 4)
-        # track D: count, companion u32, frame ids, then two u32s per key (frame + info)
+        # hide: count, flags, frame numbers, then one u32 per key
         + struct.pack("<I", 2)
         + struct.pack("<I", 0)
         + struct.pack("<2I", 0, 1)
-        + struct.pack("<4I", 7, 8, 9, 10)
-        # track E: one key, inner count 2; per-key = u32 + 5f + u32 + 2*(inner*3f) + 7f
-        + struct.pack("<I", 1)
-        + struct.pack("<I", 0)
-        + struct.pack("<I", 0)
-        + struct.pack("<5f", 1, 2, 3, 4, 5)
+        + struct.pack("<2I", 7, 8)
+        # morph: count 2, flags, frames, 5f per key, inner count 2, then per key
+        # 2 positions, 2 normals, sphere 4f, box 6f
         + struct.pack("<I", 2)
-        + struct.pack("<%df" % (2 * 3), *range(2 * 3))
-        + struct.pack("<%df" % (2 * 3), *range(2 * 3))
-        + struct.pack("<7f", *range(7))
+        + struct.pack("<I", 0)
+        + struct.pack("<2I", 0, 5)
+        + struct.pack("<10f", *range(10))
+        + struct.pack("<I", 2)
+        + (struct.pack("<12f", *range(12)) + struct.pack("<4f", 1, 2, 3, 4)
+           + struct.pack("<6f", *range(6))) * 2
     )
     blob = name32("(c) 1998 4X Tech. 0.95 (A)") + struct.pack("<I", 1) + anim
 
@@ -192,11 +197,12 @@ def selftest() -> int:
     assert a["name"] == "Anim" and a["parent"] == "Root"
     assert a["track_a"]["count"] == 2 and len(a["track_a"]["values"][0]) == 3
     assert len(a["track_c"]["values"][0]) == 4, "track C values are quaternions"
-    assert a["track_d"]["keys"] == [(7, 8), (9, 10)]
-    assert a["track_e"]["count"] == 1
+    assert [tuple(k) for k in a["track_d"]["keys"]] == [(7,), (8,)]
+    assert a["track_e"]["count"] == 2
     assert a["track_e"]["inner_count"] == 2
-    assert tuple(a["track_e"]["frames"]) == (0,)
-    assert len(a["track_e"]["tail"]) == 7
+    assert tuple(a["track_e"]["frames"]) == (0, 5)
+    assert a["track_e"]["morphs"][1]["sphere"] == (1.0, 2.0, 3.0, 4.0)
+    assert len(a["track_e"]["morphs"][1]["box"]) == 6
 
     for mutate, why in (
         (lambda b: b + b"\0", "trailing byte accepted"),

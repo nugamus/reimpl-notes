@@ -302,6 +302,9 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Next to try:** `X3d_Object_Get_Number_Weld` and the per-object transform in the render
   callback; render comparison of a character.
 - **Status:** open
+- **Status (2026-09-25):** resolved by E-0054: each welded object transforms its own range
+  of the hierarchy top's vertex array with its own world matrix
+  (`docs/engine-spec/animation.md`).
 
 ### Q-0021 — Why do U01's distant buildings look faint and its boats missing in the original?
 - **Context:** E-0044. Candidates: LOD switching (`X3d_Object_Add_Lod`; the renderer asks
@@ -328,6 +331,9 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** matching the original's distant view.
 - **Next to try:** whether the global alpha-blend state is on while state-3 faces draw
   (vertex alpha 0); disassemble `FUN_10019730` case 2 by hand for the angle.
+- **Also checked (2026-09-25):** E-0058: type 2 keeps the camera's pitch and fixes the yaw
+  at π/2; the object's true view-space origin goes to transform `+0x164`. Not yet read:
+  how `xd3d.dll` uses `+0x164` to place the object.
 - **Status:** open
 
 ### Q-0022 — What frame rate did the original run at, so what are its turn and pitch rates per second?
@@ -367,4 +373,17 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   (3D sound update); which units enable run (`+0x48`) and jump (`+0x4c`), E-0047.
 - **What we checked:** the call sites only.
 - **Blocks:** nothing in U01 beyond the halved speed near walls and the cursor while moving.
+- **Status:** open
+
+### Q-0026 — What else the animation tick drives, and what pauses `*U01_03` before `U01_Start`
+- **Context:** E-0056/E-0057. Every `animation=` node starts running and looping, yet
+  `U01_Start` "starts" `*U01_03` by unpausing it; the tick also runs scene `+0x168`
+  (`FUN_00421b90`, probably the `TRAJCAM` camera path) and `FUN_00420e00` (list `+0x1a0`,
+  a stored matrix multiplied into an object's local matrix every frame).
+- **What we checked:** the node constructor, the tick, `U01_Start`'s calls.
+- **Blocks:** whether U01's crank (`U01_03`) turns before the hand-over; any per-frame
+  object spin from the `+0x1a0` list; the camera animation `U01_Start` waits for.
+- **Next to try:** callers of `FUN_00420060`/`FUN_00420100` during U01 load
+  (`FUN_0041e500`, the U01 constructor); decompile `FUN_00421b90` and what fills
+  `+0x1a0` entries' `+0x6c`/`+0x88`.
 - **Status:** open
