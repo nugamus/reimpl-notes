@@ -94,6 +94,11 @@ After loading, U01's unit code hides `Box203` (which also loses collision, E-004
 p = (−258.44, −508.20, 29.546), a = 1.31, e = π/2 (1.5707960). This is the first shot of
 U01's scripted entry, right after the prologue video.
 
+## Back faces
+
+Faces seen from behind are not drawn (D3D's default counter-clockwise culling; xd3d never
+sets a cull mode, E-0205), the same test the pick uses (E-0070).
+
 ## Camera-facing objects
 
 Objects whose names contain `$XYZ$`, `$Z$` or `$XZ$` get camera types 1, 2, 3 (E-0045).

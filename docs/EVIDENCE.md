@@ -2575,3 +2575,135 @@ An entry at `tentative` confidence must also have a matching line in
   30: 75; 25: 80; exactly 90 only when N divides 165).
 - **Method:** capstone; PE import table.
 - **Confidence:** proven. Refines E-0161's "(c₀ − 90)/N" (`u02.md` said "toward 90").
+
+### E-0210 — Every path that stores, keeps or drops the held item
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** cursor `DAT_0046ec14`: `+4` mode (0 normal, 1 holding, 2 blinking), `+0x2c`
+  image, `+0x4a` bar name, stash `+0x4d0`/`+0x4d4`/`+0x4d8` (E-0183). The cursor setter
+  `FUN_00414540(mode, name, redraw)` (`ret 0xc`) has three callers: the take routine
+  `FUN_004211d0`, the bar item press `0x004321e0` and the stash restore `FUN_00414960`.
+  **Store** = `FUN_004149e0`: if mode is 1 or 2 (2 first stops the blink,
+  `FUN_00414ba0`), bar `+0xa8(cursor +0x4a)` (add), cursor normal (`FUN_004144b0(0,0,0)`).
+  Its callers: `App_OnEscape` (`0x00416400`) only on the in-game branch (game `+0x160` ≠ 0
+  and help panel `+0x170` = 0; the U00 branch, `+0x160` = 0, stops group 1 and opens the
+  menu without it); `FUN_004135b0` (game vtable `+0x14`, caught → `OptionLoad`); and the
+  unit switch, game vtable `+4` (`0x00412fb0`, call at `0x00412ffa`, before `+0x160` and
+  the script name are set; Ghidra has no function there, so its xref list misses it). The
+  strip press `0x00431cb0` adds `+0x4a` when mode = 1 and hides the bar; the item press
+  first forwards to it (swap). **Kept:** `App_OnLButtonDown` (`0x00417c10`, app mode 0,
+  cursor shown, rate limit) → scene `+0x30` → `FUN_0041b700`: hover, then
+  `Actions_TriggerForHotspot` only if a hotspot is under the cursor; no match ends in
+  `FUN_00412a90` (empty). WndProc (`0x00416650`) jump table `0x00416978`: 0x201 →
+  `App_OnLButtonDown`; 0x202, 0x203, 0x204, 0x205 → `0x00412aa0` (`mov eax, 1; ret 8`), so
+  right clicks do nothing. `PorteF_OnKeyDown` (`0x00431800`) only slides the bar.
+  `Scene_PickHover` resets the cursor only when mode is neither 1 nor 2. **Frames:**
+  `SetAppMode(2)` (`0x00417ce0`) stashes a holding cursor (`FUN_00414910`: `+0x4d0` = 1,
+  `+0x4d4` = 1, image) and sets it normal, but the app-mode-2 branch of the main loop
+  (`0x00416de1`..`0x00416e2f`) calls `FUN_00414800(1)` → `FUN_00414960(1)` every pass,
+  which restores the stash (`FUN_00414540(1, image)`) and clears `+0x4d0`: the item stays
+  on the cursor over every frame. Leaving mode 2 runs `FUN_00414960(0)`, the same restore.
+  **Dropped** (normal cursor, nothing added): `LoadUnitScene` (`0x004130b0`: `+0x4d0` = 0,
+  `FUN_004144b0(0, 1, 1)`), the base unit start `FUN_0041ae10`, op 3 (`0x004212b0`),
+  `U00_DonnerLunettes`, `Scene_RestoreState` without a save; `Game_NewGame`
+  (`0x00412b80`) calls `SetAppMode` and then clears the strip (bar vtable `+0xa4` =
+  `0x00431b30`, call at `0x00412ccb`).
+- **Method:** MCP decompile; capstone of the WndProc, the main loop and `0x00412fb0`;
+  vtable reads with `pefile`.
+- **Confidence:** proven. Live checks: E-0211, E-0212.
+
+### E-0211 — Live: a take puts the item on the cursor and raises the bar; only a strip click stores it
+- **Binary/file:** `C:\MonetRun` (sound patch of E-0213); `tools/proxy/cursor.ps1` reads the
+  cursor fields of E-0210; snaps in `traces/inv/` (local).
+- **Evidence:** U00 on the boat, click at game (312, 434) on the glasses: mode 1, image
+  `U04_80C.bmp`, bar name `U04_80P.bmp`; the glasses vanish from the seat and within about
+  0.6 s the bar is fully up (y = 420) with the glasses image drawn centred on the cursor
+  (`d03`..`d05`). Nothing more happens by itself: 30 s later mode is still 1 and the strip
+  empty. With the item held: left click on empty water (100, 200) → mode 1; right click
+  (500, 150) → mode 1; Space → the bar slides up, mode 1, strip empty (`b11`). Click on
+  the strip (330, 450) → mode 0, bar hides; Space → the glasses in slot 0 (`b13`). Click
+  slot 0 (111, 450) → mode 1 again, bar hides, strip empty. Holding the glasses, a click on
+  the table (200, 300) keeps mode 1. In the first run the click right after the take
+  landed at y = 428, inside the risen bar, and stored the glasses at once (`b04`..`b07`).
+- **Method:** two live runs, 2026-09-26; `send.ps1` (new `-Right`), `snap.ps1`.
+- **Confidence:** proven.
+
+### E-0212 — Live: Escape in U00 keeps the item on the cursor over the menu; Practice stores it, New game loses it
+- **Binary/file:** `C:\MonetRun`; `traces/inv/` (local).
+- **Evidence:** holding the glasses in U00 (no game), Escape: app mode 2, the Option menu
+  with the glasses image still drawn at the cursor (`b14`); cursor mode 1, stash image
+  `U04_80C.bmp` with `+0x4d0` = 0 (restored, E-0210). Practice from there: mode 0, and
+  after `sb03_bis` Space shows the glasses in slot 0 (`b16`): the unit switch stored them.
+  Same again, then New game: mode 0 at once; at U01's hand-over (`camera.ps1` = the
+  free-roam pose) Space shows only the banknote `U02_01P` (`c01`).
+- **Method:** live run, 2026-09-26.
+- **Confidence:** proven.
+
+### E-0213 — Voices of an unfocused original never end: no `DSBCAPS_GLOBALFOCUS` (answers Q-0111)
+- **Binary/file:** `MissionMonet.exe` `0x00421fc6`/`0x00421fd0`; `C:\MonetRun`.
+- **Evidence:** `LSound_72` builds the caps as `0x10080` or `0x100c0` (+2 static, E-0120),
+  never with `0x8000` (global focus), so DirectSound keeps a background application's
+  buffers silent and not advancing. Live, window never focused: after a new name the
+  read-out shows `started` = 1 and the gauge stopped for over a minute (U00 is inside the
+  blocking `sb03` Say), the camera fixed at the start pose, Up and Enter ignored (as
+  E-0203). With `patch_exe.py`'s two new patches (caps `0x18080`/`0x180c0` in the copy),
+  `sb03` returns after about 12 s (gauge state 1 at +13 s) and Up moves the eye.
+- **Method:** capstone; two live runs, 2026-09-26.
+- **Confidence:** proven. Nothing for the engine (its mixer does not depend on focus).
+
+### E-0214 — Space never reaches U00's key table while the bar exists: `spaceSeen` is set only by the ending
+- **Binary/file:** `MissionMonet.exe`; `C:\MonetRun`.
+- **Evidence:** WndProc (`0x00416650`) first hands every message to the frame manager
+  (`DAT_0046ec1c`, vtable `0x00439e5c`, `+0x68` = `0x0042bc00` → `+0x6c` = `0x0042bcc0`) and
+  returns at once when it answers non-zero. For 0x100 (jump table byte `0x0042bf30`,
+  target `0x0042bcf7`) it calls each active frame's `+0x1c`; `PorteF`'s (`0x0043ae9c` +
+  `0x1c` = `PorteF_OnKeyDown`, `0x00431800`) returns 1 for Space whenever app `+0x488` is
+  set. So Space's key-table slot `0x0046e860` is never written and
+  `U00_ProcessTutorialKeys` never sets `+0x700`; only `U00_DonnerLunettes` does. Live: near
+  Monet in state 8, Space (80 ms) then Space (400 ms): the bar toggled each time, `+0x700`
+  stayed 0 and the gauge stayed in state 8 (`sb11` keeps coming back); after the glasses
+  were given it read 1.
+- **Method:** capstone; vtable reads; live run, 2026-09-26.
+- **Confidence:** proven. Supersedes E-0232's "set only by Space (and `DonnerLunettes`)"
+  and E-0201's Space step as far as its effect goes (the code is there, the key never
+  arrives while `PorteF` is open with inventory allowed).
+
+### E-0215 — Live: U00's tutorial played end to end
+- **Binary/file:** `C:\MonetRun`; `tools/proxy/cursor.ps1`, `camera.ps1`; `traces/inv/`
+  (local).
+- **Evidence:** new player, 2026-09-26 (times after Enter): `sb03` ends at ≈12 s, gauge
+  state 1; Up during `sb04` does nothing, after it Up sets `moved` and stops the gauge
+  (state 0). Route (collision `static/Collision.o3d` placed with E-0042's matrices): the
+  courtyard west to (41, 253), south down the steps (z 15 → −3.6) to (54, 209), the ring
+  path east (105, 160) → (150, 145) → (174, 134) → (196, 72) → spur (166, 54); walking west
+  onto the boat puts the eye at (141.389, 66.874, −11.818), yaw 1.5508, pitch 0.9491
+  (looking at `*U04_43`), `onStone` = 1, state 2. On the boat Up does not move. Right
+  0.85 s: yaw 4.6708, `turned` = 1, state 4 at once; 10 s later `glassesTaken` = 1,
+  state 5. Take: state 7; strip click: the next fire sets `nearMonet` = 1 and state 3.
+  Shift: eye (149.87, 60.56, −9.26), yaw 6.7102 (0.427 + 2π, not reduced), pitch π/2,
+  `onStone` = 0, state stays 3. Walking from there toward (172, 70) stepped back onto the
+  boat (`onStone` = 1 again, same pose; answers Q-0121). At the terrace, at (68.9, 265.1),
+  the view turned to Monet (yaw 5.0204, pitch 1.2116), state 8. Glasses from the bar onto
+  Monet at (471, 262): cursor normal, `spaceSeen` = 1, state 0, the view back at the start
+  pose; Monet wears the glasses (`e2`); the Option menu about 18 s after the click, "Load a
+  game" and "Gallery" dimmed (`e4`). Practice then: unit flags fresh, `sb03_bis` ≈11 s,
+  state 1, strip unchanged (empty here; in E-0212 it kept the glasses). Hover on Monet
+  gives cursor kind 0, as his INFOOBJ entry. After the ending the hidden gauge read state
+  8 with a new start time although `spaceSeen` = 1 (Q-0112).
+- **Method:** live run, 2026-09-26; `cursor.ps1` sampled every 2–4 s.
+- **Confidence:** proven for the listed readings.
+
+### E-0205 — The renderer culls back faces: xd3d never sets a cull mode, so D3D's default CCW culling applies
+- **Binary/file:** `xd3d.dll`; `traces/u01-start-original.png`.
+- **Evidence:** capstone scan of every `IDirect3DDevice2::SetRenderState` call (vtable
+  `+0x5c`, 257 sites) in `xd3d.dll`: the immediate states set are 1 (texture handle), 9
+  (shade mode), 0xe (Z write), 0x13/0x14 (blend factors), 0x1b (alpha blend), 0x1d
+  (specular), 0x29 (colour key), 0x2c/0x2d (texture address); never 0x16
+  (`D3DRENDERSTATE_CULLMODE`). D3D's default is `D3DCULL_CCW`, so faces wound
+  counter-clockwise on screen are not drawn, matching the pick's back-face test (E-0070).
+  Engine check: with back faces culled (OpenGL `glFrontFace(GL_CCW)` in its projection)
+  U01's first shot loses the dark boat in front of the harbour, as in the original
+  capture; with the other winding the whole scene vanishes.
+- **Method:** Python capstone over `.text` of `xd3d.dll`; engine render compared with the
+  capture.
+- **Confidence:** proven for the state scan; the U01 comparison is visual. Q-0021's faint
+  buildings and the engine's birds remain unexplained.
