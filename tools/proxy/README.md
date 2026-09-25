@@ -91,12 +91,20 @@ To undo everything, delete `C:\MonetRun` and run step 1 again.
 | "insert CD" style box and exit | `Data\App.bin` is not next to the exe; rerun step 1 |
 | "Please set your screen to 16 bits" | the exe copy is unpatched: `python tools/proxy/patch_exe.py` |
 | `run.ps1` says no dialog confirmed | the game hit an error box; look at the window, then report it |
+| crash ~1.5 s into U01 (EIP `0x40af518c`) | the x3d proxy; `X3D_PROXY=0 bash tools/proxy/setup_run.sh` installs the real `x3d.dll` (h3d tracing stays) |
 | crash `c0000005` in ntdll (Application log) | seen once right after an agent typed a player name too early; not reproduced. Note it in `traces/INDEX.md` |
 
 Agents can drive and watch the original without focusing it: `tools/proxy/send.ps1` posts
 keys, text and clicks, and `tools/proxy/snap.ps1 out.png` captures the window even when it is
 covered. The game stores player profiles in `C:\MonetRun\Save\` (`User_N/`, `Info.bin`);
 delete that folder's contents for a fresh start.
+
+Reaching U01 with posted messages only (E-0043): `run.ps1`; wait 12 s; `send.ps1 -Text Name
+-Enter`; after 5 s `send.ps1 -Key 0x1B -HoldMs 70000` (Monet's tutorial polls Escape only
+between lines, so hold it); the menu appears; `send.ps1 -ClickX 376 -ClickY 37` (New game);
+the prologue cannot be skipped by posted keys (it reads `GetAsyncKeyState`), so wait ~62 s.
+The first U01 shot holds for 1.5 s, then the camera moves. Never post Escape on the players
+screen: it quits the game.
 
 ### 4. Play the scenarios
 

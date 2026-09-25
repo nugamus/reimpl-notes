@@ -32,6 +32,13 @@ set_key Resolution unforced
 set_key CaptureMouse false          # do not trap the mouse in the window
 
 # Tracing proxies (build them first: see tools/proxy/README.md, Build).
-cp "$repo/build/proxy/Release/x3d.dll" "$repo/build/proxy/Release/h3d.dll" "$run/"
+# X3D_PROXY=0 installs the real x3d.dll instead: the x3d proxy crashes the game ~1.5 s
+# into U01 (CLAUDE.md Status), the real DLL does not.
+cp "$repo/build/proxy/Release/h3d.dll" "$run/"
+if [ "${X3D_PROXY:-1}" = 0 ]; then
+    cp "$run/x3d_orig.dll" "$run/x3d.dll"
+else
+    cp "$repo/build/proxy/Release/x3d.dll" "$run/"
+fi
 python "$repo/tools/proxy/patch_exe.py" --run "$(cygpath -w "$run")"
 echo "run folder ready: $run"

@@ -46,3 +46,6 @@ venv/
 .idea/
 Thumbs.db
 desktop.ini
+
+# Captures of the original (game imagery, not ours to redistribute)
+traces/*.png
