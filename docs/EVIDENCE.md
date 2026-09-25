@@ -1963,3 +1963,195 @@ An entry at `tentative` confidence must also have a matching line in
   after each batch and 25–30 s later: the view never changed.
 - **Method:** one live run; `MissionMonet.exe` killed afterwards.
 - **Confidence:** proven for the start pose; the keys' effect is unresolved (Q-0111).
+
+### E-0160 — U02's vtable, load hook and start: ambient `s1_15`, six renames, three talkers, camera cut and an autosave
+- **Binary/file:** `MissionMonet.exe`; `Data/U02/**`, `INSTALL/02_PR/Message.txt`.
+- **Evidence:** constructor `0x00402af0`: vtable `0x00439468`, `+0x6e8` = `+0x6f0` =
+  `+0x6fc` = `+0x6c8` = 0, `+0x6ec` = 10000. Vtable: `+8` `0x00404ad0` / `+0xc`
+  `0x00404b50` read / write chunk `TIMEVENDEUSE` (`0x0043f730`: u32 `+0x6e8`, `+0x6ec`,
+  `+0x6f0`, `+0x6fc`; `+0xc` is what the game save `0x00412e40` calls), `+0x10`
+  `U02_OnLoadRenames` (`0x00402b60`, function created), `+0x14` `U02_StartUnit`
+  (`0x00402d30`, created), `+0x1c` `U02_UpdateFrameLogic`, `+0x30`
+  `U02_DispatchClickActions`, `+0x40` `0x0041b7f0` (`Scene_HandleInput`: no U02 input
+  hook). `0x00402b60`: vtable `+0x4c("s1_15", 1)`, `XScene_124`, then
+  `X3d_Scene_Get_Object` + strcpy: `*U02_01` → `*U02_06`, `lourde05` → `*U02_12` (object,
+  and node list `+0x14("lourde05", 1)` name at node `+0xc`), `*U02_07` → `*U02_07b`, next
+  `*U02_07` → `*U02_07a`, the first → `*U02_07`, `*ZonePlanc` → `*U02_13`, `*colplanch` →
+  `*U02_14`. `0x00402d30`: `FUN_0041ae10`; vtable `+0x28` talkers ("U02_02", "",
+  "$$$DUMMY.*U02Parle", 0, 8, 0), ("U02_03", …, "$$$DUMMY.*U_03Parle"), ("U02_04", …,
+  "$$$DUMMY.*visage"); node/hotspot pairs `+0x6d0/+0x6d4` `*U02_02`, `+0x6e0/+0x6e4`
+  `*U02_03`, `+0x6cc/+0x6f4` `*U02_05`, `+0x6d8/+0x6dc` `*U02_04`; actions `+0x430`
+  (M08 exhausted) and not `+0x440` (M12) → `+0x50("d1_25", hotspot +0x70, 1)`; hotspot
+  `*U02_01` object `+0x5c` ≠ 0 → `+0x114` = 1; if `a`: `FUN_00419520(122.626, 67.0605,
+  52.529)`, `FUN_00419550(0.1, π/2)`, inventory `+0x90`/`+0xa8("U02_01P")`, game vtable
+  `+0x10(FUN_0042a3c0(0x3eb), 0)`. `FUN_0042a3c0(n)` reads `Message.txt` beside the EXE
+  and returns line `n`'s text up to `;` (1003 = "Automatic save"); game `+0x10`
+  (`0x00412e40`) writes `%sGamesave%i` for slot 0 with that name. Corpus (`o3d.py` over
+  `U02.X3D`'s `OBJECT=` files): `*U02_01` in `anim/U02_04/U02_04.o3d` and
+  `anim/U02_03/U02_03.O3D` (loaded later), `*U02_07` in `Static/U02.O3d` and
+  `Static/U02_07.o3d` (later), `*U02_08` in `Static/ruisseau.O3d`, `plncher01` in
+  `Static/repo.o3d`, `lourde05` in `anim/porte.O3D`.
+- **Method:** MCP decompile and capstone (strings and floats resolved); PE import table;
+  `o3d.py`, `infoobj.py`.
+- **Confidence:** proven for the calls; which duplicate gets renamed follows from the list
+  order (Q-0090).
+
+### E-0161 — U02's frame hook: stream fall, the seller's call timer, the magpie trigger, the gauge warning and expiry
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `U02_UpdateFrameLogic` (`0x00402f70`): after `Scene_RenderFrame`,
+  `_stricmp(camera +0x3c name, "*U02_08")` = 0 → `U02_FallInStream` (`0x00404bd0`);
+  `+0x6f0` = 0, `timeGetTime − +0x6e8 > +0x6ec` (unsigned) and voice `+0x178` silent →
+  `+0x6e8` = now, `rand·3/0x7fff` 1 → `d1_12`, 2 → `d1_13`, else `d1_14`,
+  `Talkers_Say("U02_03", …)` (a vector (1818, 70, 83) is built and unused); `+0x6fc` = 1
+  and `FUN_00415e40((1280, −564, −7.15), eye) < 240` (`0x004394c4`) → suspend, `+0x6fc` =
+  2, `+0x6c8` ?= `FUN_00420360(+0x6cc, "PieVoleur", 1)` (slot by name), `FUN_00420060(0)`,
+  `FUN_00419bc0(400, clip +0x80)`, direction `X3d_Convert_From_Polar` of the X3D camera
+  `+0x54/+0x58` normalised, target eye + 150·(d.x, d.y) (`0x004394c0`) with eye z,
+  `FUN_00419620(eye, target, yaw, yaw, pitch, pitch, 1000, 0x00402f50)`, `+0x50("S1_17",
+  eye)`, `FUN_00419bc0(0, …)` while clip `+0x74` < 240, `FUN_00421300(+0x6f4, 5)`, resume.
+  `FUN_00419620`: N = ftol(ms · scene `+0x144` (fps) · 0.001), min 1; per step position
+  += Δ/N, yaw/pitch += Δ/N, callback, tick, render, emitter volumes; final snap.
+  `0x00402f50` = `Camera_FollowGround(eye)`. Gauge `+0x148` running: `DAT_0044261c` = 0
+  and duration − 20000 < elapsed < duration − 10000 → flag = 1, `Say("U02_02", "d1_26")`;
+  `FUN_0041a6c0(1)` → suspend twice, `+0x50("s1_22", eye)`, `Say("U02_02", "d1_27")`,
+  `RunFor(0)` while `+0x178` or `+0x174` plays, game vtable `+0x14` (`FUN_004135b0`,
+  E-0082). `DAT_0044261c` has no other writer. `0x00404bd0`: suspend, `+0x50("s1_19",
+  eye)`, N = ftol(`+0x144`), per step channel `+0x16c..+0x16e` −= (c₀ − 0x5a)/N if ≥ 0
+  else 0, `FUN_0041b2f0`, `RunFor(10)`; d = normalise(polar(camera `+0x34`, `+0x38`)),
+  P = (eye.x + s·d.x, eye.y + s·d.y, eye.z − (camera `+0x5c` − 30.0)), camera `+0x70` =
+  0, `Camera_Fall(eye, P)` (drops z by `FUN_00415e40(eye, P)`, 3-D), `Camera_MoveTo(800,
+  P, 100, 0.5, 40)`, twice `Camera_MoveTo(600, none, yaw + 3.0, 100, 100)`,
+  `FUN_0041bfd0(2000)`, game `+0x14`. Corpus: `SCENE.BIN` `#SCENE#` 255/255/255,
+  scale 40.0; `s1_19.wav` 10.12 s.
+- **Method:** capstone of `0x00402f70..0x00403337` and `0x00404bd0..0x00404e6f`; MCP
+  decompile of `FUN_00419620`, `Camera_Fall`, `FUN_00420360`, `FUN_00420060`.
+- **Confidence:** proven.
+
+### E-0162 — U02 dispatcher and the clerk / inspector / seller / door / plank handlers
+- **Binary/file:** `MissionMonet.exe`; `Data/U02/INFOACT.BIN`.
+- **Evidence:** `0x00403340`: `FUN_0041b700`, then while `+0x1a4` drains the queue
+  comparing, in order, `ClickControleur` `0x00403560`, `ClickGuichetier` `0x004035f0`,
+  `Donner100FrsAGuichetier` `0x00403850`, `ReTake100Frs` `0x004039a0`, `ClickVendeuse`
+  `0x00403b30`, `AcheterMarron` `0x00403bc0`, `PieVoleur` `0x00403d70`, `ClicDoor`
+  `0x00404010`, `TakePlanche` `0x00404380`, `PoserPlanche` `0x004043b0`, `MarronToPie`
+  `0x00404060`, `ClickRonfle` `0x00403790`, `Sonner` `0x00404440`, `AcheterTicket`
+  `0x004046a0`, `TakeTicket` `0x00404800`, `MonterDansTrain` `0x00404890` (all renamed
+  `U02_*`); nothing after the loop. `0x00403560`: actions `+0x814` (M01 count) = 1 →
+  `Say("U02_02", "d1_15")`, cursor 5 on `+0x6d4`; else `rand·2/0x7fff` = 1 → `d1_15`,
+  else `d1_16`. `0x004035f0`: `+0x818` = 1 → `d1_17` and cursor 5 on `+0x6dc`; = 2 →
+  `d1_18`; else random 1 → `d1_17`, else `d1_18`; `Say("U02_04")`; `+0x6ec` = 15000,
+  `+0x6e8` = now. `0x00403850`: suspend, `FUN_00420220(+0x6d8,
+  "%sAnim/U02_04/RendreArgent.A3D", "RendreArgent", 3, 1)` (slot 3, active; `+0x68` = 0),
+  hotspot `*U02_01`: `FUN_004212b0`, cursor 4, `+0x28("*U02_01", 1, 1)`, object `+0x114`
+  = 0; `Say("U02_04", "d1_19")`; `+0x6e8` = now; cursor 0 on `+0x6dc`; `MoveTo(800,
+  (2339.33, −116.49, 78), 1.62)`; camera `+0x44` = `+0x40` = 0; `FUN_0041e2a0(M16, 1)`;
+  resume. `0x004039a0`: `FUN_0041e2a0(M16, 0)`, `FUN_004211d0("*U02_01")`, slot
+  `RendreArgent` (or load it) `+0x70` = 1, running, camera `+0x44` = `+0x40` = 1, cursor 3
+  on `+0x6dc`, `*U02_01` object `+0x114` = 1. `0x00403b30`: `+0x6ec` = 20000; if `+0x430`
+  and not `+0x440` and `+0x860` > 0: `DAT_00442620` (no writer anywhere) → `d1_28`, else
+  random 1 → `d1_29`, else `d1_30`, `Say("U02_03")`, `+0x6e8` = now. `0x00404010`: node
+  `*U02_12` frame < 2.0 → `+0x70` = 0, `FUN_00420100(50.0, 1)`; else `+0x70` = 1, run to
+  1.0. `0x00404380`: `_stricmp(camera +0x3c name, "plncher01")` ≠ 0 →
+  `FUN_004211d0("*U02_07")`. `0x004043b0`: `+0x28("*U02_07a", 1, 0)`, `FUN_004212b0`,
+  cursor 0 on `*U02_13` and `*U02_07a` by name, `X3d_Scene_Get_Object("*U02_14")`
+  `+0x118` = 0 (a `*U02_08` lookup before it is unused). `0x00403790`: `+0x860` (M20
+  count) = 1 → cursor 3 on `+0x6e4`; = 3 → cursor 0 on `+0x6dc`; `+0x50("d1_25_2",
+  hotspot +0x70)`; loop `RunFor(0)` + vtable `+0x40` while `+0x174` plays and
+  `strstr(emitter +0x18, "d1_25_2")`; `0x004036d0`: `+0x184` = `FUN_00414c80(4, s·50)`,
+  `SoundEmitter_Play("%sSound/d1_25.wav", +0x6dc +0x70, 1)`. `FUN_00420220(node, path,
+  name, slot, active)` puts the clip in that slot (`FUN_004202f0`), inheriting the node's
+  fps `+0x78`, loop `+0x68` and paused `+0x60`; `FUN_00416180(a, b, exact)` is
+  case-insensitive equality or (exact 0) "a contains b".
+- **Method:** capstone of `0x00403340..0x004047f2` (strings, floats); MCP decompile of
+  `FUN_00420220`, `FUN_004202f0`, `FUN_004211d0`, `FUN_004212b0`, `FUN_00421300`,
+  `FUN_00416180`; `infoact.py --file`.
+- **Confidence:** proven.
+
+### E-0163 — `AcheterMarron`, `PieVoleur`, `MarronToPie`: the seller's change, the magpie, the 180-s gauge and the clerk's sleep
+- **Binary/file:** `MissionMonet.exe`; `Data/U02/Anim/U02_03`, `U02_04`, `U02_05`.
+- **Evidence:** `0x00403bc0`: suspend, `+0x6ec` = 30000, `+0x6f0` = 1, camera `+0x40` =
+  `+0x44` = 0, `MoveTo(1000, (1859.8, 73.65, 78.929), 3.1)`, cursor 4 on `*U02_06`,
+  `+0x6f8` = `FUN_00420220(+0x6e0, "…U02_03/ACTION01.A3D", "DonnerMarron", 1, 1)`, its
+  `+0x7c` := `FUN_0041c380(+0x7c, "*U02_03")` (sub-animation by name, depth first),
+  `+0x68` = 0, `+0x78` = 8.0, running; `Say("U02_03", "d1_22")`; `+0x6e8` = now;
+  `RunFor(0)` until `+0x60`; `FUN_0041e2a0(M06, 1)`; resume. `0x00403d70`: node `+0x6cc`
+  `FUN_004200c0(30.0)`, `X3d_Object_Unhide(obj, 1)`, `FUN_00420080(1)`, running, `+0x78`
+  = 40.0; `DonnerMonnaie` = `ACTION02.A3D` slot 2, sub-animation `*U02_03`, `+0x68` = 0,
+  `+0x78` = 50.0, frame 1.0, running; yaw/pitch saved; camera `+0x70` = 0; loop
+  `RunFor(0)` until magpie `+0x74` > 145.0 (`0x004394c8`), saying `d1_23_1` once when the
+  clip's frame > 60.0; `+0x50("S1_17", eye)`, `Say("U02_03", "d1_23_2")`; `LookAt(0)`
+  while < 240.0; camera `+0x70` = 1; `MoveTo(300, none, yaw, pitch, 100)`; `+0x6e8` =
+  now; clip `+0x78` = 80.0, `RunFor(0)` until paused; `FUN_00420080(+0x6e0, 1)`; camera
+  `+0x40` = `+0x44` = 1; `+0x6c8` = `FUN_00420220(+0x6cc, "…U02_05/Action02.A3D",
+  "PieVoleur", 1, 1)`, `+0x68` = 0, `+0x78` = 30.0, `FUN_00420060(1)` (paused), frame
+  (anim `+0x38` first frame) + 10.0; `+0x6fc` = 1; `+0x6f0` = 0. `0x00404060`: `+0x6ec` =
+  60000, suspend, `FUN_004212b0(+0x6f4)`, `+0x28("*U02_06a", 1, 1)`, node running,
+  `RunFor(300)`, `OnBarriere` = `ACTION03.A3D` slot 1 (`DAT_00442624`), `+0x68` = 1,
+  `+0x78` = 20.0, `LookAt(500)`, `RunFor(500)`, `+0x28("*U02_09a", 1, 1)`, node running,
+  `+0x68` = 0, `S'envoler` = `ACTION04.A3D` slot 1, `RunFor(0)` while frame < 29.0,
+  `+0x28("*U02_06a", 0, 1)`, while frame < last − 30: `LookAt(0)`, once frame > 80.0
+  `+0x50("s1_17", eye)`; `+0x6e8` = now; resume; P = eye − (0, 0, 5·s); app `+0x484` =
+  0; `RunFor(0)` + `+0x40` for 2000 ms of `timeGetTime`; `+0x48("d1_24", P)`;
+  `FUN_0041a560(180.0, 1, "", 0)`; `RunFor(0)` + `+0x40` while `+0x174` plays; app
+  `+0x484` = 1; `0x00403a70`: `Sleep` = `U02_04/ACTION01.A3D` slot 1, running, `+0x6c` =
+  1, `+0x68` = 0, frame 85.0, `FUN_00420140(0x55, 0x56)`, `+0x78` = 1.0,
+  `U02_StartSnoreEmitter`, cursor 2 on `+0x6dc` and `*U02_10`. `FUN_004200c0` clamps to
+  anim `+0x38`/`+0x3c` (first/last); `FUN_00420080` on a base node sets enabled and
+  active slot 0. Corpus (`a3d.py`): `U02_03/ACTION01` 1..20, `ACTION02` 1..370,
+  `U02_05/ACTION01` 1..370, `ACTION02` 1..700, `ACTION03` 642..830, `ACTION04` 1..250,
+  `U02_04/ACTION01` 0..171; INFOOBJ `*U02_05` hidden, paused, 30 fps, not looping.
+- **Method:** capstone; MCP decompile of `FUN_0041c380`, `FUN_00420080`, `FUN_004200c0`,
+  `FUN_00420140`, `FUN_00420100`.
+- **Confidence:** proven.
+
+### E-0164 — `Sonner`, `AcheterTicket`, `TakeTicket`, `MonterDansTrain`: U02 ends with `LeHavRou.AVI` and unit 3
+- **Binary/file:** `MissionMonet.exe`; `Data/Video/LeHavRou.avi`, `S6_1.wav`.
+- **Evidence:** `0x00404440`: suspend; node list `+0x14("*U02_10", 0)` (contains-match;
+  the node is `$Z$*U02_10`) running; cursor 5 on `+0x6dc`; eye, yaw, pitch, FOV (camera
+  `+0x10`) saved; `LookAt(500, bell)`; `FUN_00414dc0(+0x184)`, delete, `+0x184` = 0;
+  `+0x50("SIREN", eye)`; `MoveTo(2000, none, 100, 100, 60)`; `RunFor(0)` until the bell
+  `+0x60`; clerk slot 1 (`+0x6d8 +0x18c`) `FUN_00420170` (restore range), `+0x6c` =
+  `+0x68` = 0, `+0x78` = 80.0; `FUN_00419600(saved FOV)`; `FUN_004194f0((2334.25, −100,
+  78.9))`, `FUN_00419550(1.54, π/2)`; `MoveTo(1000, none, 100, 100, 60)`; `RunFor(0)`
+  until slot 1 pauses; `FUN_00420080(+0x6d8, 1)`; `Say("U02_04", "D1_31")`; `RunFor(0)`
+  while `+0x178`; `FUN_004194f0(saved eye)`, `FUN_00419550(saved yaw, pitch)`; `+0x6e8` =
+  now; cursor 0 on `+0x6e4`; resume. `0x004046a0`: suspend, `MoveTo(1400, (2362.52,
+  −93.43, 78.9), 1.94, π/2)`, `Say("U02_04", "d1_32")`, `+0x6e8` = now, `DonnerTicket` =
+  `U02_04/ACTION02.A3D` slot 2, `+0x78` = 30.0, `+0x68` = 0, frame 15.0, `FUN_004212b0`,
+  cursor 0 on `+0x6dc`, `RunFor(0)` while frame < 100.0, `+0x50("s1_20", eye)`,
+  `+0x28("*U02_11", 1, 1)`, resume. `0x00404800`: slot 3 (`+0x194`) or load
+  `RendreArgent` into it; frame := anim `+0x3c`, `+0x68` = 0, `+0x70` = 1,
+  `FUN_004201c0(node, 3, 1)`. `0x00404890`: suspend, `FUN_0041e2a0(M01, 0)`,
+  `FUN_0041a680(gauge)`, `FUN_004212b0`, `LaisserEntrer` = `U02_02/ACTION02.A3D` slot 1,
+  `+0x68` = 0, `+0x78` = 30.0, `Say("U02_02", "d1_33")`, `+0x6e8` = now, `RunFor(0)`
+  until `+0x60` or `GetAsyncKeyState(VK_RETURN)`, `MoveTo(2000, (1413.16, 219.05, 78.93),
+  4.55)`, twice z += 5.0 with `MoveTo(1000, …, 4.55)` + `RunFor(200)`, `MoveTo(2000,
+  (1404, 293, 88.036), −1.62)`, `+0x50("s1_22", eye)`, `RunFor(0)` while `+0x178` or
+  `+0x174`, `PlayVideo("LeHavRou", "s6_1", 0, 1)`, game vtable `+4(3)`. `PlayVideo`
+  (`0x00417030`) takes four cdecl arguments: AVI name, WAV name (`[esp+0x210]`, used by
+  `%sVideo/%s.wav` when non-empty), redraw (`[esp+0x214]`: call scene `+0x1c` after),
+  stop group 2 (`[esp+0x218]`); U01 passes `("Prologue", "Prologue", 0, 1)` (refines
+  E-0035's three-argument reading). Corpus: `LeHavRou.avi` IV41, 640×480, 66,667 µs/frame,
+  496 frames (33.07 s); `S6_1.wav` 22,050 Hz mono 8-bit, 33.0 s.
+- **Method:** capstone; MCP decompile of `FUN_00420170`, `FUN_00419600`, `FUN_004194f0`,
+  `FUN_004201c0`, `FUN_004163b0`, `FUN_00414dc0`, `Camera_MoveTo`; AVI header and
+  Python `wave`.
+- **Confidence:** proven.
+
+### E-0165 — U02 corpus: INFOACT ids and conditions, INFOOBJ, clips and sounds used by U02.cpp
+- **Binary/file:** `Data/U02/INFOACT.BIN`, `INFOOBJ.BIN`, `SCENE.BIN`, `U02.X3D`,
+  `Anim/**`, `Sound/*.wav`.
+- **Evidence:** `infoact.py --file`: ids 1..8, 12..21; conditions M02 `!M12`, M03/M04
+  `!M05`, M06/M19 `FALSE`, M12 `M08`, M13 `M12`, M14 `M13`, M20 `M08 & !M12`, others
+  `TRUE`; max 1 for M05, M06, M08, M12, M13, M14, M18, max 3 for M20. `infoobj.py`: 17
+  hotspots `*U02_01`..`*U02_14`, `*U02_06a`, `*U02_07a`, `*U02_09a`; types 6 for
+  `*U02_02..04`, 5 for `*U02_05`, `*U02_06a`, `*U02_09a`, `*U02_10`, `*U02_12`; hidden
+  at start `*U02_01`, `*U02_05`, `*U02_06a`, `*U02_07a`, `*U02_09`, `*U02_09a`, `*U02_11`,
+  `*U02_14`. `U02.X3D`: characters `U02_04` (clerk, `attente.a3d`), `U02_02`
+  (inspector), `U02_03` (seller), `U02_05` (magpie, `ACTION01.a3d`), `porte`, `U02_10`,
+  `U02_06a`, `U02_09a`. `SCENE.BIN`: scale 40.0, `#CAMERA#` FOV 90, radius 20, Z offset
+  40. Sounds (Python `wave`): `s1_15` 28.11 s, `d1_25` 8.22 s, `d1_25_2` 6.82 s, `SIREN`
+  2.52 s, `s1_17` 2.65 s, `s1_18` 1.79 s, `s1_19` 10.12 s, `s1_20` 0.13 s, `s1_22` 6.77 s,
+  `d1_12`..`d1_33` 1.1–8.7 s (lip `.BIN` for all but `d1_25`, `d1_25_2`).
+- **Method:** the parsers named; Python `wave`.
+- **Confidence:** proven.

@@ -565,3 +565,33 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   Up hold; check whether a Say was blocking (keys released during a Say are lost), or
   whether collision with Monet blocks the first step; or the user plays it by hand.
 - **Status:** open
+
+### Q-0090 — Which duplicate objects do U02's renames hit?
+- **Context:** E-0160. `*U02_01` exists in the clerk's and the seller's `.O3D`, `*U02_07`
+  in `Static/U02.O3d` and `Static/U02_07.o3d`; the renames take the first found. With a
+  newest-first list (Q-0045), the seller's becomes `*U02_06` (the chestnut bag) and
+  `U02.O3d`'s becomes `*U02_07a` (the bridge plank, hidden); `u02.md` assumes that.
+- **What we checked:** load order in `U02.X3D`, the rename code; not X3D's list at runtime.
+- **Blocks:** which objects are the bag, the counter coin and the two planks.
+- **Next to try:** answered together with Q-0045 (trace `X3d_Scene_Get_Object` at load).
+- **Status:** open
+
+### Q-0091 — Does a save restored between `MarronToPie` and `Sonner` keep the clerk's `Sleep` clip?
+- **Context:** E-0163/E-0164. `Sonner` reads the clerk's slot 1 (`Sleep`) without a null
+  check; `Sleep` is added only by `MarronToPie`. On a restore `U02_StartUnit` plays the
+  snore on the effects emitter instead of the group-4 emitter and adds no clip.
+- **What we checked:** U02's restore path; not the generic save/restore of node slots
+  (`FUN_0041d490` / `FUN_0041d650`).
+- **Blocks:** restore fidelity in U02 only.
+- **Next to try:** decompile `FUN_0041d490` for node slot data; or save after the magpie
+  in the original, reload, ring the bell.
+- **Status:** open
+
+### Q-0092 — What happens to the seller's call timer after a restore?
+- **Context:** E-0160. Chunk `TIMEVENDEUSE` stores `callStart` as a raw `timeGetTime`
+  value; after a restore in a new session `now − callStart` is arbitrary (unsigned), so
+  the first call may come at once or much later.
+- **What we checked:** the chunk reader/writer; no live restore.
+- **Blocks:** nothing (the engine saves a relative time).
+- **Next to try:** restore a U02 save after a reboot in the original and time the first call.
+- **Status:** open
