@@ -122,7 +122,7 @@ it). `max_runs` ≥ 100: unlimited.
 | 4 | Start (unpause) the animation node named `arg`. |
 | 6 | Wait `arg` ms (blocking, as `RunFor`). Not in the corpus. |
 | 7 | Set the target's cursor kind to `arg`. |
-| 9 | Show the target if `arg` ≠ 0, else hide it. |
+| 9 | Show the target if `arg` is `0` (or empty), else hide it and take it out of collision (E-0088). |
 | 10 | Queue the action for the unit's code under name `arg` (below). |
 | 12 | Play `Sound/<arg>.WAV` (non-positional). Not in the corpus. |
 | 13 | Play `Sound/<arg>.WAV` at the hotspot's position (`arg` ending `.wav` is used as is). |
