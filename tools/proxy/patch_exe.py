@@ -13,6 +13,10 @@ Patches:
   MissionMonet.exe 0x00416cdc  push 1 -> push 4. WinMain's windowed-path
       ShowWindow(hwnd, SW_SHOWNORMAL) (0x00416cdf) becomes SW_SHOWNOACTIVATE, so the
       window appears behind whatever you are using instead of taking focus.
+  MissionMonet.exe 0x00421fca / 0x00421fd4  DSBCAPS 0x10080 / 0x100c0 -> 0x18080 / 0x180c0.
+      LSound_72 creates every sound buffer without DSBCAPS_GLOBALFOCUS (E-0120), so the
+      voices of a window that never had focus do not advance and U00's blocking lines never
+      return (E-0213, Q-0111). With the flag, sounds play while the window is in the back.
   MissionD.exe 0x0042cd6b / 0x0042bbcf  the same two patches in the developer build
       (GetDeviceCaps at 0x0042cd62, windowed-path ShowWindow at 0x0042bbd8).
 """
@@ -29,6 +33,8 @@ import pefile
 PATCHES = [
     ("MissionMonet.exe", 0x0041768C, b"\x74\x35", b"\xEB\x35", "skip 16-bit desktop check"),
     ("MissionMonet.exe", 0x00416CDC, b"\x6A\x01", b"\x6A\x04", "show game window without activating it"),
+    ("MissionMonet.exe", 0x00421FCA, b"\x80\x00", b"\x80\x80", "sound buffers keep playing unfocused"),
+    ("MissionMonet.exe", 0x00421FD4, b"\xC0\x00", b"\xC0\x80", "sound buffers keep playing unfocused (pan)"),
     # Same two sites in the developer build (unoptimised, so different code shape).
     ("MissionD.exe", 0x0042CD6B, b"\x74\x6B", b"\xEB\x6B", "skip 16-bit desktop check"),
     ("MissionD.exe", 0x0042BBCF, b"\x6A\x01", b"\x6A\x04", "show game window without activating it"),

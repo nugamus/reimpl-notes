@@ -564,6 +564,15 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Next to try:** the same run with `camera.ps1` reading the eye before and after a long
   Up hold; check whether a Say was blocking (keys released during a Say are lost), or
   whether collision with Monet blocks the first step; or the user plays it by hand.
+- **Status:** RESOLVED (E-0213) the blocking `sb03` never ended because the sound buffers lack `DSBCAPS_GLOBALFOCUS` and the window was never focused; `patch_exe.py` now sets the flag in the run copy.
+
+### Q-0112 — Who restarts U00's gauge in state 8 after the ending?
+- **Context:** E-0215: after `DonnerLunettes` opened the Option menu, the hidden gauge read
+  state 8 with a fresh start time while `spaceSeen` (`+0x700`) was 1. The only `Start(8)`
+  sites (`0x00409a6b` frame hook, `0x00409cfd` near Monet) both require `+0x700` = 0.
+- **What we checked:** every `call 0x0041a560` in U00's code; one live reading.
+- **Blocks:** nothing (U00 is left through the menu; the gauge is invisible).
+- **Next to try:** a watchpoint on gauge `+0x10` during the ending.
 - **Status:** open
 
 ### Q-0120 — What do U00's tutorial lines say?
@@ -584,7 +593,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** confirming that the tutorial can be left by walking after the jump.
 - **Next to try:** in the original, walk onto the boat, Shift, then Up; read
   `camera.ps1` before and after and see whether the view snaps back onto the boat.
-- **Status:** open
+- **Status:** RESOLVED (E-0215) yes; walking from the jump-off pose toward (172, 70) put the eye back on the boat with the step-on pose. The step-on is reached from the path spur at about (166, 54).
 
 ### Q-0090 — Which duplicate objects do U02's renames hit?
 - **Context:** E-0160. `*U02_01` exists in the clerk's and the seller's `.O3D`, `*U02_07`

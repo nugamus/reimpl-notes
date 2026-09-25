@@ -52,3 +52,4 @@ traces/*.png
 
 # Save files copied from runs of the original (binary, machine-specific).
 traces/save/
+traces/inv/

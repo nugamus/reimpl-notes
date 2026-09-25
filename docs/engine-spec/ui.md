@@ -108,8 +108,24 @@ Adding appends at the end; removing shifts every later item 70 px left.
   "holding" (`interaction.md`); the item is removed from the strip; the bar hides.
 - **Click the strip while holding an item**: the held item's name with its 7th character
   replaced by `P` is added; the cursor returns to normal; the bar hides.
-- A take step sets the cursor to `<target>C`: nothing enters the bar until the player
-  clicks the strip (or presses Escape, which also stores a held item, E-0105).
+- A take step sets the cursor to `<target>C` and slides the bar up; nothing enters the
+  bar by itself (E-0211). Clicking anywhere on the strip (not only an empty slot) stores it.
+
+**The held item (E-0210..E-0212).** Once held, the item stays on the cursor until one of:
+
+| Event | Result |
+|---|---|
+| click on the strip / on a bar item | stored (a bar item is then taken: swap) |
+| click on a hotspot whose action accepts it (trigger 7) | the action runs (op 3 uses it up) |
+| left click on nothing, or on a hotspot with no matching action | nothing, still held |
+| right click, Space, hover | nothing, still held (Space only slides the bar) |
+| Escape (or F5) in a game (unit ≠ U00) | stored, then the `Save` prompt |
+| Escape in U00 (no game) | not stored; the Option menu opens with the item still on the cursor |
+| any frame / menu (app mode 2) | still drawn on the cursor over the frame, restored on return |
+| caught (`OptionLoad` path) | stored |
+| unit switch (Practice, a unit's exit to the next unit) | stored, then the new unit loads |
+| New game | lost (the strip is emptied; U01 starts with only `U02_01P`) |
+| a unit's start, loading a save | cursor normal (a save restores its own `CURSOR` chunk) |
 
 U01 gives the player `U02_01P` (a banknote) at `U01_Start` if the bar does not have it
 (runtime: the first slot shows it at the hand-over). The bar's contents are saved in a
@@ -135,7 +151,8 @@ Escape on the players screen quits the game.
 
 ## Escape (E-0105)
 
-Only while "Escape allowed" (E-0043). First, a held item goes back to the bar. Then:
+Only while "Escape allowed" (E-0043). In a game (unit ≠ U00) a held item first goes back to
+the bar; in U00 it stays on the cursor (E-0210, E-0212). Then:
 
 - **App mode 0, no game started** (U00 before New game): stop the voice, open the Option
   menu (app mode 2).

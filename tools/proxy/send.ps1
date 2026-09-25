@@ -1,12 +1,12 @@
 # Send input to the running original game without focusing it (posted window messages).
 #   powershell -ExecutionPolicy Bypass -File tools\proxy\send.ps1 -Text "Name" -Enter
 #   ... -Key 0x26 -HoldMs 2000          virtual key (0x26 = Up) held for 2 s
-#   ... -ClickX 320 -ClickY 240         left click at game coordinates (640x480)
+#   ... -ClickX 320 -ClickY 240         left click at game coordinates (640x480); -Right: right click
 #   ... -Process scummvm                 drive the engine instead
 # The game reads keys and mouse from window messages in the shipping build; MissionD also
 # uses DirectInput, which posted messages do not reach.
 param([string]$Text = '', [switch]$Enter, [int]$Key = -1, [int]$HoldMs = 100,
-      [int]$ClickX = -1, [int]$ClickY = -1, [string]$Process = '')
+      [int]$ClickX = -1, [int]$ClickY = -1, [switch]$Right, [string]$Process = '')
 Add-Type @'
 using System;using System.Runtime.InteropServices;
 public class I{[DllImport("user32.dll")]public static extern bool PostMessage(IntPtr h,uint m,IntPtr w,IntPtr l);
@@ -38,6 +38,7 @@ if ($ClickX -ge 0) {
     $x = [int]($ClickX * $r.r / 640); $y = [int]($ClickY * $r.b / 480)
     $l = [IntPtr](($y -shl 16) -bor $x)
     [I]::PostMessage($h, 0x0200, [IntPtr]0, $l) | Out-Null; Start-Sleep -Milliseconds 100   # WM_MOUSEMOVE
-    [I]::PostMessage($h, 0x0201, [IntPtr]1, $l) | Out-Null; Start-Sleep -Milliseconds 100   # WM_LBUTTONDOWN
-    [I]::PostMessage($h, 0x0202, [IntPtr]0, $l) | Out-Null                                  # WM_LBUTTONUP
+    $down = if ($Right) { 0x0204 } else { 0x0201 }                                          # WM_R/LBUTTONDOWN
+    [I]::PostMessage($h, $down, [IntPtr]$(if ($Right) { 2 } else { 1 }), $l) | Out-Null; Start-Sleep -Milliseconds 100
+    [I]::PostMessage($h, $down + 1, [IntPtr]0, $l) | Out-Null                               # WM_R/LBUTTONUP
 }
