@@ -4749,3 +4749,17 @@ An entry at `tentative` confidence must also have a matching line in
   (`camera.ps1`, a one-off `ReadProcessMemory` of camera `+0x40..+0x54`), `send.ps1`.
 - **Confidence:** proven. Supersedes E-0047's "`+0x48` = `+0x4c` = 0" and E-0609's "only
   U33" (E-0609's key bindings stand).
+
+### E-0614 — U01's train test is the `*U01_20` object itself; the train's part names repeat elsewhere
+- **Binary/file:** `MissionMonet.exe`; `Data/U01/Anim/U01_20.O3D`, `Data/U01/static/*.O3D`.
+- **Evidence:** E-0083: `+0x6e8` = (camera `+0x3c` == the `*U01_20` object), a pointer
+  compare. Corpus (`o3d.py`): `U01_20.O3D` holds `*U01_20` (10 faces) with children
+  `*U01_23`, `Cylinder06/08/10..13`, `Box33`, `Box158`, `Box160`, `Box161`; `Box33` also
+  names floor objects in `PLDV.O3D` and `RAILS.O3D` (one at (166, −354, −30.45), on the way
+  from the station to the barrel `*U01_24`), `Cylinder10` one in `U01.o3d`. The engine
+  compared names and walked parents: standing on PLDV's `Box33` with Up held rode the
+  train (a playtest's "teleported to the handcar at the barrel"; reproduced with
+  `goto 166 -354 30`, `press up`: eye jumped to (311, 409, 42) over `*U01_20`). With the
+  identity test the same input walks on, and standing on the car at (318, 380) still rides.
+- **Method:** `o3d.py` over U01's files; engine `dev_commands` runs.
+- **Confidence:** proven.
