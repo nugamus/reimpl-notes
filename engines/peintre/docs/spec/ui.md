@@ -54,7 +54,7 @@ Quit closes the window and the program. The screen ends with message 0x502 (`boo
 
 ## Cursors (E-0416)
 
-`Curseurs.SPR` frame and hot-spot offset (the frame's centre is drawn at cursor + offset;
+`Curseurs.SPR` frame and hot-spot offset (the frame's centre is drawn at cursor − offset;
 table 0x4a64e8, `{frame, dx, dy}`, set by 0x40e25a):
 
 | n | dx, dy | Use |
