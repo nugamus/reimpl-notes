@@ -451,3 +451,16 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
 - **Method:** decompiles in `engines/ring/notes/decomp/`; Python prototype then
   `ring_hbr` in `parsers/ringdec.c`; `python engines/ring/tools/parsers/cnm.py`: 100%.
 - **Confidence:** proven
+
+### E-0029 — Video sound chunks are raw PCM; the language channel picks 'Z', 'A' or 'B'
+- **Binary/file:** `RING_DVD.EXE` `aCinMov::ReadSound` 0x415770, `aCinMov::Play` 0x415990;
+  DVD `.cnm`
+- **Evidence:** ReadSound reads a u32 byte count (rejects > 10,000,000), reads that many
+  bytes and hands them unchanged to 0x46a590 (the stream sound), or frees them when sound
+  is off; the format is the header's (1 channel, 16 bits, 22,050 Hz). Play reads 'Z' when
+  the channel at `this+0x61` (Init's 5th argument) is 0 or 1, 'A' when it is 2, 'B' when
+  3, and skips the others (SkipSound). DVD corpus: 26,799 non-empty and 12,229 empty 'Z'
+  chunks, 7,111/1,585 'A', 7,234/1,462 'B', all of even length; 14 DVD videos carry all
+  three tracks, 306 only 'Z' with sound, 132 only empty 'Z'.
+- **Method:** decompiles; census over the DVD `.cnm`.
+- **Confidence:** proven
