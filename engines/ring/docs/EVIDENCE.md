@@ -284,3 +284,30 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   field) or type-2 TGAs; all consumed to the last byte. Loader choice as E-0017.
 - **Method:** `python engines/ring/tools/parsers/bmp.py`: 100%.
 - **Confidence:** proven
+
+### E-0020 — .aqc panorama nodes: index stream, colour table, layer sections
+- **Binary/file:** `RING_DVD.EXE` `aApplication::AddRot` 0x404dc0, `CAquatorStream::InitFull`
+  0x4111d0 (its error strings name it), `aSecComAqi::DecompressNode` 0x429be0,
+  `DecompressChannel` 0x429dc0, decoders 0x430600 (13-bit literals) and 0x430770 (16-bit),
+  table conversion 0x410ff0; all 587 `.aqc` (351 distinct)
+- **Evidence:** AddRot builds `%s%s\%s\%s\%s.aqc` when the global at app+0x54 is set,
+  `.aqi` otherwise (and `_%03d.aqc` channel files only on the `.aqi` path; the corpus has
+  no `.aqi` and no `_nnn.aqc`). InitFull opens the `.aqc`, calls DecompressNode once and
+  DecompressChannel once per layer (count at `this+0x48`). DecompressNode: u32 size A,
+  13 dwords of header, A bytes decoded with 13-bit literals to buffer+0x34, u32 B, B bytes
+  decoded with 16-bit literals after the index area. DecompressChannel continues at the
+  cursor: u32 count, two u32, then per entry u32 size, 13-dword header, bits. 0x410ff0
+  rewrites 0xfd20 table words from 565 layout (`v & 0x1f` blue, `v & 0x7e0` green,
+  `v >> 8 & 0xf8` red) into the display's masks. Corpus: headers are 2048×688 (113 files,
+  floats 360/−60/60) or 2048×856 (238, 360/−75/75); data_size = (x1−x0)(y1−y0)·2,
+  stride = (x1−x0)·2; node index count = data_size/8 (+1 padding code at most); the table
+  is 32,400 values (8,100 entries of 4) in every file; every index < 8,100. Sections:
+  784 static (count 1, 0, 0), the rest animations with unk_a = 0x41400000 (12.0) and
+  unk_b = count − 1 (up to 403 frames). One file (Prophet `A03S02N05R01.aqc`, MD5
+  `9a1d45d0…`) has 18,289 bytes after its tenth section that do not form a section (Q-0003).
+- **Reference:** `reference/templier-scummvm-ring/engines/ring/base/stream.cpp`
+  (`decompressNode`, `decompressChannel`, `decodeChannel` 13 bits, `decodeNode` 16 bits).
+- **Method:** decompiles in `engines/ring/notes/decomp/`; `tools/ghidra/scripts/callers.py`;
+  `python engines/ring/tools/parsers/aqc.py`: 587 files, 351 distinct, 100%.
+- **Confidence:** proven (layout, counts); what the 4 pixels per index are is the
+  rotation renderer's spec.

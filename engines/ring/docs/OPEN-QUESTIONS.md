@@ -39,3 +39,12 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** nothing for ScummVM (we pick the pixel format), but the spec of image
   loading should name the conversion step.
 - **Status:** open
+
+### Q-0003 — Does Prophet read only 10 layers of A03S02N05R01.aqc?
+- **Context:** E-0020: 18,289 bytes after the tenth section of this file do not form a
+  section (they start with a copy of the last entry). The engine reads as many sections as
+  the rotation has layers (`this+0x48`, from the game code).
+- **What we checked:** the file; LEGEND.EXE strings (rotation names are not stored whole).
+- **Blocks:** nothing if the layer count is 10; the validator keeps the bytes as
+  `unk_trailing` for this file only.
+- **Status:** open (answer from Prophet's zone a03 code: the AddRot call for this node)

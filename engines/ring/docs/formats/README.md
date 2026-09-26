@@ -16,6 +16,7 @@ The corpus of a type is its loose files and the members of every archive of that
 | Packed image (BMA): loose `.bma`, `.bmp` members of `.at2` | 14,408 (4,895) + 6 misnamed text | `bma.py` | `bma.ksy` | E-0017 | done |
 | Packed TGA (TGC): `.tga` members of `.at2` | 22,868 (1,501) | `tgc.py` | `tgc.ksy` | E-0018 | done |
 | Plain BMP / TGA on disk | 53 (21) + 3 misnamed text | `bmp.py` | below | E-0019 | done |
+| `.aqc` panorama node | 587 (351) | `aqc.py` | `aqc.ksy` | E-0020 | done (1 file with trailing bytes, Q-0003) |
 
 ## Packed bit stream
 
