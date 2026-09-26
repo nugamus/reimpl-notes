@@ -524,3 +524,19 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   + 618 (WA) = 4,149 lines.
 - **Method:** line count.
 - **Confidence:** proven
+
+### E-0033 — Seventeen zone dispatchers route engine events to per-zone handlers (DVD)
+- **Binary/file:** `RING_DVD.EXE`: the callers of 0x402450 (current zone) that switch on it:
+  0x40bbb0, 0x40bd40, 0x40bed0, 0x40c060, 0x40c1f0, 0x40c2b0, 0x40c420, 0x40c590,
+  0x40c650, 0x40c7a0, 0x40c910, 0x40ca80, 0x40cc10, 0x40cde0, 0x40ced0, 0x40cff0,
+  0x40d130 (0x40d1f0 and 0x40d220 also read the zone); key handler 0x40b060; right button
+  0x40afe0; `MouseLeftEvent` 0x409d90
+- **Evidence:** each dispatcher's cases 1..8 and its callers (table in `spec/events.md`,
+  generated from the decompiles in `engines/ring/notes/decomp/flow/` and `callers.py`).
+  Cases map to zones by the numbering of E-0030. The `(param_3 == 1 && param_4 == 1)`
+  override precedes the switch in 0x40bbb0, 0x40bd40, 0x40bed0, 0x40c060, 0x40ca80.
+  0x40b060 compares the key with each enabled hot spot's key (0x423950) of the puzzle's or
+  rotation's accessibility list and calls 0x40af80/0x40afb0 on a match.
+- **Method:** decompiles; `tools/ghidra/scripts/callers.py`.
+- **Confidence:** proven (routing); the event names in the table are from the callers
+  and are refined in the zone specs.

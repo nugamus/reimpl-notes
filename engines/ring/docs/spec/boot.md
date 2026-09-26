@@ -107,7 +107,7 @@ then by the application's mode (0x40b7c0):
 - 3 — 0x418ca0 on the object at 0x40b7e0 (the inventory/bag view);
 - 4 — pending zone change: 0x408bc0, 0x431040, 0x431190(zone, app[0x1c]).
 
-Then the overlay puzzle (0x40b760(1)) is drawn on top, the bag if shown, the drag
+Then puzzle 1 (SY's dialog puzzle, looked up by id with 0x40b760) is drawn on top, the bag if shown, the drag
 cursor (0x409520) while the left button is down, hotspot tracking (0x408dd0),
 dialogs (0x427c70), the cursor (0x423a60), and the frame is flipped. A frame counter
 gives the fps each second.
