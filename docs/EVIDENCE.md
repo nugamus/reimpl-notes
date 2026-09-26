@@ -4432,3 +4432,23 @@ An entry at `tentative` confidence must also have a matching line in
   (zero cross product or normal) and 20 agree within 30° (cosine ≥ 0.87).
 - **Method:** MCP decompile; numpy over `o3d.py` output (script not kept).
 - **Confidence:** proven. Answers Q-0023.
+
+### E-0544 — U01 after the climb: the booth roof joins the long roof `toit01`, which ends about 175 units short of the handcar; the car sits on the rails, 11 units up
+- **Binary/file:** `Data/U01/U01.X3D` and its `object=` files, `Anim/U01_20.o3d`,
+  `Anim/U01_20.A3D`.
+- **Evidence:** every `object=` file of `U01.X3D` in load pose, world transforms per
+  E-0042 and E-0054 (7,840 triangles), vertical rays: under the climb's end (485.775,
+  −44.9) the highest surface below the sky is `int05fen01` at z 79.7 (the eye at 139 is
+  59.3 above it). Along the straight line from there to the handcar the top surface is
+  `toit01` (`Static\U01.O3d`) from about 5 % to 60 % of the way, z 99.5 rising to 143.7
+  near (454, 39) and falling to 119.6 at (389, 207); beyond, only the rails (`ptitrain.O3d`
+  `A138`..`A142`, z −30.2) and a sleeper (`TRAVERS.O3d` `Box81`, −25.3). The handcar
+  `*U01_20` (child of `$$$DUMMY.Dummy01`, whose matrix swaps y and z) at `U01_20.A3D`
+  frame 20 has its origin at (324.8, 374.6, −19.1), 449 units from the climb's end
+  horizontally; over the whole 270-frame circuit it never comes closer than 332 (frame 1,
+  (491.8, 287.3)). Nothing in U01's code moves the car except the ride (E-0083).
+- **Method:** numpy over `o3d.py`, `a3d.py`, `x3d.py` output (scripts not kept); walls,
+  step limits and falls are not simulated.
+- **Confidence:** proven for the geometry. Bears on Q-0047: the car is reached by leaving
+  the roofs and walking along the rails, if the collision and fall rules allow the drop
+  from `toit01` (about 150 units).

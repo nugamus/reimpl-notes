@@ -557,6 +557,10 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Next to try:** run the original through the climb (`to_u01.sh`, then the chain of
   E-0090 with `send.ps1` clicks) and read `camera.ps1` and the ground object after it;
   check whether walking across the roofs reaches the car.
+- **Also checked (2026-09-26, static):** E-0544: the booth roof joins the long roof
+  `toit01`, which ends about 175 units short of the car; the car stands on the rails,
+  11 units above them. Open: whether the original lets the player drop from `toit01` and
+  walk to the car (collision, falls), which needs a live run.
 - **Status:** open
 
 ### Q-0110 — Do U00's gauge labels (`deplace`, `Tourner`, `Sauter`, `Take`, `Take2`) show anything?
