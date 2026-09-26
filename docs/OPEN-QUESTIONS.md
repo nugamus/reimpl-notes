@@ -883,3 +883,15 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Next to try:** every write of game `+0x160`; a save in U33 in the original and the
   `USERINFO` u16 it writes (`savegame.py`).
 - **Status:** open
+
+### Q-0144 — What hides U03's route plane `0000aaaaaa`?
+- **Context:** `u03.md` Entry step 7 hides the `*path` object and takes the path model out
+  of collision. `Anim/U03_09/path.o3d` also holds `0000aaaaaa` (56 faces, untextured
+  `DEFAULT` material, white), a sibling of `*path` under `$$$DUMMY.Dummy01`, spread over
+  the square. Hiding only `*path` leaves a white plane over the whole street in the engine,
+  which the original cannot show (engine capture, 2026-09-26).
+- **Engine for now:** the whole path model is hidden (not drawn, not picked, still
+  animated) and out of collision.
+- **Next to try:** read `U03::StartUnit` (`0x00404f70`) around the hide call: whether it
+  hides the model's root with its subtree (`X3d_Object_Hide(root, 1)`), or the plane is
+  hidden elsewhere.
