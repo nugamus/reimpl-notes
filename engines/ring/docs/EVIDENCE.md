@@ -588,3 +588,23 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   `RenderFrame` fills (0,0)–(640,16) and (0,0x1d0)–(640,0x1e0).
 - **Method:** decompiles and disassembly.
 - **Confidence:** proven
+
+### E-0037 — Video timing, skipping and sound; the DisFad fade (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x401490 (`PlyCin`), `aCinMov::Init` 0x415340,
+  `aCinMov::Play` 0x415990, `aCin::Decompress` 0x42cb90, `DisFad` 0x4018c0, wait 0x402890;
+  constants 0x47e270 (1000.0 double), 0x47e408 (0.01 double), 0x47e278 (0.0)
+- **Evidence:** Init sets `this+0x5c = 1000.0 / (hdr[+0x12] × 0.01)`; PlyCin overrides it
+  with `1000.0 / rate` when rate ≠ 0 and calls `Play(0, 0x10)`, whose picture draw is the
+  device's slot 0x14 with those coordinates. In the 'S' case with sync on (+0x5b = 1):
+  elapsed ≤ due → (after the first picture) busy-wait while `elapsed + 0x32 < due`, then
+  ReadImage; elapsed > due → `aCin::Decompress`, which reads the 0x14-byte header and
+  seeks past the payload. ReadSound passes the bytes to 0x46a590; the first sound chunk
+  starts the stream (0x46a4b0). The loop polls `GetAsyncKeyState(VK_ESCAPE)` and ends when
+  the picture count reaches the header's. DisFad: both images loaded, equal width/height
+  and depth 24 required (errors "Height is not the same", "Only true color images");
+  per byte `(short)((from − to) / frames)`; `aAnimation::Init(frames, 0x41c80000 (25.0),
+  1, 4, 0)`; per new animation frame subtract the steps from the from-image bytes and draw
+  it with slot 0x14 at (0, 0x10); afterwards draw the to-image, then `0x402890(hold)`,
+  which loops on `GetTickCount` until `hold` ms passed or Escape is down.
+- **Method:** decompiles and disassembly (0x401f05..0x401f19, 0x402890..0x4028c5).
+- **Confidence:** proven
