@@ -19,3 +19,14 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 ```
 
 ## Questions
+
+### Q-0001 — Which protection wraps Prophet's Legend.ex_, and where do its import slots lead?
+- **Context:** E-0004: sections `.cms_t`/`.cms_d`, entry point in `.cms_t`, import calls in
+  `.text` go through slots in `.cms_d` (e.g. `[0x4e82f0]`) instead of the IAT.
+- **What we checked:** section layout, entropy, byte diff against the crack (diff oracle
+  only). No product string found in `.cms_t`/`.cms_d`.
+- **Observed range:** 323 differing runs in `.text`, most of them 3-byte slot addresses.
+- **Blocks:** naming the Win32 calls in Prophet's code during RE. A slot → import map can be
+  built site by site from the diff (same call site, IAT slot in the crack) without using the
+  crack's code.
+- **Status:** open
