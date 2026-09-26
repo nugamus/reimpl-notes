@@ -95,7 +95,9 @@ persists across frames and scenes.
 Collidable objects: every object in the scene, visible or hidden (the `static\col*`
 meshes and the visible geometry alike), depth-first through the hierarchy, except those
 whose "no collision" flag (object `+0x118`) the unit code sets. U01 sets it on `Box203`
-(and hides it). Faces are one-sided: collision uses the X3D face plane normal `n` (Q-0023).
+(and hides it). Faces are one-sided: collision uses the face's stored `.O3D` normal `n` rotated by
+the object's world matrix (welded objects: normalize((v2 − v1) × (v0 − v1)) of the world
+vertices, the same direction), and edge normals normalize((v[i] − v[i+1]) × n) (E-0543).
 
 After the key handling, if the velocity is non-zero and collision is on:
 

@@ -4402,3 +4402,33 @@ An entry at `tentative` confidence must also have a matching line in
 - **Method:** MCP decompile.
 - **Confidence:** proven for the present call. Answers Q-0022 as far as the original
   defines it: the per-second rate is the refresh rate's, with 60 Hz the common value.
+
+### E-0542 — `*U01_03` is paused by its INFOOBJ record, so U01's crank does not turn before `U01_Start` runs it
+- **Binary/file:** `Data/U01/INFOOBJ.BIN`; `MissionMonet.exe`.
+- **Evidence:** `infoobj.py`: the `*U01_03` record (offset 140) has type 4, cursor 0,
+  visible 1, anim frame 1.0, anim paused 1, fps 15, loop 1. The generic start applies each
+  record to the node of that name (`FUN_004210d0`, E-0072: frame, paused, fps, loop), so
+  the node created running by `animation=` (E-0056) is paused at frame 1 before any frame
+  is drawn, and `U01_Start` unpauses it. The two other parts of Q-0026 were answered
+  before: scene `+0x168` is the current talker (E-0125), list `+0x1a0` holds the hotspots
+  whose stored matrix multiplies the local matrix (E-0391).
+- **Method:** `infoobj.py`; E-0072.
+- **Confidence:** proven. Answers Q-0026.
+
+### E-0543 — A face's collision front is its stored `.O3D` normal, which points along((v2 − v1) × (v0 − v1))
+- **Binary/file:** `x3d.dll`, `x3dmp5.dll`; `Data/U*/**/*.O3D`.
+- **Evidence:** the object reader (`FUN_10011ea0`, `notes/decomp`) stores each face's three
+  trailing floats at face `+0x18..+0x20`. `X3d_Sphere_Face_Collision` first calls
+  `FUN_10009750`, which (once per pose, transform `+0x17c`) transforms the vertices by the
+  global matrix into transform `+0x184` and, for an unwelded object, sets the collision
+  normal (face `+0x40` → `+8`) = `X3d_Normal_Mult(face +0x18, global)` (row vector times
+  the upper 3×3), normalised only when transform `+0x178` is set, and each edge normal =
+  the local edge normal times the same matrix; `FUN_10009570` made the local edge normal
+  of edge i as normalize((v[i] − v[i+1]) × n) (`X3d_Vecteur_Vectoriel(out, a, b)` = a × b).
+  For a welded object it computes n = normalize((v2 − v1) × (v0 − v1)) from the world
+  vertices and the edge normals the same way. Corpus: over the 65,360 faces of unwelded
+  objects with at least three vertices, the stored normal and (v2 − v1) × (v0 − v1) agree
+  (cosine > 0.99) for 65,176 and are never opposite; of the other 184, 164 are degenerate
+  (zero cross product or normal) and 20 agree within 30° (cosine ≥ 0.87).
+- **Method:** MCP decompile; numpy over `o3d.py` output (script not kept).
+- **Confidence:** proven. Answers Q-0023.

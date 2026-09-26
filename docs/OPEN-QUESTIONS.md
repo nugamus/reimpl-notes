@@ -381,7 +381,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   the `.O3D` vertex order).
 - **Next to try:** the `.O3D` loader's face setup in `x3d.dll`; check against U01 floor faces
   (their normals must point up for the ground ray to hit).
-- **Status:** open
+- **Status:** RESOLVED (E-0543): the stored face normal (rotated by the object's matrix),
+  which points along (v2 − v1) × (v0 − v1); edge normals are (v[i] − v[i+1]) × n.
 
 ### Q-0024 — How does `X3d_Scene_Pick_Object` pick, and where do hotspots and actions come from?
 - **Context:** E-0051: the pick goes through the renderer's vtable `+0xc`; hotspots are named
@@ -414,7 +415,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Next to try:** callers of `FUN_00420060`/`FUN_00420100` during U01 load
   (`FUN_0041e500`, the U01 constructor); decompile `FUN_00421b90` and what fills
   `+0x1a0` entries' `+0x6c`/`+0x88`.
-- **Status:** open
+- **Status:** RESOLVED (E-0542): INFOOBJ pauses `*U01_03` at frame 1; `+0x168` is the
+  talker (E-0125), `+0x1a0` the stored-matrix hotspots (E-0391).
 
 ### Q-0040 — Which face test does the pick install, and what is face `+0x38`?
 - **Context:** E-0070. The face class `+0` is `FUN_1000b040` or `FUN_1000b180`
