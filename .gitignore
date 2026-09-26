@@ -1,12 +1,16 @@
-# Game data and original binaries. Read-only source material (CLAUDE.md rule 7), 361 MB,
-# and not ours to redistribute. Keep it on disk, out of the repo.
-Original Game Files/
+# Game data: disc images and their extracted files. Read-only source material (CLAUDE.md,
+# Rules), tens of GB and not ours to redistribute. Keep it on disk, out of the repo.
+games/*/discs/
+games/*/images/
+
+# Saved web pages (ScummVM wiki) for reference
+reference/
 
 # Vendored toolchains (Ghidra, PE-bear, dgVoodoo2). Reinstallable, hundreds of MB.
 third_party/
 
 # Cloned upstream MCP server, has its own git history.
-tools/ghidra-mcp/
+tools/ghidra/mcp/
 
 # Ghidra
 *.rep/
@@ -19,9 +23,9 @@ ghidra_projects/
 logs/
 
 # Proxy traces: large, machine-specific, regenerated per run. Golden traces that a test
-# depends on get force-added and named traces/golden-*.log.
-traces/*.log
-!traces/golden-*.log
+# depends on get force-added and named engines/x3d/traces/golden-*.log.
+engines/x3d/traces/*.log
+!engines/x3d/traces/golden-*.log
 
 # Build output
 build/
@@ -48,8 +52,8 @@ Thumbs.db
 desktop.ini
 
 # Captures of the original (game imagery, not ours to redistribute)
-traces/*.png
+engines/x3d/traces/*.png
 
 # Save files copied from runs of the original (binary, machine-specific).
-traces/save/
-traces/inv/
+engines/x3d/traces/save/
+engines/x3d/traces/inv/
