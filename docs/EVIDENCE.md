@@ -4911,3 +4911,20 @@ An entry at `tentative` confidence must also have a matching line in
   (temporary logging, not committed).
 - **Confidence:** proven for the geometry and the algorithm; the frame rates the designers
   played at are not known.
+
+### E-0622 — `OptionSave` OK stays on the frame: selection, scroll and name are kept
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** the OK handler `0x00427470` (E-0184) does, in order: slot = save list
+  `+0x12c`, name = view 11 text, write (`DAT_0046ec18` `+0x10`), `XGameList_59`, then on
+  view 10 (the list) vtable `+0x138` and `+0x104`, then the three `…D` → `…N` bitmap
+  renames, and returns. It has no close, no frame switch, no `+0xc4`, and no store to
+  view 11. `#SAV`'s vtable (`0x0043a258`): `+0x138` = `0x00427b60` (row drawing: reads the
+  selection `+0x11c` for the text colour, writes nothing but the surface), `+0x104` =
+  `0x00434ca0` (gets the view rect via `+0xb4` and passes it to `DAT_0046edd4` `+0x14`: an
+  invalidate). The first-free-slot selection `0x00428450` (the only writer of `+0x11c`
+  besides a row click) is not called. So after OK the save screen stays open, the saved
+  row stays selected and shows its new name, the scroll and the edit's text are unchanged.
+  Matches the run of E-0184: after the first OK the player clicked another row and typed
+  `B` on the same screen, and the second save was named `Save without name AB`.
+- **Method:** MCP decompile; `pefile` vtable read; capstone.
+- **Confidence:** proven.

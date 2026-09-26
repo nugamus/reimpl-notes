@@ -166,7 +166,9 @@ Opened by `SaveOui` on the "Do you want to save?" frame (`ui.md` "Escape").
   it; a click selects the row under the pointer.
 - **OK** (`OptionSelectSave`): save to the selected slot with the edit's text (Saving),
   rebuild and redraw the list, and switch buttons 2, 3, 5 from their `…D` bitmaps to
-  `…N` (runtime: dim before the first save, bright after).
+  `…N` (runtime: dim before the first save, bright after). The frame stays open: the
+  saved row stays selected (now showing its name), the scroll and the edit's text are
+  unchanged (E-0622). Leaving is up to the player (Back, Main menu, Quit, Escape).
 - `OptionSave3D` (Back to the game): close the frame, back to play. `OptionSaveSommaire`
   (Main menu): the Option menu. `SaveQuit` (Quit): the quit confirmation
   `OptionQuitter`. They react while dimmed (E-0545).
