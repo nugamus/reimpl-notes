@@ -492,7 +492,7 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   window procedure and 0x40e9f0).
 - **Confidence:** proven
 
-### E-0031 — The zone API: declarations, their wrappers and the model classes (DVD)
+### E-0031 — The zone API: declarations, their wrappers and the model classes (DVD) (call count SUPERSEDED by E-0032)
 - **Binary/file:** `RING_DVD.EXE`: the 58 callees of the eight zone set-ups (0x4662a0 SY,
   0x4635a0 AS, 0x45eb30 NI, 0x45b610 N2, 0x458a90 RO, 0x455a50 RH, 0x44f3e0 FO, 0x44ab00
   WA; E-0030); ctors `aPuzzle` 0x41b740, rotation 0x41da10, `aObject` 0x41f940,
@@ -517,3 +517,10 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   does not show the use (they stay `unk_*` in `spec/api.md`).
 - **Method:** decompiles; `tools/ghidra/scripts/ring_calls.py`.
 - **Confidence:** proven for what `spec/api.md` states; `unk_*` are open.
+
+### E-0032 — The eight zone set-ups make 4,149 calls (corrects E-0031's 4,146)
+- **Binary/file:** `engines/ring/notes/calls/*_setup.jsonl`
+- **Evidence:** 286 (SY) + 373 (AS) + 657 (NI) + 477 (N2) + 399 (RO) + 415 (RH) + 924 (FO)
+  + 618 (WA) = 4,149 lines.
+- **Method:** line count.
+- **Confidence:** proven
