@@ -4823,3 +4823,29 @@ An entry at `tentative` confidence must also have a matching line in
   exhausted a click plays `U03_01_20` (caught), with M62 and M64 it does not.
 - **Method:** MCP decompile; engine `dev_commands` runs.
 - **Confidence:** proven.
+
+### E-0616 — U02's ground tests compare the ground object's own name; `TakePlanche` takes the plank only from `plncher01`; the restore snore is an effect
+- **Binary/file:** `MissionMonet.exe`, `x3d.dll`; `Data/U02/static/*.O3D`.
+- **Evidence:** `X3d_Object_Get_Son` (`x3d.dll` `0x1181`) compares the object pointer
+  itself byte by byte with the name: an X3D object's name is inline at `+0`. Camera `+0x3c`
+  is the highest ground hit's object (E-0083), so `U02_UpdateFrameLogic` (`0x00402f70`,
+  `+0x3c` ≠ 0 and `_stricmp(+0x3c, "*U02_08")` = 0) and `U02_TakePlanche` compare that
+  object's own name, case-insensitive, no parent walk. `0x00404380`: `_stricmp(camera
+  +0x3c, "plncher01")`; `TEST EAX,EAX; JNZ 0x004043ae` (return) at `0x0040439a`, so
+  `FUN_004211d0("*U02_07")` (take) runs only when the names are **equal**. This supersedes
+  E-0162's "≠ 0 → take". Corpus (`o3d.py` over `Data/U02/**/*.O3D`): `plncher01` is only in
+  `static/REPO.O3D`, `*U02_08` only in `static/RUISSEAU.O3D`: a name test and an identity
+  test agree. Engine `pos`: `plncher01` at (2160.8, −217.8, 21.7), the plank `*U02_07` at
+  (2249.7, −207, 31.2), 89 apart: the floor the plank lies on. `U02_StartUnit`
+  (`0x00402d30`): M08 exhausted (actions `+0x430`) and M12 not (`+0x440`) → vtable
+  `+0x50("d1_25", clerk hotspot +0x70, 1)`, the looping effect, not
+  `U02_StartSnoreEmitter` (`0x004036d0`, emitter `+0x184`, group 4); `U02_SonnerBell`
+  (`0x00404440`) deletes `+0x184` only if non-null, then plays `SIREN` as an effect, which
+  replaces the looping `d1_25`.
+- **Method:** MCP decompile of the three functions and `X3d_Object_Get_Son`; MCP
+  disassembly of `0x00404380`; `o3d.py` name scan; engine `dev_commands` (`flowb`): on
+  `plncher01` a click on `*U02_07` takes it, from `Object16` at (2250, −120) M07 runs and the
+  plank stays; the eye over `*U02_08` at (428, −920) falls; with the plank laid (M21) the
+  same point is over `*U02_14` and nothing fires; the magpie waits at frame 11 until the eye
+  comes near the perch after `PieVoleur`, not before.
+- **Confidence:** proven.
