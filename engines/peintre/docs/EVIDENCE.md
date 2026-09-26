@@ -181,3 +181,24 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   (E-0004), so this is the likely home of the span loops; not yet proven (Q-0002).
 - **Method:** capstone disassembly of the raw bytes.
 - **Confidence:** tentative (Q-0002)
+
+### E-0013 — BFG: 100-slot directory, entries from 0xE18, each LZ-packed with a 20-byte typed object header
+- **Binary/file:** `/MISSION.EXE`; `Data/Scenes_3D/*.BFG` (15 files)
+- **Evidence:** `C_Monde::LoadScene` (0x421e56) builds `<scene>.BFG` and calls
+  `LoadSceneFile` (0x42e85c): the whole file is read into one `m__malloc` block
+  (DAT_00598cac), from `<Target>DATA\SCENES_3D\` if the file exists there (0x42e7d0) else
+  from the other root. Objects are opened by name (0x435400 → 0x42e6e0): 0x42e67f compares
+  the name with `strcmp` against the first `count` slots (stride 0x24, name at +4); the
+  entry at `file + 0xE18 + slot.offset` of `slot.size` bytes is unpacked by 0x466bc3
+  (byte 0 == 1: copy `size-4` bytes from +4; else the LZ loop: u16 flags, bit 0 literal,
+  bit 1 `dist = (b0 & 0xF0) * 16 + b1`, `len = (b0 & 0xF) + 1`, until the source pointer
+  equals the end). CheckHeader (0x4348c0) then fills the header's words 0, 1, 3, 4 (handle,
+  size, list links) and rejects `type` outside 0..6 ("Type d'entete non valide !!!!");
+  types 1, 2, 4, 6 get their pointer table relocated (0x4343c0), 4 and 6 more pointers
+  (0x434470, 0x4344a0), 5 its own (0x4344d0), 1 its textures loaded (0x434560).
+  Corpus: `bfg.py` validates 15/15 files, every byte consumed (entries contiguous in
+  directory order, the last ends at EOF, 4 zero bytes before 0xE18, every LZ stream ends
+  exactly at its entry's end); 594 entries, all LZ; type = 1 for all 15 `.3DC`, 3 for 504
+  `.3DM`, 4 for 48 `.3DA`, 5 for 27 `.3DI`.
+- **Method:** decompiled the functions named; `engines/peintre/tools/parsers/bfg.py`.
+- **Confidence:** proven

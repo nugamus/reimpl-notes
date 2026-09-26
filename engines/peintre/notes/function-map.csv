@@ -450,9 +450,9 @@ address,module,name,ghidra,size,callers,evidence
 0x0042e023,game3d/scenes,,FUN_0042e023,970,0,
 0x0042e630,game3d/app,VangoghError,FUN_0042e630,74,27,wvsprintfA + MessageBoxA 'Vangogh Erreur'
 0x0042e67a,game3d/app,,FUN_0042e67a,5,7,
-0x0042e67f,game3d/app,,FUN_0042e67f,97,1,
-0x0042e6e0,game3d/app,OpenError3D,FUN_0042e6e0,153,1,Erreur ouverture %s|Pas assez de ram pour 3d
-0x0042e7d0,game3d/app,,FUN_0042e7d0,140,1,
+0x0042e67f,game3d/app,Bfg_FindEntry,FUN_0042e67f,97,1,strcmp over the BFG directory; E-0013
+0x0042e6e0,game3d/app,Bfg_ReadEntry,FUN_0042e6e0,153,1,Erreur ouverture %s|Pas assez de ram pour 3d; E-0013
+0x0042e7d0,game3d/app,SceneFileExists,FUN_0042e7d0,140,1,DATA\SCENES_3D\ + CreateFileA; E-0013
 0x0042e85c,game3d/app,LoadSceneFile,FUN_0042e85c,291,1,"DATA\SCENES_3D\ + GetFileSize, ptrdata => NULL"
 0x0042e97f,game3d/app,,FUN_0042e97f,418,1,
 0x0042eb21,game3d/app,App3D_InitPaths,FUN_0042eb21,625,1,DATA\GRAPHS_2D\|DATA\SCENES_3D\|\SCENES\|SAVE\
@@ -531,20 +531,20 @@ address,module,name,ghidra,size,callers,evidence
 0x00433ff0,engine3d,,FUN_00433ff0,464,1,
 0x00434270,engine3d,,FUN_00434270,213,1,
 0x00434350,engine3d,,FUN_00434350,105,1,
-0x004343c0,engine3d,,FUN_004343c0,34,1,
+0x004343c0,engine3d,Obj_RelocTable,FUN_004343c0,34,1,pointer table relocation; E-0013
 0x004343f0,engine3d,,FUN_004343f0,119,1,
 0x00434470,engine3d,,FUN_00434470,48,1,
 0x004344a0,engine3d,,FUN_004344a0,48,1,
 0x004344d0,engine3d,,FUN_004344d0,137,1,
-0x00434560,engine3d,,FUN_00434560,534,1,
-0x004348c0,engine3d,CheckHeader,FUN_004348c0,253,1,Type d'entete non valide !!!!
+0x00434560,engine3d,Obj_LoadTextures,FUN_00434560,534,1,.3DM names; E-0013
+0x004348c0,engine3d,Obj_CheckHeader,FUN_004348c0,253,1,Type d'entete non valide !!!!; E-0013
 0x00434e70,engine3d,,FUN_00434e70,317,1,
 0x00434fb0,engine3d,,FUN_00434fb0,105,1,
 0x00435020,engine3d,,FUN_00435020,309,2,
 0x00435170,engine3d,,FUN_00435170,307,2,
 0x004353c0,engine3d,,FUN_004353c0,14,2,
 0x004353d0,engine3d,,FUN_004353d0,14,2,
-0x00435400,engine3d,,FUN_00435400,106,24,
+0x00435400,engine3d,Obj_Load,FUN_00435400,106,24,opens a BFG entry into the 3D heap; E-0013
 0x00435880,engine3d,,FUN_00435880,63,1,
 0x00435930,engine3d,,FUN_00435930,64,2,
 0x00435970,engine3d,,FUN_00435970,33,31,
@@ -664,7 +664,7 @@ address,module,name,ghidra,size,callers,evidence
 0x00466a81,cryo/codec,,FUN_00466a81,117,1,
 0x00466af6,cryo/codec,,FUN_00466af6,144,1,
 0x00466b90,cryo/codec,,FUN_00466b90,51,1,
-0x00466bc3,cryo/codec,,FUN_00466bc3,372,1,
+0x00466bc3,cryo/codec,Lz_Unpack,FUN_00466bc3,372,1,BFG entry unpacking; E-0013
 0x00466d40,cryo/file,,FUN_00466d40,68,3,
 0x00466f10,cryo/file,,FUN_00466f10,69,1,
 0x00467070,cryo/file,,FUN_00467070,159,11,
