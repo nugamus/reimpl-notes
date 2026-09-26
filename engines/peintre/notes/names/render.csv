@@ -1,0 +1,50 @@
+address,name,evidence
+0x004378f0,Render_Frame,tree walk + span resolve through 0x4b01cc; E-0500
+0x00450160,Render_WalkTree,depth-first from the camera; hooks 0x4b1358/0x4b135c; E-0500
+0x0044fec0,Render_Node,world = parent x local then cull/transform/clip/project/draw; E-0500
+0x0043b060,Mat_Mul,3x3 Q15 product >> 15; E-0500
+0x0043b0f0,Mat_MulVec,3x3 Q15 times vector >> 15; E-0501
+0x0043b0c0,Mat_Transpose,3x3 transpose; E-0501
+0x0043b130,Vec_Add,three-int add; E-0501
+0x00434e70,World3D_Init,heap + node Camera flag 0x400; E-0501
+0x00436160,Node_SetPosition,local +0x1c; camera also world; E-0501
+0x004360f0,Node_SetRotation,local +0x28; camera world = transpose; E-0501
+0x00436090,Node_GetRotation,copies local +0x28; E-0501
+0x00435880,Node_AttachTo,child.parent/sibling/parent.child; E-0501
+0x00435170,View_SetViewport,focal 480*w/640 aspect centre near/far; E-0502
+0x00435020,View_SetFrustum,side planes and K_x/K_y; E-0502
+0x004353c0,View_SetNear,0x6af5bc then frustum; E-0502
+0x004353d0,View_SetFar,0x6af6c4 then frustum; E-0502
+0x0044db30,Render_ProjectVertices,2^30/z and truncated screen x y; E-0502
+0x0044bb10,Render_CullNode,bounding sphere vs view cone near far; E-0504
+0x0044bd60,Render_TransformVertices,vertices to camera space + outcodes; E-0504
+0x0044bf20,Render_TransformSharedVertices,parent's 0x80 vertices for 0x10 children; E-0504
+0x0044c100,Render_FacePlaneDots,face normal . eye >> 15; E-0505
+0x0044d980,Render_CullPolys,backface / outcode / near-clip dispatch; E-0505
+0x0044c370,Render_ClipNear,replaces a poly by near-clipped polys; E-0505
+0x00447c30,Render_BuildEdges,per face group type edge builder; E-0507
+0x00447d90,Render_BucketEdges,per vertex group type edge bucketing; E-0506
+0x00444e20,Edge_BuildTextured,types 3/-6/-4: 1/z u/z v/z gradients shade row texture; E-0507
+0x0043c780,Edge_BuildFlat,type 1: material colour + 0x1388 per poly; E-0507
+0x00447640,Edge_BucketTextured,edges into scanline buckets 0x69de60/0x69fe60; E-0506
+0x0044ab80,Span_ResolveFrame,per scanline active edges and spans; E-0506
+0x0044a6b0,Span_ResolveLine,opaque-only line; E-0506
+0x0044a820,Span_ResolveLineLayered,line with negative-type surfaces; E-0506
+0x0044a370,Span_InsertSurface,1/z order with epsilon 100 and slope tie-break; E-0506
+0x0044b740,Span_Alloc,sentinel surfaces and the 32 KB span list; E-0506
+0x0044b880,Span_InitSentinels,left/right/background sentinels for the viewport; E-0506
+0x00439a10,Tex_ConvertTo555,shade tables 565 to 555 once; E-0510
+0x0043c200,Span_Use555,swap 565/555 blend routines in both tables; E-0510
+0x00435930,Node_SetBrightness,+0xd0 = v & 0x1F1F on all nodes of an object; E-0508
+0x00455470,Render_LightsToCamera,light table to camera space (idle); E-0508
+0x0044dc30,Render_LightsToNode,lights to node space (idle); E-0508
+0x0044df60,Render_LightPolys,per-poly brightness from lights (idle); E-0508
+0x00439b90,Pick_Node,walk with the pick hook 0x43a150; E-0512
+0x0043b480,Quat_ToMatrix,Q15 (x y z w) to 3x3; E-0514
+0x0043b740,Quat_Slerp,8-bit fraction slerp via tables; E-0514
+0x00437da0,Anim_PoseNode,binary search keys, slerp/lerp into +0x28/+0x1c; E-0514
+0x00437f80,Anim_PoseNodeBlend,two animations blended; E-0514
+0x00437d90,Anim_Length,track 0 first word; E-0514
+0x00450650,Render_UpdateBoxes,walk calling 0x4503b0; E-0513
+0x004503b0,Node_UpdateBoxes,world bounds of node +0xa0 boxes (none in corpus); E-0513
+0x0044fb10,Render_SphereMapUVs,flag 0x800 UVs from normals (idle); E-0513

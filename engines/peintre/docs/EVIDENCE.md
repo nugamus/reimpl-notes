@@ -1460,3 +1460,280 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   (`build`-side script listing the pushes before each call); tables from `.data` (pefile).
 - **Confidence:** proven
 - **Doc:** `games/mission-sunlight/docs/musee.md`
+
+### E-0500 — One 3D frame: tree walk from the camera, per-node transform/cull/clip/project, edge building, then a scanline span resolve
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x4378f0 (the frame's draw call, 0x4221f6/0x4223e8): `0x450160(camera)`,
+  the optional hook 0x4e33c8 (0 in `.data`, never written), 0x450650, then
+  `(*0x4b01cc)(dest)`, 0x4b01cc = 0x44ab80 in `.data` (its only other writer, 0x4378a0,
+  has no reference). 0x450160: 0x433670 (heap mark), 0x455470, then a depth-first walk of
+  the camera's subtree (child +0x14, sibling +0x18, parent +0x10) that skips a node and
+  its subtree when flag bit 0 is set, calls 0x44fec0 on the way down and
+  `*0x4b135c` (0x447d90) on the way up. 0x44fec0: world rotation `+0x58 = parent.+0x58 ·
+  +0x28 >> 15` (0x43b060), world position `+0x4c = trunc(parent.+0x58 · +0x1c / 32768) +
+  parent.+0x4c`; resets each vertex group's cursor (+0x14 = +0xc); if flag bit 2 clear:
+  0x44bb10 (flags &= 0x1891, bounding-sphere cull), and unless culled (bit 3, see
+  E-0504): 0x44bd60 (vertices to camera space), 0x44c100 (eye in node space), 0x44d980
+  (poly cull, near clip 0x44c370), 0x44dc30 + 0x44df60 (lights, E-0508), 0x44db30
+  (projection), `*0x4b1358` (0x447c30, edge builders) unless flag 0x1000, 0x44fb10 if
+  flag 0x800. 0x450650 walks the tree again calling 0x4503b0 (node +0x9c boxes, 0 in the
+  corpus, E-0513). 0x44ab80: per scanline from the viewport top for its height, moves
+  the edges bucketed for that line (0x69de60 starts, 0x69ee60 continuations, 0x69fe60 ends) into a
+  sorted active list, steps every active edge, and resolves spans (0x44a6b0, or 0x44a820
+  when a negative-type surface is on the line) into a span list walked by 0x454a8e.
+- **Method:** decompiled the functions named (`notes/decomp/MISSION.EXE__FUN_*.c`);
+  pointers read from `.data` with pefile; xref scans in a read-only project copy.
+- **Confidence:** proven
+
+### E-0501 — Camera: node `Camera` (handle 0, flag 0x400) whose world matrix is the inverse of its local pose; scenes hang under it
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x434e70 builds the first node, named "Camera" (0x4b023c), flags 0x400,
+  both matrices identity (0x43a750), and stores it in 0x6af650, the root every frame
+  walks. 0x436160(h, pos) writes local +0x1c; 0x4360f0(h, M) writes local +0x28; for a
+  flag-0x400 node both then set world rotation `+0x58 = transpose(+0x28)` (0x43b0c0) and
+  world position `+0x4c = -(+0x58 · +0x1c >> 15)` (0x43b0f0, 0x43b190 negates). The root
+  itself is never passed to 0x44fec0 (0x450160 starts at its child), so every node's
+  world matrix is camera space: `v_cam = Mᵀ (v_world − eye)`. `C_Monde::LoadScene`
+  attaches the scene root under handle 0 (0x435880: child.parent = parent, child.sibling
+  = parent.child, parent.child = child). Camera pose from angles: E-0307 / `movement.md`
+  (0x422f30, 0x43a780).
+- **Method:** decompiled 0x434e70, 0x436160, 0x4360f0, 0x43b0c0, 0x435880; disassembled
+  0x43b190.
+- **Confidence:** proven
+
+### E-0502 — Projection: focal 480 · w / 640 on both axes, centre of the viewport, truncated to integer pixels; near 64 / far 80,000
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x435170(w, h, x0, y0, 480): `fx` (0x6af5fc) = `480·w / 640` (integer
+  division), `fy` (0x6af5f4) = `fx · (h·4.0)/(w·3.0)` (0x4a2570 = 4.0, 0x4a2578 = 3.0),
+  centre `cx = w/2 + x0` (0x6af670), `cy = h/2 + y0` (0x6af66c); all four view sizes
+  (0x421d73) are 4:3, so `fx = fy = 0.75 · w` and the field of view is the same in all:
+  `tan(hfov/2) = 320/480`, `tan(vfov/2) = 240/480` (67.4° × 53.1°). 0x44db30 and the tail
+  of 0x44bf20 (asm 0x44c0a0): `1/z` stored as `2^30 / z` (float, +0x24; 0x4a26e8 =
+  2^30), `sx = __ftol(fx · x / z + cx)`, `sy = __ftol(fy · y / z + cy)` (MSVC `__ftol`
+  truncates), then outcodes against the viewport: sx < x0 → 2, sx > x0 + w → 1, sy ≤ y0 →
+  4, sy > y0 + h → 8. 0x44bd60 sets 0x10 when `trunc(z) < near` (0x6af5bc) and 0x20 when
+  `≥ far` (0x6af6c4) unless node flag 0x80, and view-cone bits from `K = −(w/2 << 15) /
+  fx` (0x6af674) and the same for y (0x6af6a8) (0x435020). Near/far: 0x4353c0/0x4353d0,
+  64 and 80,000 after a scene load (0x421d73), 128 and 65,000 after 0x435170 alone
+  (E-0307). The four side planes of 0x435020 (0x6af630, 0x6af680, 0x6af610, 0x6af660)
+  are the view-cone normals `(∓fx, 0, −w/2)` and `(0, ∓fy, −h/2)` normalised to Q15
+  (0x43b270), used only by the sphere cull (E-0504).
+- **Method:** decompiled; x87 operands from the disassembly (`notes/decomp/
+  MISSION.EXE__asm_render.s`); constants from `.rdata` with pefile.
+- **Confidence:** proven
+
+### E-0503 — Coordinates: camera x right, y down, z forward (right-handed); world y is down; front faces run counter-clockwise on screen
+- **Binary/file:** `/MISSION.EXE`; the 15 `.3DC`
+- **Evidence:** E-0502: `sx` grows with camera x, `sy` with camera y, depth is +z. With
+  the camera matrix identity the world axes are the camera's, so world y points down
+  (E-0305 gets the same from the floor code). Drawers 0x444e20 and 0x43c780 draw a
+  triangle only when `(y2−y1)(x1−x0) − (y1−y0)(x2−x1) < 0.0` in integer screen
+  coordinates (0x4a2690 = 0.0), i.e. corners 0, 1, 2 counter-clockwise as seen on the
+  y-down screen. `engines/peintre/tools/winding_check.py` projects every poly of the 15
+  scenes from 60 random cameras with these rules: the screen test and the plane test of
+  E-0505 agree on 82,165 of 82,657 polys (99.4 %; the rest are nearly edge-on).
+- **Method:** decompiled; corpus check script.
+- **Confidence:** proven
+
+### E-0504 — Node culling by bounding sphere; node flag bits; nodes with 0x10 use their parent's 0x80 vertices
+- **Binary/file:** `/MISSION.EXE`; the 15 `.3DC`
+- **Evidence:** 0x44bb10 keeps flag bits 0x1891 and recomputes the rest each frame: the
+  sphere of centre node +0xb4..+0xbc (local, transformed like a vertex) and radius +0xb0
+  is tested against the four side planes (distance > r → bit 3, "culled"; otherwise bit
+  0x20) and against near and far (straddling → 0x40; wholly before
+  near, or beyond far without flag 0x80 → bit 3). 0x44fec0 draws a node when bit 3 is
+  clear, or when it has flag 0x10 and its parent is not culled; a 0x10 node first makes its
+  parent transform and project the parent's vertices flagged 0x80 (0x44bf20, once per
+  frame through parent bit 1). Corpus: all 1,628 poly corners that point outside their own
+  node's vertex array are in 0x10 nodes and point into the parent's array, at vertices
+  flagged 0x80. Runtime writers of node flags in the game code are only 0x435970 (set bit
+  0, hide) and 0x4359a0 (clear bit 0) (scan of all stores to `[reg+0xc]`); flags 0x4, 0x80,
+  0x800, 0x1000 never occur in the files (flags 0, 0x10, 0x20, 0x30: E-0014).
+  Radius +0xb0: 379 distinct values; +0xac, +0xc4..+0xcc, +0xd4, +0xd8 = 0 and +0xc0 = 40
+  in all 560 nodes, +0xd0 = 15 in all.
+- **Method:** decompiled; corpus scan (script over `bfg.py`/the node layout of E-0014).
+- **Confidence:** proven (+0xac, +0xc0, +0xd4, +0xd8: no reader found, unk)
+
+### E-0505 — Backface culling: poly +0x30 is the plane distance; poly flag 8 tests in camera space instead
+- **Binary/file:** `/MISSION.EXE`; the 15 `.3DC`
+- **Evidence:** 0x44c100 stores in each face normal's word 3 `n · e >> 15`, e = the camera
+  position in node space (`−(Wᵀ · +0x4c)`, asm). 0x44d980, per poly of each face group
+  (list head copied from +0x20 to +0x24): if poly word 0 lacks bit 3, it is back-facing
+  when `normal.w3 − poly.+0x30 < 0`; with bit 3 it is back-facing when `v0 · ((v0−v1) ×
+  (v1−v2)) ≥ 0` in camera space (floats scaled by 0.0625, 0x4a26ec). Back-facing, or all
+  three vertices outside one side (AND of outcodes & 0x3F), or any vertex beyond far (OR &
+  0x20) → poly word 0 |= 1, not drawn; any vertex before near (OR & 0x10) → 0x44c370
+  replaces it by clipped polys (new corners, UVs interpolated, original |= 3); else its
+  vertices get 0x40 (to be projected). Corpus: `+0x30 = (n · v0) >> 15` exactly for
+  37,742 of the 37,798 polys without bit 3 (the rest have one of the 63 malformed normals
+  or differ by a unit); bit 3 is set on 1,275 polys, all in 0x10 nodes. No poly is
+  two-sided.
+- **Method:** decompiled; corpus scan.
+- **Confidence:** proven
+
+### E-0506 — No z-buffer: a scanline span buffer ordered by 1/z, filled by type-indexed span routines
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** vertex-group items are the edges: 0x447d90 (per vertex group, on the way
+  up the tree) runs 0x447640 for types 3/−6/−4/…, which puts each edge built this frame
+  into the per-scanline start bucket (0x69de60, a 16-byte `{next, edge, type}` node) and
+  its end bucket (0x69fe60), pre-stepped to the viewport top when it starts above it.
+  The edge record (100 bytes for types 3/−6/−4, filled by 0x444e20): +4 state, +8 x
+  (20.12), +0xc dx/dy, +0x10 1/z at the edge's x on the current line, +0x14 its per-line step, +0x18
+  d(1/z)/dx, +0x28 next edge of the same poly side, +0x2e shade row (byte), +0x2f mip
+  level (type 0x14 only), +0x30 bucket link, +0x3c/+0x40 u/z and v/z, +0x44/+0x48 their
+  per-line steps, +0x4c/+0x50 their x gradients, +0x54 texel pointer, +0x58..+0x60 the
+  three x gradients × 16. 0x44ab80 turns the edges into 0x24-byte surfaces `{type, …,
+  x, …, edge}` in an x-sorted active list; 0x44a370/0x44a4d0/0x44a630 insert a surface in
+  front of the current one when its `1/z` at x (edge 1/z + (x − edge.x) · d(1/z)/dx) is
+  larger, or within 100 (0x4a26dc = −100.0) and its d(1/z)/dx is larger. Spans `{x_end,
+  x_start, type, edge}` go to 0x454a8e, which calls `table[type]` (0x4b20dc + 4 · type)
+  with ebx = x start, ecx = count, edi = destination, ebp = edge, from the last span to
+  the first. The frame's background is a permanent surface of type 0x4b12d4 = 14 (its only
+  writer 0x44b860 has no caller) behind everything: 0x458760 fills with the colour at
+  0x4e3600 = 0 (black, never written). Sentinels (types 4 and 16) call a bare `ret`.
+- **Method:** decompiled; tables from `.data`; disassembly of 0x454a8e.
+- **Confidence:** proven
+
+### E-0507 — The corpus face-group types: 3 textured opaque, −6 textured colour-keyed, −4 textured 50 % translucent, 1 flat colour
+- **Binary/file:** `/MISSION.EXE`; the 15 `.3DC`
+- **Evidence:** edge builders by type (0x447c30): 3, −6, −4 → 0x444e20; 1 → 0x43c780.
+  Span routines (`.data` table 0x4b20dc): 3 → 0x45ee50, −6 → 0x460450, −4 → 0x45a3b0
+  (0x45bae0 on 555), 1 → 0x45809a. 0x444e20, per poly: per-vertex 1/z, u/z, v/z (UV
+  16.16 from poly +0x34..+0x3c times the vertex's 2^30/z), their x and y gradients over the
+  triangle, the shade row `31 − (node.+0xd0 & 0xFF)` (or `31 − poly.+0x40` when the node
+  has lights), texel pointer `**group.+8` (the texture slot's word 2 = `.3DM` data +
+  0x8014, E-0014). 0x45ee50 (type 3): exact `u = (u/z)/(1/z)` every 16 pixels (divide by
+  0x4b2364) and linear steps between, 16.16 u/v with 8-bit fractions, texel = `texels[
+  (v >> 16) · 256 + (u >> 16)]` with no mask, pixel = high half of `table[row · 256 +
+  texel]`, two pixels per dword store; every pixel written. 0x460450 (type −6): the same,
+  but the texel offset is ANDed with 0xFFFF (u and v wrap at 256) and texels of value 0
+  set a skip bit (`sub al,1; adc ebp,ebp`) so their pixels are not written. 0x45a3b0
+  (type −4): texel offset `((v >> 16) & 0xFF) << 8 | (u >> 16) & 0xFF`, pixel =
+  `((src & 0xF7DE) + (dst & 0xF7DE)) >> 1` per RGB565 pixel (mask 0xF7DEF7DF on pixel
+  pairs, `rcr`), no key. 0x43c780 (type 1): colour = low 16 bits of `group.+8`, which
+  0x4338d0 points at the texture slot's word 11 = the material's first `unk_colour` word
+  (slot words 3..13 are the 44-byte material record, 0x434560); without lights the colour
+  grows by 0x1388 (mod 0x10000) for each poly of the group (0x43c7c5, `add edi,
+  0x13881388` before every poly); 0x45809a fills the span with it. Corpus: type −4 is
+  one group (pont `eau`); type 1 is 11 groups (38 polys, all material DEFAULT, colour
+  0x3DEF) in chambreb `perpompe`, champ `animfaux01`, `corbopere`, hopiext `porche02`,
+  musee `brul`..`brul05`, terrasse `drapoanim` (0 polys). Texel 0 occurs in 379 of the 384
+  type −6 textures.
+- **Method:** decompiled the builders; disassembled the span routines
+  (`notes/decomp/MISSION.EXE__asm_render.s`); corpus scan.
+- **Confidence:** proven
+
+### E-0508 — Every textured pixel uses shade row 16; the lighting code never runs
+- **Binary/file:** `/MISSION.EXE`; the 15 `.3DC`
+- **Evidence:** the row is `31 − brightness`, brightness = node +0xd0 low byte when node
+  +0xc4 (light count) is 0 (0x444e20). +0xd0 = 15 in all 560 nodes of the files, and its
+  only writer, 0x435930 (all nodes of an object, `value & 0x1F1F`), is called with 15 by
+  `C_Monde::LoadScene` (0x421f22) and by cafe's init for `mirroir` (0x41b7ef..0x41b7ff).
+  +0xc4 = 0 in all nodes and no game code stores to it (the stores to `[reg+0xc4]` are in
+  the Cryo library, 0x4686b8, on other structures); the light count 0x4e3658 is 0 in
+  `.data` and never written. So 0x455470 (lights to camera space), 0x44dc30 and 0x44df60
+  (per-poly brightness from type-1 directional / type-2 point lights with inner/outer
+  radii, 0x94-byte records at 0x68b1e0, into poly +0x34/+0x40/+0x41..) do nothing in
+  this game.
+- **Method:** decompiled; store scans; corpus scan.
+- **Confidence:** proven
+
+### E-0509 — Texel addressing and the odd-sized textures (Q-0003)
+- **Binary/file:** `/MISSION.EXE`; jardin `salon.3DM`, musee `plafond*.3DM`
+- **Evidence:** row stride is 256 in all three routines (E-0507); only −6 and −4 wrap.
+  Type 3 reads `texels + floor(v)·256 + floor(u)` unbounded, so u past 256 continues on
+  the next row and negative or large v reads outside the texel block. The groups using the
+  four odd textures are all type 3 or −6 with u ≤ 254.004 and v in [0.996, 255.0] (27
+  groups): the 255-row `plafond*` textures are read at row 255 only where v reaches
+  exactly 255.0; salon's rows 256 and 257 are never addressed. Of 485 textured
+  (type, material, scene) triples, 12 have UVs outside [0, 256]: maisonj `BORDS` and
+  `GRILLE` (−6, u up to 4,114.9 and 1,280), musee `PLANTE` (−6, u −14,336..2,549), and
+  type 3 in maisonj only (`SOL` u ≤ 764, `TUILES` v ≥ −554.8, `VAN02` v ≥ −237.1,
+  `MAISBGROUND` u ≥ −255, and four that exceed by under 20).
+- **Method:** disassembly; corpus scan of UVs per face group.
+- **Confidence:** proven
+
+### E-0510 — The 555 display path converts pixel formats only
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x42e97f calls 0x43c200 when 0x6516bc = 1 (555 surface, E-0100); 0x439a10
+  (from `Alloc3DMemory` 0x422a87 when the depth byte 0x5b7fa4 = 15) calls 0x43c200 once
+  (guard 0x4e35d8) and converts every loaded texture's shade table once (slot word 14
+  bit 0): `565 → 555` by `r << 10 | (g6 >> 1) << 5 | b`. 0x43c200 = 0x454af0 + 0x4549f0:
+  in both span tables swap the entries of types −4 ↔ −18, −3 ↔ −17, −2 ↔ −16, −19 ↔ −14,
+  −20 ↔ −7; the pairs are the 565 and 555 versions of the blending routines (0x45a3b0
+  masks 0xF7DEF7DF, 0x45bae0 masks 0x7BDE7BDF).
+- **Method:** decompiled; disassembly.
+- **Confidence:** proven
+
+### E-0511 — The assembly at 0x455470–0x465bcf: one C function, then span routines entered only through two type-indexed tables (Q-0002)
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x455470 is a C function (Ghidra made it: 119 bytes, called by 0x450160)
+  transforming the lights to camera space (E-0508). From 0x4554f0 the code is
+  hand-written span routines with a register interface (ebx = first x, ecx = count, edi =
+  destination pixel, ebp = edge record, esi = span list, st0 = 1.5·2^52 from 0x4b2360),
+  reached only by `call [eax*4 + 0x4b20dc]` in 0x454a8e (table 0x4b2084..0x4b215c, types
+  −22..32; 0x454ad7 for type −1 ends the walk) and `call [eax*4 + 0x4b21cc]` in 0x454b90
+  (a second walker with its own table 0x4b2174..0x4b224c, which nothing references).
+  Routines per type in E-0507 for the corpus; 0 (0x458090) only advances, 14 (0x458760)
+  fills the background, 15 (0x458793) copies from a buffer at 0x69ce54, 27 (0x4580d1)
+  fills 0x0101.
+- **Method:** capstone disassembly; table dumps; byte scans for absolute and relative
+  references.
+- **Confidence:** proven
+
+### E-0512 — Picking: nearest drawn triangle under the point, by screen-space inside test and ray depth
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x439b90(h, x, y) stores x, y (0x6af5a0, 0x6af5b4), depth 2^31
+  (0x6af5b0 = 0x4f000000), clears 0x4b135c and walks from node h with 0x43a150 as the
+  draw hook, so every node gets the whole per-node pipeline of E-0500 except edge
+  bucketing. 0x43a150 (made a function in a scratch copy): skips the node when (x, y) is
+  outside its projected bounding circle; for each poly of the node's draw list without
+  bit 0 (so visible, front-facing, clipped polys included, every group type, texel 0
+  ignored): bounding-box test, then the three edge functions of the projected corners ≤
+  0.0 (inside or on the edge), then the depth along the view ray through (x, y) of the
+  poly's camera-space plane; the smallest depth wins and 0x439b90 returns that node's
+  handle (0x433740).
+- **Method:** decompiled (function created with `define_and_decompile.py` in a
+  throw-away project copy).
+- **Confidence:** proven
+
+### E-0513 — Code present but idle in this game
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x44b120 (a second span resolver, set only by the unreferenced 0x4378a0);
+  0x454b90 (unreferenced span walker); 0x447f50 (9 KB rasteriser, no reference); 0x454870
+  (draw hook exporting projected triangles, installed when 0x4e3654 ≠ 0, which is 0 and
+  never written); 0x44fb10 (sphere-mapped UVs from camera-space vertex normals for flag
+  0x800, never set); mip selection for group type 0x14 (0x444e20, `(&0x6a0e80)[level]`,
+  thresholds 0x4a26a0..0x4a26c8; no type-0x14 group in the corpus); 0x4503b0 (world
+  bounds of node +0xa0 boxes, count +0x9c = 0 everywhere).
+- **Method:** xref and byte scans; decompiled.
+- **Confidence:** proven
+
+### E-0514 — .3DA playback: track i poses node i; keys (time, x, y, z, w); time in 66 ms ticks; track 0's first word is the length (Q-0004)
+- **Binary/file:** `/MISSION.EXE`; 48 `.3DA`
+- **Evidence:** 0x438290(obj, keyA, keyB, t, mask) (E-0318): handles are `object << 16 |
+  frame`; for i below the scene object's node count (object +0x14, nodes +0x18.., the
+  `.3DC` node table) it poses node i with the anim object's track i (+0x18..). Same
+  animation: time `((256 − t)·fA + t·fB) / 256` (float) → 0x437da0; two animations: each
+  sampled at its own integer frame and the results blended by t/256 (0x437f80).
+  0x437da0(node, track, time, mask): rotation unless mask bit 0 and only if the track has
+  ≥ 2 keys; binary search for the first key k ≥ 1 with `key.time ≥ time` (k = n − 1
+  past the end); `key.time ≤ time` → that key as is, else fraction `trunc((time −
+  prev.time) · 256 / (key.time − prev.time))` (0x4a25a8 = 256.0) and 0x43b740 between
+  the two; 0x43b480 writes node +0x28. Position the same (mask bit 1), linear with the
+  same 8-bit fraction into +0x1c. 0x43b480: `m0 = 1 − 2(q1²+q2²)`, `m1 = 2(q0q1 − q3q2)`,
+  `m2 = 2(q0q2 + q3q1)`, `m3 = 2(q0q1 + q3q2)`, `m4 = 1 − 2(q0²+q2²)`, `m5 = 2(q1q2 −
+  q0q3)`, `m6 = 2(q0q2 − q3q1)`, `m7 = 2(q1q2 + q0q3)`, `m8 = 1 − 2(q0²+q1²)` (Q30 >> 14):
+  the key is (x, y, z, w). 0x43b740: `cos = a·b >> 15`; `1 − cos < 21/32768` → linear
+  blend; `1 + cos ≤ 20/32768` → a perpendicular quaternion (−a1, a0, −a3, a2) rotated in;
+  else slerp through the angle table 0x6a0ee0 (0x43a660: `0x4786b0(i / 2048) · 4096 / 2π`,
+  i = −2048..2047) and the sine table 0x6ab5a0; no sign
+  flip toward the shorter arc. 0x437d90(h) returns track 0's first word, which every
+  `LoadAnims<scene>` stores as the length (E-0318); frames advance by elapsed 66 ms ticks
+  (E-0300). Corpus: 44 of 48 `.3DA` have exactly as many tracks as their scene has nodes
+  (jardin one with 57 of 59, maisonj one with 16 of 17, mangeurs one with 23 of 25);
+  every first rotation key has time 0; of 2,951 consecutive rotation-key pairs 36 have a
+  negative dot product, 385 fall under the linear threshold, none under the opposite one.
+  All 51 `call 0x438290` sites push mask 0 and t 0 (capstone scan of the pushes).
+- **Method:** decompiled; corpus scan.
+- **Confidence:** proven

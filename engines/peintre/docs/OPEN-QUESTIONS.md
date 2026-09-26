@@ -33,7 +33,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Context:** E-0012. No function starts there after Ghidra's analysis.
 - **What we checked:** raw disassembly of a few addresses only.
 - **Blocks:** the rasteriser spec (texture mapping, shading) if it lives there.
-- **Status:** open
+- **Status:** open RESOLVED (see E-0511)
 
 ### Q-0003 — How do the drawers address texels of the four odd-sized textures?
 - **Context:** E-0015: jardin `salon.3DM` has 512 texel bytes more than 256x256, musee
@@ -41,13 +41,13 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** sizes only. The drawers (0x43c780, 0x444e20, …) are not read yet.
 - **Blocks:** nothing if texel addressing is masked to 256x256 (the engine can pad or
   crop); the last row of the three short ones then reads the next heap object.
-- **Status:** open
+- **Status:** open RESOLVED (see E-0509)
 
 ### Q-0004 — .3DA: component order of rotation keys, meaning of track word 0 and key time units
 - **Context:** E-0016.
 - **What we checked:** data only (unit-length keys, times 0..30, word 0 = 30 in portev).
 - **Blocks:** animation playback spec.
-- **Status:** open
+- **Status:** open RESOLVED (see E-0514)
 
 ### Q-0100 — What do the constant fields of the TGP "LZWCRYO" header mean?
 - **Context:** `.TGP` single body (E-0100): `u32 0x24` at 8, two zero u32 at 0x14, `256`
@@ -143,4 +143,23 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   read); the museum's init and frame callbacks.
 - **Blocks:** nothing: the engine can load the track and never play it, like the original.
   It matters only if a cut robot exit is to be restored.
+- **Status:** open
+
+### Q-0300 — Node +0xac, +0xc0, +0xd4, +0xd8: what are they?
+- **Context:** `.3DC` node, `obj3d.ksy` (E-0504).
+- **What we checked:** the renderer's per-node code (0x44fec0 and everything it calls, the
+  pick hook 0x43a150) reads none of them; the corpus.
+- **Observed range:** +0xac, +0xd4, +0xd8 = 0 and +0xc0 = 40 in all 560 nodes.
+- **Blocks:** nothing for drawing; they stay `unk` in the ksy.
+- **Status:** open
+
+### Q-0301 — Face group +0x28, +0x30 and the material's second colour word and last 8 bytes
+- **Context:** `.3DC` face group (+0x24 is the runtime draw list, E-0505) and material
+  record (the first `unk_colour` word is the type-1 flat colour, E-0507).
+- **What we checked:** the edge builders, the poly cull and the loader's binding (0x4338d0,
+  0x434560); the corpus.
+- **Observed range:** group +0x24 = 0 in all 1,235 groups; +0x28 = 0 in 1,041, small
+  integers in the rest (1: 76, 3: 50, …); +0x30 non-zero in all, large varying values;
+  material word 2 = 0x3DEF on the 15 DEFAULT materials, else 0; the last 8 bytes zero.
+- **Blocks:** nothing for drawing.
 - **Status:** open

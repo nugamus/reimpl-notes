@@ -538,62 +538,62 @@ address,module,name,ghidra,size,callers,evidence
 0x004344d0,engine3d,,FUN_004344d0,137,1,
 0x00434560,engine3d,Obj_LoadTextures,FUN_00434560,534,1,.3DM names; E-0013
 0x004348c0,engine3d,Obj_CheckHeader,FUN_004348c0,253,1,Type d'entete non valide !!!!; E-0013
-0x00434e70,engine3d,,FUN_00434e70,317,1,
+0x00434e70,engine3d,World3D_Init,FUN_00434e70,317,1,heap + node Camera flag 0x400; E-0501 (render.csv)
 0x00434fb0,engine3d,,FUN_00434fb0,105,1,
-0x00435020,engine3d,,FUN_00435020,309,2,
-0x00435170,engine3d,,FUN_00435170,307,2,
-0x004353c0,engine3d,,FUN_004353c0,14,2,
-0x004353d0,engine3d,,FUN_004353d0,14,2,
+0x00435020,engine3d,View_SetFrustum,FUN_00435020,309,2,side planes and K_x/K_y; E-0502 (render.csv)
+0x00435170,engine3d,View_SetViewport,FUN_00435170,307,2,focal 480*w/640 aspect centre near/far; E-0502 (render.csv)
+0x004353c0,engine3d,View_SetNear,FUN_004353c0,14,2,0x6af5bc then frustum; E-0502 (render.csv)
+0x004353d0,engine3d,View_SetFar,FUN_004353d0,14,2,0x6af6c4 then frustum; E-0502 (render.csv)
 0x00435400,engine3d,Obj_Load,FUN_00435400,106,24,opens a BFG entry into the 3D heap; E-0013
-0x00435880,engine3d,,FUN_00435880,63,1,
-0x00435930,engine3d,,FUN_00435930,64,2,
+0x00435880,engine3d,Node_AttachTo,FUN_00435880,63,1,child.parent/sibling/parent.child; E-0501 (render.csv)
+0x00435930,engine3d,Node_SetBrightness,FUN_00435930,64,2,+0xd0 = v & 0x1F1F on all nodes of an object; E-0508 (render.csv)
 0x00435970,engine3d,Node_Hide,FUN_00435970,33,31,set flag bit 0; E-0307 (world.csv)
 0x004359a0,engine3d,Node_Show,FUN_004359a0,33,12,clear flag bit 0; E-0307 (world.csv)
 0x00435dc0,engine3d,Node_Retexture,FUN_00435dc0,144,6,from/to texture on face groups; E-0307 (world.csv)
 0x00435ec0,engine3d,BadHandle,FUN_00435ec0,23,5,Bad_Handle!
 0x00435fb0,engine3d,,FUN_00435fb0,102,3,
 0x00436020,engine3d,,FUN_00436020,102,2,
-0x00436090,engine3d,,FUN_00436090,42,1,
+0x00436090,engine3d,Node_GetRotation,FUN_00436090,42,1,copies local +0x28; E-0501 (render.csv)
 0x004360c0,engine3d,,FUN_004360c0,47,3,
-0x004360f0,engine3d,,FUN_004360f0,106,2,
-0x00436160,engine3d,,FUN_00436160,97,5,
+0x004360f0,engine3d,Node_SetRotation,FUN_004360f0,106,2,local +0x28; camera world = transpose; E-0501 (render.csv)
+0x00436160,engine3d,Node_SetPosition,FUN_00436160,97,5,local +0x1c; camera also world; E-0501 (render.csv)
 0x00436200,engine3d,Node_GetViewPos,FUN_00436200,41,6,copies node +0x4c; E-0307 (world.csv)
 0x00436c10,engine3d,,FUN_00436c10,57,1,
-0x004378f0,engine3d,,FUN_004378f0,126,2,
-0x00437d90,engine3d,,FUN_00437d90,16,15,
-0x00437da0,engine3d,,FUN_00437da0,475,1,
-0x00437f80,engine3d,,FUN_00437f80,780,1,
+0x004378f0,engine3d,Render_Frame,FUN_004378f0,126,2,tree walk + span resolve through 0x4b01cc; E-0500 (render.csv)
+0x00437d90,engine3d,Anim_Length,FUN_00437d90,16,15,track 0 first word; E-0514 (render.csv)
+0x00437da0,engine3d,Anim_PoseNode,FUN_00437da0,475,1,binary search keys (render.csv)
+0x00437f80,engine3d,Anim_PoseNodeBlend,FUN_00437f80,780,1,two animations blended; E-0514 (render.csv)
 0x00438290,engine3d,Anim_Pose,FUN_00438290,324,29,pose node from 3DA keys; E-0318 (world.csv)
 0x00439480,engine3d,,FUN_00439480,147,1,
 0x004395d0,engine3d,Texture_Load,FUN_004395d0,453,3,named 3DM texture; E-0307 (world.csv)
 0x004399d0,engine3d,,FUN_004399d0,64,5,
-0x00439a10,engine3d,,FUN_00439a10,150,1,
+0x00439a10,engine3d,Tex_ConvertTo555,FUN_00439a10,150,1,shade tables 565 to 555 once; E-0510 (render.csv)
 0x00439b90,engine3d,Render_Pick,FUN_00439b90,111,2,pick pass at a pixel; E-0313 (world.csv)
 0x0043a660,engine3d,Trig_BuildTables,FUN_0043a660,135,1,cos/sin * 32768 4096 entries; E-0302 (world.csv)
 0x0043a750,engine3d,,FUN_0043a750,38,2,
 0x0043a780,engine3d,Matrix_FromAngles,FUN_0043a780,314,3,pitch yaw roll Q15; E-0302 (world.csv)
-0x0043b060,engine3d,,FUN_0043b060,91,3,
-0x0043b0c0,engine3d,,FUN_0043b0c0,46,2,
-0x0043b0f0,engine3d,,FUN_0043b0f0,64,5,
-0x0043b130,engine3d,,FUN_0043b130,44,4,
+0x0043b060,engine3d,Mat_Mul,FUN_0043b060,91,3,3x3 Q15 product >> 15; E-0500 (render.csv)
+0x0043b0c0,engine3d,Mat_Transpose,FUN_0043b0c0,46,2,3x3 transpose; E-0501 (render.csv)
+0x0043b0f0,engine3d,Mat_MulVec,FUN_0043b0f0,64,5,3x3 Q15 times vector >> 15; E-0501 (render.csv)
+0x0043b130,engine3d,Vec_Add,FUN_0043b130,44,4,three-int add; E-0501 (render.csv)
 0x0043b160,engine3d,,FUN_0043b160,44,5,
 0x0043b190,engine3d,,FUN_0043b190,32,2,
 0x0043b200,engine3d,,FUN_0043b200,34,1,
 0x0043b270,engine3d,,FUN_0043b270,140,2,
 0x0043b360,engine3d,,FUN_0043b360,82,2,
 0x0043b3c0,engine3d,,FUN_0043b3c0,25,8,
-0x0043b480,engine3d,,FUN_0043b480,272,2,
-0x0043b740,engine3d,,FUN_0043b740,444,2,
+0x0043b480,engine3d,Quat_ToMatrix,FUN_0043b480,272,2,Q15 (x y z w) to 3x3; E-0514 (render.csv)
+0x0043b740,engine3d,Quat_Slerp,FUN_0043b740,444,2,8-bit fraction slerp via tables; E-0514 (render.csv)
 0x0043b940,engine3d,,FUN_0043b940,287,1,
 0x0043ba60,engine3d,,FUN_0043ba60,1401,1,
 0x0043bfe0,engine3d,,FUN_0043bfe0,474,1,
-0x0043c200,engine3d,,FUN_0043c200,10,2,
+0x0043c200,engine3d,Span_Use555,FUN_0043c200,10,2,swap 565/555 blend routines in both tables; E-0510 (render.csv)
 0x0043c210,engine3d,,FUN_0043c210,13,0,
 0x0043c220,engine3d,,FUN_0043c220,21,1,
 0x0043c240,engine3d,,FUN_0043c240,56,1,
 0x0043c280,engine3d,,FUN_0043c280,106,1,
 0x0043c2f0,engine3d,,FUN_0043c2f0,924,1,
-0x0043c780,engine3d,,FUN_0043c780,3746,1,
+0x0043c780,engine3d,Edge_BuildFlat,FUN_0043c780,3746,1,type 1: material colour + 0x1388 per poly; E-0507 (render.csv)
 0x0043d630,engine3d,,FUN_0043d630,1306,1,
 0x0043dc40,engine3d,,FUN_0043dc40,1414,1,
 0x0043e2c0,engine3d,,FUN_0043e2c0,1167,1,
@@ -601,38 +601,38 @@ address,module,name,ghidra,size,callers,evidence
 0x004402f0,engine3d,,FUN_004402f0,7277,1,
 0x00441f60,engine3d,,FUN_00441f60,5895,1,
 0x00443670,engine3d,,FUN_00443670,6054,1,
-0x00444e20,engine3d,,FUN_00444e20,6241,1,
+0x00444e20,engine3d,Edge_BuildTextured,FUN_00444e20,6241,1,types 3/-6/-4: 1/z u/z v/z gradients shade row texture; E-0507 (render.csv)
 0x00446690,engine3d,,FUN_00446690,4003,1,
-0x00447640,engine3d,,FUN_00447640,1275,1,
-0x00447c30,engine3d,,FUN_00447c30,138,1,
-0x00447d90,engine3d,,FUN_00447d90,129,1,
+0x00447640,engine3d,Edge_BucketTextured,FUN_00447640,1275,1,edges into scanline buckets 0x69de60/0x69fe60; E-0506 (render.csv)
+0x00447c30,engine3d,Render_BuildEdges,FUN_00447c30,138,1,per face group type edge builder; E-0507 (render.csv)
+0x00447d90,engine3d,Render_BucketEdges,FUN_00447d90,129,1,per vertex group type edge bucketing; E-0506 (render.csv)
 0x00447ee0,engine3d,,FUN_00447ee0,99,2,
 0x00447f50,engine3d,,FUN_00447f50,9032,0,
-0x0044a370,engine3d,,FUN_0044a370,346,1,
+0x0044a370,engine3d,Span_InsertSurface,FUN_0044a370,346,1,1/z order with epsilon 100 and slope tie-break; E-0506 (render.csv)
 0x0044a4d0,engine3d,,FUN_0044a4d0,351,1,
 0x0044a630,engine3d,,FUN_0044a630,126,1,
-0x0044a6b0,engine3d,,FUN_0044a6b0,365,2,
-0x0044a820,engine3d,,FUN_0044a820,643,2,
-0x0044ab80,engine3d,,FUN_0044ab80,1220,1,
+0x0044a6b0,engine3d,Span_ResolveLine,FUN_0044a6b0,365,2,opaque-only line; E-0506 (render.csv)
+0x0044a820,engine3d,Span_ResolveLineLayered,FUN_0044a820,643,2,line with negative-type surfaces; E-0506 (render.csv)
+0x0044ab80,engine3d,Span_ResolveFrame,FUN_0044ab80,1220,1,per scanline active edges and spans; E-0506 (render.csv)
 0x0044b120,engine3d,,FUN_0044b120,1346,0,
-0x0044b740,engine3d,,FUN_0044b740,284,1,
+0x0044b740,engine3d,Span_Alloc,FUN_0044b740,284,1,sentinel surfaces and the 32 KB span list; E-0506 (render.csv)
 0x0044b860,engine3d,,FUN_0044b860,21,0,
-0x0044b880,engine3d,,FUN_0044b880,644,1,
-0x0044bb10,engine3d,,FUN_0044bb10,587,1,
-0x0044bd60,engine3d,,FUN_0044bd60,440,1,
-0x0044bf20,engine3d,,FUN_0044bf20,480,1,
-0x0044c100,engine3d,,FUN_0044c100,278,1,
+0x0044b880,engine3d,Span_InitSentinels,FUN_0044b880,644,1,left/right/background sentinels for the viewport; E-0506 (render.csv)
+0x0044bb10,engine3d,Render_CullNode,FUN_0044bb10,587,1,bounding sphere vs view cone near far; E-0504 (render.csv)
+0x0044bd60,engine3d,Render_TransformVertices,FUN_0044bd60,440,1,vertices to camera space + outcodes; E-0504 (render.csv)
+0x0044bf20,engine3d,Render_TransformSharedVertices,FUN_0044bf20,480,1,parent's 0x80 vertices for 0x10 children; E-0504 (render.csv)
+0x0044c100,engine3d,Render_FacePlaneDots,FUN_0044c100,278,1,face normal . eye >> 15; E-0505 (render.csv)
 0x0044c220,engine3d,,FUN_0044c220,335,1,
-0x0044c370,engine3d,,FUN_0044c370,5247,1,
-0x0044d980,engine3d,,FUN_0044d980,420,1,
-0x0044db30,engine3d,,FUN_0044db30,226,1,
-0x0044dc30,engine3d,,FUN_0044dc30,808,1,
-0x0044df60,engine3d,,FUN_0044df60,6968,1,
-0x0044fb10,engine3d,,FUN_0044fb10,495,1,
-0x0044fec0,engine3d,,FUN_0044fec0,434,1,
-0x00450160,engine3d,,FUN_00450160,148,2,
-0x004503b0,engine3d,,FUN_004503b0,670,1,
-0x00450650,engine3d,,FUN_00450650,106,1,
+0x0044c370,engine3d,Render_ClipNear,FUN_0044c370,5247,1,replaces a poly by near-clipped polys; E-0505 (render.csv)
+0x0044d980,engine3d,Render_CullPolys,FUN_0044d980,420,1,backface / outcode / near-clip dispatch; E-0505 (render.csv)
+0x0044db30,engine3d,Render_ProjectVertices,FUN_0044db30,226,1,2^30/z and truncated screen x y; E-0502 (render.csv)
+0x0044dc30,engine3d,Render_LightsToNode,FUN_0044dc30,808,1,lights to node space (idle); E-0508 (render.csv)
+0x0044df60,engine3d,Render_LightPolys,FUN_0044df60,6968,1,per-poly brightness from lights (idle); E-0508 (render.csv)
+0x0044fb10,engine3d,Render_SphereMapUVs,FUN_0044fb10,495,1,flag 0x800 UVs from normals (idle); E-0513 (render.csv)
+0x0044fec0,engine3d,Render_Node,FUN_0044fec0,434,1,world = parent x local then cull/transform/clip/project/draw; E-0500 (render.csv)
+0x00450160,engine3d,Render_WalkTree,FUN_00450160,148,2,depth-first from the camera; hooks 0x4b1358/0x4b135c; E-0500 (render.csv)
+0x004503b0,engine3d,Node_UpdateBoxes,FUN_004503b0,670,1,world bounds of node +0xa0 boxes (none in corpus); E-0513 (render.csv)
+0x00450650,engine3d,Render_UpdateBoxes,FUN_00450650,106,1,walk calling 0x4503b0; E-0513 (render.csv)
 0x00450cb0,engine3d,,FUN_00450cb0,402,1,
 0x00450e50,engine3d,,FUN_00450e50,375,2,
 0x00450fd0,engine3d,,FUN_00450fd0,403,2,
@@ -652,7 +652,7 @@ address,module,name,ghidra,size,callers,evidence
 0x004549f0,engine3d,,FUN_004549f0,158,1,
 0x00454a8e,engine3d,,FUN_00454a8e,68,2,
 0x00454af0,engine3d,,FUN_00454af0,158,1,
-0x00455470,engine3d/asm,,FUN_00455470,119,1,
+0x00455470,engine3d/asm,Render_LightsToCamera,FUN_00455470,119,1,light table to camera space (idle); E-0508 (render.csv)
 0x00465bd0,cryo/codec,,FUN_00465bd0,446,0,
 0x00465d8e,cryo/codec,Apc_Decode,FUN_00465d8e,615,3,IMA ADPCM decoder (shift-add (media.csv)
 0x00465ff5,cryo/codec,,FUN_00465ff5,615,0,
