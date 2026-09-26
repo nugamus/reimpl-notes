@@ -4849,3 +4849,27 @@ An entry at `tentative` confidence must also have a matching line in
   same point is over `*U02_14` and nothing fires; the magpie waits at frame 11 until the eye
   comes near the perch after `PieVoleur`, not before.
 - **Confidence:** proven.
+
+### E-0619 — U07's plank and water tests read the ground object's name, the water one case-insensitively and right after a tip; U05 needs the dog's door to reach the grate
+- **Binary/file:** `MissionMonet.exe`; `Data/U07/Static/TACHES.O3D`, `Data/U07/Anim/PLANCHE.O3D`, `Data/U05/Static/Colporte.o3d`.
+- **Evidence:** `U07_HandleLadderAndGround` (`0x00411850`, disassembly): after M01,
+  `[camera+0x3c]` non-null → `_stricmp(it, "Planch01")` (`0x0041197c`, thunk
+  `0x004366be` → MSVCRTD `_stricmp`) = 0 and `+0x6c8` = 0 → `U07_TipPlank`; then with
+  no return, `[camera+0x3c]` is read again (`0x00411995`) and null or
+  `_strnicmp(it, "*eau", 4)` (`0x004119a4`, thunk `0x00436694` → MSVCRTD
+  `_strnicmp`, string `0x00440c7c`) = 0 → `U07_FallInWater`. Both are name compares
+  (E-0395 said `strncmp`: superseded, the import is `_strnicmp`). Corpus (`o3d.py` over
+  `Data/U07`): `Planch01` once (`Anim/PLANCHE.O3D`, parent `planche`); `*eau`,
+  `*eau0`..`*eau16`, `*eau01` only in `Static/TACHES.O3D`. U05 and U06 frame/input hooks
+  (`0x0040f160`, `0x00410ab0`, `0x00410b80`) read no ground object; their action flags
+  (`+0x410 + 4·id`) match `u05.md` / `u06.md`. Engine walk tests (`goto`, `press up`):
+  in U05 before M09/M11, walking south from (1383, −700) stops at y −854 (`ColPorte1`,
+  the hall door, at y −887), walking south from (1400, −1300) stops at y −1437
+  (`ColPorte2` at y −1473), north from (1383, −1300) at y −1216 (the grate's lattice).
+  U07 engine runs (`exhaust 1`): over `*eau5` the fall runs, over `Planch01` the tip
+  ends at (1034.55, 284.2, 374.3) over `planche02`; without `exhaust 1` neither fires.
+  U06: at (−700, 200) (safe, 274 from the clown) no shot in 10 s; at (−900, 250) game over
+  within 11 s. U05: y > 928 without M24 stays; with M24 loads U06.
+- **Method:** MCP decompile and disassembly; `pefile` IAT of the thunks; `o3d.py`;
+  engine `dev_commands` runs.
+- **Confidence:** proven (walls: engine collision on the original data).
