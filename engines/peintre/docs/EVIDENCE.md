@@ -1737,3 +1737,18 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   All 51 `call 0x438290` sites push mask 0 and t 0 (capstone scan of the pushes).
 - **Method:** decompiled; corpus scan.
 - **Confidence:** proven
+
+### E-0017 — 0x4e3120 is cleared only by the museum frame when it acts on it; 0x4e30f4 is never cleared
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** the museum frame 0x42b776 tests `0x4e3120 == 1 && scene (0x4e3144) == 0 &&
+  0x4aba48 == 0`, and only inside that branch sets the six robot parts' cursor type to 4,
+  clears 0x59901c (speaking) and writes 0x4e3120 = 0; the only writer of 1 is 0x42f515
+  (return from the option menu). So the flag stays set while it does not act (another
+  scene, or 0x4aba48 = 1) and fires on the next museum frame that qualifies. 0x4e30f4 is
+  written 1 by 0x42f2c2 (zone 11 return) and only read by the chambreb init 0x41c979
+  (`== 1 && 0x4abd5c == 0` → 0x4abd5c = 1, play the static sound `miroir` once); nothing
+  writes it back to 0, so the saved 0x4abd5c alone prevents a replay.
+- **Method:** grep of the cited decompiler listings `notes/decomp/MISSION.EXE__FUN_0042b776.c`
+  (lines 372–381), `…__FUN_0041c979.c` (156–159), `…__FUN_0042f2c2.c`, `…__FUN_0042f515.c`.
+- **Confidence:** proven (no other xref in the dumped functions; function-dump.tsv lists no
+  other reference to either address)

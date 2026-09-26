@@ -313,4 +313,4 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   speech on every frame after the first option menu; if it is cleared elsewhere (e.g. when
   the menu is opened outside the museum), a flag left over from another scene would not
   reach the museum.
-- **Status:** open
+- **Status:** RESOLVED (see E-0017)
