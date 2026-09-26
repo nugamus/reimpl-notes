@@ -30,3 +30,7 @@ address,name,evidence
 0x00424af7,HopiExt_Init,scene 2 init callback; E-0336
 0x00424c4c,HopiExt_StepAnim,anim table step; E-0336
 0x00424d93,HopiExt_Frame,scene 2 frame callback; E-0336
+0x004254f2,Hopiint_LoadSounds,scene hopiint code; E-0360
+0x00425541,Hopiint_Init,scene hopiint code; E-0360
+0x004256af,Hopiint_StepAnim,scene hopiint code; E-0360
+0x0042579a,Hopiint_Frame,scene hopiint code; E-0360

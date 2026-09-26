@@ -650,3 +650,18 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
 - **Method:** as E-0330.
 - **Confidence:** proven
 - **Doc:** `games/mission-sunlight/docs/hopiext.md`
+
+### E-0360 — hopiint (scene 8): wardrobe, four items, zones 13 and 15, PLAK exit within 3000
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** init `0x425541`, per frame `0x42579a`, anim step `0x4256af`, sounds
+  `0x4254f2`, `LoadAnimshopiint` `0x425420`. Objects `0x4acb08` (9 x 0x3c: `ARMOIRE`,
+  `LAMPE`, `BONNET`, `CROIX`, `BOUGIE`, `MIRROIRVG`, `FOU`, `PLAK`, `ECHIK`), tracks
+  `hopiint.3da` on `ARMOIRE`, `fou.3da` on `FOU` (`0x4acd28`). Items: `BOUGIE` 22, `LAMPE`
+  21, `BONNET` 20, `CROIX` 23. Zones: `MIRROIRVG` 15, `FOU`/`ECHIK` 13. `PLAK` → 8 → 2 when
+  √(x² + z²) of `0x436200`'s output < 3000.0 (`0x4a2538`); `fou.3da`'s playing word
+  (`0x4ace14`) := that distance to `ECHIK` < 1500.0 (`0x4a253c`), every frame.
+- **Method:** decompiled with PyGhidra `decompile_one.py` (read-only copy of Peintre.gpr);
+  call arguments the decompiler dropped read from the pushes before each call (capstone);
+  tables read from .data through pefile's mapped image.
+- **Confidence:** proven
+- **Doc:** `games/mission-sunlight/docs/hopiint.md`
