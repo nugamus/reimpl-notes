@@ -68,3 +68,56 @@ address,name,evidence
 0x0042ddbf,Terrasse_Init,scene terrasse code; E-0366
 0x0042df65,Terrasse_StepAnim,scene terrasse code; E-0366
 0x0042e023,Terrasse_Frame,scene terrasse code; E-0366
+0x0042ad92,Musee_Init,scene 0 init callback; E-0321
+0x0042b776,Musee_Frame,scene 0 frame callback; E-0321
+0x0042b5fe,Musee_StepAnim,anim table step; E-0321
+0x0042a980,Musee_SetBoxSet,swaps BOX/BOX1..BOX4 in collision; E-0319
+0x0042abf1,Musee_LoadSounds,robot2 etoile musee; E-0320
+0x0042ad1c,Uv_ScrollEcran,+-0x7f0000 on UV word 1; E-0319
+0x0042f988,World_WndProc,3D modes 0/4 on 0x505; E-0300
+0x0042f955,Timer3D_Callback,tick counter + PostMessage 0x505; E-0300
+0x004223e8,World_Frame,movement collision mouse draw keys frame callback; E-0300
+0x004221f6,World_Redraw,frame without keyboard movement + hourglass; E-0300
+0x00422b98,World_KeyboardMove,velocities and keys; E-0302
+0x004216b6,World_Collide,sphere push-out and floor snap; E-0304
+0x00420e07,World_Mouse,relative mouse clamp 640x480; E-0313
+0x0041ece8,Key_Held,bit 7 of current buffer; E-0301
+0x0041ec7b,Key_Released,up now down before; E-0301
+0x00422f30,Camera_Set,position + angle matrix + viewer copy; E-0302
+0x00421c98,Camera_Start,identity then Camera_Set; E-0307
+0x00421d73,World_InitHeapAndViewport,0x434e70 + 0x435170 per view size; E-0307
+0x0041fda9,World_LoadScene,bundle and start camera per scene/prevScene; E-0308
+0x0041ee1d,World_SetCallbacks,init/frame pair per scene; E-0306
+0x0041efc5,Scene_IsComplete,zoneSolved per scene; E-0306
+0x0041f14b,Scene_LeaveToMuseum,return movie when complete; E-0310
+0x0041f506,Flight_Start,20-step flight to a painting (mode 4); E-0309
+0x0041f9f8,Flight_Step,one flight step; E-0309
+0x0041faf9,Flight_End,entry movie or load; E-0309
+0x00420e99,NameTable_AddChild,depth-first name table; E-0307
+0x00420fa9,NameTable_AddSibling,depth-first name table; E-0307
+0x0041edc9,NameTable_Find,strcmp over the scene's node names; E-0307
+0x00422aa6,World_UnloadScene,unregister boxes free heap; E-0307
+0x0041eb20,Pick,viewport bounds then 0x439b90; E-0313
+0x00426594,Cursors_Load,66 cursor TGAs and Invent; E-0314
+0x00426872,Cursors_Free,frees cursor images and bar; E-0307
+0x00426171,InvBar_Update,bar states clicks icon; E-0316
+0x00426071,InvBar_DrawItems,6 held objects; E-0316
+0x00425ff2,InvBar_DrawSunflowers,Ct image; E-0316
+0x00425fb1,Inventory_Count,held flags count; E-0316
+0x00425f71,PointInRect,inclusive bounds; E-0316
+0x00425f00,InvBar_LoadSounds,bar_obj cf_clic3; E-0314
+0x00425f29,InvBar_FreeSounds,frees bar_obj cf_clic3; E-0314
+0x00424190,DrawCursorImage,thunk to Blit16Keyed; E-0314
+0x0043a780,Matrix_FromAngles,pitch yaw roll Q15; E-0302
+0x0043a660,Trig_BuildTables,cos/sin * 32768 4096 entries; E-0302
+0x00432220,Collide_SphereFace,closest point and side; E-0304
+0x00431f90,Collide_FloorFace,vertical projection on face; E-0305
+0x00439b90,Render_Pick,pick pass at a pixel; E-0313
+0x00435970,Node_Hide,set flag bit 0; E-0307
+0x004359a0,Node_Show,clear flag bit 0; E-0307
+0x00435dc0,Node_Retexture,from/to texture on face groups; E-0307
+0x004395d0,Texture_Load,named 3DM texture; E-0307
+0x00436200,Node_GetViewPos,copies node +0x4c; E-0307
+0x00438290,Anim_Pose,pose node from 3DA keys; E-0318
+0x00472710,Mouse_Read,DirectInput mouse deltas and buttons; E-0313
+0x00472b80,Keyboard_Read,DirectInput GetDeviceState 256; E-0301

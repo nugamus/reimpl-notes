@@ -1437,3 +1437,26 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
 - **Method:** decompiled.
 - **Confidence:** proven
 - **Doc:** `scene.md` "What a scene is made of"
+
+### E-0321 — musee (scene 0): object and track tables, acts and box sets, paintings retextured when complete, the robot's lines and hints, zone 0 through the vase
+- **Binary/file:** `/MISSION.EXE`; `Data/SOUND` (`a50_01*.wav`, `robot2`, `etoile`, `musee`)
+- **Evidence:** init 0x42ad92 (table 0x4ae7e8 × 22 of 0x40, count 0x4ae7e0; `LoadAnimsmusee`
+  0x42ac4a over 0x4aed70 × 4 of 0x78; `LoadBoxMusee` 0x42aab8; 0x42abf1; sunflower resets;
+  0x42a980 box-set lines; 0x4aec1a (= `vase` +0x32); 0x4abbd8 = 0 → viewer reset to (0xffd9,
+  0xff2f, 0x169, 0xfe2, 0x14, 0); 0x4395d0 / 0x435dc0 argument pairs read from the pushes
+  (e.g. 0x42b3da: `0x435dc0(Find("m01_03"), "MANGEUR", "RVBMANGE")`); 0x4aba48 → cursor
+  types 0xff at +0x32 of entries 11, 17..21). Frame 0x42b776 (painting names per branch read
+  from the pushes at 0x42b886..0x42bc82: m04_02 → 0xc, m04_03 → 0xd, m03_05 → 0xa, m01_02 →
+  3, m03_02 → 6 + 0x4abd14 = 1, m03_04 → 8, m03_01 → 5, m04_01 → 0xb, m03_06 → 9, m03_03 →
+  7, m01_03 → 4; `vase` 0x42bce7; `etoile` 0x42bd26; parts 0x42bd9d..0x42bdf7; line table
+  0x4aef50 = "a50_01", "a50_01c", "a50_01d", "a50_01e", "a50_01h"; hints push 0x4af358 /
+  0x4af360 / 0x4af368 / 0x4af37c..0x4af3a4, all "a50_01d"; 1200.0f (0x4a2550) and 1500.0f
+  (0x4a2554); `fin` 0x4af378 when 0x4aba5c and z < 0xdac). 0x42b5fe track ends. 0x416a2f
+  returns 0x651678, cleared by `Snd_PlayStreamWav` (0x416813) and set to 1 by the refill
+  routines at the stream's end (0x416bab, 0x416d91). A byte scan of `.text` for 0x4aef4c
+  finds only 0x42b20d (init, 0), 0x42b6f3 (0x42b5fe, 0) and 0x42bf75 (read): `robot03` is
+  never started. 0x4abbfa (0x42c0ec) and 0x4e3124 (0x42bd84) are written and never read.
+- **Method:** decompiled; arguments and branch strings from the disassembly
+  (`build`-side script listing the pushes before each call); tables from `.data` (pefile).
+- **Confidence:** proven
+- **Doc:** `games/mission-sunlight/docs/musee.md`

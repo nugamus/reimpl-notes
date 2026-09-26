@@ -135,3 +135,12 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** nothing for loading and writing (the block is copied whole); naming the
   fields belongs to the world spec.
 - **Status:** open
+
+### Q-0200 — Does anything start the museum robot's third track (`robot03`)?
+- **Context:** `musee.md` / E-0321: record 3 (`robot03.3da` on `robot`, playing flag
+  0x4aef4c) hides the robot at its end, but no code sets 0x4aef4c to 1.
+- **What we checked:** every reference to 0x4aef4c in `.text` (three: two writes of 0, one
+  read); the museum's init and frame callbacks.
+- **Blocks:** nothing: the engine can load the track and never play it, like the original.
+  It matters only if a cut robot exit is to be restored.
+- **Status:** open

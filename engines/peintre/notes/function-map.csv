@@ -338,39 +338,39 @@ address,module,name,ghidra,size,callers,evidence
 0x0041e383,game3d/scenes,Champ_Init,FUN_0041e383,329,0,scene 12 init callback; E-0334 (world.csv)
 0x0041e4cc,game3d/scenes,Champ_StepAnim,FUN_0041e4cc,274,1,anim table step; E-0334 (world.csv)
 0x0041e5de,game3d/scenes,Champ_Frame,FUN_0041e5de,805,0,scene 12 frame callback; E-0334 (world.csv)
-0x0041eb20,game3d/scenes,,FUN_0041eb20,331,15,
-0x0041ec7b,game3d/scenes,,FUN_0041ec7b,109,1,
-0x0041ece8,game3d/scenes,,FUN_0041ece8,43,1,
+0x0041eb20,game3d/scenes,Pick,FUN_0041eb20,331,15,viewport bounds then 0x439b90; E-0313 (world.csv)
+0x0041ec7b,game3d/scenes,Key_Released,FUN_0041ec7b,109,1,up now down before; E-0301 (world.csv)
+0x0041ece8,game3d/scenes,Key_Held,FUN_0041ece8,43,1,bit 7 of current buffer; E-0301 (world.csv)
 0x0041ed13,game3d/world,ReadPeintreIni,FUN_0041ed13,182,0,"\PEINTRE.INI, PATH = %s"
-0x0041edc9,game3d/world,,FUN_0041edc9,84,48,
-0x0041ee1d,game3d/world,,FUN_0041ee1d,368,1,
-0x0041efc5,game3d/world,,FUN_0041efc5,338,1,
-0x0041f14b,game3d/world,,FUN_0041f14b,855,2,
-0x0041f506,game3d/world,,FUN_0041f506,1222,1,
-0x0041f9f8,game3d/world,,FUN_0041f9f8,257,1,
-0x0041faf9,game3d/world,,FUN_0041faf9,644,1,
-0x0041fda9,game3d/world,,FUN_0041fda9,3970,4,
-0x00420e07,game3d/world,,FUN_00420e07,146,2,
-0x00420e99,game3d/world,,FUN_00420e99,272,3,
-0x00420fa9,game3d/world,,FUN_00420fa9,272,2,
+0x0041edc9,game3d/world,NameTable_Find,FUN_0041edc9,84,48,strcmp over the scene's node names; E-0307 (world.csv)
+0x0041ee1d,game3d/world,World_SetCallbacks,FUN_0041ee1d,368,1,init/frame pair per scene; E-0306 (world.csv)
+0x0041efc5,game3d/world,Scene_IsComplete,FUN_0041efc5,338,1,zoneSolved per scene; E-0306 (world.csv)
+0x0041f14b,game3d/world,Scene_LeaveToMuseum,FUN_0041f14b,855,2,return movie when complete; E-0310 (world.csv)
+0x0041f506,game3d/world,Flight_Start,FUN_0041f506,1222,1,20-step flight to a painting (mode 4); E-0309 (world.csv)
+0x0041f9f8,game3d/world,Flight_Step,FUN_0041f9f8,257,1,one flight step; E-0309 (world.csv)
+0x0041faf9,game3d/world,Flight_End,FUN_0041faf9,644,1,entry movie or load; E-0309 (world.csv)
+0x0041fda9,game3d/world,World_LoadScene,FUN_0041fda9,3970,4,bundle and start camera per scene/prevScene; E-0308 (world.csv)
+0x00420e07,game3d/world,World_Mouse,FUN_00420e07,146,2,relative mouse clamp 640x480; E-0313 (world.csv)
+0x00420e99,game3d/world,NameTable_AddChild,FUN_00420e99,272,3,depth-first name table; E-0307 (world.csv)
+0x00420fa9,game3d/world,NameTable_AddSibling,FUN_00420fa9,272,2,depth-first name table; E-0307 (world.csv)
 0x004210b9,game3d/world,CheckObjectCount,FUN_004210b9,180,1,NbObjets > MAX_OBJETS_SCENE
 0x0042116d,game3d/world,,FUN_0042116d,57,1,
 0x004211a6,game3d/world,,FUN_004211a6,337,0,
 0x004212f7,game3d/world,,FUN_004212f7,959,0,
-0x004216b6,game3d/world,,FUN_004216b6,1506,2,
-0x00421c98,game3d/world,,FUN_00421c98,219,1,
-0x00421d73,game3d/world,,FUN_00421d73,211,1,
+0x004216b6,game3d/world,World_Collide,FUN_004216b6,1506,2,sphere push-out and floor snap; E-0304 (world.csv)
+0x00421c98,game3d/world,Camera_Start,FUN_00421c98,219,1,identity then Camera_Set; E-0307 (world.csv)
+0x00421d73,game3d/world,World_InitHeapAndViewport,FUN_00421d73,211,1,0x434e70 + 0x435170 per view size; E-0307 (world.csv)
 0x00421e56,game3d/world,C_Monde::LoadScene,FUN_00421e56,372,1,C_Monde::LoadScene => %s
 0x00421fca,game3d/world,DebugInfo,FUN_00421fca,556,1,Pos => %d %d %d|Angle => %d %d %d|pick name => %s
-0x004221f6,game3d/world,,FUN_004221f6,498,18,
-0x004223e8,game3d/world,,FUN_004223e8,993,1,
+0x004221f6,game3d/world,World_Redraw,FUN_004221f6,498,18,frame without keyboard movement + hourglass; E-0300 (world.csv)
+0x004223e8,game3d/world,World_Frame,FUN_004223e8,993,1,movement collision mouse draw keys frame callback; E-0300 (world.csv)
 0x004227c9,game3d/world,,FUN_004227c9,160,0,
 0x00422869,game3d/world,Alloc3DMemory,FUN_00422869,573,1,Memory3D => NULL
-0x00422aa6,game3d/world,,FUN_00422aa6,242,4,
-0x00422b98,game3d/world,,FUN_00422b98,920,1,
-0x00422f30,game3d/world,,FUN_00422f30,144,3,
+0x00422aa6,game3d/world,World_UnloadScene,FUN_00422aa6,242,4,unregister boxes free heap; E-0307 (world.csv)
+0x00422b98,game3d/world,World_KeyboardMove,FUN_00422b98,920,1,velocities and keys; E-0302 (world.csv)
+0x00422f30,game3d/world,Camera_Set,FUN_00422f30,144,3,position + angle matrix + viewer copy; E-0302 (world.csv)
 0x004240f0,game3d/world,Cursor_Check,FUN_004240f0,160,1,Curseur->Buf => NULL
-0x00424190,game3d/world,,FUN_00424190,41,5,
+0x00424190,game3d/world,DrawCursorImage,FUN_00424190,41,5,thunk to Blit16Keyed; E-0314 (world.csv)
 0x004241f0,game3d/scenes,Eglise_LoadSounds,FUN_004241f0,43,1,eglise; E-0335 (world.csv)
 0x0042421b,game3d/scenes,LoadAnimsEglise,FUN_0042421b,210,1,LoadAnimsEglise::%s manque
 0x004242ed,game3d/scenes,Eglise_Init,FUN_004242ed,222,0,scene 13 init callback; E-0335 (world.csv)
@@ -388,15 +388,15 @@ address,module,name,ghidra,size,callers,evidence
 0x00425541,game3d/scenes,Hopiint_Init,FUN_00425541,366,0,scene hopiint code; E-0360 (world.csv)
 0x004256af,game3d/scenes,Hopiint_StepAnim,FUN_004256af,235,1,scene hopiint code; E-0360 (world.csv)
 0x0042579a,game3d/scenes,Hopiint_Frame,FUN_0042579a,1245,0,scene hopiint code; E-0360 (world.csv)
-0x00425f00,game3d/scenes,,FUN_00425f00,41,1,
-0x00425f29,game3d/scenes,,FUN_00425f29,72,1,
-0x00425f71,game3d/scenes,,FUN_00425f71,64,1,
-0x00425fb1,game3d/scenes,,FUN_00425fb1,65,1,
-0x00425ff2,game3d/scenes,,FUN_00425ff2,127,1,
-0x00426071,game3d/scenes,,FUN_00426071,256,1,
-0x00426171,game3d/scenes,,FUN_00426171,1043,2,
-0x00426594,game3d/scenes,,FUN_00426594,734,1,
-0x00426872,game3d/scenes,,FUN_00426872,125,1,
+0x00425f00,game3d/scenes,InvBar_LoadSounds,FUN_00425f00,41,1,bar_obj cf_clic3; E-0314 (world.csv)
+0x00425f29,game3d/scenes,InvBar_FreeSounds,FUN_00425f29,72,1,frees bar_obj cf_clic3; E-0314 (world.csv)
+0x00425f71,game3d/scenes,PointInRect,FUN_00425f71,64,1,inclusive bounds; E-0316 (world.csv)
+0x00425fb1,game3d/scenes,Inventory_Count,FUN_00425fb1,65,1,held flags count; E-0316 (world.csv)
+0x00425ff2,game3d/scenes,InvBar_DrawSunflowers,FUN_00425ff2,127,1,Ct image; E-0316 (world.csv)
+0x00426071,game3d/scenes,InvBar_DrawItems,FUN_00426071,256,1,6 held objects; E-0316 (world.csv)
+0x00426171,game3d/scenes,InvBar_Update,FUN_00426171,1043,2,bar states clicks icon; E-0316 (world.csv)
+0x00426594,game3d/scenes,Cursors_Load,FUN_00426594,734,1,66 cursor TGAs and Invent; E-0314 (world.csv)
+0x00426872,game3d/scenes,Cursors_Free,FUN_00426872,125,1,frees cursor images and bar; E-0307 (world.csv)
 0x00426b70,game3d/scenes,Jardin_SetBoxSet,FUN_00426b70,136,1,scene jardin code; E-0361 (world.csv)
 0x00426bf8,game3d/scenes,LoadBoxJardin,FUN_00426bf8,94,1,LoadBoxJardin => %s
 0x00426c56,game3d/scenes,Jardin_BoxSetForGate,FUN_00426c56,36,2,scene jardin code; E-0361 (world.csv)
@@ -427,14 +427,14 @@ address,module,name,ghidra,size,callers,evidence
 0x004298e5,game3d/scenes,Mangeurs_Init,FUN_004298e5,687,0,scene mangeurs code; E-0364 (world.csv)
 0x00429b94,game3d/scenes,Mangeurs_StepAnim,FUN_00429b94,578,1,scene mangeurs code; E-0364 (world.csv)
 0x00429dd6,game3d/scenes,Mangeurs_Frame,FUN_00429dd6,1940,0,scene mangeurs code; E-0364 (world.csv)
-0x0042a980,game3d/scenes,,FUN_0042a980,272,1,
+0x0042a980,game3d/scenes,Musee_SetBoxSet,FUN_0042a980,272,1,swaps BOX/BOX1..BOX4 in collision; E-0319 (world.csv)
 0x0042aab8,game3d/scenes,LoadBoxMusee,FUN_0042aab8,313,1,LoadBoxMusee => %s
-0x0042abf1,game3d/scenes,,FUN_0042abf1,89,1,
+0x0042abf1,game3d/scenes,Musee_LoadSounds,FUN_0042abf1,89,1,robot2 etoile musee; E-0320 (world.csv)
 0x0042ac4a,game3d/scenes,LoadAnimsmusee,FUN_0042ac4a,210,1,LoadAnimsmusee::%s manque
-0x0042ad1c,game3d/scenes,,FUN_0042ad1c,118,0,
-0x0042ad92,game3d/scenes,,FUN_0042ad92,2156,0,
-0x0042b5fe,game3d/scenes,,FUN_0042b5fe,376,1,
-0x0042b776,game3d/scenes,,FUN_0042b776,3789,0,
+0x0042ad1c,game3d/scenes,Uv_ScrollEcran,FUN_0042ad1c,118,0,+-0x7f0000 on UV word 1; E-0319 (world.csv)
+0x0042ad92,game3d/scenes,Musee_Init,FUN_0042ad92,2156,0,scene 0 init callback; E-0321 (world.csv)
+0x0042b5fe,game3d/scenes,Musee_StepAnim,FUN_0042b5fe,376,1,anim table step; E-0321 (world.csv)
+0x0042b776,game3d/scenes,Musee_Frame,FUN_0042b776,3789,0,scene 0 frame callback; E-0321 (world.csv)
 0x0042cd80,game3d/scenes,Pont_SetBoxSet,FUN_0042cd80,136,2,scene pont code; E-0365 (world.csv)
 0x0042ce08,game3d/scenes,LoadBoxPont,FUN_0042ce08,94,1,LoadBoxPont => %s
 0x0042ce66,game3d/scenes,Pont_LoadSounds,FUN_0042ce66,97,1,scene pont code; E-0365 (world.csv)
@@ -471,8 +471,8 @@ address,module,name,ghidra,size,callers,evidence
 0x0042f6a0,game3d/app,,FUN_0042f6a0,181,7,
 0x0042f755,game3d/app,Enter2DFrom3D,FUN_0042f755,286,1,3D fields to 0x4aba40 then Entry2D; E-0422 (shell.csv)
 0x0042f873,game3d/app,Save_GGameFrom3D,FUN_0042f873,226,4,Save_WriteGGame(0x4aba40 0x36c 0); E-0420 (shell.csv)
-0x0042f955,game3d/app,,FUN_0042f955,51,0,
-0x0042f988,game3d/app,,FUN_0042f988,470,1,
+0x0042f955,game3d/app,Timer3D_Callback,FUN_0042f955,51,0,tick counter + PostMessage 0x505; E-0300 (world.csv)
+0x0042f988,game3d/app,World_WndProc,FUN_0042f988,470,1,3D modes 0/4 on 0x505; E-0300 (world.csv)
 0x0042fb5e,game3d/app,Timer3D_Begin,FUN_0042fb5e,76,3,Could not begin timer 3D ...
 0x0042fbaa,game3d/app,Timer3D_End,FUN_0042fbaa,44,5,timeKillEvent + timeEndPeriod
 0x0042fbd6,game3d/cinematics,GameWndProc,FUN_0042fbd6,1238,0,switch on mode byte 0x598cb0; E-0405 (shell.csv)
@@ -497,8 +497,8 @@ address,module,name,ghidra,size,callers,evidence
 0x00431920,engine3d,,FUN_00431920,413,1,
 0x00431ac0,engine3d,,FUN_00431ac0,610,1,
 0x00431d30,engine3d,,FUN_00431d30,595,1,
-0x00431f90,engine3d,,FUN_00431f90,654,1,
-0x00432220,engine3d,,FUN_00432220,418,1,
+0x00431f90,engine3d,Collide_FloorFace,FUN_00431f90,654,1,vertical projection on face; E-0305 (world.csv)
+0x00432220,engine3d,Collide_SphereFace,FUN_00432220,418,1,closest point and side; E-0304 (world.csv)
 0x00432c30,engine3d,,FUN_00432c30,438,1,
 0x00432df0,engine3d,,FUN_00432df0,16,1,
 0x00432e00,engine3d,,FUN_00432e00,16,1,
@@ -547,9 +547,9 @@ address,module,name,ghidra,size,callers,evidence
 0x00435400,engine3d,Obj_Load,FUN_00435400,106,24,opens a BFG entry into the 3D heap; E-0013
 0x00435880,engine3d,,FUN_00435880,63,1,
 0x00435930,engine3d,,FUN_00435930,64,2,
-0x00435970,engine3d,,FUN_00435970,33,31,
-0x004359a0,engine3d,,FUN_004359a0,33,12,
-0x00435dc0,engine3d,,FUN_00435dc0,144,6,
+0x00435970,engine3d,Node_Hide,FUN_00435970,33,31,set flag bit 0; E-0307 (world.csv)
+0x004359a0,engine3d,Node_Show,FUN_004359a0,33,12,clear flag bit 0; E-0307 (world.csv)
+0x00435dc0,engine3d,Node_Retexture,FUN_00435dc0,144,6,from/to texture on face groups; E-0307 (world.csv)
 0x00435ec0,engine3d,BadHandle,FUN_00435ec0,23,5,Bad_Handle!
 0x00435fb0,engine3d,,FUN_00435fb0,102,3,
 0x00436020,engine3d,,FUN_00436020,102,2,
@@ -557,21 +557,21 @@ address,module,name,ghidra,size,callers,evidence
 0x004360c0,engine3d,,FUN_004360c0,47,3,
 0x004360f0,engine3d,,FUN_004360f0,106,2,
 0x00436160,engine3d,,FUN_00436160,97,5,
-0x00436200,engine3d,,FUN_00436200,41,6,
+0x00436200,engine3d,Node_GetViewPos,FUN_00436200,41,6,copies node +0x4c; E-0307 (world.csv)
 0x00436c10,engine3d,,FUN_00436c10,57,1,
 0x004378f0,engine3d,,FUN_004378f0,126,2,
 0x00437d90,engine3d,,FUN_00437d90,16,15,
 0x00437da0,engine3d,,FUN_00437da0,475,1,
 0x00437f80,engine3d,,FUN_00437f80,780,1,
-0x00438290,engine3d,,FUN_00438290,324,29,
+0x00438290,engine3d,Anim_Pose,FUN_00438290,324,29,pose node from 3DA keys; E-0318 (world.csv)
 0x00439480,engine3d,,FUN_00439480,147,1,
-0x004395d0,engine3d,,FUN_004395d0,453,3,
+0x004395d0,engine3d,Texture_Load,FUN_004395d0,453,3,named 3DM texture; E-0307 (world.csv)
 0x004399d0,engine3d,,FUN_004399d0,64,5,
 0x00439a10,engine3d,,FUN_00439a10,150,1,
-0x00439b90,engine3d,,FUN_00439b90,111,2,
-0x0043a660,engine3d,,FUN_0043a660,135,1,
+0x00439b90,engine3d,Render_Pick,FUN_00439b90,111,2,pick pass at a pixel; E-0313 (world.csv)
+0x0043a660,engine3d,Trig_BuildTables,FUN_0043a660,135,1,cos/sin * 32768 4096 entries; E-0302 (world.csv)
 0x0043a750,engine3d,,FUN_0043a750,38,2,
-0x0043a780,engine3d,,FUN_0043a780,314,3,
+0x0043a780,engine3d,Matrix_FromAngles,FUN_0043a780,314,3,pitch yaw roll Q15; E-0302 (world.csv)
 0x0043b060,engine3d,,FUN_0043b060,91,3,
 0x0043b0c0,engine3d,,FUN_0043b0c0,46,2,
 0x0043b0f0,engine3d,,FUN_0043b0f0,64,5,
@@ -806,7 +806,7 @@ address,module,name,ghidra,size,callers,evidence
 0x00472670,cryo/dinput,,FUN_00472670,45,4,
 0x004726a0,cryo/dinput,,FUN_004726a0,53,1,
 0x004726e0,cryo/dinput,,FUN_004726e0,47,3,
-0x00472710,cryo/dinput,,FUN_00472710,192,2,
+0x00472710,cryo/dinput,Mouse_Read,FUN_00472710,192,2,DirectInput mouse deltas and buttons; E-0313 (world.csv)
 0x004727d0,cryo/dinput,,FUN_004727d0,154,1,
 0x00472870,cryo/dinput,,FUN_00472870,154,1,
 0x00472910,cryo/dinput,,FUN_00472910,155,1,
@@ -814,7 +814,7 @@ address,module,name,ghidra,size,callers,evidence
 0x00472ae0,cryo/dinput,,FUN_00472ae0,45,3,
 0x00472b10,cryo/dinput,,FUN_00472b10,53,1,
 0x00472b50,cryo/dinput,,FUN_00472b50,47,3,
-0x00472b80,cryo/dinput,,FUN_00472b80,62,2,
+0x00472b80,cryo/dinput,Keyboard_Read,FUN_00472b80,62,2,DirectInput GetDeviceState 256; E-0301 (world.csv)
 0x00472bc0,cryo/dinput,,FUN_00472bc0,68,1,
 0x00472d40,cryo/dsound,DS_Create,FUN_00472d40,340,1,DirectSoundCreate
 0x00472ea0,cryo/dsound,,FUN_00472ea0,77,1,
