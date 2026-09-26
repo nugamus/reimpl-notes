@@ -389,7 +389,7 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   engines/ring/tools/parsers/cnm.py`: 100% at container level.
 - **Confidence:** proven (container); the frame codec is not yet specified.
 
-### E-0025 — .dia subtitle and .dan timing files
+### E-0025 — .dia subtitle and .dan timing files (count of unterminated files SUPERSEDED by E-0027)
 - **Binary/file:** `RING_DVD.EXE` `aDialog::Init` 0x426ef0 (paths `%s%s\%s\%s\%s\%sdia`,
   `…dan`), `ReadLyrics` 0x427090, `ParseLyricLine` 0x427550, `ReadDialogAnimation`
   0x4271b0; all `.dia` and `.dan`
@@ -418,4 +418,11 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   `aObj.ini` has 96 objects × 10 languages (ENG GER FRA ITA SPA HOL SWE HEB GRE SLO), CD/ISO
   5, Prophet 7; `fl.ini` has 24 pairs (Prophet 17); every `.aba` is a zero count.
 - **Method:** `python engines/ring/tools/parsers/ini.py`: 100%.
+- **Confidence:** proven
+
+### E-0027 — 22 .dia files end without a final newline (corrects E-0025's 20)
+- **Binary/file:** all `.dia`
+- **Evidence:** 22 files (22 distinct) end in an unterminated `… END` line and 3 in
+  unterminated spaces; the engine parses neither (E-0025).
+- **Method:** census over `dia.py`'s `ignored_tail`.
 - **Confidence:** proven
