@@ -4824,7 +4824,7 @@ An entry at `tentative` confidence must also have a matching line in
 - **Method:** MCP decompile; engine `dev_commands` runs.
 - **Confidence:** proven.
 
-### E-0616 — U02's ground tests compare the ground object's own name; `TakePlanche` takes the plank only from `plncher01`; the restore snore is an effect
+### E-0618 — U02's ground tests compare the ground object's own name; `TakePlanche` takes the plank only from `plncher01`; the restore snore is an effect
 - **Binary/file:** `MissionMonet.exe`, `x3d.dll`; `Data/U02/static/*.O3D`.
 - **Evidence:** `X3d_Object_Get_Son` (`x3d.dll` `0x1181`) compares the object pointer
   itself byte by byte with the name: an X3D object's name is inline at `+0`. Camera `+0x3c`
