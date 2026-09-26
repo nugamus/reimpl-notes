@@ -568,3 +568,23 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   loose file only in Prophet). NI 51/51, FO 72/72, WA 68/68 distinct stand.
 - **Method:** set comparison.
 - **Confidence:** proven
+
+### E-0036 — Draw types, alpha, and puzzle drawing order (DVD)
+- **Binary/file:** `RING_DVD.EXE`: video device vtable 0x47e388 (slot 9 = 0x414790),
+  0x42c210, 0x42c180, 0x42c0a0 (constant 0x47e4fc = 1/255), `aPuzzle::Update` 0x41c320,
+  `aPuzzle::AddPreImg` 0x41cb70, image handle ctor 0x42d320 and setters 0x42d760 (+0x6b),
+  0x42d770 (+0x67), 0x42d790 (+0x66), getters 0x42d780/0x42d7a0/0x42d7c0/0x42d810
+- **Evidence:** 0x414790 switches on the device depth (+0x20) and the image depth (+0x15):
+  8/16-bit images go to `aImage::Display1`; 24/32-bit ones by the type byte: 1 Display1,
+  2 locks the surface and writes converted pixels except where the three source bytes
+  are 0, 3 locks and calls 0x42c210, which per row calls 0x42c180: `a = src & 0xff0000;
+  a == 0 → skip; a != 0xff0000 → per channel mask m: (src & m) + ((dst & m) × (0xff −
+  a>>16) >> 8) & m`. 0x42c0a0 (disassembly): factor = alpha × 1/255 (x87), each of the
+  three channels × factor truncated (`__ftol`), shifted into the display masks, alpha to
+  bits 16..23. `aPuzzle::Update` draws the background with type 1, advances animations
+  when +0x28 is 0, then walks +0x10 drawing kind-1 handles with `draw(h, +0x55, +0x59,
+  +0x66)` when active and shown, kind-2 through 0x422940. `AddPreImg` inserts before the
+  first entry whose +0x67 is greater. The declarations place backgrounds at (0, 16) and
+  `RenderFrame` fills (0,0)–(640,16) and (0,0x1d0)–(640,0x1e0).
+- **Method:** decompiles and disassembly.
+- **Confidence:** proven

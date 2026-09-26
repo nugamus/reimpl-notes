@@ -56,7 +56,7 @@ Rotation angles, "ran" and the transition kind byte are specified with the rende
 | `ObjSetPuzAccKey` | 0x402d60 | int object, int index, int key | the key of the object's index-th accessibility (0x423940) |
 | `ObjSetAccOff` | 0x403090 | int object, int from, int to | `ObjSetAccOnOrOff(object, 0, from, to)`: disables accessibilities from..to |
 | `ObjAddPre` | 0x4032f0 | int object | appends a presentation to the object |
-| `ObjPreAddImgToPuz` | 0x403370 | int object, int presentation, int puzzle, str file, int x, int y, u8 unk_7, u8 unk_8, int priority | an image of the presentation on the puzzle (`aObject::addObjectImageToPuz` 0x4205d0) |
+| `ObjPreAddImgToPuz` | 0x403370 | int object, int presentation, int puzzle, str file, int x, int y, u8 active, u8 draw_type, int priority | an image of the presentation on the puzzle (`aObject::addObjectImageToPuz` 0x4205d0 → 0x42d320; `spec/drawing.md`) |
 | `ObjPreAddAniToPuz` | 0x403460 | int object, int presentation, int puzzle, str name, int unk_5, int unk_6, int unk_7, u8 unk_8, int unk_9, int unk_10, f32 unk_11, u8 unk_12 | an animation on the puzzle (`aObject::addAnimationToPuz` 0x420650 → `aAnimationImage::Init` 0x4219f0); bit 2 of unk_12 clear = the animation starts stopped (0x42e480). Observed: unk_10 13..25, unk_11 12.5 |
 | `ObjPreAddImgToRot` | 0x403560 | int object, int presentation, int rotation, int layer | the rotation layer's image as a presentation (`aObject::addImageToRot` 0x4206e0; layer < the rotation's layer count) |
 | `ObjPreAddAniToRot` | 0x403660 | int object, int presentation, int rotation, int layer, int unk_5, f32 unk_6, u8 unk_7 | the layer as an animation (`aObject::addAnimationToRot` 0x420750); layer < the rotation's layer count |
