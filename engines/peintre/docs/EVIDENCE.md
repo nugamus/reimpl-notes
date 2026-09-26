@@ -1750,5 +1750,5 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   writes it back to 0, so the saved 0x4abd5c alone prevents a replay.
 - **Method:** grep of the cited decompiler listings `notes/decomp/MISSION.EXE__FUN_0042b776.c`
   (lines 372–381), `…__FUN_0041c979.c` (156–159), `…__FUN_0042f2c2.c`, `…__FUN_0042f515.c`.
-- **Confidence:** proven (no other xref in the dumped functions; function-dump.tsv lists no
-  other reference to either address)
+- **Confidence:** strong (the cited listings only; a Ghidra xref listing of both addresses
+  would make it proven)
