@@ -561,7 +561,17 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   `toit01`, which ends about 175 units short of the car; the car stands on the rails,
   11 units above them. Open: whether the original lets the player drop from `toit01` and
   walk to the car (collision, falls), which needs a live run.
-- **Status:** open
+- **Also checked (2026-09-26, engine run):** with the spec's collision (`movement.md`,
+  sphere radius 20, Z offset 20 after the climb, `u01.md`), the player walks from the
+  climb end (485.775, −44.9, 139) at yaw 4.346 (toward the car) off the booth roof, lands
+  on the ground (z −30) and walks onto `*U01_20`, whose ground object starts the ride;
+  with the points thrown the ride reaches U02. Verified in one continuous run and after a
+  load. An earlier "stuck" (4 units, then stopped) came from an engine bug: a load in U01
+  re-applied `U01_Start`'s offset 37 after restoring `CAMERA`, so the sphere centre sat
+  17 units lower and caught on the corner shared by `hangarsel4` (a wall, n = (0, −1, 0))
+  and `toit01` (n = (0.905, 0, 0.425)) at (477.8, −24.6, 99.4); fixed in the engine.
+  So the route is the spec's; a live run of the original would only confirm it.
+- **Status:** answered by the spec in the engine; unconfirmed in the original
 
 ### Q-0110 — Do U00's gauge labels (`deplace`, `Tourner`, `Sauter`, `Take`, `Take2`) show anything?
 - **Context:** `FUN_0041a560` copies a label to gauge `+0x12`; U00 always starts the gauge
