@@ -34,3 +34,17 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** raw disassembly of a few addresses only.
 - **Blocks:** the rasteriser spec (texture mapping, shading) if it lives there.
 - **Status:** open
+
+### Q-0003 — How do the drawers address texels of the four odd-sized textures?
+- **Context:** E-0015: jardin `salon.3DM` has 512 texel bytes more than 256x256, musee
+  `plafond.3DM`, `plafond2.3DM`, `plafond3.3DM` 256 fewer.
+- **What we checked:** sizes only. The drawers (0x43c780, 0x444e20, …) are not read yet.
+- **Blocks:** nothing if texel addressing is masked to 256x256 (the engine can pad or
+  crop); the last row of the three short ones then reads the next heap object.
+- **Status:** open
+
+### Q-0004 — .3DA: component order of rotation keys, meaning of track word 0 and key time units
+- **Context:** E-0016.
+- **What we checked:** data only (unit-length keys, times 0..30, word 0 = 30 in portev).
+- **Blocks:** animation playback spec.
+- **Status:** open

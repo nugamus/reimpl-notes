@@ -202,3 +202,57 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   `.3DM`, 4 for 48 `.3DA`, 5 for 27 `.3DI`.
 - **Method:** decompiled the functions named; `engines/peintre/tools/parsers/bfg.py`.
 - **Confidence:** proven
+
+### E-0014 — .3DC layout: node table, materials, then a node tree with 1-based root-relative pointers; 15/15 fully covered
+- **Binary/file:** `/MISSION.EXE`; the 15 `.3DC` entries of the BFGs
+- **Evidence:** `Obj_CheckHeader` (0x4348c0) for type 1: `Obj_RelocTable` (0x4343c0)
+  turns the `n` body-relative node offsets into pointers; 0x434350 walks the tree from
+  node [0] (child at +0x14, sibling at +0x18, parent at +0x10) and 0x434270 adds
+  `root - 1` to the node fields +0x10/+0x14/+0x18/+0x80/+0x88/+0x90/+0x98/+0xa0/+0xa4/
+  +0xa8, then to face groups (0x433b70: +0 next, +0x20 polys; per poly the words at
+  +4..+0x2c, and +0x34..+0x3c when the poly is 0x44 bytes; 0x38-byte polys for group types
+  -2, 1, 4, 0x11, 0x1b) and vertex groups (0x433ff0: +0 next, +0xc items; item sizes
+  100/0x70/0x58/0x3c by type; words 0, 7, 8 of each item). `Obj_LoadTextures` (0x434560)
+  reads `num_materials` 44-byte records after the node table and loads `<name at +16>.3DM`
+  for each, refcounting textures in 15-word slots (texel pointer = entry data + 0x8014).
+  0x4338d0 binds each face group to its material by name (strcmp at group +0xc). Node
+  flags (0x450160, 0x44fec0): bit 0 or bit 2 set = the node is not processed. World
+  position/rotation are recomputed per frame (0x44fec0: 0x43b060 multiplies the parent's
+  +0x58 by the local +0x28 into +0x58; +0x4c..+0x54 = rotated position + parent's).
+  Corpus (`obj3d.py`): 15/15 bodies covered exactly once by the structures reached; the
+  node table lists exactly the tree's nodes in all 15; node[0] follows the materials;
+  `+0x2c` of every face group equals the poly size the loader uses; node +0x9c/+0xa0 are
+  0 everywhere; material tail = `ef3d ef3d` + 8 zero bytes on the 15 DEFAULT materials, 12
+  zero bytes on the other 485; vertex flags 0 (57,007) or 0x80 (713); node flags 0 (352),
+  0x10 (132), 0x20 (50), 0x30 (26); names at most 10 characters.
+- **Method:** decompiled the named functions; `engines/peintre/tools/parsers/obj3d.py`.
+- **Confidence:** proven for the layout; the Q15 / 16.16 readings are strong (values
+  0x8000 on matrix diagonals and normals, UVs 0..0xFF0000)
+
+### E-0015 — .3DM: 32x256 RGB565 shade table in u32 high halves, then 256x256 8-bit texels
+- **Binary/file:** 504 `.3DM` entries
+- **Evidence:** `Obj_LoadTextures` stores `data + 0x8014` (header 0x14 + table 0x8000) as
+  the texel pointer. All 504 tables have zero low halves; mean luminance falls
+  monotonically from level 0 to 31 (chambrev `sol.3DM`: 128, 119, 112 … 68 at levels 0,
+  4, 8 … 28). Decoding chambrev `sol.3DM` with level 16 gives a coherent wood-plank image
+  (256x256). 500 textures have exactly 65,536 texel bytes; jardin `salon.3DM` has 66,048
+  (512 extra) and musee `plafond.3DM`, `plafond2.3DM`, `plafond3.3DM` 65,280 (one row
+  short) (Q-0003).
+- **Method:** `obj3d.py`; decode script over the extracted entry.
+- **Confidence:** proven (layout); strong (RGB565: images decode with natural colours)
+
+### E-0016 — .3DA tracks of rotation/position keys; .3DI box sets; layouts fully covered
+- **Binary/file:** 48 `.3DA`, 27 `.3DI` entries
+- **Evidence:** 3DA (type 4): 0x4343c0 relocates the track table body-relative, 0x434470
+  relocates each track's +0xc and +0x10. Track = u32, u32 nrot, u32 npos, rot ptr, pos
+  ptr; rot keys 20 B, pos keys 16 B cover every body exactly (48/48). chambrev
+  `portev.3da`: 3 tracks of length 30; its first position key (0, -385, -532, 1001)
+  equals the position of chambrev's root node `Object03`; rotation keys like (0, 0, -1429,
+  0, 32736) are unit Q15 quaternions (norm 32767). 3DI (type 5): 0x4344d0 adds `body - 1`
+  to +4, +0xc, +0x14 and, per 0x60-byte face (count at +8), to words 0, 1, 2, 3 and 17.
+  Layout vertices (12 B) / faces (0x60) / items (12 B) plus a 0x1c-byte header covers
+  27/27; the header's last word is leftover memory. `C_Monde::LoadScene` loads `BOX.3DI`
+  for every scene; `LoadBox<Scene>` loads the extra ones (`BOX1.3DI`, `BOXBAS/BOXHAUT`).
+- **Method:** as E-0014.
+- **Confidence:** proven (layouts); tentative (quaternion component order, track field 0 =
+  length in frames: Q-0004)
