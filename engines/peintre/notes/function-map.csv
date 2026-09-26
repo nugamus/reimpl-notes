@@ -1,80 +1,80 @@
 address,module,name,ghidra,size,callers,evidence
-0x004022c0,game/puzzles,,FUN_004022c0,182,0,
-0x00402376,game/puzzles,,FUN_00402376,24,0,
+0x004022c0,game/puzzles,Zone04_OnPlace,FUN_004022c0,182,0,A03_011 / A03_012e / movie 15; E-0427 (shell.csv)
+0x00402376,game/puzzles,Zone04_OnAbort,FUN_00402376,24,0,flag 0x4e039c; E-0427 (shell.csv)
 0x0040238e,game/puzzles,,FUN_0040238e,75,1,
 0x004023d9,game/puzzles,,FUN_004023d9,33,1,
 0x004023fa,game/puzzles,,FUN_004023fa,33,1,
-0x0040241b,game/puzzles,,FUN_0040241b,1386,0,
-0x004029b1,game/puzzles,,FUN_004029b1,34,0,
-0x004029d3,game/puzzles,,FUN_004029d3,34,0,
-0x004029f5,game/puzzles,,FUN_004029f5,205,0,
-0x00402ac2,game/puzzles,,FUN_00402ac2,24,0,
-0x00402ada,game/puzzles,,FUN_00402ada,119,0,
-0x00402b51,game/puzzles,,FUN_00402b51,119,0,
+0x0040241b,game/puzzles,Zone04_Obj6,FUN_0040241b,1386,0,three places then moving target; E-0427 (shell.csv)
+0x004029b1,game/puzzles,Zone05_OnPlace,FUN_004029b1,34,0,Movie_Open(0x15 0); E-0430 (shell.csv)
+0x004029d3,game/puzzles,Zone06_OnPlace,FUN_004029d3,34,0,Movie_Open(0x3d 0); E-0430 (shell.csv)
+0x004029f5,game/puzzles,Zone07_OnPlace,FUN_004029f5,205,0,A03_021 A03_022 A03_023a; E-0427 (shell.csv)
+0x00402ac2,game/puzzles,Zone07_OnAbort,FUN_00402ac2,24,0,flag 0x4e039c; E-0427 (shell.csv)
+0x00402ada,game/puzzles,Zone07_Obj10,FUN_00402ada,119,0,voice then movie 30; E-0427 (shell.csv)
+0x00402b51,game/puzzles,Zone07_Obj11,FUN_00402b51,119,0,voice then movie 31; E-0427 (shell.csv)
 0x00402bc8,game/puzzles,,FUN_00402bc8,88,1,
-0x00402c20,game/puzzles,,FUN_00402c20,574,0,
-0x00402e76,game/puzzles,,FUN_00402e76,903,2,
-0x00403215,game/puzzles,,FUN_00403215,230,1,
+0x00402c20,game/puzzles,Zone07_Obj12,FUN_00402c20,574,0,three hot spots 0x4a5168 0x4a5198; E-0427 (shell.csv)
+0x00402e76,game/puzzles,Zone08_DrawElement,FUN_00402e76,903,2,frame formulas 0x4a4a30; E-0430 (shell.csv)
+0x00403215,game/puzzles,Zone08_HitElement,FUN_00403215,230,1,rects 0x4a4a90 0x4a4b30; E-0430 (shell.csv)
 0x004032fb,game/puzzles,,FUN_004032fb,75,1,
-0x00403346,game/puzzles,,FUN_00403346,428,0,
-0x004034f2,game/puzzles,,FUN_004034f2,15,0,
+0x00403346,game/puzzles,Zone08_OnPlace,FUN_00403346,428,0,A13_031 / a13_032c; E-0430 (shell.csv)
+0x004034f2,game/puzzles,Zone08_OnAbort,FUN_004034f2,15,0,flag 0x4e039c; E-0430 (shell.csv)
 0x00403501,game/puzzles,,FUN_00403501,250,2,
-0x004035fb,game/puzzles,,FUN_004035fb,1023,0,
-0x00403a1a,game/puzzles,,FUN_00403a1a,937,0,
-0x00403dfd,game/puzzles,,FUN_00403dfd,129,0,
+0x004035fb,game/puzzles,Zone08_Obj13,FUN_004035fb,1023,0,six rounds a13_031a..l; E-0430 (shell.csv)
+0x00403a1a,game/puzzles,Zone08_Obj14,FUN_00403a1a,937,0,six pairs a13_032; E-0430 (shell.csv)
+0x00403dfd,game/puzzles,Zone10_OnPlace,FUN_00403dfd,129,0,Movie_Open 0x14 / a13_052a 0x16; E-0430 (shell.csv)
 0x00403e7e,game/puzzles,,FUN_00403e7e,35,1,
-0x00403ea1,game/puzzles,,FUN_00403ea1,24,0,
+0x00403ea1,game/puzzles,Zone10_OnAbort,FUN_00403ea1,24,0,flag 0x4e039c; E-0430 (shell.csv)
 0x00403eb9,game/puzzles,,FUN_00403eb9,75,1,
-0x00403f04,game/puzzles,,FUN_00403f04,498,0,
-0x0040410e,game/puzzles,,FUN_0040410e,34,0,
-0x00404130,game/puzzles,,FUN_00404130,34,0,
-0x00404152,game/puzzles,,FUN_00404152,197,0,
-0x00404217,game/puzzles,,FUN_00404217,24,0,
+0x00403f04,game/puzzles,Zone10_Obj17,FUN_00403f04,498,0,four hot spots 0x4a4ed8; E-0430 (shell.csv)
+0x0040410e,game/puzzles,Zone11_OnPlace,FUN_0040410e,34,0,Movie_Open(0x3a 0); E-0430 (shell.csv)
+0x00404130,game/puzzles,Zone12_OnPlace,FUN_00404130,34,0,Movie_Open(0x3e 0); E-0427 (shell.csv)
+0x00404152,game/puzzles,Zone13_OnPlace,FUN_00404152,197,0,A03_041 / a03_042a a03_042b; E-0427 (shell.csv)
+0x00404217,game/puzzles,Zone13_OnAbort,FUN_00404217,24,0,flag 0x4e039c; E-0427 (shell.csv)
 0x0040422f,game/puzzles,,FUN_0040422f,109,1,
 0x0040429c,game/puzzles,,FUN_0040429c,106,1,
 0x00404306,game/puzzles,,FUN_00404306,75,1,
 0x00404351,game/puzzles,,FUN_00404351,39,1,
-0x00404378,game/puzzles,,FUN_00404378,951,0,
-0x0040474b,game/puzzles,,FUN_0040474b,72,0,
+0x00404378,game/puzzles,Zone13_Obj21,FUN_00404378,951,0,three pieces target 0x4a4f78; E-0427 (shell.csv)
+0x0040474b,game/puzzles,Zone14_OnPlace,FUN_0040474b,72,0,Movie_Open 0x25 / 0x26; E-0430 (shell.csv)
 0x00404793,game/puzzles,,FUN_00404793,161,1,
 0x00404834,game/puzzles,,FUN_00404834,156,1,
 0x004048d0,game/puzzles,,FUN_004048d0,173,1,
 0x0040497d,game/puzzles,,FUN_0040497d,202,1,
-0x00404a47,game/puzzles,,FUN_00404a47,280,0,
-0x00404b5f,game/puzzles,,FUN_00404b5f,24,0,
+0x00404a47,game/puzzles,Zone15_OnPlace,FUN_00404a47,280,0,A13_061 / movie 0x42; E-0430 (shell.csv)
+0x00404b5f,game/puzzles,Zone15_OnAbort,FUN_00404b5f,24,0,flag 0x4e039c; E-0430 (shell.csv)
 0x00404b77,game/puzzles,,FUN_00404b77,103,1,
-0x00404bde,game/puzzles,,FUN_00404bde,2497,0,
-0x004055bb,game/puzzles,,FUN_004055bb,158,0,
+0x00404bde,game/puzzles,Zone15_Obj24,FUN_00404bde,2497,0,sixteen pieces 0x4a4d98; E-0430 (shell.csv)
+0x004055bb,game/puzzles,Zone16_OnPlace,FUN_004055bb,158,0,a03_05 cf_clic1..3 movie 0x33; E-0427 (shell.csv)
 0x00405659,game/puzzles,,FUN_00405659,83,1,
-0x004056ac,game/puzzles,,FUN_004056ac,15,0,
+0x004056ac,game/puzzles,Zone16_OnAbort,FUN_004056ac,15,0,flag 0x4e039c; E-0427 (shell.csv)
 0x004056bb,game/puzzles,,FUN_004056bb,106,1,
 0x00405725,game/puzzles,,FUN_00405725,65,1,
 0x00405766,game/puzzles,,FUN_00405766,88,1,
 0x004057be,game/puzzles,,FUN_004057be,88,1,
-0x00405816,game/puzzles,,FUN_00405816,1584,0,
-0x00405e6a,game/puzzles,,FUN_00405e6a,34,0,
-0x00405e8c,game/puzzles,,FUN_00405e8c,154,0,
+0x00405816,game/puzzles,Zone16_Obj26,FUN_00405816,1584,0,six pieces 0x4a4b88; E-0427 (shell.csv)
+0x00405e6a,game/puzzles,Zone17_OnPlace,FUN_00405e6a,34,0,Movie_Open(0x3f 0); E-0430 (shell.csv)
+0x00405e8c,game/puzzles,Zone18_OnPlace,FUN_00405e8c,154,0,a03_06b..e movie 0x1b; E-0427 (shell.csv)
 0x00405f26,game/puzzles,,FUN_00405f26,53,1,
-0x00405f5b,game/puzzles,,FUN_00405f5b,15,0,
+0x00405f5b,game/puzzles,Zone18_OnAbort,FUN_00405f5b,15,0,flag 0x4e039c; E-0427 (shell.csv)
 0x00405f6a,game/puzzles,,FUN_00405f6a,60,1,
-0x00405fa6,game/puzzles,,FUN_00405fa6,1158,0,
-0x004074c0,game/puzzles,,FUN_004074c0,73,0,
-0x00407509,game/puzzles,,FUN_00407509,270,0,
+0x00405fa6,game/puzzles,Zone18_Obj28,FUN_00405fa6,1158,0,click in window 0x4a5138; E-0427 (shell.csv)
+0x004074c0,game/puzzles,Zone19_OnPlace,FUN_004074c0,73,0,A04_01 / Movie_Open 0x43; E-0428 (shell.csv)
+0x00407509,game/puzzles,Zone20_OnPlace,FUN_00407509,270,0,a14_01b..j movie 0x36; E-0431 (shell.csv)
 0x00407617,game/puzzles,,FUN_00407617,155,1,
-0x004076b2,game/puzzles,,FUN_004076b2,15,0,
+0x004076b2,game/puzzles,Zone20_OnAbort,FUN_004076b2,15,0,flag 0x4e0528; E-0431 (shell.csv)
 0x004076c1,game/puzzles,,FUN_004076c1,75,1,
-0x0040770c,game/puzzles,,FUN_0040770c,1111,0,
-0x00407b83,game/puzzles,,FUN_00407b83,34,0,
-0x00407ba5,game/puzzles,,FUN_00407ba5,34,0,
-0x00407bc7,game/puzzles,,FUN_00407bc7,380,0,
+0x0040770c,game/puzzles,Zone20_Obj31,FUN_0040770c,1111,0,three wheels 0x4a57d8; E-0431 (shell.csv)
+0x00407b83,game/puzzles,Zone22_OnPlace,FUN_00407b83,34,0,Movie_Open(0x23 0); E-0428 (shell.csv)
+0x00407ba5,game/puzzles,Zone23_OnPlace,FUN_00407ba5,34,0,Movie_Open(0x24 0); E-0428 (shell.csv)
+0x00407bc7,game/puzzles,Zone24_OnPlace,FUN_00407bc7,380,0,mask 0x2d420 a14_021a a14_021b; E-0431 (shell.csv)
 0x00407d43,game/puzzles,,FUN_00407d43,142,1,
-0x00407dd1,game/puzzles,,FUN_00407dd1,15,0,
+0x00407dd1,game/puzzles,Zone24_OnAbort,FUN_00407dd1,15,0,flag 0x4e0528; E-0431 (shell.csv)
 0x00407de0,game/puzzles,,FUN_00407de0,88,1,
 0x00407e38,game/puzzles,,FUN_00407e38,75,1,
-0x00407e83,game/puzzles,,FUN_00407e83,457,1,
+0x00407e83,game/puzzles,Zone24_Uncover,FUN_00407e83,457,1,mask count < 0x2423; E-0431 (shell.csv)
 0x0040804c,game/puzzles,,FUN_0040804c,106,1,
 0x004080b6,game/puzzles,,FUN_004080b6,98,1,
-0x00408118,game/puzzles,,FUN_00408118,1570,0,
+0x00408118,game/puzzles,Zone24_Obj34,FUN_00408118,1570,0,uncover then five pieces 0x4a5850; E-0431 (shell.csv)
 0x00408c10,game/puzzles,,FUN_00408c10,138,4,
 0x00408c9a,game/puzzles,,FUN_00408c9a,87,4,
 0x00408cf1,game/shell,,FUN_00408cf1,16,1,
@@ -90,11 +90,11 @@ address,module,name,ghidra,size,callers,evidence
 0x004090ad,game/shell,,FUN_004090ad,41,0,
 0x004090d6,game/shell,,FUN_004090d6,182,0,
 0x0040918c,game/shell,Tgp_Unpack,FUN_0040918c,21,3,thunk to Hlz_Unpack used by both TGP loaders; E-0100 (2d.csv)
-0x00409310,game/shell,,FUN_00409310,168,2,
+0x00409310,game/shell,ViewA_Start,FUN_00409310,168,2,Tgp_Load2 + Sprite_Open + pas_VG2; E-0411 (shell.csv)
 0x004093b8,game/shell,,FUN_004093b8,19,1,
-0x004093cb,game/shell,,FUN_004093cb,406,2,
-0x00409600,game/shell,,FUN_00409600,69,1,
-0x00409645,game/shell,,FUN_00409645,310,1,
+0x004093cb,game/shell,ViewA_Step,FUN_004093cb,406,2,frame per odd tick until click; E-0411 (shell.csv)
+0x00409600,game/shell,Credits_Start,FUN_00409600,69,1,Snd_CreateStatic Credits; E-0418 (shell.csv)
+0x00409645,game/shell,Credits_Step,FUN_00409645,310,1,Credit%02u 250 ticks; E-0418 (shell.csv)
 0x004097f0,game/shell,AllocFrameBuffers,FUN_004097f0,125,2,Could not allocate frame-buffer ...
 0x0040986d,game/shell,,FUN_0040986d,106,2,
 0x004098d7,game/shell,,FUN_004098d7,21,1,
@@ -150,115 +150,115 @@ address,module,name,ghidra,size,callers,evidence
 0x0040cbc7,game/shell,,FUN_0040cbc7,24,0,
 0x0040cbdf,game/shell,Hnm_ConsumeSuperchunk,FUN_0040cbdf,61,2,advances the ring read position and wakes the read thread; E-0201 (media.csv)
 0x0040cc1c,game/shell,Hnm_SignalEnd,FUN_0040cc1c,27,1,sets the end flag and wakes the read thread; E-0201 (media.csv)
-0x0040d0f0,game/shell,,FUN_0040d0f0,34,0,
-0x0040d112,game/shell,,FUN_0040d112,221,0,
-0x0040d1ef,game/shell,,FUN_0040d1ef,24,0,
-0x0040d207,game/shell,,FUN_0040d207,106,1,
-0x0040d271,game/shell,,FUN_0040d271,34,0,
-0x0040d293,game/shell,,FUN_0040d293,1348,0,
+0x0040d0f0,game/shell,Zone01_OnPlace,FUN_0040d0f0,34,0,Movie_Open(0x1d 0); E-0426 (shell.csv)
+0x0040d112,game/shell,Zone02_OnPlace,FUN_0040d112,221,0,A01_031 / a01_032a; E-0426 (shell.csv)
+0x0040d1ef,game/shell,Zone02_OnAbort,FUN_0040d1ef,24,0,flag 0x4e1f74; E-0426 (shell.csv)
+0x0040d207,game/shell,Zone02_Free,FUN_0040d207,106,1,frees a01_032a and sounds; E-0426 (shell.csv)
+0x0040d271,game/shell,Zone03_OnPlace,FUN_0040d271,34,0,Movie_Open(0x3c 0); E-0429 (shell.csv)
+0x0040d293,game/shell,Zone02_Obj3,FUN_0040d293,1348,0,five pieces 0x4a62c0; E-0426 (shell.csv)
 0x0040d9c0,game/shell,Tgp_Load,FUN_0040d9c0,610,2,%sDATA\GFX\%s.TGP
-0x0040dc22,game/shell,,FUN_0040dc22,127,2,
+0x0040dc22,game/shell,Panorama_Start,FUN_0040dc22,127,2,centre the view and the cursor; E-0411 (shell.csv)
 0x0040dca1,game/shell,,FUN_0040dca1,38,1,
 0x0040dcc7,game/shell,,FUN_0040dcc7,44,2,
-0x0040dcf3,game/shell,,FUN_0040dcf3,861,2,
-0x0040e200,game/shell,,FUN_0040e200,56,3,
+0x0040dcf3,game/shell,Panorama_Step,FUN_0040dcf3,861,2,edge and arrow-key scrolling; E-0411 (shell.csv)
+0x0040e200,game/shell,Cursor_Open,FUN_0040e200,56,3,Sprite_Open Curseurs; E-0416 (shell.csv)
 0x0040e238,game/shell,,FUN_0040e238,24,3,
 0x0040e250,game/shell,,FUN_0040e250,5,1,
 0x0040e255,game/shell,,FUN_0040e255,5,3,
-0x0040e25a,game/shell,,FUN_0040e25a,94,23,
+0x0040e25a,game/shell,Cursor_Set,FUN_0040e25a,94,23,table 0x4a64e8 {frame dx dy}; E-0416 (shell.csv)
 0x0040e2b8,game/shell,,FUN_0040e2b8,31,1,
 0x0040e2d7,game/shell,,FUN_0040e2d7,37,2,
-0x0040e2fc,game/shell,,FUN_0040e2fc,119,2,
-0x0040e373,game/shell,,FUN_0040e373,84,2,
+0x0040e2fc,game/shell,Cursor_Draw,FUN_0040e2fc,119,2,frame at cursor - hotspot; E-0416 (shell.csv)
+0x0040e373,game/shell,Cursor_SetPos,FUN_0040e373,84,2,clamped 0..639 0..479; E-0407 (shell.csv)
 0x0040e3c7,game/shell,,FUN_0040e3c7,13,0,
 0x0040e3d4,game/shell,,FUN_0040e3d4,13,0,
-0x0040e3e1,game/shell,,FUN_0040e3e1,137,1,
+0x0040e3e1,game/shell,Cursor_MoveByMouse,FUN_0040e3e1,137,1,2 * DirectInput dx dy; E-0407 (shell.csv)
 0x0040e46a,game/shell,,FUN_0040e46a,107,1,
-0x0040e4d5,game/shell,,FUN_0040e4d5,26,19,
-0x0040e4ef,game/shell,,FUN_0040e4ef,31,21,
+0x0040e4d5,game/shell,Cursor_GetPos,FUN_0040e4d5,26,19,returns 0x4e1fd4 0x4e1fd8; E-0407 (shell.csv)
+0x0040e4ef,game/shell,Mouse_LeftDown,FUN_0040e4ef,31,21,0x4727d0 rgbButtons[0]; E-0407 (shell.csv)
 0x0040e50e,game/shell,,FUN_0040e50e,31,0,
 0x0040e52d,game/shell,,FUN_0040e52d,26,0,
-0x0040e620,game/shell,,FUN_0040e620,219,1,
-0x0040e6fb,game/shell,,FUN_0040e6fb,143,1,
+0x0040e620,game/shell,OptionMenu_Open,FUN_0040e620,219,1,option options cursopt lcaps trobo12; E-0415 (shell.csv)
+0x0040e6fb,game/shell,OptionMenu_Close,FUN_0040e6fb,143,1,restore screen volume view size; E-0415 (shell.csv)
 0x0040e78a,game/shell,Save_ListGames,FUN_0040e78a,492,1,%sSAVE\GAME%02u%02u.BIN + CompareFileTime
 0x0040e976,game/shell,,FUN_0040e976,217,1,
 0x0040ea4f,game/shell,,FUN_0040ea4f,75,1,
 0x0040ea9a,game/shell,,FUN_0040ea9a,154,1,
 0x0040eb34,game/shell,,FUN_0040eb34,75,1,
 0x0040eb7f,game/shell,,FUN_0040eb7f,90,1,
-0x0040ebd9,game/shell,,FUN_0040ebd9,251,1,
+0x0040ebd9,game/shell,OptionMenu_DrawLoadList,FUN_0040ebd9,251,1,lcaps frame and Game %u; E-0415 (shell.csv)
 0x0040ecd4,game/shell,OptionMenu,FUN_0040ecd4,2557,1,load|scrsize|keyboard|quit|option
 0x0040fb60,game/shell,,FUN_0040fb60,38,1,
-0x0040fb86,game/shell,,FUN_0040fb86,99,1,
+0x0040fb86,game/shell,Bar_BuildSlideTable,FUN_0040fb86,99,1,60 * cos(pi/2 - 3deg i); E-0410 (shell.csv)
 0x0040fbe9,game/shell,Timer_Begin,FUN_0040fbe9,191,1,Could not begin timer ...
 0x0040fca8,game/shell,,FUN_0040fca8,35,1,
-0x0040fccb,game/shell,,FUN_0040fccb,216,1,
+0x0040fccb,game/shell,OptionTimer_Begin,FUN_0040fccb,216,1,timeSetEvent 40 ms callback posting 0x503; E-0406 (shell.csv)
 0x0040fda3,game/shell,,FUN_0040fda3,35,1,
 0x0040fdc6,game/shell,Entry2D,FUN_0040fdc6,273,3,Entrée 2D: n° de ZA (%u) pas valide...
-0x0040fed7,game/shell,,FUN_0040fed7,160,2,
+0x0040fed7,game/shell,Save_Restore2D,FUN_0040fed7,160,2,2D block offsets 0 0x64 0xf0; E-0421 (shell.csv)
 0x0040ff77,game/shell,Save_WriteGame,FUN_0040ff77,476,1,"%sSAVE\GAME%02u%02u.BIN, Game save: create file failed..."
 0x00410153,game/shell,Save_WriteGGame,FUN_00410153,530,3,"%sSAVE\GGAME%u.BIN, Game save: create file failed..."
-0x00410365,game/shell,,FUN_00410365,565,1,
+0x00410365,game/shell,Zone_Init,FUN_00410365,565,1,0x4a6b18 + zone*0x6c; LoupeOut Retour RetourM; E-0408 (shell.csv)
 0x0041059a,game/shell,Timer_StartPeriodic,FUN_0041059a,89,3,timeBeginPeriod + timeSetEvent(period); E-0203 (media.csv)
 0x004105f3,game/shell,Timer_End,FUN_004105f3,49,6,timeKillEvent + timeEndPeriod
-0x00410624,game/shell,,FUN_00410624,1372,1,
-0x00410b80,game/shell,,FUN_00410b80,78,2,
+0x00410624,game/shell,Zone_Free,FUN_00410624,1372,1,frees zone sprites and sounds; E-0408 (shell.csv)
+0x00410b80,game/shell,Inv_BuildFlags,FUN_00410b80,78,2,35 flags from the list 0x4e2688; E-0414 (shell.csv)
 0x00410bce,game/shell,,FUN_00410bce,15,1,
-0x00410bdd,game/shell,,FUN_00410bdd,68,28,
-0x00410c21,game/shell,,FUN_00410c21,109,1,
-0x00410c8e,game/shell,,FUN_00410c8e,43,1,
-0x00410cb9,game/shell,,FUN_00410cb9,43,1,
+0x00410bdd,game/shell,Rect_Contains,FUN_00410bdd,68,28,x y w h test; E-0410 (shell.csv)
+0x00410c21,game/shell,Key_Released,FUN_00410c21,109,1,down in previous buffer and up now; E-0407 (shell.csv)
+0x00410c8e,game/shell,Key_Down,FUN_00410c8e,43,1,bit 7 of current buffer; E-0407 (shell.csv)
+0x00410cb9,game/shell,Key_Up,FUN_00410cb9,43,1,bit 7 clear; E-0407 (shell.csv)
 0x00410ce4,game/shell,,FUN_00410ce4,55,7,
 0x00410d1b,game/shell,,FUN_00410d1b,77,1,
 0x00410d68,game/shell,,FUN_00410d68,131,1,
 0x00410deb,game/shell,,FUN_00410deb,15,7,
 0x00410dfa,game/shell,,FUN_00410dfa,54,7,
-0x00410e30,game/shell,,FUN_00410e30,803,1,
-0x00411153,game/shell,,FUN_00411153,213,4,
+0x00410e30,game/shell,Bar_Step,FUN_00410e30,803,1,bar y 0x1df - T[i]; E-0410 (shell.csv)
+0x00411153,game/shell,Bar_DrawIcons,FUN_00411153,213,4,OPI frames and count; E-0410 (shell.csv)
 0x00411228,game/shell,,FUN_00411228,46,3,
 0x00411256,game/shell,,FUN_00411256,37,1,
 0x0041127b,game/shell,,FUN_0041127b,62,2,
 0x004112b9,game/shell,,FUN_004112b9,62,2,
 0x004112f7,game/shell,,FUN_004112f7,148,1,
 0x0041138b,game/shell,,FUN_0041138b,85,1,
-0x004113e0,game/shell,,FUN_004113e0,116,1,
-0x00411454,game/shell,,FUN_00411454,192,2,
-0x00411514,game/shell,,FUN_00411514,309,1,
-0x00411649,game/shell,,FUN_00411649,95,1,
-0x004116a8,game/shell,,FUN_004116a8,102,1,
-0x0041170e,game/shell,,FUN_0041170e,249,17,
-0x00411807,game/shell,,FUN_00411807,285,2,
+0x004113e0,game/shell,Bar_HitObject,FUN_004113e0,116,1,six slots 0x4a6918; E-0410 (shell.csv)
+0x00411454,game/shell,Zone_HitButtons,FUN_00411454,192,2,views 1 2 Retour 3 RetourM 4; E-0411 (shell.csv)
+0x00411514,game/shell,Bar_Scroll,FUN_00411514,309,1,arrows every 8th tick; E-0410 (shell.csv)
+0x00411649,game/shell,Zone_HitPlacedSlot,FUN_00411649,95,1,rects 0x4a6a20; E-0410 (shell.csv)
+0x004116a8,game/shell,Zone_HitDropSlot,FUN_004116a8,102,1,rects 0x4a69d8; E-0412 (shell.csv)
+0x0041170e,game/shell,Zone_DrawSlots,FUN_0041170e,249,17,CapsE CapsAO CapsAC; E-0412 (shell.csv)
+0x00411807,game/shell,Zone_DrawMagnifier,FUN_00411807,285,2,LoupeOut last frame; E-0411 (shell.csv)
 0x00411924,game/shell,,FUN_00411924,23,1,
 0x0041193b,game/shell,,FUN_0041193b,32,0,
-0x0041195b,game/shell,,FUN_0041195b,103,1,
-0x004119c2,game/shell,,FUN_004119c2,58,2,
-0x004119fc,game/shell,,FUN_004119fc,44,0,
-0x00411a28,game/shell,,FUN_00411a28,1545,0,
-0x00412065,game/shell,,FUN_00412065,429,1,
-0x0041222e,game/shell,,FUN_0041222e,15,14,
-0x0041223d,game/shell,,FUN_0041223d,15,13,
-0x0041224c,game/shell,,FUN_0041224c,37,0,
-0x00412271,game/shell,,FUN_00412271,37,0,
-0x00412296,game/shell,,FUN_00412296,37,0,
+0x0041195b,game/shell,Loupe_Close,FUN_0041195b,103,1,LoupeIn + bar_outi; E-0411 (shell.csv)
+0x004119c2,game/shell,Loupe_Open,FUN_004119c2,58,2,LoupeOut; E-0411 (shell.csv)
+0x004119fc,game/shell,Zone00_OnPlace,FUN_004119fc,44,0,Movie_Open(0x20 1); E-0431 (shell.csv)
+0x00411a28,game/shell,Zone00_Obj0,FUN_00411a28,1545,0,a14_031b..d views and sunflower; E-0431 (shell.csv)
+0x00412065,game/shell,Zone21_Ending,FUN_00412065,429,1,a14_032a a14_032b; E-0431 (shell.csv)
+0x0041222e,game/shell,Shell_SetBusy,FUN_0041222e,15,14,0x4e22fc = 1; E-0406 (shell.csv)
+0x0041223d,game/shell,Shell_ClearBusy,FUN_0041223d,15,13,0x4e22fc = 0; E-0406 (shell.csv)
+0x0041224c,game/shell,Timer_Post500,FUN_0041224c,37,0,PostMessageA 0x500; E-0406 (shell.csv)
+0x00412271,game/shell,Timer_Post503,FUN_00412271,37,0,PostMessageA 0x503; E-0406 (shell.csv)
+0x00412296,game/shell,Timer_Post504,FUN_00412296,37,0,PostMessageA 0x504; E-0406 (shell.csv)
 0x004122bb,game/shell,MainWndProc,FUN_004122bb,9151,1,DefWindowProcA; Could not re-init DirectDraw ...
 0x0041474a,game/shell,,FUN_0041474a,47,1,
 0x00414779,game/shell,Tgp_Load2,FUN_00414779,300,23,%sDATA\GFX\%s.TGP
-0x004148a5,game/shell,,FUN_004148a5,300,1,
-0x004149d1,game/shell,,FUN_004149d1,196,1,
-0x00414a95,game/shell,,FUN_00414a95,57,1,
+0x004148a5,game/shell,Zone_LoadObjectSprites,FUN_004148a5,300,1,ouvrcaps fermcaps OPnn; E-0412 (shell.csv)
+0x004149d1,game/shell,Obj_LoadCapsSprites,FUN_004149d1,196,1,CapsAO CapsAC CapsOP; E-0408 (shell.csv)
+0x00414a95,game/shell,Obj_LoadCapsE,FUN_00414a95,57,1,CapsE%02u; E-0408 (shell.csv)
 0x00414ace,game/shell,Movie_Open,FUN_00414ace,263,33,opens movie n of the table at 0x4a7a08 with its rectangle and CVY; E-0204 (media.csv)
 0x00414bd5,game/shell,,FUN_00414bd5,35,0,
 0x00414bf8,game/shell,Movie_Step,FUN_00414bf8,225,1,Hnm_Stream + blit into the rectangle + CVY mask; skip on input; E-0204 (media.csv)
 0x00414cd9,game/shell,Movie_Redraw,FUN_00414cd9,135,0,Display_Flip or blit frame + CVY mask; E-0204 (media.csv)
 0x00414d60,game/shell,Movie_Blit,FUN_00414d60,108,1,blit frame + CVY mask of frame n; E-0204 (media.csv)
-0x00414dcc,game/shell,,FUN_00414dcc,32,14,
-0x00414dec,game/shell,,FUN_00414dec,78,14,
-0x00414e3a,game/shell,,FUN_00414e3a,110,1,
-0x00414ea8,game/shell,,FUN_00414ea8,116,1,
+0x00414dcc,game/shell,Slot_WaitMovie,FUN_00414dcc,32,14,result 1 until Movie_Step ends; E-0417 (shell.csv)
+0x00414dec,game/shell,Slot_WaitVoice,FUN_00414dec,78,14,result 1 until the stream ends or a click; E-0417 (shell.csv)
+0x00414e3a,game/shell,VanGogh_LoadAB,FUN_00414e3a,110,1,PA..a PA..b pas_VG; E-0413 (shell.csv)
+0x00414ea8,game/shell,VanGogh_LoadC,FUN_00414ea8,116,1,PA..c; E-0413 (shell.csv)
 0x00414f1c,game/shell,,FUN_00414f1c,72,2,
-0x00414f64,game/shell,,FUN_00414f64,91,2,
-0x00414fbf,game/shell,,FUN_00414fbf,241,1,
-0x004150b0,game/shell,,FUN_004150b0,61,1,
+0x00414f64,game/shell,Tourn_Load,FUN_00414f64,91,2,TOURN%u tourneso; E-0413 (shell.csv)
+0x00414fbf,game/shell,Bar_Load,FUN_00414fbf,241,1,Invent OPI OP count bar_obj fleche; E-0410 (shell.csv)
+0x004150b0,game/shell,Pot_Load,FUN_004150b0,61,1,POT vase; E-0413 (shell.csv)
 0x00416650,game/sound,Snd_Init,FUN_00416650,161,1,DirectSound initialisation failed...
 0x004166f1,game/sound,Snd_InitMovieBuffer,FUN_004166f1,150,1,Movie sound-buffer initialization failed...
 0x00416787,game/sound,Snd_PlayStreamWav,FUN_00416787,237,3,marks the name with '_' and starts the 64 KB stream buffer; E-0209 (media.csv)
@@ -284,31 +284,31 @@ address,module,name,ghidra,size,callers,evidence
 0x00417b36,game/sound,,FUN_00417b36,39,0,
 0x00417b5d,game/sound,,FUN_00417b5d,17,0,
 0x004180c0,game/users,App_Init,FUN_004180c0,733,1,Could not retrieve registry informations...
-0x0041839d,game/users,,FUN_0041839d,10,6,
-0x004183a7,game/users,,FUN_004183a7,29,0,
-0x004183c4,game/users,,FUN_004183c4,19,5,
-0x004183d7,game/users,,FUN_004183d7,19,1,
-0x004183ea,game/users,,FUN_004183ea,22,3,
-0x00418400,game/users,,FUN_00418400,22,1,
+0x0041839d,game/users,User_GetIndex,FUN_0041839d,10,6,returns 0x4e298c; E-0402 (shell.csv)
+0x004183a7,game/users,User_GetName,FUN_004183a7,29,0,lstrcpyA of record +0; E-0402 (shell.csv)
+0x004183c4,game/users,User_GetViewSize,FUN_004183c4,19,5,record +0x24; E-0402 (shell.csv)
+0x004183d7,game/users,User_GetVolume,FUN_004183d7,19,1,record +0x20; E-0402 (shell.csv)
+0x004183ea,game/users,User_SetViewSize,FUN_004183ea,22,3,record +0x24; E-0402 (shell.csv)
+0x00418400,game/users,User_SetVolume,FUN_00418400,22,1,record +0x20; E-0402 (shell.csv)
 0x00418416,game/users,Registry_Read,FUN_00418416,519,1,"SOFTWARE\Cryo\Mission Sunlight: Path, Target, Language, Install Level"
 0x0041861d,game/users,Users_CheckSessions,FUN_0041861d,413,1,'%s' previous session was not properly closed
-0x004187ba,game/users,,FUN_004187ba,226,1,
-0x0041889c,game/users,,FUN_0041889c,202,1,
-0x00418966,game/users,,FUN_00418966,199,2,
-0x00418a2d,game/users,,FUN_00418a2d,260,1,
-0x00418b31,game/users,,FUN_00418b31,139,0,
-0x00418bbc,game/users,,FUN_00418bbc,101,1,
+0x004187ba,game/users,Users_DeleteSaves,FUN_004187ba,226,1,DeleteFileA GGAME%u and GAME%02u%02u 0..34; E-0424 (shell.csv)
+0x0041889c,game/users,Users_Load,FUN_0041889c,202,1,%sSAVE\USERS.BIN rb; E-0402 (shell.csv)
+0x00418966,game/users,Users_Save,FUN_00418966,199,2,%sSAVE\USERS.BIN wb; E-0402 (shell.csv)
+0x00418a2d,game/users,Accueil_Paint,FUN_00418a2d,260,1,BitBlt ACCUEIL bitmap centred; E-0402 (shell.csv)
+0x00418b31,game/users,Accueil_EditProc,FUN_00418b31,139,0,Enter/Escape key-up to parent; E-0402 (shell.csv)
+0x00418bbc,game/users,Accueil_DestroyButtons,FUN_00418bbc,101,1,DestroyWindow 0x66 0x67 0x68+i; E-0402 (shell.csv)
 0x00418c21,game/users,Accueil_WndProc,FUN_00418c21,2587,0,"ACCUEIL_BMP, BOUTONS_BMP, player's name"
 0x00419684,game/users,,FUN_00419684,133,1,
 0x00419ca0,game/users,,FUN_00419ca0,130,1,
 0x00419d22,game/users,Display_Flip,FUN_00419d22,205,2,Could not flip display:
-0x00419e50,game/users,,FUN_00419e50,190,2,
+0x00419e50,game/users,Auberge_SetBoxSet,FUN_00419e50,190,2,swaps BOX/BOXBAS/BOXHAUT in collision; E-0330 (world.csv)
 0x00419f0e,game3d/scenes,LoadBoxAuberge,FUN_00419f0e,165,1,LoadBoxAuberge => %s
-0x00419fb3,game3d/scenes,,FUN_00419fb3,43,1,
+0x00419fb3,game3d/scenes,Auberge_LoadSounds,FUN_00419fb3,43,1,Snd_CreateStatic auberge; E-0330 (world.csv)
 0x00419fde,game3d/scenes,LoadAnimsauberge,FUN_00419fde,210,1,LoadAnimsauberge::%s manque
-0x0041a0b0,game3d/scenes,,FUN_0041a0b0,507,0,
-0x0041a2ab,game3d/scenes,,FUN_0041a2ab,384,1,
-0x0041a42b,game3d/scenes,,FUN_0041a42b,980,0,
+0x0041a0b0,game3d/scenes,Auberge_Init,FUN_0041a0b0,507,0,scene 1 init callback; E-0330 (world.csv)
+0x0041a2ab,game3d/scenes,Auberge_StepAnim,FUN_0041a2ab,384,1,anim table step; E-0330 (world.csv)
+0x0041a42b,game3d/scenes,Auberge_Frame,FUN_0041a42b,980,0,scene 1 frame callback; E-0330 (world.csv)
 0x0041aae0,game3d/scenes,Rgb555To565,FUN_0041aae0,160,2,after LoadTga when DAT_005b7fa4 == 16; E-0104 (2d.csv)
 0x0041ab80,game3d/tga,SaveScreenTga,FUN_0041ab80,262,1,D:/VANGOGH/TGA/%04d.TGA
 0x0041ac86,game3d/tga,SaveScreenBtm,FUN_0041ac86,116,0,D:/VANGOGH/TGA/%04d.BTM
@@ -317,27 +317,27 @@ address,module,name,ghidra,size,callers,evidence
 0x0041af1c,game3d/tga,LoadTga2,FUN_0041af1c,325,1,LoadTga::Erreur ouverture %s
 0x0041b061,game3d/tga,Blit16,FUN_0041b061,372,1,opaque clipped copy; E-0104 (2d.csv)
 0x0041b1d5,game3d/tga,Blit16Keyed,FUN_0041b1d5,417,1,skips 0x03E0/0x07C0 (pure green); E-0104 (2d.csv)
-0x0041b5a0,game3d/scenes,,FUN_0041b5a0,115,1,
-0x0041b613,game3d/scenes,,FUN_0041b613,136,0,
+0x0041b5a0,game3d/scenes,Cafe_LoadSounds,FUN_0041b5a0,115,1,billiard/cafe_int/pendule/serrure/tictac; E-0331 (world.csv)
+0x0041b613,game3d/scenes,Cafe_ClockUv,FUN_0041b613,136,0,orloge UV shift by clock state; E-0331 (world.csv)
 0x0041b6ab,game3d/scenes,LoadAnimscafe,FUN_0041b6ab,210,1,LoadAnimscafe::%s manque
-0x0041b77d,game3d/scenes,,FUN_0041b77d,771,0,
-0x0041ba80,game3d/scenes,,FUN_0041ba80,335,1,
-0x0041bbcf,game3d/scenes,,FUN_0041bbcf,2106,0,
-0x0041c810,game3d/scenes,,FUN_0041c810,151,1,
+0x0041b77d,game3d/scenes,Cafe_Init,FUN_0041b77d,771,0,scene 5 init callback; E-0331 (world.csv)
+0x0041ba80,game3d/scenes,Cafe_StepAnim,FUN_0041ba80,335,1,anim table step; E-0331 (world.csv)
+0x0041bbcf,game3d/scenes,Cafe_Frame,FUN_0041bbcf,2106,0,scene 5 frame callback; E-0331 (world.csv)
+0x0041c810,game3d/scenes,Chambreb_LoadSounds,FUN_0041c810,151,1,chambrVG...papier; E-0332 (world.csv)
 0x0041c8a7,game3d/scenes,LoadAnimschambreb,FUN_0041c8a7,210,1,LoadAnimschambreb::%s manque
-0x0041c979,game3d/scenes,,FUN_0041c979,1392,0,
-0x0041cee9,game3d/scenes,,FUN_0041cee9,638,1,
-0x0041d167,game3d/scenes,,FUN_0041d167,1688,0,
-0x0041dc70,game3d/scenes,,FUN_0041dc70,61,1,
+0x0041c979,game3d/scenes,Chambreb_Init,FUN_0041c979,1392,0,scene 6 init callback; E-0332 (world.csv)
+0x0041cee9,game3d/scenes,Chambreb_StepAnim,FUN_0041cee9,638,1,anim table step; E-0332 (world.csv)
+0x0041d167,game3d/scenes,Chambreb_Frame,FUN_0041d167,1688,0,scene 6 frame callback; E-0332 (world.csv)
+0x0041dc70,game3d/scenes,Chambrev_LoadSounds,FUN_0041dc70,61,1,chambrVG/placard; E-0333 (world.csv)
 0x0041dcad,game3d/scenes,LoadAnimschambrev,FUN_0041dcad,210,1,LoadAnimschambrev::%s manque
-0x0041dd7f,game3d/scenes,,FUN_0041dd7f,230,0,
-0x0041de65,game3d/scenes,,FUN_0041de65,115,1,
-0x0041ded8,game3d/scenes,,FUN_0041ded8,562,0,
-0x0041e250,game3d/scenes,,FUN_0041e250,97,1,
+0x0041dd7f,game3d/scenes,Chambrev_Init,FUN_0041dd7f,230,0,scene 6 (chambrev) init callback; E-0333 (world.csv)
+0x0041de65,game3d/scenes,Chambrev_StepAnim,FUN_0041de65,115,1,door track step; E-0333 (world.csv)
+0x0041ded8,game3d/scenes,Chambrev_Frame,FUN_0041ded8,562,0,scene 6 (chambrev) frame callback; E-0333 (world.csv)
+0x0041e250,game3d/scenes,Champ_LoadSounds,FUN_0041e250,97,1,champ/faux/pistolet/corbeaux; E-0334 (world.csv)
 0x0041e2b1,game3d/scenes,LoadAnimschamp,FUN_0041e2b1,210,1,LoadAnimschamp::%s manque
-0x0041e383,game3d/scenes,,FUN_0041e383,329,0,
-0x0041e4cc,game3d/scenes,,FUN_0041e4cc,274,1,
-0x0041e5de,game3d/scenes,,FUN_0041e5de,805,0,
+0x0041e383,game3d/scenes,Champ_Init,FUN_0041e383,329,0,scene 12 init callback; E-0334 (world.csv)
+0x0041e4cc,game3d/scenes,Champ_StepAnim,FUN_0041e4cc,274,1,anim table step; E-0334 (world.csv)
+0x0041e5de,game3d/scenes,Champ_Frame,FUN_0041e5de,805,0,scene 12 frame callback; E-0334 (world.csv)
 0x0041eb20,game3d/scenes,,FUN_0041eb20,331,15,
 0x0041ec7b,game3d/scenes,,FUN_0041ec7b,109,1,
 0x0041ece8,game3d/scenes,,FUN_0041ece8,43,1,
@@ -371,23 +371,23 @@ address,module,name,ghidra,size,callers,evidence
 0x00422f30,game3d/world,,FUN_00422f30,144,3,
 0x004240f0,game3d/world,Cursor_Check,FUN_004240f0,160,1,Curseur->Buf => NULL
 0x00424190,game3d/world,,FUN_00424190,41,5,
-0x004241f0,game3d/scenes,,FUN_004241f0,43,1,
+0x004241f0,game3d/scenes,Eglise_LoadSounds,FUN_004241f0,43,1,eglise; E-0335 (world.csv)
 0x0042421b,game3d/scenes,LoadAnimsEglise,FUN_0042421b,210,1,LoadAnimsEglise::%s manque
-0x004242ed,game3d/scenes,,FUN_004242ed,222,0,
-0x004243cb,game3d/scenes,,FUN_004243cb,156,1,
-0x00424467,game3d/scenes,,FUN_00424467,717,0,
-0x004248f0,game3d/scenes,,FUN_004248f0,136,2,
+0x004242ed,game3d/scenes,Eglise_Init,FUN_004242ed,222,0,scene 13 init callback; E-0335 (world.csv)
+0x004243cb,game3d/scenes,Eglise_StepAnim,FUN_004243cb,156,1,anim step by elapsed/2; E-0335 (world.csv)
+0x00424467,game3d/scenes,Eglise_Frame,FUN_00424467,717,0,scene 13 frame callback; E-0335 (world.csv)
+0x004248f0,game3d/scenes,HopiExt_SetBoxSet,FUN_004248f0,136,2,swaps BOX/BOX1 in collision; E-0336 (world.csv)
 0x00424978,game3d/scenes,LoadBoxHopiExt,FUN_00424978,94,1,LoadBoxHopiExt => %s
 0x004249d6,game3d/scenes,LoadAnimsHopiExt,FUN_004249d6,210,1,LoadAnimsHopiExt::%s manque
-0x00424aa8,game3d/scenes,,FUN_00424aa8,79,1,
-0x00424af7,game3d/scenes,,FUN_00424af7,341,0,
-0x00424c4c,game3d/scenes,,FUN_00424c4c,327,1,
-0x00424d93,game3d/scenes,,FUN_00424d93,1013,0,
+0x00424aa8,game3d/scenes,HopiExt_LoadSounds,FUN_00424aa8,79,1,hopi_ext/portail/cloche; E-0336 (world.csv)
+0x00424af7,game3d/scenes,HopiExt_Init,FUN_00424af7,341,0,scene 2 init callback; E-0336 (world.csv)
+0x00424c4c,game3d/scenes,HopiExt_StepAnim,FUN_00424c4c,327,1,anim table step; E-0336 (world.csv)
+0x00424d93,game3d/scenes,HopiExt_Frame,FUN_00424d93,1013,0,scene 2 frame callback; E-0336 (world.csv)
 0x00425420,game3d/scenes,LoadAnimshopiint,FUN_00425420,210,1,LoadAnimshopiint::%s manque
-0x004254f2,game3d/scenes,,FUN_004254f2,79,1,
-0x00425541,game3d/scenes,,FUN_00425541,366,0,
-0x004256af,game3d/scenes,,FUN_004256af,235,1,
-0x0042579a,game3d/scenes,,FUN_0042579a,1245,0,
+0x004254f2,game3d/scenes,Hopiint_LoadSounds,FUN_004254f2,79,1,scene hopiint code; E-0360 (world.csv)
+0x00425541,game3d/scenes,Hopiint_Init,FUN_00425541,366,0,scene hopiint code; E-0360 (world.csv)
+0x004256af,game3d/scenes,Hopiint_StepAnim,FUN_004256af,235,1,scene hopiint code; E-0360 (world.csv)
+0x0042579a,game3d/scenes,Hopiint_Frame,FUN_0042579a,1245,0,scene hopiint code; E-0360 (world.csv)
 0x00425f00,game3d/scenes,,FUN_00425f00,41,1,
 0x00425f29,game3d/scenes,,FUN_00425f29,72,1,
 0x00425f71,game3d/scenes,,FUN_00425f71,64,1,
@@ -397,36 +397,36 @@ address,module,name,ghidra,size,callers,evidence
 0x00426171,game3d/scenes,,FUN_00426171,1043,2,
 0x00426594,game3d/scenes,,FUN_00426594,734,1,
 0x00426872,game3d/scenes,,FUN_00426872,125,1,
-0x00426b70,game3d/scenes,,FUN_00426b70,136,1,
+0x00426b70,game3d/scenes,Jardin_SetBoxSet,FUN_00426b70,136,1,scene jardin code; E-0361 (world.csv)
 0x00426bf8,game3d/scenes,LoadBoxJardin,FUN_00426bf8,94,1,LoadBoxJardin => %s
-0x00426c56,game3d/scenes,,FUN_00426c56,36,2,
-0x00426c7a,game3d/scenes,,FUN_00426c7a,79,1,
+0x00426c56,game3d/scenes,Jardin_BoxSetForGate,FUN_00426c56,36,2,scene jardin code; E-0361 (world.csv)
+0x00426c7a,game3d/scenes,Jardin_LoadSounds,FUN_00426c7a,79,1,scene jardin code; E-0361 (world.csv)
 0x00426cc9,game3d/scenes,LoadAnimsjardin,FUN_00426cc9,210,1,LoadAnimsjardin::%s manque
-0x00426d9b,game3d/scenes,,FUN_00426d9b,409,0,
-0x00426f34,game3d/scenes,,FUN_00426f34,309,1,
-0x00427069,game3d/scenes,,FUN_00427069,1212,0,
-0x00427870,game3d/scenes,,FUN_00427870,97,1,
+0x00426d9b,game3d/scenes,Jardin_Init,FUN_00426d9b,409,0,scene jardin code; E-0361 (world.csv)
+0x00426f34,game3d/scenes,Jardin_StepAnim,FUN_00426f34,309,1,scene jardin code; E-0361 (world.csv)
+0x00427069,game3d/scenes,Jardin_Frame,FUN_00427069,1212,0,scene jardin code; E-0361 (world.csv)
+0x00427870,game3d/scenes,Maisonet_LoadSounds,FUN_00427870,97,1,scene maisonet code; E-0362 (world.csv)
 0x004278d1,game3d/scenes,LoadAnimsMaisonet,FUN_004278d1,210,1,LoadAnimsMaisonet::%s manque
-0x004279a3,game3d/scenes,,FUN_004279a3,501,0,
-0x00427b98,game3d/scenes,,FUN_00427b98,620,1,
-0x00427e04,game3d/scenes,,FUN_00427e04,1237,0,
-0x004285e0,game3d/scenes,,FUN_004285e0,226,1,
+0x004279a3,game3d/scenes,Maisonet_Init,FUN_004279a3,501,0,scene maisonet code; E-0362 (world.csv)
+0x00427b98,game3d/scenes,Maisonet_StepAnim,FUN_00427b98,620,1,scene maisonet code; E-0362 (world.csv)
+0x00427e04,game3d/scenes,Maisonet_Frame,FUN_00427e04,1237,0,scene maisonet code; E-0362 (world.csv)
+0x004285e0,game3d/scenes,Maisonj_SetBoxSet,FUN_004285e0,226,1,scene maisonj code; E-0363 (world.csv)
 0x004286e2,game3d/scenes,LoadBoxMaisonj,FUN_004286e2,239,1,LoadBoxMaisonj => %s
-0x004287d1,game3d/scenes,,FUN_004287d1,97,1,
+0x004287d1,game3d/scenes,Maisonj_LoadSounds,FUN_004287d1,97,1,scene maisonj code; E-0363 (world.csv)
 0x00428832,game3d/scenes,LoadAnimsmaisonj,FUN_00428832,210,1,LoadAnimsmaisonj::%s manque
-0x00428904,game3d/scenes,,FUN_00428904,123,2,
-0x0042897f,game3d/scenes,,FUN_0042897f,781,0,
-0x00428c8c,game3d/scenes,,FUN_00428c8c,471,1,
-0x00428e63,game3d/scenes,,FUN_00428e63,1200,0,
-0x004296d0,game3d/scenes,,FUN_004296d0,23,0,
-0x004296e7,game3d/scenes,,FUN_004296e7,23,0,
-0x004296fe,game3d/scenes,,FUN_004296fe,45,0,
-0x0042972b,game3d/scenes,,FUN_0042972b,45,0,
-0x00429758,game3d/scenes,,FUN_00429758,187,1,
+0x00428904,game3d/scenes,Maisonj_BoxSetForDoors,FUN_00428904,123,2,scene maisonj code; E-0363 (world.csv)
+0x0042897f,game3d/scenes,Maisonj_Init,FUN_0042897f,781,0,scene maisonj code; E-0363 (world.csv)
+0x00428c8c,game3d/scenes,Maisonj_StepAnim,FUN_00428c8c,471,1,scene maisonj code; E-0363 (world.csv)
+0x00428e63,game3d/scenes,Maisonj_Frame,FUN_00428e63,1200,0,scene maisonj code; E-0363 (world.csv)
+0x004296d0,game3d/scenes,Uv_SubV550000,FUN_004296d0,23,0,scene mangeurs code; E-0364 (world.csv)
+0x004296e7,game3d/scenes,Uv_AddV550000,FUN_004296e7,23,0,scene mangeurs code; E-0364 (world.csv)
+0x004296fe,game3d/scenes,Uv_AddU550000Wrap,FUN_004296fe,45,0,scene mangeurs code; E-0364 (world.csv)
+0x0042972b,game3d/scenes,Uv_AddU400000Wrap,FUN_0042972b,45,0,scene mangeurs code; E-0364 (world.csv)
+0x00429758,game3d/scenes,Mangeurs_LoadSounds,FUN_00429758,187,1,scene mangeurs code; E-0364 (world.csv)
 0x00429813,game3d/scenes,LoadAnimsmangeurs,FUN_00429813,210,1,LoadAnimsmangeurs::%s manque
-0x004298e5,game3d/scenes,,FUN_004298e5,687,0,
-0x00429b94,game3d/scenes,,FUN_00429b94,578,1,
-0x00429dd6,game3d/scenes,,FUN_00429dd6,1940,0,
+0x004298e5,game3d/scenes,Mangeurs_Init,FUN_004298e5,687,0,scene mangeurs code; E-0364 (world.csv)
+0x00429b94,game3d/scenes,Mangeurs_StepAnim,FUN_00429b94,578,1,scene mangeurs code; E-0364 (world.csv)
+0x00429dd6,game3d/scenes,Mangeurs_Frame,FUN_00429dd6,1940,0,scene mangeurs code; E-0364 (world.csv)
 0x0042a980,game3d/scenes,,FUN_0042a980,272,1,
 0x0042aab8,game3d/scenes,LoadBoxMusee,FUN_0042aab8,313,1,LoadBoxMusee => %s
 0x0042abf1,game3d/scenes,,FUN_0042abf1,89,1,
@@ -435,47 +435,47 @@ address,module,name,ghidra,size,callers,evidence
 0x0042ad92,game3d/scenes,,FUN_0042ad92,2156,0,
 0x0042b5fe,game3d/scenes,,FUN_0042b5fe,376,1,
 0x0042b776,game3d/scenes,,FUN_0042b776,3789,0,
-0x0042cd80,game3d/scenes,,FUN_0042cd80,136,2,
+0x0042cd80,game3d/scenes,Pont_SetBoxSet,FUN_0042cd80,136,2,scene pont code; E-0365 (world.csv)
 0x0042ce08,game3d/scenes,LoadBoxPont,FUN_0042ce08,94,1,LoadBoxPont => %s
-0x0042ce66,game3d/scenes,,FUN_0042ce66,97,1,
+0x0042ce66,game3d/scenes,Pont_LoadSounds,FUN_0042ce66,97,1,scene pont code; E-0365 (world.csv)
 0x0042cec7,game3d/scenes,LoadAnimspont,FUN_0042cec7,210,1,LoadAnimspont::%s manque
-0x0042cf99,game3d/scenes,,FUN_0042cf99,73,2,
-0x0042cfe2,game3d/scenes,,FUN_0042cfe2,648,0,
-0x0042d26a,game3d/scenes,,FUN_0042d26a,543,1,
-0x0042d489,game3d/scenes,,FUN_0042d489,1229,0,
-0x0042dcb0,game3d/scenes,,FUN_0042dcb0,61,1,
+0x0042cf99,game3d/scenes,Pont_FitHandle,FUN_0042cf99,73,2,scene pont code; E-0365 (world.csv)
+0x0042cfe2,game3d/scenes,Pont_Init,FUN_0042cfe2,648,0,scene pont code; E-0365 (world.csv)
+0x0042d26a,game3d/scenes,Pont_StepAnim,FUN_0042d26a,543,1,scene pont code; E-0365 (world.csv)
+0x0042d489,game3d/scenes,Pont_Frame,FUN_0042d489,1229,0,scene pont code; E-0365 (world.csv)
+0x0042dcb0,game3d/scenes,Terrasse_LoadSounds,FUN_0042dcb0,61,1,scene terrasse code; E-0366 (world.csv)
 0x0042dced,game3d/scenes,LoadAnimsterrasse,FUN_0042dced,210,1,LoadAnimsterrasse::%s manque
-0x0042ddbf,game3d/scenes,,FUN_0042ddbf,422,0,
-0x0042df65,game3d/scenes,,FUN_0042df65,190,1,
-0x0042e023,game3d/scenes,,FUN_0042e023,970,0,
+0x0042ddbf,game3d/scenes,Terrasse_Init,FUN_0042ddbf,422,0,scene terrasse code; E-0366 (world.csv)
+0x0042df65,game3d/scenes,Terrasse_StepAnim,FUN_0042df65,190,1,scene terrasse code; E-0366 (world.csv)
+0x0042e023,game3d/scenes,Terrasse_Frame,FUN_0042e023,970,0,scene terrasse code; E-0366 (world.csv)
 0x0042e630,game3d/app,VangoghError,FUN_0042e630,74,27,wvsprintfA + MessageBoxA 'Vangogh Erreur'
 0x0042e67a,game3d/app,,FUN_0042e67a,5,7,
 0x0042e67f,game3d/app,Bfg_FindEntry,FUN_0042e67f,97,1,strcmp over the BFG directory; E-0013
 0x0042e6e0,game3d/app,Bfg_ReadEntry,FUN_0042e6e0,153,1,Erreur ouverture %s|Pas assez de ram pour 3d; E-0013
 0x0042e7d0,game3d/app,SceneFileExists,FUN_0042e7d0,140,1,DATA\SCENES_3D\ + CreateFileA; E-0013
 0x0042e85c,game3d/app,LoadSceneFile,FUN_0042e85c,291,1,"DATA\SCENES_3D\ + GetFileSize, ptrdata => NULL"
-0x0042e97f,game3d/app,,FUN_0042e97f,418,1,
+0x0042e97f,game3d/app,WinMain,FUN_0042e97f,418,1,called by CRT entry 0x476510; App_Init then GetMessage loop; E-0400 (shell.csv)
 0x0042eb21,game3d/app,App3D_InitPaths,FUN_0042eb21,625,1,DATA\GRAPHS_2D\|DATA\SCENES_3D\|\SCENES\|SAVE\
 0x0042ed92,game3d/app,,FUN_0042ed92,10,0,
 0x0042ed9c,game3d/app,,FUN_0042ed9c,68,1,
 0x0042ede0,game3d/app,,FUN_0042ede0,5,1,
 0x0042ede5,game3d/app,,FUN_0042ede5,5,1,
 0x0042edea,game3d/app,,FUN_0042edea,5,1,
-0x0042edef,game3d/app,,FUN_0042edef,239,1,
-0x0042eede,game3d/app,,FUN_0042eede,49,2,
+0x0042edef,game3d/app,OptionMenu3D_Open,FUN_0042edef,239,1,mode 3 and 0x40fccb; E-0415 (shell.csv)
+0x0042eede,game3d/app,Inv_SetHeldFlags3D,FUN_0042eede,49,2,copies 0x8c bytes to 0x4aba80 and 0x651220; E-0419 (shell.csv)
 0x0042ef0f,game3d/app,Load3DGame,FUN_0042ef0f,514,2,%sSAVE\GAME%04d.BIN + ReadFile
 0x0042f111,game3d/app,Load3DGGame,FUN_0042f111,433,1,%sSAVE\GGAME%d.BIN + ReadFile
-0x0042f2c2,game3d/app,,FUN_0042f2c2,582,1,
-0x0042f508,game3d/app,,FUN_0042f508,13,1,
-0x0042f515,game3d/app,,FUN_0042f515,379,1,
+0x0042f2c2,game3d/app,Zone_ReturnTo3D,FUN_0042f2c2,582,1,codes -3 -2 -1 n; cinefin; E-0414 (shell.csv)
+0x0042f508,game3d/app,App_Quit,FUN_0042f508,13,1,PostQuitMessage(0); E-0418 (shell.csv)
+0x0042f515,game3d/app,OptionMenu3D_Close,FUN_0042f515,379,1,-2 quit / n load / view size; E-0415 (shell.csv)
 0x0042f6a0,game3d/app,,FUN_0042f6a0,181,7,
-0x0042f755,game3d/app,,FUN_0042f755,286,1,
-0x0042f873,game3d/app,,FUN_0042f873,226,4,
+0x0042f755,game3d/app,Enter2DFrom3D,FUN_0042f755,286,1,3D fields to 0x4aba40 then Entry2D; E-0422 (shell.csv)
+0x0042f873,game3d/app,Save_GGameFrom3D,FUN_0042f873,226,4,Save_WriteGGame(0x4aba40 0x36c 0); E-0420 (shell.csv)
 0x0042f955,game3d/app,,FUN_0042f955,51,0,
 0x0042f988,game3d/app,,FUN_0042f988,470,1,
 0x0042fb5e,game3d/app,Timer3D_Begin,FUN_0042fb5e,76,3,Could not begin timer 3D ...
 0x0042fbaa,game3d/app,Timer3D_End,FUN_0042fbaa,44,5,timeKillEvent + timeEndPeriod
-0x0042fbd6,game3d/cinematics,,FUN_0042fbd6,1238,0,
+0x0042fbd6,game3d/cinematics,GameWndProc,FUN_0042fbd6,1238,0,switch on mode byte 0x598cb0; E-0405 (shell.csv)
 0x00430700,engine3d,Hlz_Unpack,FUN_00430700,140,1,Cryo HLZ LZ = ScummVM HLZDecoder; E-0101 (2d.csv)
 0x00430980,engine3d,,FUN_00430980,23,1,
 0x004309a0,engine3d,,FUN_004309a0,34,2,

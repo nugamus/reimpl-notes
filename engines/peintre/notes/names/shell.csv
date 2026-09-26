@@ -1,0 +1,129 @@
+address,name,evidence
+0x0042e97f,WinMain,called by CRT entry 0x476510; App_Init then GetMessage loop; E-0400
+0x0042fbd6,GameWndProc,switch on mode byte 0x598cb0; E-0405
+0x0041889c,Users_Load,%sSAVE\USERS.BIN rb; E-0402
+0x00418966,Users_Save,%sSAVE\USERS.BIN wb; E-0402
+0x004187ba,Users_DeleteSaves,DeleteFileA GGAME%u and GAME%02u%02u 0..34; E-0424
+0x0041839d,User_GetIndex,returns 0x4e298c; E-0402
+0x004183a7,User_GetName,lstrcpyA of record +0; E-0402
+0x004183c4,User_GetViewSize,record +0x24; E-0402
+0x004183d7,User_GetVolume,record +0x20; E-0402
+0x004183ea,User_SetViewSize,record +0x24; E-0402
+0x00418400,User_SetVolume,record +0x20; E-0402
+0x00418a2d,Accueil_Paint,BitBlt ACCUEIL bitmap centred; E-0402
+0x00418b31,Accueil_EditProc,Enter/Escape key-up to parent; E-0402
+0x00418bbc,Accueil_DestroyButtons,DestroyWindow 0x66 0x67 0x68+i; E-0402
+0x00410365,Zone_Init,0x4a6b18 + zone*0x6c; LoupeOut Retour RetourM; E-0408
+0x00410624,Zone_Free,frees zone sprites and sounds; E-0408
+0x00410b80,Inv_BuildFlags,35 flags from the list 0x4e2688; E-0414
+0x0040fed7,Save_Restore2D,2D block offsets 0 0x64 0xf0; E-0421
+0x0042f2c2,Zone_ReturnTo3D,codes -3 -2 -1 n; cinefin; E-0414
+0x0042f515,OptionMenu3D_Close,-2 quit / n load / view size; E-0415
+0x0042f755,Enter2DFrom3D,3D fields to 0x4aba40 then Entry2D; E-0422
+0x0042f873,Save_GGameFrom3D,Save_WriteGGame(0x4aba40 0x36c 0); E-0420
+0x0042edef,OptionMenu3D_Open,mode 3 and 0x40fccb; E-0415
+0x0042eede,Inv_SetHeldFlags3D,copies 0x8c bytes to 0x4aba80 and 0x651220; E-0419
+0x0042f508,App_Quit,PostQuitMessage(0); E-0418
+0x0040fccb,OptionTimer_Begin,timeSetEvent 40 ms callback posting 0x503; E-0406
+0x0041224c,Timer_Post500,PostMessageA 0x500; E-0406
+0x00412271,Timer_Post503,PostMessageA 0x503; E-0406
+0x00412296,Timer_Post504,PostMessageA 0x504; E-0406
+0x0041222e,Shell_SetBusy,0x4e22fc = 1; E-0406
+0x0041223d,Shell_ClearBusy,0x4e22fc = 0; E-0406
+0x0040e200,Cursor_Open,Sprite_Open Curseurs; E-0416
+0x0040e25a,Cursor_Set,table 0x4a64e8 {frame dx dy}; E-0416
+0x0040e2fc,Cursor_Draw,frame at cursor - hotspot; E-0416
+0x0040e373,Cursor_SetPos,clamped 0..639 0..479; E-0407
+0x0040e3e1,Cursor_MoveByMouse,2 * DirectInput dx dy; E-0407
+0x0040e4d5,Cursor_GetPos,returns 0x4e1fd4 0x4e1fd8; E-0407
+0x0040e4ef,Mouse_LeftDown,0x4727d0 rgbButtons[0]; E-0407
+0x00410c21,Key_Released,down in previous buffer and up now; E-0407
+0x00410c8e,Key_Down,bit 7 of current buffer; E-0407
+0x00410cb9,Key_Up,bit 7 clear; E-0407
+0x00410bdd,Rect_Contains,x y w h test; E-0410
+0x0040e620,OptionMenu_Open,option options cursopt lcaps trobo12; E-0415
+0x0040e6fb,OptionMenu_Close,restore screen volume view size; E-0415
+0x0040ebd9,OptionMenu_DrawLoadList,lcaps frame and Game %u; E-0415
+0x00409600,Credits_Start,Snd_CreateStatic Credits; E-0418
+0x00409645,Credits_Step,Credit%02u 250 ticks; E-0418
+0x00409310,ViewA_Start,Tgp_Load2 + Sprite_Open + pas_VG2; E-0411
+0x004093cb,ViewA_Step,frame per odd tick until click; E-0411
+0x0040dc22,Panorama_Start,centre the view and the cursor; E-0411
+0x0040dcf3,Panorama_Step,edge and arrow-key scrolling; E-0411
+0x0040fb86,Bar_BuildSlideTable,60 * cos(pi/2 - 3deg i); E-0410
+0x00410e30,Bar_Step,bar y 0x1df - T[i]; E-0410
+0x00411153,Bar_DrawIcons,OPI frames and count; E-0410
+0x00411454,Zone_HitButtons,views 1 2 Retour 3 RetourM 4; E-0411
+0x00411514,Bar_Scroll,arrows every 8th tick; E-0410
+0x00411649,Zone_HitPlacedSlot,rects 0x4a6a20; E-0410
+0x004113e0,Bar_HitObject,six slots 0x4a6918; E-0410
+0x004116a8,Zone_HitDropSlot,rects 0x4a69d8; E-0412
+0x0041170e,Zone_DrawSlots,CapsE CapsAO CapsAC; E-0412
+0x00411807,Zone_DrawMagnifier,LoupeOut last frame; E-0411
+0x0041195b,Loupe_Close,LoupeIn + bar_outi; E-0411
+0x004119c2,Loupe_Open,LoupeOut; E-0411
+0x00414fbf,Bar_Load,Invent OPI OP count bar_obj fleche; E-0410
+0x004148a5,Zone_LoadObjectSprites,ouvrcaps fermcaps OPnn; E-0412
+0x004149d1,Obj_LoadCapsSprites,CapsAO CapsAC CapsOP; E-0408
+0x00414a95,Obj_LoadCapsE,CapsE%02u; E-0408
+0x00414e3a,VanGogh_LoadAB,PA..a PA..b pas_VG; E-0413
+0x00414ea8,VanGogh_LoadC,PA..c; E-0413
+0x00414f64,Tourn_Load,TOURN%u tourneso; E-0413
+0x004150b0,Pot_Load,POT vase; E-0413
+0x00414dcc,Slot_WaitMovie,result 1 until Movie_Step ends; E-0417
+0x00414dec,Slot_WaitVoice,result 1 until the stream ends or a click; E-0417
+0x004119fc,Zone00_OnPlace,Movie_Open(0x20 1); E-0431
+0x00411a28,Zone00_Obj0,a14_031b..d views and sunflower; E-0431
+0x00412065,Zone21_Ending,a14_032a a14_032b; E-0431
+0x0040d0f0,Zone01_OnPlace,Movie_Open(0x1d 0); E-0426
+0x0040d112,Zone02_OnPlace,A01_031 / a01_032a; E-0426
+0x0040d1ef,Zone02_OnAbort,flag 0x4e1f74; E-0426
+0x0040d207,Zone02_Free,frees a01_032a and sounds; E-0426
+0x0040d293,Zone02_Obj3,five pieces 0x4a62c0; E-0426
+0x0040d271,Zone03_OnPlace,Movie_Open(0x3c 0); E-0429
+0x004022c0,Zone04_OnPlace,A03_011 / A03_012e / movie 15; E-0427
+0x00402376,Zone04_OnAbort,flag 0x4e039c; E-0427
+0x0040241b,Zone04_Obj6,three places then moving target; E-0427
+0x004029b1,Zone05_OnPlace,Movie_Open(0x15 0); E-0430
+0x004029d3,Zone06_OnPlace,Movie_Open(0x3d 0); E-0430
+0x004029f5,Zone07_OnPlace,A03_021 A03_022 A03_023a; E-0427
+0x00402ac2,Zone07_OnAbort,flag 0x4e039c; E-0427
+0x00402ada,Zone07_Obj10,voice then movie 30; E-0427
+0x00402b51,Zone07_Obj11,voice then movie 31; E-0427
+0x00402c20,Zone07_Obj12,three hot spots 0x4a5168 0x4a5198; E-0427
+0x00403346,Zone08_OnPlace,A13_031 / a13_032c; E-0430
+0x004034f2,Zone08_OnAbort,flag 0x4e039c; E-0430
+0x004035fb,Zone08_Obj13,six rounds a13_031a..l; E-0430
+0x00403a1a,Zone08_Obj14,six pairs a13_032; E-0430
+0x00402e76,Zone08_DrawElement,frame formulas 0x4a4a30; E-0430
+0x00403215,Zone08_HitElement,rects 0x4a4a90 0x4a4b30; E-0430
+0x00403ddb,Zone09_OnPlace,Movie_Open(0x3b 0); not a Ghidra function; E-0408
+0x00403dfd,Zone10_OnPlace,Movie_Open 0x14 / a13_052a 0x16; E-0430
+0x00403ea1,Zone10_OnAbort,flag 0x4e039c; E-0430
+0x00403f04,Zone10_Obj17,four hot spots 0x4a4ed8; E-0430
+0x0040410e,Zone11_OnPlace,Movie_Open(0x3a 0); E-0430
+0x00404130,Zone12_OnPlace,Movie_Open(0x3e 0); E-0427
+0x00404152,Zone13_OnPlace,A03_041 / a03_042a a03_042b; E-0427
+0x00404217,Zone13_OnAbort,flag 0x4e039c; E-0427
+0x00404378,Zone13_Obj21,three pieces target 0x4a4f78; E-0427
+0x0040474b,Zone14_OnPlace,Movie_Open 0x25 / 0x26; E-0430
+0x00404a47,Zone15_OnPlace,A13_061 / movie 0x42; E-0430
+0x00404b5f,Zone15_OnAbort,flag 0x4e039c; E-0430
+0x00404bde,Zone15_Obj24,sixteen pieces 0x4a4d98; E-0430
+0x004055bb,Zone16_OnPlace,a03_05 cf_clic1..3 movie 0x33; E-0427
+0x004056ac,Zone16_OnAbort,flag 0x4e039c; E-0427
+0x00405816,Zone16_Obj26,six pieces 0x4a4b88; E-0427
+0x00405e6a,Zone17_OnPlace,Movie_Open(0x3f 0); E-0430
+0x00405e8c,Zone18_OnPlace,a03_06b..e movie 0x1b; E-0427
+0x00405f5b,Zone18_OnAbort,flag 0x4e039c; E-0427
+0x00405fa6,Zone18_Obj28,click in window 0x4a5138; E-0427
+0x004074c0,Zone19_OnPlace,A04_01 / Movie_Open 0x43; E-0428
+0x00407509,Zone20_OnPlace,a14_01b..j movie 0x36; E-0431
+0x004076b2,Zone20_OnAbort,flag 0x4e0528; E-0431
+0x0040770c,Zone20_Obj31,three wheels 0x4a57d8; E-0431
+0x00407b83,Zone22_OnPlace,Movie_Open(0x23 0); E-0428
+0x00407ba5,Zone23_OnPlace,Movie_Open(0x24 0); E-0428
+0x00407bc7,Zone24_OnPlace,mask 0x2d420 a14_021a a14_021b; E-0431
+0x00407dd1,Zone24_OnAbort,flag 0x4e0528; E-0431
+0x00407e83,Zone24_Uncover,mask count < 0x2423; E-0431
+0x00408118,Zone24_Obj34,uncover then five pieces 0x4a5850; E-0431
