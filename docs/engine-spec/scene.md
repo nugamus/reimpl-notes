@@ -65,7 +65,14 @@ For scene file `Uxx.X3D`:
 - `.DMF` pixels: bpp 8 through a B, G, R, x palette; bpp 15 as RGB555; bpp 16 as RGB565.
 - A map with an `fb21` colour key: texels equal to the key are transparent, but only on
   faces whose material draw mode (`+0x50`) is 1, 2 or 3. Mode 0 draws them in the key
-  colour, like any other texel (E-0481; U01's sky and water reflections have such texels).
+  colour, like any other texel (E-0481, E-0485; U01's sky and water reflections have such
+  texels).
+- Materials are shared by name within a scene (E-0484): when an `.O3D` material has the
+  same name (exact, case-sensitive) as one already loaded, from any earlier `object=` or
+  `lod=` file, its faces use the earlier material with all its fields (texture, `+0x4c`,
+  `+0x50`, tiling, colours); its own fields are discarded. Maps are shared by name the
+  same way. This is why foliage stored as mode 0 in later files (U03 `arbre`, most of
+  U04's plants) is colour-keyed: its first definition is mode 1.
 
 ## Drawing order and blending (E-0480..E-0483)
 

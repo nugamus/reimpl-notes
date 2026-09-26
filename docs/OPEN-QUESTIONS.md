@@ -895,3 +895,16 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Next to try:** read `U03::StartUnit` (`0x00404f70`) around the hide call: whether it
   hides the model's root with its subtree (`X3d_Object_Hide(root, 1)`), or the plane is
   hidden elsewhere.
+
+### Q-0194 — Do U04 `fenetremais` and U05 `COKE.O3D` `Material #170` really show their key colour?
+- **Context:** E-0484: after name sharing, these two mode-0 materials still map keyed
+  texels onto their faces (27 % of `ARBREGR1`'s UV area, 26 % of `BAT02`'s). By E-0481 and
+  E-0485 the original draws those texels in the key colour.
+- **What we checked:** every `SetRenderState` site (no colour key, alpha test or blend in
+  the mode-0 drawers), `H3d_Add_Texture`/`H3d_Set_Color_Key` (a DirectDraw source key on
+  the surface, used only under COLORKEYENABLE), the palette conversion `FUN_1001df20` (no
+  alpha), the EXE's render-state calls (filtering, dither, render class only).
+- **Blocks:** nothing known; engine follows the rule.
+- **Next to try:** a capture of those faces in the original (U04 house window, U05 coke
+  building).
+- **Status:** open

@@ -4021,3 +4021,45 @@ An entry at `tentative` confidence must also have a matching line in
   crops of both captures agree in layout and tone.
 - **Method:** snap.ps1 of both, cropped and compared by eye.
 - **Confidence:** visual. Closes the visible part of Q-0021.
+
+### E-0484 — Materials are shared by name across a scene: the first loaded wins, so most "mode-0 foliage" draws with an earlier mode-1 material
+- **Binary/file:** `x3d.dll`; the corpus `.X3D` and `.O3D` files.
+- **Evidence:** the `.O3D` material reader `FUN_10011450` builds each material, then for
+  each calls `X3d_Scene_Add_Material(scene, mat)` and, if that returns another pointer,
+  releases its own (`X3d_Material_Release`) and stores the returned one in the file's
+  material array, which the faces index. `X3d_Scene_Add_Material` (`0x10021dd0`, export
+  205) walks the scene's material list (scene `+8`, next at `+4`) comparing the names at
+  `+0xc` byte by byte (an inlined `strcmp`: exact, case-sensitive) and returns the first
+  match; only a new material is linked in and gets `X3d_Material_Set_Render_State(…,
+  0x400)` (state from its own fields, E-0480). So every field of a later same-named
+  material is ignored: texture, transparency `+0x4c`, draw mode `+0x50`, tiling.
+  `X3d_Scene_Add_Map` (`0x10021c50`, export 204) does the same for maps by name (scene `+0xc`). Corpus,
+  loading each `U##/U##.X3D`'s `OBJECT`/`LOD` files in order: 609 of 1,366 materials are
+  replaced by an earlier one, 169 of them with different `+0x44..+0x58` fields and 13 with
+  a different texture. 58 later materials with mode 0 and a map at least 30 % key
+  colour resolve to an earlier mode-1 material: U03 `arbre` in `ARBRE1.O3D` and
+  `U03_25.O3D` (mode 0, `ARBRE4`) resolves to `arbre` in `U03.O3D` (mode 1); U04
+  `nenudrt`, `herbassin2simple`, `arbustefin`, `glaieuldrt`, `arbjone`, `arbrflor`,
+  `pot` and others resolve to `U04.O3D`'s mode-1 materials; U05 `SORTIE2.O3D`
+  `Material #208` to `SORTIE.O3D`'s. Six first-loaded mode-0 materials keep a map with at
+  least 30 % key texels: U04 `herbassinbordeau` (`HERBASS5`; its faces' UV area is 1.2 %
+  key), U04 `fenetremais` (`ARBREGR1`, 27 %), U05 `COKE.O3D` `Material #170` (`BAT02`,
+  26 %), U06 `ORANGE.O3D` `Material #2` (`ORMUR2`, 0 %), U07 `Material #2`/`#21`
+  (`LUM`, no faces).
+- **Method:** MCP decompile of `FUN_10011450`, `X3d_Scene_Add_Material`,
+  `X3d_Scene_Add_Map`; Python over `o3d.py`/`dmf.py` (UV coverage by rasterising the faces'
+  UV polygons, coordinates beyond ±1 wrapped).
+- **Confidence:** proven for the sharing rule and the counts; objects the unit code loads
+  later (not in the `.X3D`) are not counted.
+
+### E-0485 — The original draws U01's mode-0 sky key texels in the key colour
+- **Binary/file:** `traces/u01-start-original.png`, `traces/u01-start-engine.png`.
+- **Evidence:** at the capture pixels where the engine shows black specks (E-0481), the
+  original shows the key colour (194, 91, 58) of `CDEVBAMD`, distinct from the sky 3 px
+  above and below: (250, 204) → (194, 93, 59) against (171, 110, 72) and (190, 117, 70);
+  (265, 204) → (193, 98, 61) against (170, 106, 66); (275, 203) → (186, 96, 61);
+  (355, 197) → (188, 107, 66) against (170, 106, 66). So those texels are drawn, not cut
+  over a matching clear colour.
+- **Method:** numpy over the captures.
+- **Confidence:** proven (the key colour survives 16-bit rounding and filtering nearly
+  exactly).
