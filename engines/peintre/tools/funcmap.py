@@ -114,7 +114,7 @@ NAMES = {
     0x42E630: ("VangoghError", "wvsprintfA + MessageBoxA 'Vangogh Erreur'"),
     0x42E6E0: ("Bfg_ReadEntry", "Erreur ouverture %s|Pas assez de ram pour 3d; E-0013"),
     0x42E67F: ("Bfg_FindEntry", "strcmp over the BFG directory; E-0013"),
-    0x42E7D0: ("SceneFileExists", "DATA\SCENES_3D\ + CreateFileA; E-0013"),
+    0x42E7D0: ("SceneFileExists", "DATA\\SCENES_3D\\ + CreateFileA; E-0013"),
     0x466BC3: ("Lz_Unpack", "BFG entry unpacking; E-0013"),
     0x435400: ("Obj_Load", "opens a BFG entry into the 3D heap; E-0013"),
     0x42E85C: ("LoadSceneFile", "DATA\\SCENES_3D\\ + GetFileSize, ptrdata => NULL"),

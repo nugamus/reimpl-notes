@@ -1,6 +1,7 @@
 """Apply names from a CSV (columns `address`, `name`, optional `evidence`) to a program.
 
-Only functions still called FUN_* are renamed (names given by hand in Ghidra win). A
+Only functions still called FUN_* or named earlier by this script are renamed (names
+given by hand in Ghidra win). A
 `Class::method` name puts the function in that class namespace. The evidence goes into
 the function's plate comment.
 
@@ -32,7 +33,8 @@ def apply(program, path: Path) -> None:
         if f is None:
             print(f"  no function at {row['address']}")
             continue
-        if not f.getName().startswith("FUN_") and f.getName(True) != name:
+        ours = (f.getComment() or "").startswith("Named from: ")  # a name this script gave
+        if not f.getName().startswith("FUN_") and not ours and f.getName(True) != name:
             skipped += 1
             continue
         cls, _, method = name.rpartition("::")
