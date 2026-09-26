@@ -427,7 +427,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   some faces are double-sided or flagged unpickable.
 - **Next to try:** callers of `FUN_1000b690`; writers of face `+0x38` in `x3d.dll`'s O3D
   reader.
-- **Status:** open
+- **Status:** RESOLVED (E-0607): the any-corner test `0x1000b180` is installed; face `+0x38` is never set (faces are `calloc`ed)
 
 ### Q-0041 — Where does the held-item cursor image come from, and what is the inventory UI?
 - **Context:** E-0073/E-0074: a take step sets the cursor item to `<name>C` through the
@@ -480,7 +480,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   shows.
 - **Next to try:** `FUN_0041fe90`'s traversal and the list's `+4` method; a capture of a
   talking character.
-- **Status:** open
+- **Status:** RESOLVED (E-0606): nodes tick in insertion order, so mouth nodes override the body; of two enabled slots the later-loaded wins
 
 ### Q-0073 — Which U01 code plays `d1_04`, `d1_05`, `telgrisi2`, `s1_11`, `S1_10`?
 - **Context:** E-0127: `d1_04`/`d1_05` are in U01's string area (`0x0043f238`,
@@ -488,7 +488,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   `telgrisi2.wav` has no reference found. Their triggers were not followed.
 - **Blocks:** U01's sound completeness, not the sound system.
 - **Next to try:** xrefs to those strings; the handlers owning `0x004017f3`, `0x0040188f`.
-- **Status:** open
+- **Status:** RESOLVED (E-0082, E-0084, E-0085): `S1_10`/`s1_11` in the climb, `d1_04`/`d1_05` in `ClickMaire`, `telgrisi2` in `ClicTel`
 
 ### Q-0045 — Which U01 objects become `Box203` and `*U01_21`?
 - **Context:** E-0080. The renames depend on the order of X3D's top-level object list
@@ -519,7 +519,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** nothing for U01 as long as highlights are drawn every frame while hovered and
   clicks on the bar do not reach the scene.
 - **Next to try:** callers of view `+0xc` with 7; scene vtable `+0x3c` (`0x0041b760`).
-- **Status:** open
+- **Status:** RESOLVED (E-0603, E-0608): event 7 follows every draw of a view; scene `+0x3c` stops the blinking held-item cursor
 
 ### Q-0061 — How do the list views (`cSU#`, `AOL#`, `VAS#`) draw and scroll?
 - **Context:** `fra.ksy` `scroll`: three names (`UserASC`, `UserBoule`, `SCR.BitmapScroll`),
@@ -529,7 +529,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   player by clicking the list.
 - **Next to try:** the `#SCR` vtable `0x0043b340` draw and event methods; `XGameList`
   (`DAT_0046ec10`, `%sUser_%i` folders).
-- **Status:** open
+- **Status:** RESOLVED (E-0600; rows E-0184, E-0185): scroll bar geometry, arrows, track pages, drag (`save.md` "Lists")
 
 ### Q-0062 — Are inventory items outside the strip clipped?
 - **Context:** E-0104: items sit at 86 + 70·i and scroll by 70; with more than 7 items some
@@ -537,7 +537,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** layout and scroll code; not the item draw clip.
 - **Blocks:** nothing in U01 (at most a few items).
 - **Next to try:** the strip's draw (`vop#` vtable `0x0043b058`) and the manager `+0x7c`.
-- **Status:** open
+- **Status:** RESOLVED (E-0602): items are clipped to the strip for drawing and hit tests
 
 ### Q-0063 — Does a greyed Option item (Load, Gallery) still react to clicks?
 - **Context:** E-0106: greying swaps the bitmap of views 3 and 6; their `RCS@` stays.
@@ -580,7 +580,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   chunk `JAUGE` or other readers of `+0x12`.
 - **Blocks:** nothing for play.
 - **Next to try:** xrefs to reads of gauge `+0x12` (`FUN_0041a820`/`FUN_0041a790`).
-- **Status:** open
+- **Status:** RESOLVED (E-0605): the labels are only saved and loaded (`JAUGE`)
 
 ### Q-0111 — Why did posted arrow keys not move the camera in U00's tutorial?
 - **Context:** E-0203: after a new name, posted Down/Right key messages left the view
@@ -685,8 +685,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** nothing for U01; the gallery (if that is the reader) and list fidelity.
 - **Next to try:** decompile `0x00425c10`; snap `OptionUser` with two players, one with a
   gap in the `User_<i>` indices.
-- **Status:** partly answered (E-0452: it drives the gallery's unlocked paintings); the list
-  label is open
+- **Status:** RESOLVED (E-0452, E-0601): the unit number drives the gallery; a list row is numbered by screen position (scroll position + 1 for the first row)
 
 ### Q-0103 — What do U04's `PARAMS` and U07's `PLANCHE` save?
 - **Context:** E-0182: U04 unit `+0x6ec`, `+0x6e8`, `+0x6e4`; U07 unit `+0x6c8`.
@@ -897,7 +896,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** Settings fidelity (whether the engine should keep the music value at all).
 - **Next to try:** in the original, open Settings from the menu, snap the music knob, move
   it, OK, start a game and compare U01's ambient loudness with a default run.
-- **Status:** open
+- **Status:** RESOLVED (E-0604): no lasting effect; every return to play passes `SetAppMode`, which sets group 1 to 85
 
 ### Q-0191 — Who enables the gallery thumbnails' `GIH@` captions (`<p>IndexA`, drawn at +49, +292)?
 - **Context:** E-0453. Every `Galerie.fra` thumbnail has a `GIH@` (starts disabled) with
@@ -906,7 +905,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** the gallery's hover look.
 - **Next to try:** xrefs to the `@HIG` enabled field (`@HIL` `+0x24` family, E-0102); a
   live hover over an unlocked thumbnail.
-- **Status:** open
+- **Status:** RESOLVED (E-0603): nothing disables it; `GIH@` draws at absolute (49, 292) while an unlocked thumbnail is hovered
 
 ### Q-0192 — What does unit class 50 do with a painting's `U##D.X3D` scene?
 - **Context:** E-0455. `GotoScene3D` loads `U01D`..`U06D`, `U33D` with

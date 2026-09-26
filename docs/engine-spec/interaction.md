@@ -23,8 +23,11 @@ camera, recomputed at pick time, not the last frame's.
    Children are visited even when the parent is skipped. The LOD actually drawn
    (E-0052) supplies the faces; the reported object is the base object.
 2. For each face of the object, in camera space (vertices after the model-view matrix):
-   - Skip back faces: with n = (v0 − v1) × (v2 − v1), the face is kept only if
-     n · v0 < −0.01 (Q-0040).
+   - Skip back faces (E-0607): for the corners k = 1, 2, …, n − 1, 0 in turn, with
+     n_k = (v_{k−1} − v_k) × (v_{k+1} − v_k) (indices wrapping), keep the face at the first
+     corner where n_k · v_{k−1} < −0.01; drop it if no corner passes. For a planar convex
+     face this is the first corner's test; later corners only matter when v0, v1, v2 are
+     collinear. No face is flagged unpickable.
    - Skip faces with every vertex outside one frustum plane; clip the rest against the
      near and far planes.
    - Project each vertex: `sx = cx + fx · X / Z`, `sy = cy − fy · Y / Z`, with the viewport
@@ -98,7 +101,8 @@ code change it). Cursor modes:
   centred (offset 16, 16), named `<object name without *>C`, e.g. `U01_04C`
   (`Data/2dbit/U01_04C.BMP` exists for every U01 item; the loader path is Q-0041). Over a
   hotspot whose kind is 5 it blinks: item, nothing, item, … at 6 frames per second;
-  elsewhere it is steady. The item stays held through clicks on nothing, clicks on
+  elsewhere it is steady, and a message consumed by a 2D frame (the inventory bar) also
+  makes it steady (E-0608). The item stays held through clicks on nothing, clicks on
   hotspots with no matching action, right clicks, Space and menus; what stores or drops
   it is `ui.md` "The held item" (E-0210).
 

@@ -4467,3 +4467,177 @@ An entry at `tentative` confidence must also have a matching line in
 - **Method:** capstone; MCP decompile; byte and instruction search.
 - **Confidence:** proven for every path found; stores through computed pointers were not
   enumerated. Answers Q-0100.
+
+### E-0600 — List scroll bars: a bar bitmap at the view's right edge, arrows 33 px, a thumb centred on the position, one row per arrow click, one page per track click, drag snaps to rows
+- **Binary/file:** `MissionMonet.exe`; `Data/2DFRA/OptionUser.fra`, `OptionLoad.fra`, `OptionSave.fra`; `Data/2dbit/*ASC.bmp`, `*Boule.bmp`.
+- **Evidence:** `#SCR` (constructor `0x004325d0`, vtable `0x0043b340`) keeps `fra.ksy`
+  `scroll.unk_a` at `+0x54` (up-arrow height), `unk_b` at `+0x58` (down-arrow height),
+  `unk_c` at `+0x5c` (row step), `name_a`/`name_b`/`name_c` at `+0xb8`/`+0xd8`/`+0xf8`.
+  `+0x24` (`0x004327a0`) → `ScrollList_LoadBitmaps` (`0x004327c0`, `+0x10c`): `name_a` → bar
+  (`+0x94`, source rect `+0x60`), `name_b` → thumb (`+0xa0`, rect `+0x70`), `name_c` →
+  content (`+0xac`, rect `+0x80`); min (`+0x44`) = 0, max (`+0x48`) = (content bottom −
+  content top − view h) / step, position (`+0x4c`) = 0. Accessors `0x00424240..0x00424290`:
+  `+0xd8` max, `+0xdc` min, `+0xe0` position, `+0xe4`/`+0xe8`/`+0xec` their setters.
+  Overrides: `#USc` `0x00429790` loads only bar and thumb, step = 32 (`0x00442268`),
+  max = player count (word `DAT_0046ec10 +6`) − 9 (`0x00442270`); `#LOA`/`#SAV`
+  `0x004276f0` (content height `+0x8c` = 32 · used saves (`0x00428010`) resp. 32 · 98
+  (`0x004282b0`), step 32 (`0x004421d0`)): max = (rows · 32 − view h) / 32.
+  `ScrollList_Draw` (`0x004328c0`; the same code in `#LOA`/`#SAV` `0x004277e0` and `#USc`
+  `0x00429870`), with R the view rect (`+0xb4`), L = R.h − up − down, f = L / (max − min)
+  (float): only when max > 0 (`#LOA`, `#SAV`: max ≥ 1; `#USc`: max ≥ 0): bar at
+  (R.right − bar w, R.top); thumb at (R.right − bar w, ftol(R.top + up + position · f −
+  ⌊thumb h / 2⌋)); both with blit flags 0x60 (as `@HIL`). Press `ScrollList_OnPress`
+  (`0x00432ab0`, `+0x80`, reached from view event 4 `0x00434a80`), only when max > 0,
+  tries in order, each on the column x ∈ [R.right − bar w, R.right):
+  `ScrollList_PressUpArrow` (`0x00432b30`, y < R.top + up: position − 1 if ≥ min),
+  `ScrollList_PressDownArrow` (`0x00432be0`, y ≥ R.bottom − down: position + 1 if ≤ max),
+  `ScrollList_PressThumb` (`0x00432e20`, y within ⌊thumb h / 2⌋ of c = ftol(R.top + up +
+  position · f): dragging `+0x90` = 1), `ScrollList_PressTrack` (`0x00432c90`, between the
+  arrows: page = ftol(R.h / step); y ≤ R.top + up + position · f → position − page, not
+  below min, else + page, not above max). Each change calls `+0x124` (`#USc` `0x00429ef0`,
+  lists `0x00427e70`: redraw rows from the new position) and invalidates the view. Mouse
+  moves with the left button down reach the pressed view as event 12 (frame `+0x2c`
+  `0x0042ce90` → view `+0x60` `0x00434b90` → `+0x90`): `ScrollList_Drag` (`0x00432f70`)
+  while dragging: d = mouse y − up − R.top, s = ftol(L / (max − min)), position = d div s,
+  + 1 when d mod s > s div 2, clamped to min..max. Release (event 13, `+0x94`
+  `0x00433090`) clears dragging. `#USc`'s press (`0x00429f10`) runs the scroll press first,
+  then the row hit (`ScrollList_PtInRows` `0x00432f20`: the view rect minus the bar
+  column). `fra.py`: `cSU#` (149, 126, 406, 288) `UserASC`/`UserBoule`, 33/33/32; `AOL#`
+  (133, 83, 444, 320) `LoadASC`/`LoadBoule`, 33/33/20; `VAS#` (149, 126, 406, 288)
+  `SaveAsc`/`SaveBoule`, 33/33/20. BMP headers: `UserASC` and `SaveAsc` 29×288, `LoadASC`
+  34×320 (each as tall as its view), `UserBoule`/`SaveBoule` 29×13, `LoadBoule` 34×14.
+- **Method:** capstone; MCP decompile; `fra.py`; BMP header read.
+- **Confidence:** proven statically. With max = min (exactly 9 players) the `#USc` draw
+  divides by zero and the thumb's y is undefined. Answers Q-0061.
+
+### E-0601 — The players list numbers rows by screen position: first visible row = scroll position + 1
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `PlayerList_DrawRows` (`0x00429bf0`, `#USc` `+0x130`): counter
+  (`[esp+0x18]`) = position (`+0xe0`) + 1 at `0x00429cf3`, + 1 per drawn row
+  (`0x00429e51`), printed with `"%i"` (`0x0044225c`, push at `0x00429d72`) before `" - "`
+  and the name. The player slot comes separately from `PlayerList_NextUsed` (`0x00429eb0`):
+  the slot index starts at the position (`0x00429d57`) and skips slots whose used flag
+  (`DAT_0046ec10 +8 + 2·i`) is 0; rows stop after `+6` (player count) names or at the view
+  height. So rows read `1 - <first player>`, `2 - <second>`, … whatever the `User_<i>`
+  indices; scrolled by p, the first row is numbered p + 1 and shows the first used slot
+  ≥ p (the (p + 1)-th player only when slots 0..p − 1 are all used). The save and load
+  lists print slot + 1 instead (E-0184).
+- **Method:** capstone of the draw loop.
+- **Confidence:** proven. Answers the list half of Q-0102.
+
+### E-0602 — Views clip to ancestors whose `.fra` `unk_7` is 1; inventory items outside the strip are clipped and unclickable
+- **Binary/file:** `MissionMonet.exe`; `Data/2DFRA/*.fra`.
+- **Evidence:** the view constructor (`0x004342f0`) reads the 0x24-byte record: `visible`
+  → `+0x38`, `unk_7` → `+0x3c`, `unk_8` → `+0x40` (`0x004343a3..0x004343b0`); the
+  code-built constructor `0x00434210` takes the same fields from its argument
+  (`0x0043429b..0x004342ae`). `View_GetClipRect` (`0x00434530`, vtable `+0xbc`): the view's
+  screen rect (`+0xb4`); unless `+0x40` ≠ 0, intersected (`IntersectRect`) with the rect
+  of every ancestor (`+8` chain) whose `+0x3c` ≠ 0. Bitmap blits
+  (`LSharedMediaObject_241` `0x004333e0`, `0x00433980`) clip the destination to that rect
+  of the drawing view, clamped to 640×480 (no view: the whole screen). The hit test
+  (`+0x3c`, `0x004349b0`) is `PtInRect` on the same rect, so press (`0x0042cba0`) and
+  hover (`0x0042cab0`) ignore clipped parts. Inventory items (`0x00431cf0`) are built with
+  parent = the strip's id (`vop#` 200), `unk_7` = 1, `unk_8` = 0; `PorteF.fra`: `EIV#` 1
+  (0, 420, 640, 60), `TIB#` 2 (same), strip `vop#` 200 (57, 420, 535, 60), all `unk_7` = 1.
+  Corpus (`fra.py`, 25 files): 72 views `unk_7` = 0, 34 `unk_7` = 1, `unk_8` = 0 in all 106.
+- **Method:** capstone; MCP decompile; `fra.py`.
+- **Confidence:** proven. Answers Q-0062.
+
+### E-0603 — `GIH@` is a hover highlight drawn at absolute screen coordinates; it starts enabled
+- **Binary/file:** `MissionMonet.exe`; `Data/2DFRA/Galerie.fra`.
+- **Evidence:** factory `0x0042ab50`: `GIH@` (`0x40484947`) → `0x0042ef30` →
+  `0x0042ef90`: the `LIH@` constructor (`0x0042ec90`: name, dx `+0x24`, dy `+0x28`,
+  hovered `+0x10` = 0), vtable `0x0043ac24`, then property `+4` = 0. The base
+  (`0x0042e210`) sets `+4` = 1 and enabled `+0xc` = 1. The two vtables (`0x0043abf0`,
+  `0x0043ac24`) share the event handler `0x0042ede0` (enabled `+0xc` required; event 1 →
+  hovered 0, 2 → hovered 1, redraw; 7 → draw while hovered) and differ only in
+  `+0x2c`/`+0x30`: `GlobalHighlight_Draw` (`0x0042efe0`) blits the bitmap at (dx, dy) with
+  no view (no clip) and `0x0042f040` invalidates (dx, dy, w, h), where `@HIL` uses view
+  position + (dx, dy). Property `+4` is read only by `View_SizeToLocalProperty`
+  (`0x004344c0`, view `+0x108`: size the view to the first property with a rect and `+4`
+  ≠ 0); nothing gates drawing on it. View `+0x18(0, tag)` (`0x0042e1c0`, tag 0 = all)
+  calls every property's `+0x20` (`0x00423300`: enabled := arg); `Gallery_Open` calls it
+  with 0 on locked thumbnails (E-0453, `0x0042587e`). Event 7 comes from
+  `View_DrawThenEvent7` (`0x00434c50`, view `+0xa0`): draw the view (`+0x1c`), then offer
+  event 7 to its properties.
+- **Method:** capstone; MCP decompile.
+- **Confidence:** proven statically. Supersedes E-0453's reading of `GIH@` as disabled.
+  Answers Q-0191 and the event-7 half of Q-0060.
+
+### E-0604 — Group volumes: SetAppMode resets groups 1, 4, 5 on every mode change; Numpad +/− step all six groups by 10; focus loss deactivates sounds
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `SetAppMode` (`0x00417ce0`), only when the mode changes: to 2 → groups 1,
+  4, 5 = 0; to any other → group 1 = 85, 4 = 80, 5 = 80. Direct stores to app `+0x47c`
+  bypass it: `Game_GoToUnit` (`0x00412fe9`, mode 1 while a unit loads), `0x00416cfe`
+  (boot, 2), `0x004267bc` (2). `LoadUnitScene` ends with `SetAppMode(0)` (`0x0041313b`);
+  `OptionScreen_LeaveSubmenu` (`0x00427377`), `LUser_SelectUser` (`0x004296c2`) and
+  `App_OnEscape` also call it (17 call sites). So a value OK writes to group 1 in Settings
+  (E-0450) lasts until the next mode change out of 2 (or out of 1 after a unit load),
+  which sets 85. `LSoundManager`'s constructor (`0x00422d70`) builds it as a
+  property-style listener (vtable `0x00439a88`) registered with the frame manager
+  (`DAT_0046edb0 +4`, `0x00422dbe`). `LSoundManager_OnEvent` (`0x00423740`): event 15
+  (key down, data = vk) with 0x6b (Numpad +) → groups 1..6 := min(volume + 10, 100);
+  0x6d (Numpad −) → max(volume − 10, 0); event 17 → `LSoundManager_SetActive(1)`, 18 →
+  `(0)` (`0x004237f0`: when the flag `+0x54` changes, `0x004229d0(flag)` on every sound
+  in `+0x48`). `FrameManager_OnMessage` (`0x0042bcc0`) sends 15 on `WM_KEYDOWN`
+  (`0x0042bd00`), 17 on `WM_ACTIVATE` active and not minimised, 18 on `WM_ACTIVATE`
+  inactive or minimised and on every `WM_ACTIVATEAPP` (`0x0042bdb3..0x0042bdee`); it is
+  reached only while a frame is open and `0x0046ec68` = 0 (`0x0042bc00`).
+- **Method:** MCP decompile; capstone.
+- **Confidence:** proven statically; what `0x004229d0` does to a sound was not read.
+  Answers Q-0190 (no lasting effect).
+
+### E-0605 — U00's gauge labels are only saved and loaded
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** the gauge is a heap object (scene `+0x148`, `0x00409890`), so every access
+  to its label is `[reg + 0x12]`. Capstone scan of `.text` for `+ 0x12]` operands:
+  `FUN_0041a560` (start, copies the label, `0x0041a5a2`), `Gauge_Stop` (`0x0041a680`,
+  clears it, `0x0041a689`), `Gauge_Load` (`0x0041a790`, chunk `JAUGE`, `0x0041a7ac`),
+  `Gauge_Save` (`0x0041a820`, `0x0041a848`); the other hits are stack locals
+  (`0x00417e6b`, `0x0042312c`, `0x0042a856`). The gauge's draw reads no label (E-0201).
+- **Method:** capstone scan; MCP decompile.
+- **Confidence:** proven. Answers Q-0110.
+
+### E-0606 — Animation nodes tick in insertion order; mouth nodes, appended last, override the body pose
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `AnimNode_TickList` (`0x0041fe90`): for each node, if bound and enabled
+  (`+0x64`), advance unless paused and `X3d_Object_Animate_Spline(object, anim, time, 0,
+  1)`; then recurse into `+0x50`; then the next sibling `+0x5c`. Insertion, node vtable
+  `+4` (`0x0041df60`, vtable `0x004399d8`) with flag 0: if `+0x50` is empty, `+0x50` :=
+  the new node (its `+0x54` := this), else recurse into `+0x50`: nodes form one `+0x50`
+  chain in insertion order, ticked first to last. `FUN_004217b0` inserts each mouth node
+  through scene `+0x158`'s `+4(node, 0)` in the load order `A`, `B`, `Ch`, `Ch_yeux`, `E`,
+  `F`, `O`, `Yeux` (E-0125), after the character's nodes (built at unit load). A later
+  `Animate` of the same object overwrites an earlier one within the tick.
+- **Method:** MCP decompile; capstone.
+- **Confidence:** proven for the order. Answers Q-0072.
+
+### E-0607 — The pick installs the any-corner face test; face `+0x38` is always 0
+- **Binary/file:** `MissionMonet.exe`, `x3d.dll`, `xd3d.dll`.
+- **Evidence:** the EXE calls `X3d_Init_Vtbl(1)` (`0x0041788f`), so `FUN_1000b690`
+  installs `0x1000106e` → `Face_IsFrontAnyCorner` (`0x1000b180`) as the face class test
+  (argument 0 would install `Face_IsFrontFirstCorner`, `0x1000b040`). `0x1000b180`, in
+  camera space: 0 when face `+0x38` ≠ 0; else it tries the corners in winding order,
+  starting with n = (v0 − v1) × (v2 − v1) against v0, then n = (v1 − v2) × (v3 − v2)
+  against v1, and so on around the polygon (wrapping), and returns 1 at the first corner
+  with n · v < −0.01, 0 when none. `X3d_Face_Create` (`0x100010fa`) allocates the face
+  with the host allocator `DAT_10028f00`, which `X3d_Init_Ptr` (`0x1000b620`) sets from its
+  6th argument; the EXE passes `calloc` (`0x00436682` → MSVCRTD `calloc`, push at
+  `0x0041786b`), so faces start zeroed. No instruction in `x3d.dll` stores to a face's
+  `+0x38` (the 14 `[reg + 0x38]` stores target cameras, lights, the scene or object
+  `+0xfc` data), and `xd3d.dll` has none.
+- **Method:** MCP decompile; capstone scans of both DLLs.
+- **Confidence:** proven for direct stores; block copies into faces were not enumerated.
+  Answers Q-0040.
+
+### E-0608 — When a frame consumes input in play, a blinking held-item cursor stops blinking
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** scene `+0x3c` = `Scene_OnFrameConsumedInput` (`0x0041b760`): if cursor
+  mode (`DAT_0046ec14 +4`) is 2, `Cursor_StopBlink` (`0x00414ba0`: frame counters
+  `+0x44c`/`+0x44e` = 0, `FUN_00414960(0)`: back to mode 1 with the saved held-item image
+  `+0x4d8`). Mode 2 is set only by `Cursor_StartBlink` (`0x00414b60`, 1000 / fps ms per
+  frame), called only from `Scene_UpdateHoverCursor` (`0x0041b695`) with 6 fps when the
+  held-item cursor is over a hotspot of kind 5; the same function stops it when the hover
+  leaves such a hotspot.
+- **Method:** MCP decompile.
+- **Confidence:** proven. With E-0603 answers Q-0060.

@@ -17,7 +17,7 @@ with their parent). The game finds views by id. A view is a rect plus:
 | `EIV#` | plain view: draws nothing, carries properties (most buttons are this: a hit rect over the background) |
 | `TIB#` | bitmap view: draws `Data/2DBIT/<bitmap>` (`.bmp` appended when the name has no `.`) at view position + (`bmp_dx`, `bmp_dy`); name `0` = no bitmap; `w`/`h` 0 take the bitmap's size |
 | `POL#` | bitmap view of the magnifier: pans its bitmap near the edges (Gallery, below) |
-| `cSU#` `AOL#` `VAS#` `RCS#` | list with scroll bar: players (`cSU#`), saves to load / to overwrite (Q-0061) |
+| `cSU#` `AOL#` `VAS#` `RCS#` | list with scroll bar: players (`cSU#`), saves to load / to overwrite (`save.md` "Lists") |
 | `dEU#` `dES#` `idE#` | one-line text edit: player name (max 30 chars), save name (max 40) |
 | `vop#` `bop#` | inventory strip and its arrows (below) |
 | `loV#` `AoV#` `BoV#` | volume slider base; music slider (group 1); voice slider (groups 2 + 3) (Settings, below) |
@@ -25,20 +25,26 @@ with their parent). The game finds views by id. A view is a rect plus:
 
 A view is drawn and hit-tested only while `visible` ≠ 0 (all corpus views start visible).
 
+**Clipping** (E-0602): a view's drawing and its hit rect are its own rect intersected with
+the rect of every ancestor whose `unk_7` is 1 (unless its own `unk_8` is 1; 0 in the
+corpus), then with the 640×480 screen. Parts cut away are neither drawn nor clickable nor
+hoverable. 34 of the 106 corpus views have `unk_7` = 1 (all of `PorteF`'s, among others).
+
 **Properties** give views behaviour. Each receives the view's events:
 
 | Tag | Data | Behaviour |
 |---|---|---|
 | `ucg@` | cursor kind | pointer enters → game cursor kind = value (0 default, 2 click, table in `interaction.md`); leaves → 0. Ignored while the cursor holds an item. |
 | `LIH@` | bitmap, dx, dy | hover highlight: while the pointer is inside, draw `bitmap` over the view at view position + (dx, dy) |
-| `GIH@` | as `LIH@` | same, but starts disabled |
+| `GIH@` | as `LIH@` | same, but (dx, dy) are absolute screen coordinates, not relative to the view, and the bitmap is not clipped (E-0603) |
 | `RCS@` | command | on press (event 4) run the named command (table below) |
 | `ARF@` `RUC@` `ARD@` `INA@` | | not used by any corpus frame |
 
 **Events** a view gets: 1 pointer left, 2 pointer entered, 3 pointer moved inside, 4 left
 button pressed on it (a click acts on press, not release), 13 released, 15 key pressed
-(sent to every property of the frame, with the virtual key). Event 7 redraws a hovered
-highlight; its sender is not traced (Q-0060).
+(sent to every property of the frame, with the virtual key), 12 pointer moved with the
+left button down (to the view pressed last). Event 7 follows each draw of the view, so a
+hovered highlight is drawn over its view every time the view is drawn (E-0603).
 
 ## Frame manager (E-0101)
 
@@ -52,7 +58,8 @@ highlight; its sender is not traced (Q-0060).
   - mouse: hit test from the last view in the list to the first, visible views only,
     point in rect; move sends 1/2/3 as the hovered view changes; press sends 4 to the
     hit view and remembers it; release sends 13 to that view.
-  A message a frame consumes never reaches the scene.
+  A message a frame consumes never reaches the scene; in play it only stops a blinking
+  held-item cursor (back to the steady item image, `interaction.md`, E-0608).
 - **Timer**: the manager runs a 50 ms Windows timer (`SetTimer`); frame animations (the
   inventory slide) advance one step per tick, not per rendered frame.
 - **Drawing**: in app mode 0 each rendered frame is 3D scene, then the open frames (list
@@ -101,7 +108,9 @@ Adding appends at the end; removing shifts every later item 70 px left.
 
 - **Arrows** (on press): right arrow shifts all items 70 px right if the scroll offset is
   below 0 (offset + 1); left arrow shifts them 70 px left if count + offset > 7
-  (offset − 1). Clipping of items shifted outside the strip: Q-0062.
+  (offset − 1). Items are clipped to the strip (57, 420, 535, 60) (E-0602): an item
+  shifted outside it is not drawn and cannot be clicked or hovered, and one that straddles
+  its edge shows and reacts only inside it.
 - **Click an item** (press): first, if the cursor holds an item, that item is stored in
   the bar (as below); then the cursor holds this item — cursor image name = item name
   with its 7th character replaced by `C` (`U01_04P` → `U01_04C`, 32×32), cursor mode
@@ -222,7 +231,8 @@ menu. **Cancel** (`ReglageAnnuler`): back to the menu, volumes unchanged.
 **Persistence.** None: no file stores a volume. G₂ and G₃ keep the value until the game
 exits (nothing else changes them). G₁ does not survive: every app-mode change sets it (0
 in mode 2, 85 otherwise, `sound.md`), so in the menu the music slider opens at 0 and the
-next change out of mode 2 replaces OK's value with 85 (Q-0190). An engine that wants a
+next change out of mode 2 replaces OK's value with 85 (E-0604: every way back to play
+passes `SetAppMode`, so the music slider has no lasting effect). An engine that wants a
 working music volume should keep it as a user setting and scale the mode rule by it
 (beyond parity).
 
@@ -285,8 +295,10 @@ background `GalerieFond`, a bar `GalerieBarre` at (73, 441) with the back button
 | 12 | `U13_06` | 262, 260, 64, 82 | 21 | `U14_07` | 544, 362, 79, 58 |
 
 A locked painting's thumbnail gets no bitmap and a zero size: not drawn, not clickable.
-Each thumbnail also carries a disabled `GIH@` (`<p>IndexA`, 194×111, at +49, +292); no code
-that enables it has been found, so draw nothing for it (Q-0191). Every screen change below shows the wait cursor (kind 1) while
+Each thumbnail also carries a `GIH@` (`<p>IndexA`, 194×111, at screen (49, 292)): while
+the pointer is over an unlocked thumbnail, draw its `<p>IndexA` caption at (49, 292) on
+top, besides the `LIH@` hover image. Locked thumbnails have all properties disabled, so
+they show neither (E-0603). Every screen change below shows the wait cursor (kind 1) while
 the frame loads, and each opens replacing the current frame.
 
 **`Tableau`** (the painting; `GoToTableau` takes the painting as the first 6 characters of

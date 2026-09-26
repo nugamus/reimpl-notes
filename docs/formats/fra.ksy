@@ -75,8 +75,10 @@ types:
         doc: id of the parent view, 0 = none; a child moves with its parent (0x00434670)
       - id: unk_7
         type: s4
+        doc: view +0x3c; 1 = descendants are clipped to this view (0x00434530, E-0602)
       - id: unk_8
         type: s4
+        doc: view +0x40; 1 = not clipped to ancestors (E-0602); 0 in all 106
 
   bitmap:
     doc: '#BIT constructor 0x00423ea0 reads 0x2c bytes.'
@@ -110,18 +112,24 @@ types:
       - id: name_a
         type: strz
         size: 32
+        doc: scroll-bar bitmap, as tall as the view, drawn at its right edge (E-0600)
       - id: unk_a
         type: s4
+        doc: up-arrow height, +0x54 (33 in the corpus)
       - id: unk_b
         type: s4
+        doc: down-arrow height, +0x58 (33)
       - id: name_b
         type: strz
         size: 32
+        doc: thumb bitmap
       - id: name_c
         type: strz
         size: 32
+        doc: content bitmap of the base class; the three list classes ignore it
       - id: unk_c
         type: s4
+        doc: row step, +0x5c; the three list classes replace it with 32
 
   vol:
     doc: '#Vol constructor 0x00434d30 reads 0x24 bytes.'

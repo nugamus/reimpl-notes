@@ -34,6 +34,13 @@ sets G₁ = 85, G₄ = 80, G₅ = 80; a change to mode 2 (2D frame over the scen
 voice and effects keep playing under a frame. Changing G re-applies it to that group's
 sounds at once.
 
+**Keys and focus** (E-0604), while at least one 2D frame is open (the frame manager passes
+messages on only then; `ui.md`): Numpad + raises all six groups by 10 (at most 100),
+Numpad − lowers them by 10 (at least 0); the next app-mode change still resets G₁, G₄, G₅.
+When the window loses focus or is minimised every sound is deactivated, and reactivated
+when it becomes active again. The Settings screen's music slider sets G₁ only until the
+next app-mode change (`ui.md` Settings).
+
 | Group | Use in U01 | Start rule |
 |---:|---|---|
 | 1 | Ambient / music: step op 12, the unit's own loop `u01.wav` | op 12 starts another sound; nothing stops the group except the unit |
@@ -137,9 +144,11 @@ object is used. It becomes an animation node bound to the face object (so it pos
 face dummy and, by `animation.md`'s recursive Animate, the mouth, cheeks, brows and eyes
 under it), at 15 fps, looping, **disabled** (not ticked) and paused. Missing files leave
 their slot empty; empty slots 1..8 and slot 0 then point to the lowest-numbered loaded
-clip. These nodes are added to the scene's node list after the character's own nodes, so
-when enabled they override the body animation's pose of the face subtree (inferred from the
-list order, Q-0072).
+clip. These nodes are added to the scene's node list after the character's own nodes, and
+nodes are animated in the order they were added (E-0606), so when enabled they override
+the body animation's pose of the face subtree. If two mouth slots are enabled at once, the
+one loaded later (order `A`, `B`, `Ch`, `Ch_yeux`, `E`, `F`, `O`, `Yeux`) wins; in
+particular slot 8 (`A`), left enabled when a talk ends, never hides another enabled slot.
 
 ### Say(character, name)
 
@@ -203,7 +212,8 @@ and "past the last record", so the mouth can stop before the voice (Q-0070).
 | `OpenDoor`, `CloseDoor`, `TelGrisi`, `s1_05`, `s1_13`, `S1_10` | U01's action handlers (`interaction.md`) | effects |
 | `s1_11` | U01 code, at a position | voice emitter |
 | `s1_12` | the train departure (below) | effects, looping |
-| `d1_04`, `d1_05`, `telgrisi2` | U01 code paths not traced here (Q-0073) | |
+| `d1_04`, `d1_05` | `ClickMaire` (`u01.md`, E-0084) | voice (talk) |
+| `telgrisi2` | the phone call (`u01.md`, E-0085) | its own emitter at the phone, looping |
 
 **Train departure** (`0x00401b90`, when the `Train2` clip of `Anim/U01_20A.A3D` reaches
 its last frame): play `s1_12` looping on the effects emitter at the eye, stop group 1 (the

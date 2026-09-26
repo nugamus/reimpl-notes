@@ -189,7 +189,7 @@ Opened by `SaveOui` on the "Do you want to save?" frame (`ui.md` "Escape").
   (runtime: dim with no selection, bright with one); the Option menu greys "Load a game"
   when the player has no save (`ui.md`).
 
-## Lists (E-0184, E-0185; answers most of Q-0061)
+## Lists (E-0184, E-0185, E-0600)
 
 The three list classes (`#SCR` subclasses `#LOA` = `AOL#`, `#SAV` = `VAS#`, `#USc` =
 `cSU#`) draw the same way:
@@ -199,11 +199,34 @@ The three list classes (`#SCR` subclasses `#LOA` = `AOL#`, `#SAV` = `VAS#`, `#US
 - Each row: text centred horizontally and vertically in (0, 32·row, w − 38, 32), single
   line, GDI, colour (247, 196, 90) for the selected row and (135, 186, 235) otherwise,
   on the frame background (the list surface is colour-keyed, key RGB (32, 32, 80)).
-- The scroll bar (arrow bitmap `name_a`, thumb `name_b` of `fra.ksy` `scroll`) is not
-  specified (Q-0061 stays open for it).
+
+**Scroll bar** (E-0600). Scroll position p (the top row), 0 ≤ p ≤ max, max = rows −
+⌊view h / 32⌋ (players: player count − 9; saves: 98 − 9 = 89; loads: used saves − 10).
+With R the view rect, up = down = 33 (`fra.ksy` `scroll.unk_a`, `unk_b`), track length
+L = R.h − 66, f = L / max (float), bar width w_b and thumb height h_t from the bitmaps:
+- **Draw**, only when max > 0 (players list: max ≥ 0; with max = 0 its thumb position is
+  undefined, so draw the bar only): bitmap `name_a` (`UserASC` 29×288, `SaveAsc` 29×288,
+  `LoadASC` 34×320: the whole bar with both arrows, as tall as the view) at
+  (R.right − w_b, R.top); bitmap `name_b` (`UserBoule`/`SaveBoule` 29×13, `LoadBoule`
+  34×14) at (R.right − w_b, trunc(R.top + 33 + p · f − ⌊h_t / 2⌋)). Both are blitted
+  like the `LIH@` highlights (same blit flags).
+- **Press** (left button down, only when max > 0), inside the column
+  R.right − w_b ≤ x < R.right, first match wins: y < R.top + 33 → p − 1 (if p > 0);
+  y ≥ R.bottom − 33 → p + 1 (if p < max); within ⌊h_t / 2⌋ of the thumb centre
+  c = trunc(R.top + 33 + p · f) → start dragging; elsewhere between the arrows → one page
+  (page = ⌊R.h / 32⌋ rows; players and saves 9, loads 10) up if y ≤ R.top + 33 + p · f,
+  else down, clamped to 0..max. A press outside the column goes to the rows.
+- **Drag** (mouse moves with the button down after a thumb press): d = y − R.top − 33,
+  s = trunc(L / max) px per row, p = d div s, plus 1 when d mod s > s div 2, clamped to
+  0..max. Releasing the button ends the drag.
+- Every change of p redraws the rows from the new top.
 
 **Players list** (`OptionUser` id 10): one row per existing player in index order, text
-`"<number> - <name>"` (which number: Q-0102). A click selects the row and copies that
+`"<n> - <name>"` where n is the row's position on screen counted from the scroll
+position: the first visible row is p + 1, the next p + 2, … (not the player's `User_<i>`
+index; E-0601). Scrolled by p, the rows show the used player slots from slot p on (the
+original starts the slot walk at slot index p, so with gaps in the slots a scrolled list
+can start with a player that was already above; parity keeps that). A click selects the row and copies that
 player's name into the name edit (id 11); it does not select the player: OK (or Enter)
 does (`ui.md` `SelectUser`). Typing in the edit selects the row whose name matches and
 switches the OK bitmap (`UserOKM` with text, `UserOKN` when empty). The edit starts with
