@@ -981,3 +981,15 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Next to try:** the engine's `where` at that spot for the ground height versus eye − 60;
   in the original, read camera `+0x1c` and the ground ray (`FUN_00416000`) there.
 - **Status:** open
+
+### Q-0197 — Do the unit input hooks see this step's ground object or the previous one?
+- **Context:** the flow audit of U07 (E-0619) reads the original as running the generic
+  camera input before a unit's ground tests in the same frame; the engine calls the unit
+  input hook first, so ground-object triggers (U00 boat, U02 fall, U04 window/boat, U07
+  plank/water) test the ground of the previous step, one step late.
+- **What we checked:** U07 only (`0x00411850`). Not checked across units or against
+  `Scene_HandleInput` (`0x0041b7f0`) and U01's hook (E-0083), which calls it itself.
+- **Blocks:** nothing visible; a one-step lag on triggers that fire on entering an object.
+- **Next to try:** per unit, the order of `Scene_HandleInput` and the ground read in the
+  unit vtable `+0x40` hook; move the engine's call if it differs.
+- **Status:** open
