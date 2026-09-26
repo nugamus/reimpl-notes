@@ -314,3 +314,12 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   the menu is opened outside the museum), a flag left over from another scene would not
   reach the museum.
 - **Status:** RESOLVED (see E-0017)
+
+### Q-0359 — Are the slots redrawn where a puzzle step names only a background?
+- **Context:** `a03.md` zone 4, object 6, steps 3 and 4 ("voice `A03_012c`, background
+  `a03_012a`, back to 2"; "Background and looping sprite `A03_012<e + h>`") say
+  "background" without "the slots", unlike the other steps.
+- **What we checked:** the spec; the engine follows it literally, so the object slots on the
+  left are blank from those steps until the run ends (seen in a click run).
+- **Blocks:** whether the slots stay visible during the moving-target step.
+- **Status:** open
