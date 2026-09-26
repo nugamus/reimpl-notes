@@ -61,7 +61,7 @@ two callbacks and the start camera):
    the entry `<scene>.3DC` (the scene tree, E-0014, with its `.3DM` textures); attach it
    under the camera object (0x435880: the scene root becomes a child of handle 0); set the
    word at +0xd0 of every node of the scene's handle group to 0xF (0x435930, `15 & 0x1F1F`;
-   read by the renderer, role not traced here); load
+   the brightness: shade row 31 - 15 = 16 for every pixel, `render.md` "Lighting", E-0508); load
    `BOX.3DI`, the scene's collision faces (E-0016), start the collision world (0x432df0)
    with one moving body, the viewer (0x432e70, flags 0xF, `movement.md`), and register
    `BOX.3DI` in it (0x432e10).
