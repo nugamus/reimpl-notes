@@ -464,3 +464,30 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   three tracks, 306 only 'Z' with sound, 132 only empty 'Z'.
 - **Method:** decompiles; census over the DVD `.cnm`.
 - **Confidence:** proven
+
+### E-0030 — Boot sequence, zone numbering, start-up screens and the frame loop (DVD)
+- **Binary/file:** `RING_DVD.EXE`: CRT entry 0x46fbfc → WinMain 0x40f720; 0x40f460 (window,
+  DirectDraw, timer 100); window procedure 0x40eec0 (timers 100/101, mouse, keys,
+  `WM_CLOSE`); `aApplication::Init` 0x407b80; 0x430ed0, 0x431040, 0x4314a0; frame 0x40e9f0;
+  zone folders 0x402010, characters 0x4020b0, `GetreadFrom` 0x402130
+- **Evidence:** as written in `engines/ring/docs/spec/boot.md`, each step read from the
+  named function: `CreateWindowExA(8, "Ring", "Ring", 0x90000000, 0, 0, 0x280, 0x1e0)`,
+  0x40e740(0x280, 0x1e0, 0x10), `SetTimer(100, 3000)`; timer 100 creates the application
+  (`operator new(0xa6)`, 0x407750), calls Init, 0x430ed0, 0x431040 and `SetTimer(0x65,
+  2000)`; timer 0x65 calls 0x4314a0 and `StartMenu(0)`. 0x402010 returns `sy ni rh fo ro wa
+  as n2` for 1..8; 0x4020b0 returns "" for 1, Alberich (2, 3), Siegmund (4), Loge (5, 8),
+  Brünnhilde (6), Dril (7). Init stores the `ART_SY`, `ART_AS`, `ART_NI`, `ART_N2`,
+  `ART_RO`, `ART_RH`, `ART_WA`, `ART_FO` values at app+0x4b..0x52 in that order;
+  `GetreadFrom` maps zone 1..8 to +0x4b, +0x4d, +0x50, +0x52, +0x4f, +0x51, +0x4c, +0x4e.
+  0x431040 calls 0x4662a0, 0x4635a0, 0x45eb30, 0x45b610, 0x458a90, 0x455a50, 0x44f3e0,
+  0x44ab00 with app+0x58 set from +0x4b, +0x4c, +0x4d, +0x4e, +0x4f, +0x50, +0x52, +0x51
+  (so they are the SY, AS, NI, N2, RO, RH, FO, WA set-ups). 0x4314a0 plays `logo`
+  (0x401490 builds `…\PLA\` + name + `.cnm`; DVD `DATA/SY/PLA/LOGO.CNM`) and fades the
+  `beg*.bmp` pictures (20 frames, holds 3000/0/6000 ms) with Escape checks between.
+  The frame clears the rectangles (0, 0)–(640, 16) and (0, 0x1d0)–(640, 0x1e0) with a
+  colour fill, then switches on 0x40b7c0 (0..4).
+- **Reference:** Templier's `shared.h` zone ids (SY 1, NI 2, RH 3, FO 4, RO 5) agree; his
+  `ApplicationRing::setup`/`showStartupScreen` cover the same steps.
+- **Method:** decompiles in `engines/ring/notes/decomp/` (define_and_decompile for the
+  window procedure and 0x40e9f0).
+- **Confidence:** proven

@@ -67,3 +67,12 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** the file; the ISO EXE's Play has not been read yet.
 - **Blocks:** faithful playback of one ISO-version video (FO zone transition).
 - **Status:** open
+
+### Q-0006 — How does the DVD EXE resolve a data path (install dir vs CD path)?
+- **Context:** spec/boot.md: paths are built from app+0x6b (0x402460), the string at
+  app+0x14 (0x402470, the `CDPATH` value set by 0x40b4d0) and the one at app+0x18
+  (0x402480), with formats like `%s%s\%s\%s\%s`.
+- **What we checked:** the three getters; not yet the callers' choice between them.
+- **Blocks:** nothing for ScummVM (everything is under one game directory), but the spec
+  of file lookup should say which prefix each kind of file uses.
+- **Status:** open
