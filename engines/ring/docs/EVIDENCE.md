@@ -608,3 +608,13 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   which loops on `GetTickCount` until `hold` ms passed or Escape is down.
 - **Method:** decompiles and disassembly (0x401f05..0x401f19, 0x402890..0x4028c5).
 - **Confidence:** proven
+
+### E-0038 — The ten languages and their channels; PlyCin plays channel 0
+- **Binary/file:** `RING_DVD.EXE` `aApplication::Init` 0x407b80 (calls at the top of the
+  function), strings 0x485a48..0x485a6c; `PlyCin` 0x401490
+- **Evidence:** `AddLanguage(1, ENG, ENG, 1)`, `(2, FRA, FRA, 2)`, `(3, GER, GER, 3)`,
+  `(4, ITA, ITA, 1)`, `(5, SPA, SPA, 2)`, `(6, SWE, SWE, 1)`, `(7, HOL, HOL, 3)`,
+  `(8, HEB, HEB, 1)`, `(9, GRE, GRE, 1)`, `(10, SLO, SLO, 1)`. PlyCin calls
+  `aCinMov::Init(path, name, device, 1, 0)`: channel 0.
+- **Method:** decompile.
+- **Confidence:** proven

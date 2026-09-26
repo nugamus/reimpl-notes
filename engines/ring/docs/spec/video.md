@@ -16,8 +16,8 @@ Evidence: E-0037 (and E-0024, E-0028, E-0029 for the file format). Addresses are
   now + 50 ms, the player waits until 50 ms before it is due, then decodes and draws it;
   if it is already late, the chunk is skipped unread (`aCin::Decompress` 0x42cb90 only
   seeks past it).
-- **Sound:** the sound chunk of the language channel (`spec` E-0029: 'Z' for channels 0/1,
-  'A' for 2, 'B' for 3) is appended to one streaming sound as raw PCM in the header's
+- **Sound:** the sound chunks of the caller's channel (E-0029: 'Z' for channels 0 and 1,
+  'A' for 2, 'B' for 3; `PlyCin` passes 0, `PlyCinMul` a channel argument) are appended to one streaming sound as raw PCM in the header's
   format; the other channels are skipped. The stream starts with the first sound chunk.
 - **Subtitles:** `aCinMov::Init` looks for `<name>.dia` in the language's DIA folder; when
   present it is shown as a dialogue during the video (`spec/dialogue.md`, to come).

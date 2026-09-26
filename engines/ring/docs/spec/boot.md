@@ -28,7 +28,9 @@ the application exists, it reads the cursor position and runs one frame (0x40e9f
 
 ## aApplication::Init (0x407b80)
 
-Registers ten languages (`AddLanguage`), then reads `fl.ini` (formats README
+Registers ten languages (`AddLanguage(id, name, folder, channel)`): 1 ENG 1, 2 FRA 2,
+3 GER 3, 4 ITA 1, 5 SPA 2, 6 SWE 1, 7 HOL 3, 8 HEB 1, 9 GRE 1, 10 SLO 1 (name and folder
+are the same three letters). Then it reads `fl.ini` (formats README
 "Configuration files"): `CDPATH` (the literal `CDROM` sets a flag at app+0x1c; the value is
 stored as the CD path, a `\` appended), `LANGUAGE` (`SetActLanguage`), `CHECKCD`, the
 `SOUNDCHUNCK_*`/`LOADFROM_*` pairs, `ART_*` and `CHECKLOADSAVE`. `ART_x: 1` makes zone x
