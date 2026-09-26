@@ -1,0 +1,9 @@
+# Formats (Peintre engine, Mission Sunlight)
+
+One row per recovered format: status here, the Kaitai spec next to it (`<fmt>.ksy`), the
+validator in `engines/peintre/tools/parsers/<fmt>.py` (with `--selftest`), the proof in
+`EVIDENCE.md`. A format is done only when its validator passes 100% of that type in
+`games/mission-sunlight/discs/cd`, every byte consumed.
+
+| Format | Files | Validator | Spec | Evidence | Status |
+|---|---:|---|---|---|---|
