@@ -370,7 +370,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** a faithful per-second turn rate in the engine (it uses a provisional tick).
 - **Next to try:** in the original, hold Right for 10 s in U01 and count full turns
   (dgVoodoo caps at 60 fps, `traces/INDEX.md`); read `H3d_Show_BackBuffer`'s flip flags.
-- **Status:** open
+- **Status:** RESOLVED (E-0541): fullscreen presents with a vsync'd Flip, so one frame and
+  one 0.06-rad turn step per display refresh: 3.6 rad/s at 60 Hz.
 
 ### Q-0023 — Which side of a face is its front for collision?
 - **Context:** E-0048: sphere and segment tests use face `+0x40` (`+8` plane normal, `+4`
@@ -715,7 +716,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   `U16_01`, `U14_01`, `U13_11`.
 - **Next to try:** decompile the class created for `TableauJeu` and its `+0x114`; parse
   `2DFRA/TableauJeu.fra` with `fra.py`; spec it in `ui.md`.
-- **Status:** open
+- **Status:** RESOLVED (E-0457): full-screen `<name>.bmp`, cursor 2, a click
+  (`FinTableauJeu`) closes it; `ui.md` "Other frames".
 
 ### Q-0140 — What does the original do on a U03 restore made after the clown's trick?
 - **Context:** `u03.md`, E-0301, E-0303. U03 writes no unit chunk. On restore with M10
@@ -837,7 +839,9 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   (`BARKE_TOURNEROND`) can reach it.
 - **Next to try:** `o3d.py`/`a3d.py` over `Static/U04.o3d`, `BARKE_TRAJECTOIRE1.A3D`,
   `BARKE_TOURNEROND.A3D`: the key's position against the path; then a live row.
-- **Status:** open
+- **Status:** RESOLVED (E-0540): with both oars the boat passes over the key, within 80
+  units for Traj frames 296..713; the one-oar circle never gets closer than 153. Water
+  occluding the pick is not checked.
 
 ### Q-0180 — Which duplicates do U33's renames hit (`GeoSphere0/1`, `pedalegch`, `pedaledrt`)?
 - **Context:** E-0421. `X3d_Scene_Get_Object` takes the first match in X3D's list:

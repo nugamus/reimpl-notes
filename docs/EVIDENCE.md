@@ -4368,3 +4368,37 @@ An entry at `tentative` confidence must also have a matching line in
   item is used up.
 - **Method:** capstone; MCP decompile.
 - **Confidence:** proven. Answers Q-0173.
+
+### E-0540 — U04's key lies under the two-oar trajectory: within 80 units of the eye for Traj frames 296..713; the one-oar circle never comes within 153
+- **Binary/file:** `Data/U04/Static/U04.O3D`, `Data/U04/Anim/BARKE_TRAJECTOIRE1.A3D`,
+  `BARKE_TOURNEROND.A3D`, `BARKE_PLACEMENT.O3D`.
+- **Evidence:** `*U04_36` (child of `$$$DUMMY.Dummy01` in `Static/U04.O3D`, 89 vertices,
+  not welded), world transform per E-0042: vertices span x 35.9..49.1, y −75.5..−58.8,
+  z −70.6..−67.5 (centre (47.0, −68.4, −67.9)). The boat root `*U04_32`'s translation
+  track (the eye is the boat's position + (0, 0, 10), E-0338), keys linearly
+  interpolated: `BARKE_TRAJECTOIRE1` (0..1338, 21 keys) passes about 2 units beside the key
+  horizontally near frame 440, eye z −11.6, 55.9 from the nearest key vertex; the key's
+  centre is within 80 of the eye for frames 296..713 (418 frames, 13.9 s at the clip's
+  30 fps), the horizontal distance there running 0..57. `BARKE_TOURNEROND` (1..800, 9
+  keys) stays at least 153 from every key vertex. On the boat the camera keeps can turn
+  (`+0x44` is not cleared, E-0338), so the player can look down (PgDn, `movement.md`).
+- **Method:** `o3d.py`, `a3d.py`, numpy transform of the key's vertices (script not kept);
+  the spline between keys is approximated linearly.
+- **Confidence:** proven for the geometry to within the key interpolation. Whether a face
+  between the eye and the key (the water) takes the pick first is not checked. Answers
+  Q-0150: the key is in the 80-unit pick reach only with both oars.
+
+### E-0541 — The original's frame rate is the monitor's refresh: fullscreen presents with a vsync'd `Flip`
+- **Binary/file:** `h3d.dll`.
+- **Evidence:** `H3d_Show_BackBuffer` (export 48): when context `+0x234d8` (the fullscreen
+  flag `ctx[0x8d36]` of E-0029) is 0 (windowed), `IDirectDrawSurface::Blt(front, rect,
+  back, 0, DDBLT_WAIT)` (`0x1000000`), no vertical-blank wait; otherwise `Flip(back,
+  DDFLIP_WAIT)` (1), which in DirectDraw waits for the vertical blank (no
+  `DDFLIP_NOVSYNC`). Fullscreen is the shipping default (the dialog sets the flag to 1,
+  E-0029), and the EXE has no other frame cap (E-0046). So a machine that renders faster
+  than the display runs one frame, one logic step and one 0.06-rad turn step per refresh:
+  3.6 rad/s (a full turn in 1.75 s) at 60 Hz, 4.5 rad/s at 75 Hz; slower machines turn
+  slower.
+- **Method:** MCP decompile.
+- **Confidence:** proven for the present call. Answers Q-0022 as far as the original
+  defines it: the per-second rate is the refresh rate's, with 60 Hz the common value.

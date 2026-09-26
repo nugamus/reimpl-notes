@@ -16,8 +16,8 @@ One iteration of the main loop, while the app is in mode 0 (running scene):
 4. Unless input is suspended (app `+0x480`): **camera input** (`+0x40`), which moves the
    camera for the next frame.
 
-There is exactly one logic step per rendered frame and no frame cap in the EXE (a cap, if
-any, is the driver's page flip: Q-0022). The clock is `QueryPerformanceCounter`, read right
+There is exactly one logic step per rendered frame and no frame cap in the EXE (fullscreen, the
+default, presents with a vsync'd `Flip`, so the rate is the display's refresh, E-0541). The clock is `QueryPerformanceCounter`, read right
 after the render: `fps = frequency / (counter − previous counter)`, i.e. the reciprocal of
 the time between the last two presents. The X3D DLLs have no clock.
 
@@ -31,9 +31,9 @@ until `timeGetTime` has advanced `ms` (0 = one frame).
 
 Run logic in fixed ticks, render as often as possible, interpolate the camera between the
 last two ticks. Movement: per tick move `speed · s · dt`. Turning: the original's 0.06 rad
-per rendered frame has no per-second value until Q-0022 is answered; the engine uses
-0.06 rad per tick at 60 ticks per second, which matches the original under dgVoodoo's
-60 fps cap (E-0059) and is provisional until then.
+per rendered frame is per display refresh (E-0541); the engine uses 0.06 rad per tick at
+60 ticks per second (3.6 rad/s), the original on a 60 Hz display (and under dgVoodoo's
+60 fps cap, E-0059).
 
 ## Camera state (E-0047)
 
