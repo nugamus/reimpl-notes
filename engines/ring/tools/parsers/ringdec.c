@@ -70,3 +70,34 @@ __declspec(dllexport) int ring_decode(const uint8_t *buf, size_t len, int vbits,
 	*endpos = pos;
 	return (int)n;
 }
+
+/* Mono sound DPCM (RING_DVD.EXE 0x47bc20, called with vbits 10 from 0x47bbf0): 3 bits
+ * skipped, then nsamples codes: 0 + vbits: delta d (d > 0x1ff: 0x200 - d), times 64;
+ * 1: the previous delta again. Each code adds the delta to the running sample. state[0]
+ * is the sample, state[1] the delta; both carry over between chunks. */
+__declspec(dllexport) int ring_dpcm(const uint8_t *buf, size_t len, uint32_t pos, int vbits,
+                                    int nsamples, int16_t *out, int16_t *state,
+                                    uint32_t *endpos)
+{
+	int16_t sample = state[0], delta = state[1];
+	pos += 3;
+	for (int n = 0; n < nsamples; n++) {
+		uint32_t w = window(buf, len, pos);
+		int sh = 31 - (int)(pos & 7);
+		if (!((w >> sh) & 1)) {
+			int16_t d = (int16_t)((w << (32 - sh)) >> (32 - vbits));
+			if (d > 0x1ff)
+				d = (int16_t)(0x200 - d);
+			delta = (int16_t)(d * 0x40);
+			pos += vbits + 1;
+		} else {
+			pos += 1;
+		}
+		sample = (int16_t)(sample + delta);
+		out[n] = sample;
+	}
+	state[0] = sample;
+	state[1] = delta;
+	*endpos = pos;
+	return nsamples;
+}

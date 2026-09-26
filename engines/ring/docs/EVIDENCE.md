@@ -185,7 +185,7 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   the data blocks for NUL-terminated strings, xrefs to functions).
 - **Confidence:** strong
 
-### E-0014 — Few virtual methods: 34 vtables in the DVD EXE, most with one entry
+### E-0014 — Few virtual methods: 34 vtables in the DVD EXE, most with one entry (entry counts SUPERSEDED by E-0023)
 - **Binary/file:** the four programs; `engines/ring/notes/vtables/*.md`
 - **Evidence:** tables installed by `MOV dword ptr [reg], imm32` whose target is a run of
   function entries: DVD 34 (0x47e380..0x47f100), ISO 35, CD 39, Prophet 34; 28 of the DVD's
@@ -311,3 +311,51 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   `python engines/ring/tools/parsers/aqc.py`: 587 files, 351 distinct, 100%.
 - **Confidence:** proven (layout, counts); what the 4 pixels per index are is the
   rotation renderer's spec.
+
+### E-0021 — .wac is mono DPCM in 256-sample chunks, .was stereo packed bit stream; 53 DVD files are damaged
+- **Binary/file:** `RING_DVD.EXE` vtables 0x47f0a8 (`aSecComSou`: 0x47a900, Init 0x47a970,
+  0x47aa90, DecompressHeader 0x47aaf0, Decompress 0x47ac90, …) and 0x47f0d4
+  (`aSecComSouMono`: …, Init 0x47b0d0, DecompressHeader 0x47b250, Decompress 0x47b3b0);
+  decoders 0x430a80 and 0x47bc20; every `.wac` and `.was`
+- **Evidence:** Init calls the vtable slot +0xc (DecompressHeader). Stereo header: 0x3c
+  bytes = chunk count, WAV size, 11 dwords (44-byte WAV header), first packed and unpacked
+  size; each chunk read is packed+8 bytes (the next sizes ride along) and decoded by
+  0x430a80, the packed bit stream with literals `<< 4` (called with 12, 6). Mono header:
+  0x36 bytes = count, size, 44 bytes, u16 first chunk size; each chunk is decoded by
+  0x47bc20 (called with 10 from 0x47bbf0) which starts 3 bits in and emits 0x100 samples:
+  `0`+10 bits d (d > 0x1ff → 0x200 − d), delta = d·0x40; `1` = previous delta; sample +=
+  delta, both carried over. Split functions: 0x47ac90 and 0x47b3b0 were inside 0x47aaf0 /
+  0x47b250 after auto-analysis (`tools/ghidra/scripts/split_function.py`). Corpus: 4,690
+  files; 4,637 (2,638 distinct) parse to the last byte: mono wav_size = 44 + 512·count,
+  every chunk's 256 samples end fewer than 8 bits before its end, the 3 leading bits are 0
+  in every chunk; stereo wav_size = 44 + Σ unpacked, codes = unpacked/2 (+1). Rates 22,050
+  (all but two), 16,000 (one .was), 44,100 (one .wac); 6 headers have `fact` after `fmt `.
+  53 files (53 distinct), all DVD `SOUND/{SPA,ITA,HOL,SWE}/*.WAC`, are damaged: in 52 the
+  chunk chain breaks at a chunk that crosses a 64 KiB file offset (the size field there
+  is wrong and about 4 KB of bytes after it decode as nothing; a valid chain resumes
+  later, e.g. `AS/SOUND/ITA/1106.WAC` breaks at 0xff93 and resumes at 0x11144); in
+  `N2/SOUND/ITA/1437.WAC` the 44 header bytes are not a WAV header.
+- **Reference:** `reference/templier-scummvm-ring/engines/ring/sound/sound_loader.cpp`
+  (same split into mono and stereo loaders).
+- **Method:** decompiles; `python engines/ring/tools/parsers/wac.py` (C `ring_dpcm` and
+  Python `py_dpcm` agree, `bitstream.py --selftest`): 100% of the undamaged files; the
+  damaged list `parsers/wac_damaged.txt`.
+- **Confidence:** proven
+
+### E-0022 — Plain .wav files are standard RIFF WAVE
+- **Binary/file:** 744 `.wav` (210 distinct), e.g. DVD `DATA/SY/SOUND`, CD disc 6 `data/WA`
+- **Evidence:** RIFF size + 8 = file size; chunks even-padded to the end; PCM `fmt ` and
+  `data` in every file. The EXEs import WINMM `mmioOpenA`/`mmioDescend`/`mmioRead`
+  (E-0002).
+- **Method:** `python engines/ring/tools/parsers/wav.py`: 100%.
+- **Confidence:** proven
+
+### E-0023 — E-0014's vtable entry counts are lower bounds
+- **Binary/file:** `RING_DVD.EXE` vtable 0x47f0a8
+- **Evidence:** the table continues past the 3 entries `ring_vtables.py` reported
+  (0x47aaf0, 0x47ac90, 0x47afe0, … are slots +0xc, +0x10, …, used through `call [eax+0xc]`
+  in `aSecComSou::Init`): the script stops at the first slot that Ghidra has not made a
+  function, and vtable-only methods often are not. The table census stands; entry counts
+  and "single entry" do not.
+- **Method:** raw dwords at 0x47f0a0, decompile of `aSecComSou::Init`.
+- **Confidence:** proven

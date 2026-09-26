@@ -73,6 +73,10 @@ def _load():
                                     ctypes.c_uint32, ctypes.c_uint32,
                                     ctypes.POINTER(ctypes.c_uint16), ctypes.c_size_t,
                                     ctypes.POINTER(ctypes.c_uint32)]
+        lib.ring_dpcm.restype = ctypes.c_int
+        lib.ring_dpcm.argtypes = [ctypes.c_char_p, ctypes.c_size_t, ctypes.c_uint32, ctypes.c_int,
+                                  ctypes.c_int, ctypes.POINTER(ctypes.c_int16),
+                                  ctypes.POINTER(ctypes.c_int16), ctypes.POINTER(ctypes.c_uint32)]
         _lib = lib
     return _lib
 
@@ -84,6 +88,39 @@ def decode(buf: bytes, vbits: int, ibits: int, pos: int, end: int, max_codes: in
     endpos = ctypes.c_uint32()
     n = lib.ring_decode(buf, len(buf), vbits, ibits, pos, end, out, cap, ctypes.byref(endpos))
     return out[:n], endpos.value
+
+
+def py_dpcm(buf: bytes, pos: int, vbits: int, nsamples: int, state: list[int]):
+    """Mono sound DPCM (0x47bc20): returns (samples, end bit); updates state [sample, delta]."""
+    sample, delta = state
+    pos += 3
+    out = []
+    for _ in range(nsamples):
+        o = pos >> 3
+        w = int.from_bytes(buf[o:o + 4].ljust(4, b"\0"), "big")
+        sh = 31 - (pos & 7)
+        if not (w >> sh) & 1:
+            d = ((w << (32 - sh)) & 0xFFFFFFFF) >> (32 - vbits)
+            if d > 0x1FF:
+                d = 0x200 - d
+            delta = ((d * 0x40 + 0x8000) & 0xFFFF) - 0x8000
+            pos += vbits + 1
+        else:
+            pos += 1
+        sample = ((sample + delta + 0x8000) & 0xFFFF) - 0x8000
+        out.append(sample)
+    state[:] = [sample, delta]
+    return out, pos
+
+
+def dpcm(buf: bytes, pos: int, vbits: int, nsamples: int, state: list[int]):
+    lib = _load()
+    out = (ctypes.c_int16 * nsamples)()
+    st = (ctypes.c_int16 * 2)(*state)
+    endpos = ctypes.c_uint32()
+    lib.ring_dpcm(buf, len(buf), pos, vbits, nsamples, out, st, ctypes.byref(endpos))
+    state[:] = [st[0], st[1]]
+    return list(out), endpos.value
 
 
 def selftest() -> None:
@@ -101,6 +138,9 @@ def selftest() -> None:
     blob = bytes(rnd.randrange(256) for _ in range(4000))
     for vb, ib in ((16, 6), (11, 6), (13, 6)):
         assert py_decode(blob, vb, ib, 3, 30000, 10**6) == decode(blob, vb, ib, 3, 30000, 10**6)
+    for start in (0, 5):
+        a, b = [0, 0], [0, 0]
+        assert py_dpcm(blob, start, 10, 256, a) == dpcm(blob, start, 10, 256, b) and a == b
     print("selftest ok")
 
 

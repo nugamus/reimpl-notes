@@ -115,10 +115,10 @@ def run(parser: Callable[[bytes], object], loose: tuple[str, ...], members: tupl
     bad = sum(1 for v in seen.values() if v)
     print(f"loose: {' '.join(loose) or '-'}  members: {' '.join(members) or '-'} "
           f"(of {' '.join(archives)})")
-    print(f"files: {total}  not this type: {len(excluded)}  distinct parsed: {distinct}  "
+    print(f"files: {total}  excluded: {len(excluded)}  distinct parsed: {distinct}  "
           f"passed: {distinct - bad}  failed: {bad}")
     for label, why in excluded:
-        print(f"  NOT THIS TYPE {label}: {why}")
+        print(f"  EXCLUDED {label}: {why}")
     for label, err in failures[:limit]:
         print(f"  FAIL {label}  {err}")
     ok = total > 0 and bad == 0

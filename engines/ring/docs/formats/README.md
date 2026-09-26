@@ -17,6 +17,8 @@ The corpus of a type is its loose files and the members of every archive of that
 | Packed TGA (TGC): `.tga` members of `.at2` | 22,868 (1,501) | `tgc.py` | `tgc.ksy` | E-0018 | done |
 | Plain BMP / TGA on disk | 53 (21) + 3 misnamed text | `bmp.py` | below | E-0019 | done |
 | `.aqc` panorama node | 587 (351) | `aqc.py` | `aqc.ksy` | E-0020 | done (1 file with trailing bytes, Q-0003) |
+| `.wac` / `.was` packed sound | 4,637 (2,638) + 53 damaged | `wac.py` (+ `wac_damaged.txt`) | `wac.ksy` | E-0021 | done (damaged DVD files: Q-0004) |
+| `.wav` | 744 (210) | `wav.py` | below | E-0022 | done |
 
 ## Packed bit stream
 
@@ -42,8 +44,19 @@ rows padded to 4 bytes, bottom-up, optionally 2 zero bytes after the pixels that
 file-size field counts. TGA = type 2, 24 or 32 bpp, no id, no colour map, optional TGA 2.0
 footer.
 
+## Plain WAV
+
+RIFF WAVE with even-padded chunks to the RIFF size; a PCM `fmt ` and a `data` chunk.
+
 ## Not this type
 
 `BOGUS.BMA`, `BOGUS2.BMA`, `BOGUS2.BMP` in `DATA/SY/IMAGE` of the DVD, CD disc 1 and ISO
 disc 1 (MD5 `00a84375…`, 181 bytes) hold the text of a `.dia` subtitle file; no EXE names
 them (E-0017). The validators report them as "not this type".
+
+## Damaged in the corpus
+
+53 `.wac` files of the DVD's added languages (SPA 18, ITA 13, HOL 11, SWE 11) are damaged
+on the disc: 52 have a run of undecodable bytes (about 4 KB) after a chunk that crosses a
+64 KiB file offset, one (`N2/SOUND/ITA/1437.WAC`) has no WAV header. `wac_damaged.txt`
+lists them; `wac.py` reports them as excluded (E-0021, Q-0004).

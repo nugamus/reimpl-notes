@@ -48,3 +48,14 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** nothing if the layer count is 10; the validator keeps the bytes as
   `unk_trailing` for this file only.
 - **Status:** open (answer from Prophet's zone a03 code: the AddRot call for this node)
+
+### Q-0004 — What does the original do with the 53 damaged DVD voice files?
+- **Context:** E-0021: 52 DVD `.wac` files (SPA/ITA/HOL/SWE) break at a 64 KiB offset,
+  one has no WAV header. The mono decoder reads `size + 2` bytes per chunk, so after the
+  break it reads garbage sizes; a failed read raises `aSecComSouMono::Decompress -> raed
+  Error`.
+- **What we checked:** the decoder and the files; the good chain resumes about 4 KB later.
+- **Blocks:** how our engine plays these lines (stop at the break like a read error, skip
+  to the resumed chain, or fall back to another language's file). One precise run of the
+  original DVD in Spanish on `AS/SOUND/SPA/1104.WAC` would answer what the player hears.
+- **Status:** open
