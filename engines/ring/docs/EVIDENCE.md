@@ -388,3 +388,34 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
 - **Method:** decompiles in `engines/ring/notes/decomp/`; `python
   engines/ring/tools/parsers/cnm.py`: 100% at container level.
 - **Confidence:** proven (container); the frame codec is not yet specified.
+
+### E-0025 — .dia subtitle and .dan timing files
+- **Binary/file:** `RING_DVD.EXE` `aDialog::Init` 0x426ef0 (paths `%s%s\%s\%s\%s\%sdia`,
+  `…dan`), `ReadLyrics` 0x427090, `ParseLyricLine` 0x427550, `ReadDialogAnimation`
+  0x4271b0; all `.dia` and `.dan`
+- **Evidence:** ReadLyrics `_lread`s at most 0x1000 bytes, zeroes each `\n` and the byte
+  before it, and parses each line ending in `\n`; ParseLyricLine skips `isspace`, reads
+  `isdigit` digits, optionally `,` digits `:` digits `.` digits, skips spaces, splits the
+  rest at `#` (and for language 9 turns 0xa0 into spaces). ReadDialogAnimation needs
+  `fscanf("%d") == 1` then loops `fscanf("%d %d %d") == 3`. Corpus: 7,755 files (4,498
+  distinct), all under 0x1000 bytes (largest 1,613); every `.dan` is 1 + 3n integers; in 5
+  DVD `.dia` (HOL/ITA/SWE 1160/1161/1163) lines end in bare `\n`, so the engine drops their
+  last character (a `#`); 20 `.dia` end without `\n`, so their last line (`… END`) is never
+  parsed.
+- **Method:** `python engines/ring/tools/parsers/dia.py`: 100%.
+- **Confidence:** proven
+
+### E-0026 — Configuration files and save lists
+- **Binary/file:** `RING_DVD.EXE` `aApplication::Init` 0x407b80 (`fl.ini`), `aPreFer::Load`
+  0x428870, 0x402280 (`data\cd.ini`), 0x4213d0 (`aObj.ini`), `GetMultiLanMes` 0x40e150
+  (`%sames.ini`), `aFileList::Load` 0x47a1d0; every `.ini` and `.aba`
+- **Evidence:** fl.ini: `fscanf("%d")` then that many `fscanf("%s %s")`, keys compared
+  with `CDPATH:` … `CHECKLOADSAVE:` (24 strings at 0x4858b0..0x4859f8); aPre.ini:
+  `"%d %d %d %d"` must give 4; aObj.ini: `"%d\n"` then 10 lines (loop to 0xb) per object,
+  the line whose first 3 characters equal the language name split at its last two `#`;
+  aMes.ini: `"%s\n"` tokens until the key, then lines matched on 3 characters.
+  aFileList::Load reads a u32 record count. Corpus: 38 files (19 distinct) parse; DVD
+  `aObj.ini` has 96 objects × 10 languages (ENG GER FRA ITA SPA HOL SWE HEB GRE SLO), CD/ISO
+  5, Prophet 7; `fl.ini` has 24 pairs (Prophet 17); every `.aba` is a zero count.
+- **Method:** `python engines/ring/tools/parsers/ini.py`: 100%.
+- **Confidence:** proven

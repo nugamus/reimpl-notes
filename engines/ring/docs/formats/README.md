@@ -19,6 +19,8 @@ The corpus of a type is its loose files and the members of every archive of that
 | `.aqc` panorama node | 587 (351) | `aqc.py` | `aqc.ksy` | E-0020 | done (1 file with trailing bytes, Q-0003) |
 | `.wac` / `.was` packed sound | 4,637 (2,638) + 53 damaged | `wac.py` (+ `wac_damaged.txt`) | `wac.ksy` | E-0021 | done (damaged DVD files: Q-0004) |
 | `.wav` | 744 (210) | `wav.py` | below | E-0022 | done |
+| `.dia` subtitles, `.dan` lip timing | 7,755 (4,498) | `dia.py` | below | E-0025 | done |
+| Configuration: `fl.ini`, `aPre.ini`, `cd.ini`, `aObj.ini`, `aMes.ini`; `.aba` save lists | 38 (19) | `ini.py` | below | E-0026 | done (`.aba` records not specced: corpus has none) |
 | `.cnm` / `.ci2` video, `CNM UNR` images in `.at3` | 3,462 (2,780) + 1 damaged | `cnm.py` | `cnm.ksy` | E-0024 | container done; codec not yet decoded (Q-0005 for the damaged file) |
 
 ## Packed bit stream
@@ -48,6 +50,35 @@ footer.
 ## Plain WAV
 
 RIFF WAVE with even-padded chunks to the RIFF size; a PCM `fmt ` and a `data` chunk.
+
+## Dialog text
+
+`.dia` (`aDialog::ReadLyrics` 0x427090, `ParseLyricLine` 0x427550): the first 0x1000 bytes,
+cut at each `
+`; the byte before each `
+` is blanked (the ``, or the last character
+of a line in files with bare `
+`); each complete line is spaces, a decimal time,
+optionally `,digits:digits.digits`, spaces, the text; `#` splits the text into two parts.
+Bytes after the last `
+` are never parsed. `.dan` (`aDialog::ReadDialogAnimation`
+0x4271b0): `%d`, then `%d %d %d` triples until the scan fails.
+
+## Configuration files
+
+Whitespace-token files read with `fscanf` (`fl.ini`: a count then that many `KEY: value`
+pairs; `aPre.ini`: four integers; `cd.ini`: the disc number) and line files (`aObj.ini`: an
+object id line followed by one `LAN<ws>#text#…` line per language, 10 in the DVD, 5 in the
+CD and ISO versions, 7 in Prophet; `aMes.ini`: a message key followed by `LAN<ws>#title#text`
+lines). The readers match a language by its first three characters (the CD/ISO `aMes.ini`
+has a `TA` line no language matches). Details in `parsers/ini.py`.
+
+## Not read by the game
+
+`INSTALL/*.LAN`, `*.LIS`, `*.UNI` (installer), `aObj.BAK` (CD disc 6), `.pdf`/`.txt`/`.htm`
+documents, and `ARXRIN.GRE`/`.HEB`/`.SLO`: no game EXE names them. The EXEs load one font
+each (`arxrin.fon`, Prophet `Legend.FON`, via `AddFontResourceA`): a standard Windows
+`.FON`, validator not written yet.
 
 ## Not this type
 
