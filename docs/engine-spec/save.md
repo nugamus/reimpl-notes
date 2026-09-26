@@ -198,7 +198,8 @@ The three list classes (`#SCR` subclasses `#LOA` = `AOL#`, `#SAV` = `VAS#`, `#US
   list scrolls by rows.
 - Each row: text centred horizontally and vertically in (0, 32·row, w − 38, 32), single
   line, GDI, colour (247, 196, 90) for the selected row and (135, 186, 235) otherwise,
-  on the frame background (the list surface is colour-keyed, key RGB (32, 32, 80)).
+  on an opaque RGB (32, 32, 80) box of (w − 38) × h at the view's top-left (not
+  colour-keyed, E-0610).
 
 **Scroll bar** (E-0600). Scroll position p (the top row), 0 ≤ p ≤ max, max = rows −
 ⌊view h / 32⌋ (players: player count − 9; saves: 98 − 9 = 89; loads: used saves − 10).
@@ -230,7 +231,8 @@ can start with a player that was already above; parity keeps that). A click sele
 player's name into the name edit (id 11); it does not select the player: OK (or Enter)
 does (`ui.md` `SelectUser`). Typing in the edit selects the row whose name matches and
 switches the OK bitmap (`UserOKM` with text, `UserOKN` when empty). The edit starts with
-`Player's name` (`Message.txt` line 301) and, like the save edit, appends typed
+the current player's name, or `Player's name` (`Message.txt` line 301) when there is no
+player (`ui.md` "Players screen", E-0610), and, like the save edit, appends typed
 characters (the sample player created by typing `Name` is `Player's nameName`).
 
 ## Engine notes

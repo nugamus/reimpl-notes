@@ -140,18 +140,53 @@ U01 gives the player `U02_01P` (a banknote) at `U01_Start` if the bar does not h
 (runtime: the first slot shows it at the hand-over). The bar's contents are saved in a
 `PORTEF` chunk: u32 last index, then 30-byte names. Saving, loading, `OptionSave`, `OptionLoad` and the lists: `save.md`.
 
-## Players screen: frame `OptionUser` (E-0105)
+## Players screen: frame `OptionUser` (E-0105, E-0610)
 
-Opened by `U00_Start` after Monet's first line when "practice" is off (`boot.md`). Views:
-background `UserFond` (id 1); OK button `UserOKM` at (510, 443, 31, 23), hover `UserOKH`,
-command `SelectUser` (id 2); players list (id 10, (149, 126, 406, 288), Q-0061); name edit
-(id 11, (306, 91, 236, 19), max 30 characters; runtime shows the default text
-"Player's name"). Enter in the edit also reaches `SelectUser` (the capture script types a
-name and presses Enter).
+Opened by `U00_Start` after Monet's first line when "practice" is off (`boot.md`). The
+frame has four views and nothing else (no delete button; the original cannot remove a
+player):
+
+| id | Class | Rect | Role |
+|---:|---|---|---|
+| 1 | `TIB#` | (0, 0, 640, 480) | background `UserFond` (title, "New players :" label, OK bar), cursor kind 0 |
+| 2 | `TIB#` | (510, 443, 31, 23) | OK: `UserOKM`, hover `UserOKH`, cursor kind 2, command `SelectUser` |
+| 10 | `cSU#` | (149, 126, 406, 288) | players list (`save.md` "Lists"), cursor kind 2 |
+| 11 | `dEU#` | (306, 91, 236, 19) | name edit, max 30 |
+
+**Opening.** The edit's text is the current player's name (the one selected last, kept
+across runs) when at least one player exists, else `Player's name` (`Message.txt` line
+301). This is real text, not a placeholder: the caret is at its end, typing appends, and
+OK with it unchanged selects or creates that name. Then the text-changed rule below runs,
+so the current player's row starts selected (and scrolled into view).
+
+**The edit** (all text edits, E-0610): white text on RGB (32, 32, 80), left aligned at the
+edit's x, vertically centred, one line. A caret (a 1 px column, full edit height, the
+pixels inverted) sits at the text width before the caret position and blinks with the
+Windows caret blink time (530 ms by default); any caret move shows it and restarts the
+blink. Characters are inserted at the caret while the text has at most 30 characters
+(so a 31st still goes in). Backspace deletes the selection, else the character before
+the caret. Left moves the caret one left; Right moves it one right of the selection's end;
+both drop the selection. No other key edits (no Delete, Home or End). A press in the edit
+puts the caret at the nearest character boundary (Shift + press extends the selection);
+dragging selects. The selection is drawn RGB (32, 32, 80) on white. Enter runs
+`SelectUser`; Escape and Tab are not the edit's.
+
+**Text changed** (after each typed character or row click): empty text → the OK bitmap
+becomes `UserOKN` and OK's properties are disabled (no command, no hover highlight, no
+click cursor), no row selected. Otherwise `UserOKM`, OK enabled, and the selected row is
+the player whose name equals the text exactly (case-sensitive), or none; when one matches
+and the list scrolls (max > 0) the scroll position becomes min(row, max).
+
+**The list** (`save.md` "Lists", scroll bar E-0600): rows `"<n> - <name>"`, the selected
+one in (247, 196, 90), on an opaque RGB (32, 32, 80) box of (w − 38) × h at the view's
+top-left. A press on a row (not below the last player) selects it and puts that player's
+name in the edit (caret at the end), then the text-changed rule. A double click on a row
+(Windows double-click: second press within 500 ms and 4 px) is that press followed by
+`SelectUser` while a row is selected.
 
 `SelectUser`: take the edit's text; if empty do nothing. Otherwise look the name up in the
-player list; if absent add a new player. Open `PorteF` (parked), select the player, close
-`OptionUser`, then:
+player list; if absent add a new player. Open `PorteF` (parked), select the player (it
+becomes the current player), close `OptionUser`, then:
 - new player: app mode 0, so U00 continues: Monet's tutorial (move, jump, take; Space
   opens the bar) runs in the garden;
 - known player: open the Option menu at once.
