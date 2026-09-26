@@ -34,11 +34,24 @@ kind, animation id, sound id, timer id) is read per handler in the zone specs
 
 ## Keys and accessibilities
 
-A key (0x40b060) first goes to the zone's key handler (SY only). Otherwise it is matched
-against the `key` of each enabled accessibility of the current puzzle (or of the active
-rotation, whose hot spot is then projected to the screen, 0x4107f0) and, on a match,
-behaves as a left click on that hot spot (0x40af80, or 0x40afb0 with Ctrl). Escape is
-first drained from the keyboard state and 0x406e40(5, 0x1002) is called.
+A key (0x40b060, E-0045):
+
+1. Escape: waits until Escape is released, calls 0x406e40(5, 0x1002) (0x469150: ends a
+   playing dialogue of kind 5, `aDialog::RemoveDialog`, and raises its end event) and drops
+   the pending key messages.
+2. If puzzle 1 (SY's dialogue puzzle) exists, its visual object lists (+0x20) get the key
+   first (0x41d890, virtual +0x14); one that takes it ends the handling. If puzzle 1 is in
+   mode 2, its accessibilities are searched (step 4) and nothing else.
+3. Otherwise the zone's key handler (0x40d130, SY only: 0x433d30) runs, then the current
+   puzzle is searched (its visual object lists first, as in 2) or, when a rotation is
+   current, the rotation's accessibilities.
+4. Search: the first accessibility whose hot spot is enabled and whose `key` equals the key
+   code. Its hot spot's centre ((x1 + x2) / 2, (y1 + y2) / 2; for a rotation projected to
+   the screen by 0x4107f0) is clicked: `MouseLeftEvent` (0x40af80, sets app+0xa5 first; with
+   Ctrl held 0x40afb0). A centre with y < 16 also calls 0x409d70, as a release there does.
+
+The key codes are `WM_CHAR` characters (13 Enter, 27 Escape, 8 Backspace) and Delete (0x2e,
+from `WM_KEYDOWN`). In SY the dialogues' OK / yes buttons have key 13, cancel / no key 27.
 
 ## Right button
 

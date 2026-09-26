@@ -731,3 +731,15 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
 - **Reference:** Templier's `base/text.cpp` and `base/font.cpp` cover the same classes; not used as proof.
 - **Method:** decompiles, string reads with `pefile`.
 - **Confidence:** proven (behaviour); GDI's size choice for height 12 is Q-0010.
+
+### E-0045 — Keys on accessibilities (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x40b060, 0x41d890, 0x40af80, 0x406e40 → 0x469150;
+  SY key handler 0x433d30; `ObjSetPuzAccKey` calls in `engines/ring/notes/zones/sy.md`
+- **Evidence:** as written in `spec/events.md` "Keys and accessibilities", from the
+  decompiles in `engines/ring/notes/decomp/flow/` (0x40b060) and
+  `engines/ring/notes/decomp/text/`. Puzzle 1 in mode 2 is searched without calling the zone's key handler (the handler call
+  is on the path where puzzle 1 is missing or not in mode 2).
+- **Method:** decompiles.
+- **Confidence:** proven
+- Supersedes the order in E-0033's summary of the key path ("first the zone's key handler,
+  otherwise the current puzzle"): the handler is skipped while puzzle 1 is in mode 2.
