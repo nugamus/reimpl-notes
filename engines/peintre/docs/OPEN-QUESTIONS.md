@@ -301,7 +301,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** in the engine a click held over two 66 ms ticks picks the object up and puts
   it back on the second tick. Whether the original guards the carry (or reads the button
   less often) decides whether the engine needs an edge there.
-- **Status:** open
+- **Status:** RESOLVED (E-0018): the original has no guard either; a click that spans two
+  frames drops the object again. The engine keeps the level behaviour (parity).
 
 ### Q-0406 — Who clears 0x4e3120 (back from the option menu) and 0x4e30f4 (back from zone 11)?
 - **Context:** `musee.md` "Back from the option menu" reads 0x4e3120 (set by 0x42f515);

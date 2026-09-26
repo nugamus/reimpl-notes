@@ -1752,3 +1752,17 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   (lines 372–381), `…__FUN_0041c979.c` (156–159), `…__FUN_0042f2c2.c`, `…__FUN_0042f515.c`.
 - **Confidence:** strong (the cited listings only; a Ghidra xref listing of both addresses
   would make it proven)
+
+### E-0018 — The carry click has no edge: a button held over two frames picks up and drops
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x472710 reads the mouse with `IDirectInputDevice::GetDeviceState` (vtable
+  +0x24, 16-byte DIMOUSESTATE) and stores `rgbButtons[0] >> 7` into `click` (0x5b7fac) every
+  frame (called from 0x420e07). The mangeurs frame 0x429dd6: with 0x502734 = 0, `click == 1`
+  and cursor 0x25 over a carriable node set 0x502734 = 1 and 0x502a80 = the node; with
+  0x502734 = 1, any `click == 1` over a node (fire, stove or anything else) acts and writes
+  0x502734 = 0. Nothing between the two waits for the button to go up; the frame clears
+  `click` only at its end (lines 222–223), and the next 0x420e07 sets it again while held.
+- **Method:** decompiler listings `notes/decomp/MISSION.EXE__FUN_00472710.c`,
+  `…__FUN_00429dd6.c` (lines 38–90, 222–223).
+- **Confidence:** proven for mangeurs (cafe 0x41bbcf and pont 0x42d489 follow the same
+  pattern per E-0317; not re-read line by line)
