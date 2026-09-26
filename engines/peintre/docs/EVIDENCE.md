@@ -388,3 +388,80 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   `CRYOFONT` magic) is a different format.
 - **Method:** decompiled the functions named (`notes/decomp/`); `engines/peintre/tools/parsers/awf.py`.
 - **Confidence:** proven
+
+### E-0200 — HNM6 files: 64-byte header, one superchunk per frame, a zero u32 at the end; 95/95 validate
+- **Binary/file:** `/MISSION.EXE`; `Data/MOVIES/*.HNM` (94) and `Data/MOVIES/A13_052B` (no extension)
+- **Evidence:** Hnm_Open (0x40ba64) reads 64 header bytes and fails unless the tag is
+  `HNM6` ("HNM version not supported"), the u32 at +0x1C (`max_frame_size`) is >= 1
+  ("corrupted header"), width is 640 and height 480 ("video width/height not
+  supported"); it keeps `frame_count` (+0x10), the audio flags (+6) and `file_size - 0x40`
+  (+0x0C) as the byte count to stream. Corpus (`hnm.py`): 95/95 files, every byte
+  consumed: `file_size` = file length, exactly `frame_count` superchunks (size in the low
+  24 bits, high byte 0 in all), then 4 zero bytes; chunks padded to 4 bytes with zeros;
+  chunk flags 0; header `unk_04` 0, `bpp` 16, `unk_14` 0, `unk_18` 0, `unk_1a` 2, author
+  "Pascal URRO  R&D", "-Copyright CRYO-" in all 95. Chunks: 21,363 `IX`, 80 `AA`, 18,208
+  `BB`; frame 0 of every file is an `IX` key frame (quality < 0). The extensionless
+  `A13_052B` (101 frames) differs from `A13_052B.HNM` (94 frames); the EXE only opens
+  `%s.HNM`.
+- **Method:** decompiled 0x40ba64; `engines/peintre/tools/parsers/hnm.py`.
+- **Confidence:** proven
+
+### E-0201 — HNM playback: a read thread fills a 512 KB ring; one superchunk per Hnm_Stream call; IX/IV video, AA/BB sound
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** Hnm_Open allocates `0x32000 + 0x80004` bytes, reads the first 0x80000
+  (Hnm_ReadBlock 0x40c13a, 1 KB reads) and starts Hnm_StartReadThread (0x40c3d8); the
+  thread (0x40c38a) waits on two events and refills the ring (Hnm_FillRing 0x40c1b3,
+  0x5000 or 0x8000 bytes per read). Hnm_NextSuperchunkSize (0x40c50a) reads
+  `u32 & 0xFFFFFF`; Hnm_ParseChunks (0x40c5c2) walks the chunks to `start + size`,
+  next = `data + ((size - 5) >> 2) * 4` (4-byte padding), keeps `0x4141` AA / `0x4242` BB
+  as sound (kind 1 / 2) and `0x5649` IV / `0x5849` IX as the video chunk;
+  Hnm_DecodeVideo (0x40c725) passes it and the two 0x96000-byte frame buffers
+  (alternating; Hnm_AllocDecBuffers 0x40b992) to 0x4674c9. Hnm_Stream (0x40c072) decodes
+  the next frame while `frame < frame_count - 1`, else closes the movie (Hnm_Close
+  0x40bf9e) and returns 0.
+- **Method:** decompiled the functions named (`notes/names/media.csv`).
+- **Confidence:** proven (the video codec 0x4674c9 itself not read, see E-0206)
+
+### E-0202 — Movie sound: the audio flags give rate and channels; AA holds 32 frames of sound, each BB one frame
+- **Binary/file:** `/MISSION.EXE`; `Data/MOVIES`
+- **Evidence:** Hnm_InitSound (0x40c9aa): no sound if DirectSound is off or frame 0 has
+  no AA/BB; channels = `((flags & 0x80) >> 7) + 1`, rate = `((flags & 0x60) >> 4) *
+  11025`, 16 bits; the movie buffer (Snd_InitMovieBuffer 0x4166f1) has 32 slices of
+  `(AA_payload * 4 - 0x80) >> 5` bytes (one frame of PCM each) and is filled first with
+  the whole AA chunk (Hnm_DecodeAudio 0x40c783: Apc_InitState on the AA header, then
+  `(AA_payload * 2 - 0x40) / channels` samples). Each later frame decodes its BB chunk
+  into the next of 8 staging slices and Hnm_QueueAudio (0x40c8b5) copies one into slot
+  `n & 31`; a frame without a sound chunk gives a slice of silence (memset 0).
+  Corpus: every AA ADPCM size is a multiple of 32 and every BB is exactly that / 32
+  (all 80 sound files); 1,836 samples per frame mono (58 files), 1,837 stereo (21), 1,764
+  in `a03_05a.hnm`. The sample count in AA's APC header is the soundtrack's (e.g.
+  `A13_051.HNM` 690,134 = `SOUND/a13_051.APC`) and the player does not use it.
+- **Method:** decompiled 0x40c9aa, 0x40c783, 0x40c8b5, 0x4166f1; `hnm.py -v`.
+- **Confidence:** proven
+
+### E-0203 — Movie frame rate: a multimedia timer of 1000 / fps ms with sound, 80 ms without
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** Hnm_InitSound stores `fps = rate * channels * 16 / (AA_payload - 32)`
+  (float at 0x4e1e58). Hnm_Open 0x40bf27: `FLD 1000.0 (0x4a2054); FDIV [0x4e1e58];
+  CALL __ftol` gives the frame period; without sound 0x40bf59 stores 0x50 (80) instead.
+  Timer_StartPeriodic (0x41059a) then runs `timeSetEvent(period, 5, …, periodic)`.
+  Corpus: 22050 * 16 / 29376 = 12.010 fps → 83 ms (58 files), stereo 12.003 → 83 ms (21),
+  `a03_05a` 12.5 → 80 ms, silent → 80 ms (15).
+- **Method:** decompiled 0x40c9aa, 0x41059a; disassembled 0x40bf1e..0x40bf59.
+- **Confidence:** proven
+
+### E-0206 — ScummVM's HNMDecoder reads the corpus as is; IX frames carry a 28-byte header
+- **Binary/file:** `Data/MOVIES`; `../scummvm/video/hnm_decoder.cpp`, `image/codecs/hnm.cpp`
+- **Evidence:** ScummVM's HNM6 path reads the same header fields (audio flags +6, width,
+  height, frame count, frame size +0x1C), superchunk `& 0xFFFFFF`, 4-byte-aligned chunks,
+  `IX`/`IW` video and `AA`/`BB` APC sound (`APCAudioTrack`: rate `((flags >> 4) & 6) *
+  11025`, stereo bit 7, the same as E-0202). `HNM6::DecoderImpl::decodeFrame` reads a
+  24-byte header (quality, bit, motion, short-motion, JPEG, end offsets), then
+  `end - 24` bytes. Corpus (`hnm.py`): in all 21,363 IX payloads the first stream offset
+  is 28, the offsets ascend, `end` = payload size <= `max_frame_size`, and the u32 at +24
+  (`unk_18`) = `end`, so ScummVM reads it into its buffer and never uses it. Audio:
+  `(AA samples & 31) == 0` and `BB samples == AA samples / 32` in all 80 files, so
+  `HNM6VideoTrack::newFrame`'s asserts hold. Difference: a silent HNM6 defaults to 66 ms
+  per frame (the EXE: 80, E-0203).
+- **Method:** read the ScummVM sources; `hnm.py`.
+- **Confidence:** strong (no frame decoded here; the header and stream bounds match)

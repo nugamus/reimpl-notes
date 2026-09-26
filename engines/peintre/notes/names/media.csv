@@ -1,0 +1,33 @@
+address,name,evidence
+0x0040ba0b,Hnm_CloseAndFree,Hnm_Close then frees both 0x96000-byte decode buffers; E-0201
+0x0040bf9e,Hnm_Close,frees the CVY table/buffers and the 0x80000 ring; stops the read thread; E-0201
+0x0040c13a,Hnm_ReadBlock,reads n bytes of the HNM in 1 KB pieces; E-0201
+0x0040c1b3,Hnm_FillRing,read thread body: refills the 0x80000 ring with 0x5000/0x8000-byte reads; E-0201
+0x0040c38a,Hnm_ReadThreadProc,WaitForMultipleObjects on the two read-thread events then Hnm_FillRing; E-0201
+0x0040c498,Hnm_StopReadThread,SetEvent + WaitForSingleObject on the thread + CloseHandle; E-0201
+0x0040c50a,Hnm_NextSuperchunkSize,u32 & 0xFFFFFF at the ring read position; 0 when not yet loaded; E-0201
+0x0040c5c2,Hnm_ParseChunks,chunk walk: AA/BB audio and IV/IX video; E-0201
+0x0040c725,Hnm_DecodeVideo,passes the IX chunk and the two frame buffers to 0x4674c9; E-0201
+0x0040c759,Cvy_UnpackFrame,Hlz unpacks CVY frame n into the CVY buffer; E-0204
+0x0040c783,Hnm_DecodeAudio,APC-decodes the AA (after its 32-byte header) or BB chunk of the frame; E-0202
+0x0040c8b5,Hnm_QueueAudio,copies one decoded slice into slot (n & 31) of the movie sound buffer; E-0202
+0x0040c9aa,Hnm_InitSound,audio_flags -> channels/rate; 32-slot movie buffer from the AA chunk; fps; E-0202
+0x0040cbdf,Hnm_ConsumeSuperchunk,advances the ring read position and wakes the read thread; E-0201
+0x0040cc1c,Hnm_SignalEnd,sets the end flag and wakes the read thread; E-0201
+0x0041059a,Timer_StartPeriodic,timeBeginPeriod + timeSetEvent(period); E-0203
+0x00414ace,Movie_Open,opens movie n of the table at 0x4a7a08 with its rectangle and CVY; E-0204
+0x00414bf8,Movie_Step,Hnm_Stream + blit into the rectangle + CVY mask; skip on input; E-0204
+0x00414cd9,Movie_Redraw,Display_Flip or blit frame + CVY mask; E-0204
+0x00414d60,Movie_Blit,blit frame + CVY mask of frame n; E-0204
+0x0046f716,Blit_SetMovieRect,stores source/destination strides and the x/y/w/h of the movie rectangle; E-0204
+0x0046f779,Blit_MovieFrame,copies the top-left w x h of the 640-wide frame to (x, y); E-0204
+0x0046f78b,Blit_CvyMask,paints a CVY run mask in one colour at (x, y); E-0205
+0x00465d8e,Apc_Decode,IMA ADPCM decoder (shift-add, high nibble first); E-0207
+0x004662bd,Apc_Encode,PCM -> CRYO_APC 1.20 encoder (no callers); E-0207
+0x004666dc,Apc_GetInfo,CRYO_APC header -> PCM size, rate, stereo; E-0207
+0x004667ad,Apc_InitState,CRYO_APC header -> decoder state; E-0207
+0x00416787,Snd_PlayStreamWav,marks the name with '_' and starts the 64 KB stream buffer; E-0209
+0x00416874,Snd_PlayStreamApc,marks the name with '!' and starts the 64 KB stream buffer; E-0209
+0x004169ad,Snd_StopStream,stops the stream buffer and closes its file; E-0209
+0x00416a39,Snd_RefillStreamWav,refills 0x2000 bytes of raw WAV data; E-0209
+0x00416bb9,Snd_RefillStreamApc,refills 0x2000 bytes from 0x800 APC bytes; E-0209

@@ -15,6 +15,7 @@ validator in `engines/peintre/tools/parsers/<fmt>.py` (with `--selftest`), the p
 | `.TGP` full-screen / panorama image | 134 (110 single 640x480, 24 chunked panoramas) | `tgp.py` | `tgp.ksy` | E-0100, E-0101 | done (LZWCRYO constants open, Q-0100) |
 | `.SPR` sprite bank | 289 (12 RLE, 115 band, 10 raw8, 152 raw16; 5,827 frames) | `spr.py` | `spr.ksy` | E-0102, E-0103 | done |
 | `.TGA` 2D overlay / cursor | 104 (11 with TGA 2.0 footer) | `tga.py` | `tga.ksy` | E-0104 | done |
+| `.HNM` movie (Cryo HNM6) | 95 (94 `.HNM` + extensionless `A13_052B`; 21,363 IX, 80 AA, 18,208 BB chunks) | `hnm.py` | `hnm.ksy` | E-0200..E-0203, E-0206 | done |
 | `.AWF` bitmap font | 2 (1 fixed, 1 proportional) | `awf.py` | `awf.ksy` | E-0105 | done |
 
 ## `.BFG` — scene bundle (E-0013)
@@ -112,3 +113,27 @@ measure routine counts `fixed_width + 1` per char for a fixed font, one more tha
 TOPAZ8: fixed 8×8, chars 32..165. TROBO12: proportional, 17 rows, chars 32..122 (next to
 it, `TROBO.TTF` is a TrueType font, not read by this loader). ScummVM's Cryo font reader
 (`CRYOFONT`) is a different format.
+
+## `.HNM` — movies, Cryo HNM6 (E-0200..E-0203, E-0206)
+
+64-byte header (`HNM6`, audio flags, bpp 16, 640x480 (the EXE accepts nothing else),
+file size, frame count, max video payload, author and copyright strings), then one
+superchunk per frame (`u32 size | flags << 24`, flags 0 in the corpus) and a zero u32 at
+the end. Chunks `{u32 size, char type[2], u16 flags}` are padded to 4 bytes. Three chunk
+types occur: `IX` video in every frame (frame 0 always a key frame, `quality < 0`), `AA`
+in frame 0 (a 32-byte `CRYO_APC 1.20` header, then the sound for the first 32 frames)
+and `BB` in later frames (one frame of sound, exactly `AA`'s ADPCM size / 32 in every
+file). Sound: 15 silent, 59 22050 Hz mono, 21 22050 Hz stereo. The `IX` payload has a
+28-byte header (quality, five stream offsets, then `unk_18` = `end` again) whose `end`
+equals the payload size in all 21,363 frames.
+
+**ScummVM:** `Video::HNMDecoder` reads every file unchanged: it handles `IX`, `AA`, `BB`
+(the EXE's walker also accepts `IV`, absent here; ScummVM's `IW` is absent too), its
+24-byte frame header ends before `unk_18`, and its `(samples & 31) == 0` and equal-`BB`
+asserts hold for all 80 sound files. What the engine must add: a silent movie's frame
+delay is 80 ms in the EXE (ScummVM's HNM6 default is 66 ms; the constructor takes the
+delay); with sound the EXE runs a `1000 / fps` ms timer (83 ms; 80 ms for `a03_05a`, 1,764
+samples per frame) where ScummVM clocks frames by the samples (1,836 mono or 1,837
+stereo per frame, 83.3 ms). Movies with a table entry are drawn into a rectangle with a
+CVY mask on top (below).
+
