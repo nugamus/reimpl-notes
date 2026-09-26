@@ -263,7 +263,7 @@ unlocked list is rebuilt from it:
 | 4 | `U13_14`, `U13_05`, `U13_13`, `U13_03`, `U13_01`, `U13_12`, `U13_11`, `U13_06`, `U13_04` | 14 |
 | 5, 6, 7 | `U14_01`, `U13_15`, `U14_02`, `U14_05`, `U14_03`, `U14_07` | 20 |
 
-(Whether unit 33 can be saved as 33: Q-0193.) The menu greys Gallery when the list is
+(Unit 33 is saved as 33: `LoadUnitScene` sets it from the scene name, E-0532.) The menu greys Gallery when the list is
 empty.
 
 **`Galerie`** (opened by `OptionGalerie`; the Option frame is hidden, not closed):

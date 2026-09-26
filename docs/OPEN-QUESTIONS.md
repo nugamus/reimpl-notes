@@ -496,7 +496,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** which object U01 hides and which one is the switch hotspot.
 - **Next to try:** trace `X3d_Scene_Get_Object` return values at U01 load and read the
   names at those addresses.
-- **Status:** open
+- **Status:** RESOLVED (E-0530): only a file's root enters the list, prepended; `Box203`
+  is INTCAB's `Box20`, the switch `Box31` is `U01_21.o3d`'s, as `u01.md` assumed.
 
 ### Q-0046 — What do the frame manager's `+0xb8` → `+0x90` / `+0xa8` do with `U02_01P`?
 - **Context:** E-0081: U01's entry calls `+0x90("U02_01P")` and, when it returns 0,
@@ -612,7 +613,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** load order in `U02.X3D`, the rename code; not X3D's list at runtime.
 - **Blocks:** which objects are the bag, the counter coin and the two planks.
 - **Next to try:** answered together with Q-0045 (trace `X3d_Scene_Get_Object` at load).
-- **Status:** open
+- **Status:** RESOLVED (E-0530): the seller's `*U02_01` becomes `*U02_06`; `U02_07.o3d`
+  keeps `*U02_07`, `U02.O3d`'s becomes `*U02_07a`, as `u02.md` assumed.
 
 ### Q-0091 — Does a save restored between `MarronToPie` and `Sonner` keep the clerk's `Sleep` clip?
 - **Context:** E-0163/E-0164. `Sonner` reads the clerk's slot 1 (`Sleep`) without a null
@@ -623,7 +625,9 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** restore fidelity in U02 only.
 - **Next to try:** decompile `FUN_0041d490` for node slot data; or save after the magpie
   in the original, reload, ring the bell.
-- **Status:** open
+- **Status:** RESOLVED (E-0535): yes; `Sleep` is slot 1 of the clerk's `*U02_04` node, so
+  `ANIMATIONS` re-creates it with its overridden range 85..86 and the backup; `Sonner`
+  finds it.
 
 ### Q-0092 — What happens to the seller's call timer after a restore?
 - **Context:** E-0160. Chunk `TIMEVENDEUSE` stores `callStart` as a raw `timeGetTime`
@@ -652,7 +656,9 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** restore of scripted clips in units with several `*` nodes.
 - **Next to try:** a save in U02 after the magpie or clerk clips; `FUN_0041fe90` for the
   tree walk; writers of node `+0x1cc`.
-- **Status:** open
+- **Status:** RESOLVED (E-0535): every node of the `+0x50` chain (the list's next link,
+  not a child link) whose name starts `*` and that has slot clips; `+0x1cc`/`+0x1d0` back
+  up the animation's first/last frame while a range override is active.
 
 ### Q-0102 — What does a player's saved unit number drive, and which number labels a players-list row?
 - **Context:** E-0181, E-0185. `USERINFO`'s u16 is read only by `0x00425c10` (via
@@ -695,7 +701,9 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   did not create).
 - **Next to try:** answered with Q-0101; or save in the original after the dog sits and
   reload.
-- **Status:** open
+- **Status:** RESOLVED (E-0535): `ANIMATIONS` re-creates every slot clip of `*U05_05` and
+  `*U04_04` with its frame, flags, fps and the active slot; the unit's timers still
+  restart.
 
 ### Q-0161 — What does the `TableauJeu` frame show, and how does it close?
 - **Context:** E-0364. U05's `DoTableauA`/`B` open frame `TableauJeu` for paintings
@@ -721,7 +729,9 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** faithful restore of U03 mid-chain; the engine should rebuild the post-trick
   state from M10 rather than crash.
 - **Next to try:** in the original, save after the trick, reload, click the policeman.
-- **Status:** open
+- **Status:** RESOLVED (E-0537): `ANIMATIONS` re-creates `AttenteHorloge` (and any later
+  policeman clip), so nothing crashes; the policeman stands at his clip's own pose as in
+  live play.
 
 ### Q-0141 — Can the clown's line end before `magie` passes frame 48, so that no postcard is given?
 - **Context:** `AnimeSpeakClown` gives `U03_06P` only inside a loop that runs while the
@@ -732,7 +742,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** whether the engine must guard against a soft lock (U04 needs `U03_06`).
 - **Next to try:** in the original, hold Enter through the clown's second line and check
   the inventory.
-- **Status:** open
+- **Status:** RESOLVED (E-0538): Enter gives the card at once, and the voice outlasts
+  frame 48 by over 11 s; the card is missed only when the voice never plays.
 
 ### Q-0142 — Which child of Coordcam's root does `+0x24` return: `*Target` or `*camera`?
 - **Context:** the cutscene aims at (`*camera` `+0x20`) `+0x24` (E-0305). `Coordcam.o3d`'s
@@ -742,7 +753,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   (prepend or append) not read.
 - **Blocks:** nothing if the assumption holds; the cutscene's framing if not.
 - **Next to try:** decompile the child linking in `x3d.dll`'s o3d loader.
-- **Status:** open
+- **Status:** RESOLVED (E-0530): children keep file order, so `+0x24` is `*Target`, as
+  `u03.md` assumed.
 
 ### Q-0143 — How does `X3d_Object_Animate_Transition` blend rotation, scale and visibility?
 - **Context:** E-0305: translation is a linear mix; three more per-track functions and a
@@ -768,7 +780,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Next to try:** read `*U03_02`'s local transform with `o3d.py`; decompile
   `X3d_Make_Rotation_Matrice_Z` / `X3d_Matrice_Mult` in x3d.dll; a live run walking
   around the clown.
-- **Status:** open
+- **Status:** RESOLVED (E-0533): the stored matrix is `TIRE.O3D`'s identity rotation, so
+  the clown turns in place by Rz(3π/2 − yaw) on his posed rotation, with no jump.
 
 ### Q-0171 — What is U06's `shooting` flag before its first write?
 - **Context:** E-0390. Neither the constructor nor `U06_StartUnit` writes unit `+0x6d0`;
@@ -779,7 +792,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** constructor `0x00410940`, base constructor `0x0041a890`, start.
 - **Blocks:** exact behaviour right after a restore near the clown (minor).
 - **Next to try:** `operator new` in `MSVCRTD.DLL` / a memory read of a fresh U06 object.
-- **Status:** open
+- **Status:** RESOLVED (E-0534): 0xCDCDCDCD (true); the first frame's stop runs the clown
+  to frame 49 and clears it.
 
 ### Q-0172 — After a restore with `PLANCHE` = 1, what state is U07's plank in?
 - **Context:** E-0395. The tip loads `planche.A3D` at run time and binds a new node; a
@@ -789,7 +803,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** saves made in U07 after the tip.
 - **Next to try:** whether the generic `ANIMATIONS` chunk (Q-0101) restores nodes added at
   run time; a live save/restore after the tip.
-- **Status:** open
+- **Status:** RESOLVED (E-0536): the plank shows its load (untipped) pose and cannot tip
+  again.
 
 ### Q-0173 — Whose cursor does U07's use-up on the hotspot list head clear?
 - **Context:** E-0396. `Open2Secret` and `CouperDynamite` call `FUN_004212b0` with the
@@ -800,7 +815,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   `FUN_00420a90`; not who creates the head.
 - **Blocks:** nothing visible if the head has no object.
 - **Next to try:** xrefs to `FUN_00420a90` and the writer of scene `+0x1a0`.
-- **Status:** open
+- **Status:** RESOLVED (E-0539): the head is the object-less hotspot `Root`; only the item
+  is used up.
 
 ### Q-0174 — Which `Object04` is U07's dynamite?
 - **Context:** E-0394. The first `Object04` found is renamed `*U06_260`, the second
@@ -809,7 +825,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** which object `CouperDynamite` hides and the fuse's position.
 - **Next to try:** the engine's object order compared with `X3d_Scene_Get_Object`; a live
   hover over the dynamite.
-- **Status:** open
+- **Status:** RESOLVED (E-0530): the first `Object04` found is `Chambre1.O3d`'s
+  (`*U06_260`), the second `Cave2.O3d`'s (`*U06_26`, the dynamite).
 
 ### Q-0150 — Where do the key, the boat's trajectory and the banks lie in U04's pond?
 - **Context:** E-0338. The key `*U04_36` is fishable only from the boat (M29 is TRUE while
@@ -835,7 +852,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** which objects the hotspots `*U03_30`/`*U03_31` pick; nothing in INFOACT
   uses them (cursor 0), so only hover is affected.
 - **Next to try:** answered with Q-0045 (trace `X3d_Scene_Get_Object` at load).
-- **Status:** open
+- **Status:** RESOLVED (E-0530): `coffre.o3d`'s spheres and `u03.o3d`'s pedals, as E-0421
+  assumed.
 
 ### Q-0181 — Is a root object's next-sibling link (`+0x28`) always null?
 - **Context:** E-0421. `U33::SetNoCollisionTree(obj, 1)` sets `+0x118` on the object, its
@@ -848,7 +866,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** whether other top-level objects (the `COL*` meshes) lose collision in U33.
 - **Next to try:** decompile the object constructor in `x3d.dll` (`FUN_10011ea0`'s
   allocation) for `+0x28`.
-- **Status:** open
+- **Status:** RESOLVED (E-0530): yes; objects are calloc'd and only children get `+0x28`
+  written.
 
 ### Q-0190 — Does the Settings music slider have any lasting effect?
 - **Context:** E-0450. The slider reads group 1, which `SetAppMode(2)` has set to 0 in the
@@ -885,7 +904,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** the exact unlock count after a save in U33.
 - **Next to try:** every write of game `+0x160`; a save in U33 in the original and the
   `USERINFO` u16 it writes (`savegame.py`).
-- **Status:** open
+- **Status:** RESOLVED (E-0532): `LoadUnitScene` sets `+0x160` = 33 after `U33.x3D` loads,
+  so a save in U33 unlocks 5.
 
 ### Q-0144 — What hides U03's route plane `0000aaaaaa`?
 - **Context:** `u03.md` Entry step 7 hides the `*path` object and takes the path model out

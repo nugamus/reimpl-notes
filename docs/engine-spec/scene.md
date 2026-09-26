@@ -52,6 +52,14 @@ For scene file `Uxx.X3D`:
   child of its partner, children in file order; a base child with no partner gets no LOD.
   Each partner becomes a LOD of its base object with threshold d² (d < 0 counts as 0).
   Several `lod=` lines on one object add more partners.
+- A `lod=` line is ignored when its root's weld flag differs from the base root's
+  (E-0530: `X3d_Object_Add_Lod` does nothing then). In the corpus that is U04's
+  `tablo3LoD`/`coffreLoD` and U33's `coffreLOD`, all faceless: the painting and the
+  chests are drawn in full at every distance.
+- Object lookup by name (E-0530): each `.O3D` adds only its root to the scene list, in
+  front (newest file first); within a file, depth first, the object before its children,
+  children in file order. `tools/object_order.py` prints the order and the winner of a
+  duplicate name.
 - Every frame, for each base object: s = squared distance from the object's world origin
   (row 3 of its W) to the camera position. Draw the partner with the largest threshold
   ≤ s; if none qualifies, draw the base object. The chosen object is drawn with its own

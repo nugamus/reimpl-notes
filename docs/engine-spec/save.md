@@ -82,8 +82,13 @@ Field notes:
   `C:\MonetRun\Data\U01/Anim/U01_02/Action03.A3D`); char clip name[64] (`GiveCard`);
   u32 enabled; u32 paused; u32 loop; u32 ping-pong; u32 backward; f32 frame; f32 fps;
   u32 first frame; u32 last frame; u32 `unk_1cc`, `unk_1d0`. Base-node frames are not in
-  this chunk (they are in `OBJECTS`). Entries run to the end of the chunk. Traversal and
-  failure cases: Q-0101.
+  this chunk (they are in `OBJECTS`). Entries run to the end of the chunk. Written for every
+  node of the scene's node list whose name starts `*` and that has at least one slot clip;
+  `unk_1cc`/`unk_1d0` are the clip's own first/last frame saved while a frame-range
+  override is active (0xCD otherwise). Reading: find the node by name, re-create each slot
+  clip from its path, then set the fields and the active slot; a name not found desyncs
+  the rest of the chunk. Nodes made at run time without slot clips (U07's plank) are not
+  saved (E-0535, E-0536).
 - **JAUGE.** The timed gauge of `u01.md` ("escape timer"); duration = ⌊seconds⌋·1000.
 - **Unit chunks.** U01: u32 `train2Loaded`, u32 `onTrain` (`u01.md`). U02: u32
   `callStart`, `callPeriod`, `callOff`, `magpie` (`u02.md`; `callStart` is a raw clock

@@ -4185,3 +4185,186 @@ An entry at `tentative` confidence must also have a matching line in
   starts with can move = can turn = 1 and no unit code changes them.
 - **Method:** MCP decompile; `pefile` table dumps; byte search of `U01.o3d`.
 - **Confidence:** proven statically. Functions renamed.
+
+### E-0530 — X3D's object tree: one scene-list entry per `.O3D` (its root, prepended), children in file order, objects zeroed; a LOD is unlinked only when both roots' weld flags match
+- **Binary/file:** `x3d.dll`, `MissionMonet.exe`; `Data/**/*.O3D`, `Data/U*/*.X3D`.
+- **Evidence:** `X3d_Load_Sdk_o3d` (export 82) reads the materials, then
+  `O3d_ReadObjectsAndLink` (`0x10012920`, renamed), and calls
+  `X3d_Scene_Add_Object(scene, objects[0])` once: only the file's first object enters the
+  scene list, and `X3d_Scene_Add_Object` prepends it (`+0x2c` next, `+0x30` previous,
+  E-0080). `O3d_ReadObjectsAndLink` creates every object with `X3d_Object_Create`, whose
+  memory comes from host callback 6 (`X3d_SetHostCallbacks`, `0x1000b620`, renamed; set
+  through `X3d_Init_Ptr` by `MessageToUser_34`, `0x00417861..0x00417889`: callback 6 =
+  `0x00436682` = `jmp [calloc]`, MSVCRTD), so every field starts at 0; then, for each
+  object with a parent (`+0x20`), it sets `+0x28` = 0 and appends it at the end of the
+  parent's child chain (`+0x24` first child, `+0x28` next sibling): children keep file
+  order. No code writes a root's `+0x28`, so it stays 0. `X3d_Object_Get_Son` compares the
+  object itself, then its first child's subtree, then that child's siblings: depth first,
+  self before children, file order. `X3d_Object_Add_Lod` (export 124) does everything
+  (child pairing, `X3d_Object_Unlink` of the LOD from the scene list, insertion in the
+  `+0x3c` chain by squared distance) only when (base `+0x20` = 0 or base transform `+0` =
+  0) and base `+0x40` = LOD `+0x40` (the weld flag, E-0054); otherwise it does nothing,
+  and the LOD file's root stays in the scene list as an ordinary object tree.
+  `load::load_185` (`0x0041f620`) always passes the last `object=` root as the base.
+  Corpus: all 596 `.O3D` have exactly one parentless object, at index 0 (`o3d.py`). Of the
+  391 `lod=` lines in the 18 unit scripts, 385 have equal root weld flags; 6 do not:
+  `U04.x3d` and `U04Cpl.x3d` (`Anim\tablo3LoD.o3d`, `Anim\coffreLoD.o3d`), `U04D.x3d`
+  (`tablo3LoD`), `U33.x3d` (`anim\coffreLOD.o3d`): base roots unwelded, LOD roots welded. Those three LOD files hold only
+  `$$$DUMMY` objects with no vertices and no faces (`o3d.py`), so the kept trees draw and
+  pick nothing, and their base models have no LOD: they are drawn at every distance.
+  `tools/object_order.py` models the lookup: in U01 `Box20` in lookup order is PLDV,
+  RAILS, INTCAB, PTITRAIN (so `Box203` = INTCAB's) and the first `Box31` is
+  `U01_21.o3d`'s; in U02 the first `*U02_01` is `U02_03.O3D`'s (the seller), the first
+  `*U02_07` `Static\U02_07.o3d`'s; in U07 the first `Object04` is `Chambre1.O3d`'s (so
+  `*U06_26` is Cave2's); in U33 the first `GeoSphere0`/`GeoSphere1` are
+  `anim\coffre.o3d`'s and the first `pedalegch`/`pedaledrt` `static\u03.o3d`'s.
+  `Coordcam.o3d`'s `$$$DUMMY.Dummy01` has first child `*Target` (file order).
+- **Method:** MCP decompile of the x3d.dll functions named; capstone of the EXE's
+  `X3d_Init_Ptr` call; `pefile` imports; `tools/object_order.py` (`--selftest`).
+- **Confidence:** proven. Answers Q-0045, Q-0090, Q-0142,
+  Q-0174, Q-0180, Q-0181.
+
+### E-0531 — U03 hides `*path`'s parent with its whole subtree, so the route plane `0000aaaaaa` is hidden too
+- **Binary/file:** `MissionMonet.exe`, `x3d.dll`; `Data/U03/Anim/U03_09/path.o3d`.
+- **Evidence:** `U03::StartUnit` `0x00405175..0x00405197`: `X3d_Scene_Get_Object("*path")`
+  (`0x0043f7b8`), `esi` = object `+0x20` (its parent), `X3d_Object_Hide(esi, 1)`
+  (`0x0040518b`), `U03::DisableCollisionTree(esi)`. `X3d_Object_Hide(o, 1)` sets `+0x5c`
+  on `o`, on its first child, and `Object_HideSiblingTrees` (`0x100182e0`, renamed) on that
+  child's children and siblings: the whole subtree. `path.o3d`: root `$$$DUMMY.Dummy01`
+  with children `0000aaaaaa` (154 vertices) and `*path` (18). E-0301's "object `*path`
+  hidden" is corrected to "its parent, with the subtree".
+- **Method:** capstone; MCP decompile; `o3d.py`.
+- **Confidence:** proven. Answers Q-0144.
+
+### E-0532 — `LoadUnitScene` sets game `+0x160` to the two digits after the scene name's first letter; in U33 that is 33
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** writes of game `+0x160` (instruction search): `Game_NewGame` (1),
+  `FUN_00412af0` (1), `Game_GoToUnit` (3 for n = 8, else n; `0x00413009`, `0x00413023`),
+  `U04_StartUnit` (4, `0x0040a7aa`), `Game_LoadSave` (from the chunk) and `LoadUnitScene`
+  (`0x0041319b`). `LoadUnitScene(name, …)`: `Str_Substring(name, 1, 2)` (`0x00416140`,
+  renamed: characters 1..2 inclusive), `atoi` → n, `CreateUnitScene(n)`, load and start,
+  then game `+0x160` = n. App mode 1 always loads through `LoadUnitScene(game +0x14c)`
+  (E-0033), and a restore too (E-0182), so after `U33.x3D` loads the value is 33,
+  overwriting `Game_GoToUnit`'s 3. `Game_WriteSave` passes `+0x160` to `USERINFO`
+  (E-0452).
+- **Method:** MCP instruction search and decompile; capstone.
+- **Confidence:** proven. Answers Q-0193: a save in U33 unlocks 5 paintings.
+
+### E-0533 — U06's clown turn: the hotspot's matrix is the O3D's identity rotation, so the turn is Rz(3π/2 − yaw) on the posed rotation, no jump
+- **Binary/file:** `MissionMonet.exe`, `x3d.dll`, `x3dmp5.dll`;
+  `Data/U06/Anim/U03_02/TIRE.O3D`, `TIRE.A3D`.
+- **Evidence:** `X3d_Object_Get_Local_Matrice` copies transform `+0x74`, the rotation
+  matrix only (translation `+0x34` and scale `+0x54` are separate, E-0042); at load it is
+  the file's 16 floats (`+0xb4` copy). The hotspot takes it at creation (`FUN_00420b40`,
+  E-0391) inside `Scene_StartGeneric`; nothing poses objects before that: the node tick
+  (`AnimNode_TickList` `0x0041fe90`) is reached only from `Scene_TickAnimations`, which is
+  called by `Scene_RunFor` and the main loop (vtable `+0x24`), never from `XScene_70` or
+  `LoadUnitScene`, and U06's start runs no `RunFor`. `TIRE.O3D` root `*U03_02` matrix =
+  identity (`TIRE.A3D`'s root rotates by 10° about x from frame 1 on). `x3dmp5.dll`:
+  `X3d_Make_Rotation_Matrice_Z(a)` = [[cos a, sin a, 0], [−sin a, cos a, 0], [0, 0, 1]]
+  row-major; `X3d_Matrice_Mult(out, A, B)` = A·B; `X3d_Convert_To_Polar` yaw =
+  atan2(−y, x). With the start yaw 3π/2 the stored matrix after any number of turns is
+  Rz(3π/2 − current yaw).
+- **Method:** MCP decompile; `o3d.py`, `a3d.py`; xrefs.
+- **Confidence:** proven. Answers Q-0170.
+
+### E-0534 — Unit objects come from MSVCRTD `operator new`, so unwritten fields start at 0xCDCDCDCD; U06's `shooting` starts true
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `operator_new` (`0x0043651c`) is `jmp [0x00439168]` = MSVCRTD
+  `??2@YAPAXI@Z`, the debug-heap `operator new`, which fills a new normal block with 0xCD;
+  the EXE imports no `_CrtSetDbgFlag`. U06's constructor `0x00410940` and the base
+  constructor `0x0041a890` do not write `+0x6d0` (E-0390), so it holds 0xCDCDCDCD
+  (non-zero) until `U06_ClownStopShooting` or `U06_ClownStartShooting` writes it. The
+  `Gamesave.1` sample shows 0xCD in never-set node fields (E-0183), consistent. First
+  frame after a new entry at (−673.3, 475): safe (y > 280) and `shooting` ≠ 0 → stop: the
+  clown's node runs to frame 49 and pauses there; `shooting` = `shots` = 0.
+- **Method:** `pefile` import table; capstone; the MSVC debug heap's documented fill.
+- **Confidence:** proven for the allocator and the missing write. Answers Q-0171.
+
+### E-0535 — `ANIMATIONS`: the node list is chained by `+0x50`; every `*` node with slot clips is saved, and a restore re-creates the clips
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** list node base `ListNode_Construct` (`0x0041dd90`, vtable `0x0043999c`;
+  anim nodes `0x004399d8`): `+0x4c`, `+0x50`, `+0x54`, `+0x58`, `+0x5c` = 0; vtable `+4`
+  `ListNode_Append` (`0x0041df60`): append at the end of the `+0x50` chain (`+0x54` back
+  link); `+0xc` `ListNode_AppendSameName` (`0x0041dfe0`): append on the `+0x5c` chain;
+  `+0x14` `ListNode_FindByName` (`0x0041dea0`): self, then the `+0x50` chain, then `+0x5c`.
+  `XSceneAnim_AddNode` (`0x0041c280`) appends a new node to scene `+0x158` with `+4`, or,
+  when a node of that name exists, to that node's `+0x5c` chain. So `+0x50` is the list's
+  next link and `+0x5c` chains nodes sharing a name (E-0056's "child" reading of `+0x50`
+  is superseded). Slots: `AnimNode_AddSlotClip` (`0x00420220`) builds a node
+  (`AnimNode_Construct` `0x0041fc20`, name = clip name, `+0x84` = path), loads the `.A3D`
+  on the parent's object (`XAnimation_55` fails only when the file does not load) and
+  calls `AnimNode_SetSlot` (`0x004202f0`: replaces an existing slot; slot 0 := the parent
+  on the first add; `+0x1c8` += 1 counts added slots; the clip's `+0x64` = 1, `+0x60` = 0;
+  active `+0x1ca` := slot when asked). `AnimNode_FindSlot` (`0x00420360`) searches slots
+  0..15 by clip name. `AnimNode_OverrideFrameRange` (`0x00420140`) copies the animation's
+  first and last frame (anim `+0x38`, `+0x3c`) to `+0x1cc`, `+0x1d0` and sets new ones;
+  `AnimNode_RestoreFrameRange` (`0x00420170`) copies them back: `+0x1cc`/`+0x1d0` are that
+  backup (0xCD until an override). Writer `AnimNodes_WriteChunk` (`0x00420760`): for each
+  node on the `+0x50` chain (it recurses on `+0x50` only) with an animation, a name
+  starting `*` and `+0x1c8` ≠ 0: name, count, active slot, then per non-null slot 1..15
+  the fields of E-0183. Reader `AnimNodes_ReadChunk` (`0x00420410`): per entry, find the
+  node by name; if found, per slot re-create the clip with `AnimNode_AddSlotClip` (path
+  re-rooted at the data directory, activation from the saved `+0x64`) and read `+0x60`,
+  `+0x68`, `+0x6c`, `+0x70`, `+0x74`, `+0x78`, anim `+0x38`, `+0x3c`, `+0x1cc`, `+0x1d0`
+  into it; then `+0x1ca` := saved active slot; if the last slot's animation name does not
+  start with `*`, that slot's object := its parent. If the name is not found, nothing more
+  of that entry is read and the next 64 bytes are taken as a name. `Scene_RestoreState`
+  (`0x0041d490`) reads `SCENE`, cursor, camera, `OBJECTS` (INFOOBJ reload), `ANIMATIONS`,
+  gauge, actions, all inside `Scene_StartGeneric`, before the unit's own start continues.
+- **Method:** MCP decompile; vtables read with `pefile`.
+- **Confidence:** proven. Answers Q-0101; with E-0536 and E-0537 also Q-0160, Q-0172,
+  Q-0140.
+
+### E-0536 — U07's tipped plank is not saved: after a restore with `PLANCHE` = 1 the plank shows its load pose and cannot tip again
+- **Binary/file:** `MissionMonet.exe`; `Data/U07/U07.X3D`, `Anim/PLANCHE.*`.
+- **Evidence:** `U07_TipPlank` (E-0395) makes the plank's node with `XSceneAnim_AddNode`
+  (`*U06_30`, `planche.A3D`, no slot clip: `+0x1c8` = 0), so `AnimNodes_WriteChunk` skips
+  it (E-0535); `OBJECTS` restores only nodes that exist after the reload, and
+  `planche.A3D` is commented out in `U07.X3D`, so no node poses the plank after a restore.
+  The plank keeps `PLANCHE.O3D`'s load pose, and `plankTipped` = 1 blocks the tip.
+- **Method:** from E-0395 and E-0535.
+- **Confidence:** proven. Answers Q-0172.
+
+### E-0537 — A U03 restore after the clown's trick brings back the policeman's clips; nothing dereferences a missing `AttenteHorloge`
+- **Binary/file:** `MissionMonet.exe`, `x3d.dll`; `Data/U03/**`.
+- **Evidence:** `AttenteHorloge` is slot 1 of node `*U03_09` (E-0303), so `ANIMATIONS`
+  saves it and a restore re-creates it with its state (E-0535); `FlicSalut` and
+  `DoCinematiqueFlic` then find it with `AnimNode_FindSlot`. The trick's new clown node is
+  named `*U03_02` (`magie.A3D` root; the old node was renamed `ClownDeleted`), so its
+  `marche` slot is saved and, on restore, re-created on the reloaded juggler's `*U03_02`
+  node (`U03_25.o3d` root `*U03_02`), whose object `OBJECTS` keeps hidden. With M10
+  exhausted `U03::StartUnit` sets `follow` = 0 and makes no clown emitter (E-0301).
+  `X3d_Object_Set_Global_Position` writes the global matrix's translation (`+0xfc` →
+  `+0x124..+0x12c`) once; the next animation sample sets the dirty flag and the matrix is
+  rebuilt from the clip, so once `follow` is off the policeman stands where his active
+  clip puts him, in live play and after a restore alike.
+- **Method:** MCP decompile; `o3d.py`/`a3d.py` root names.
+- **Confidence:** proven. Answers Q-0140.
+
+### E-0538 — The clown gives the postcard whenever Enter is down or `magie` passes frame 48 while his voice plays; the voice outlasts that frame
+- **Binary/file:** `MissionMonet.exe`; `Data/U03/Sound/U03_01_04B.wav`.
+- **Evidence:** capstone `0x0040593c..0x0040599c`: `magie` running; if group `+0x178` is
+  not playing → no card; loop: frame (`+0x74`) > 48.0 or `Input_IsKeyDown(VK_RETURN)`
+  (`0x004163b0`, renamed: `GetAsyncKeyState & 0x8000`) → `U03::GiveCartePostale`; else
+  `Scene_RunFor(0)` (tick, render, message pump; no key handling) and repeat while the
+  group plays. Nothing between `Say(U03_01_04B)` and this loop stops the voice (Enter in
+  the first loop only starts `magie` early). `U03_01_04B.wav`: 22,050 Hz, 8-bit mono,
+  610,383 data bytes (27.68 s); E-0123's early "not playing" starts at most 83,333 bytes
+  (3.78 s) before the end, so the group plays for at least 23.9 s, while frame 48 comes
+  at most 9 s + 47/15 s ≈ 12.1 s after the line starts.
+- **Method:** capstone; MCP decompile; `wave` header read.
+- **Confidence:** proven. Answers Q-0141: the card is missed only if the voice never
+  plays (no sound device).
+
+### E-0539 — The hotspot list head (scene `+0x1a0`) is an object-less hotspot named `Root`
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `XScene_70` `0x0041aa63..0x0041aa95`: `Hotspot_Construct(4, id, "Root"
+  (`0x00441778`), 0, 1)` (`0x00420a90`, renamed: `+0x60` object = 0) stored at scene
+  `+0x1a0`. `Hotspot_UseUpHeldItem` (`0x004212b0`, renamed) resets the cursor
+  (`FUN_00414ba0`, `FUN_004144b0(0, 0, 0)`), calls `Hotspot_SetCursor(this, 0, "", 0)`
+  (`0x00421300`, renamed: with the last argument 0 it acts on `this` and skips a null
+  object) and the inventory's `+0x98` (remove the held item). Called on the head, only the
+  item is used up.
+- **Method:** capstone; MCP decompile.
+- **Confidence:** proven. Answers Q-0173.
