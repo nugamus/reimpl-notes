@@ -4717,3 +4717,18 @@ An entry at `tentative` confidence must also have a matching line in
   power-of-two width and height; none is non-power-of-two.
 - **Method:** one-off `python` loop over `tools/parsers/dmf.py`.
 - **Confidence:** proven (corpus statistic).
+
+### E-0612 — U01's mayor opens his mouth visibly while he talks; the mouth-slot load order decides it
+- **Binary/file:** `MissionMonet.exe` (live, `C:\MonetRun`); `Data/U01/Sound/d1_02.bin`.
+- **Evidence:** a live run to U01's entry (the `to_u01.sh` steps up to the prologue skip,
+  then `snap.ps1` every ~1.5 s) caught the mayor (`U01_02`) during `d1_02` with the lips
+  apart and the dark mouth interior (`FOND01`, the dark texels of `TETEMAI` around
+  u 0.79..0.85, v 0.89..0.94) showing in about half the frames. `d1_02.bin` has 637
+  records, 51 of them shape 1, so the slot-8 `A` node is enabled at rest early and stays
+  enabled (E-0125). The engine, loading the slots 1..8 in slot order, made `A` the last
+  node, so it overrode every other slot and the mouth stayed shut; loading them in the
+  order of E-0125 (`A` first, `Yeux` last) gives open mouths like the capture.
+- **Method:** live capture (one question: does the mayor's mouth open during `d1_02`);
+  `lip.py` shape counts; engine runs with forced slots.
+- **Confidence:** proven for the visible result; the order itself is E-0125/E-0606.
+

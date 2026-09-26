@@ -196,7 +196,9 @@ commented out).
 - Advance node frames in the fixed logic tick with dt = the tick length. For rendering
   above the tick rate, sample each node at the frame interpolated between the last two
   ticks (skip interpolation across a loop wrap); sampling is continuous in the frame, so
-  this matches the original's per-present sampling.
+  this matches the original's per-present sampling. Re-apply every enabled node in list
+  order, interpolated or not: a node that did not move (a paused mouth slot) must still
+  override the earlier nodes that did (E-0606, E-0612).
 - Hide and morph can be left unimplemented for U01 (no keys in the corpus), but keep the
   parsed data.
 
