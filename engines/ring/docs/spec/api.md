@@ -65,7 +65,9 @@ Rotation angles, "ran" and the transition kind byte are specified with the rende
 | `ObjPreSetAniCooOnPuz` | 0x4039f0 | int object, int presentation, int x, int y | animation position |
 | `ObjPrePauAni` | 0x403a40 | int object, int presentation | pauses the animation |
 | `ObjPreAddTxtToPuz` | 0x403b10 | int object, int presentation, int puzzle, str text, then 9 arguments passed to `aText::Init` | a text on the puzzle (`aObjectPresentation::ObjPreAddTxtToPuz` 0x42f270) |
-| `ObjPreSho` | 0x403c80, 0x403e00 | int object[, int presentation] | shows the object's presentations (one or all) |
+| `ObjPreSho` | 0x403c80 / 0x403e00 | int object, int presentation / int object | shows one presentation / all of them (`aObject::ShowPresentation`) |
+| `ObjPreHid` | 0x403d00 / 0x403e80 | the same | hides one / all (`aObject::HidePresentation`) |
+| `ObjPreHidDeaPuz` | 0x403d80 / 0x403f00 | the same | hides one / all and frees their pictures (`aObjectPresentation::HideWithDeallocPuzzle`) |
 | `ObjSetPasCur`, `ObjSetActCur`, `ObjSetPasDraCur`, `ObjSetActDraCur` | 0x403f80, 0x404030, 0x4040e0, 0x404190 | int object, then 7 dwords unk_2..unk_8 | the object's cursors, stored verbatim at +0x15/+0x32/+0x4f/+0x6c (0x420b70 …) with the load-from byte from `ART_BAG`. Observed: `22, 22, 20, 4, 12.5, 4, 4` (active), `22, 22, 0, 3, 0, 0, 3` (passive) |
 | `ObjAddBagAni` | 0x402ed0 | int object, int unk_2, u8 unk_3, int unk_4, f32 unk_5, u8 unk_6 | the object's inventory animation (`aAnimationImage::Init` with the object's icon name 0x426cb0, from the bag archive per `ART_BAG`) |
 | `PuzAddMovToRot` | 0x404450 | int puzzle, int rotation, str ride, int x1, y1, x2, y2, u8 enabled, int cursor, int unk_10 | a movability of kind 2 |
@@ -77,7 +79,7 @@ Rotation angles, "ran" and the transition kind byte are specified with the rende
 | `RotSetMovToRot` | 0x405250 | int rotation, int index, f32 alpha1, f32 beta1, f32 ran1, int unk_24, u8 kind, f32 alpha2, f32 beta2, f32 ran2 | the whole transition |
 | `RotSetMovOff` | 0x405850 | int rotation, int from, int to | `RotSetMovOnOrOff(rotation, 0, from, to)` |
 | `RotSetJugOn` | 0x405c70 | int rotation, f32 unk_2, f32 unk_3 | `RotSetJugOn` (the renderer's spec) |
-| `SouAdd` | 0x406970, 0x406ba0 | int id, int type, str file, … | a sound in the global sound list (0x4683c0; when the 5th argument ≠ 1 the sound object is the larger class with an event, vtable 0x47e86c, else vtable 0x47e844) |
+| `SouAdd` | 0x406970 (4 arguments), 0x406ba0 (6) | int id, int type, str file, … | a sound in the global sound list (0x4683c0; when the 5th argument ≠ 1 the sound object is the larger class with an event, vtable 0x47e86c, else vtable 0x47e844) |
 | `PuzAddAmbSou` / `RotAddAmbSou` | 0x404b00 / 0x405d50 | int owner, int sound, int unk_3, int unk_4, int unk_5, int unk_6, int fade | an ambient sound of the puzzle/rotation (`aSoundItem::Init` 0x41a150: fade > 1 required, stored as fade − 1; the sound must be of the ambient-music type) |
 | `PuzAdd3DSou` / `RotAdd3DSou` | 0x404c30 / 0x405e80 | int owner, int sound, int unk_3, int unk_4, int unk_5, int unk_6, f32 unk_7, int unk_8 | a 3D sound (`aRotation::Add3DSound` / `aPuzzle::Add3DSound`; the sound must be of the ambient-effect type) |
 | `PuzSetAmbSouOff`, `PuzSet3DSouOff`, `RotSetAmbSouOff`, `RotSet3DSouOff` | 0x404be0, 0x404d20, 0x405e30, 0x405f70 | int owner, int sound | switches a sound off |

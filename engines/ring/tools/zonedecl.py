@@ -40,8 +40,8 @@ API = {
     "004039f0": ("ObjPreSetAniCooOnPuz", "iiii"),
     "00403a40": ("ObjPrePauAni", "ii"),
     "00403b10": ("ObjPreAddTxtToPuz", "iiisiiiiiiiii"),
-    "00403c80": ("ObjPreSho", "i"),
-    "00403e00": ("ObjPreSho", "ii"),
+    "00403c80": ("ObjPreSho", "ii"),
+    "00403e00": ("ObjPreSho", "i"),
     "00403f80": ("ObjSetPasCur", "iiiiifii"),
     "00404030": ("ObjSetActCur", "iiiiifii"),
     "004040e0": ("ObjSetPasDraCur", "iiiiifii"),
@@ -56,8 +56,8 @@ API = {
     "00405250": ("RotSetMovToRot", "iifffibfff"),
     "00405850": ("RotSetMovOff", "iii"),
     "00405c70": ("RotSetJugOn", "iff"),
-    "00406970": ("SouAdd", "iisiii"),
-    "00406ba0": ("SouAdd", "iisi"),
+    "00406970": ("SouAdd", "iisi"),
+    "00406ba0": ("SouAdd", "iisiii"),
     "00404b00": ("PuzAddAmbSou", "iiiiiii"),
     "00405d50": ("RotAddAmbSou", "iiiiiii"),
     "00404c30": ("PuzAdd3DSou", "iiiiiifi"),
@@ -119,6 +119,11 @@ def selftest() -> None:
     assert fmt({"str": "a.bma"}, "s") == '"a.bma"'
     row = {"at": "1", "addr": "004045c0", "callee": "x", "args": [5, 0, 0x42500000, 0, 0x42aa999a]}
     assert render([row])[0].endswith("PuzSetMovToRot(5, 0, 52, 0, 85.3)"), render([row])
+    for f in sorted(CALLS.glob("*_setup.jsonl")):
+        for line in f.read_text(encoding="utf-8").splitlines():
+            r = json.loads(line)
+            if r["addr"] in API:
+                assert len(API[r["addr"]][1]) == r["purge"] // 4, (r["at"], API[r["addr"]])
     print("selftest ok")
 
 

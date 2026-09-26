@@ -689,3 +689,16 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   BMA 352×30 (`bma.py`), `Exit.bmp` 320×150 with the question drawn in, `ex_yes.bmp` 56×24.
 - **Method:** decompiles, disassembly, rendering the pictures with the validators.
 - **Confidence:** proven (the handlers); the unexplained 16-pixel offset is Q-0009.
+
+### E-0042 — Argument counts of `ObjPreSho` and `SouAdd` (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x403c80, 0x403e00, 0x406970, 0x406ba0;
+  `engines/ring/notes/calls/*_setup.jsonl`
+- **Evidence:** the callee's `ret n` (the `purge` field) over all 4,149 extracted calls:
+  0x403c80 pops 8 bytes (34 calls, object and presentation; the decompile passes the second
+  argument to `aObject::ShowPresentation`), 0x403e00 pops 4 (8 calls; its error string is
+  `ObjPreSho(INT id)`); 0x406ba0 pops 24 (468 calls), 0x406970 pops 16 (23 calls). The
+  table in `engines/ring/tools/zonedecl.py` had both pairs the other way round; the notes
+  in `engines/ring/notes/zones/` are regenerated, and its selftest now checks every
+  call's argument count against the purge.
+- **Method:** script over the call lists; decompiles of 0x403c80 / 0x403d00 / 0x403f00.
+- **Confidence:** proven
