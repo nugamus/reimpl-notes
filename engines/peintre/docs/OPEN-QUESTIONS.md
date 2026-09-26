@@ -302,3 +302,71 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   it back on the second tick. Whether the original guards the carry (or reads the button
   less often) decides whether the engine needs an edge there.
 - **Status:** open
+
+### Q-0400 — When does a scene track end, and which frame is "its last frame"?
+- **Context:** the flow docs' animation tables ("stops at its end", "holds the last frame",
+  "pose track n at its last frame", auberge's "length / 2"); scene.md "What a scene is made
+  of" gives only `length` = the track's first word and `frame` += elapsed.
+- **What we checked:** the flow docs and E-0318; the end tests of the per-scene anim steps
+  (0x42b5fe, 0x41a2ab, …) are not written into the specs.
+- **Blocks:** nothing visible: the `peintre` engine ends a track when `frame >= end` (end =
+  length, or length / 2), holds `frame` at `end`, and poses "the last frame" at `length`.
+  An off-by-one would show as a one-frame difference in the final pose.
+- **Status:** open
+
+### Q-0401 — The museum robot's screen scroll: which node, which way first?
+- **Context:** `musee.md` "Speaking" (the screen scrolls every 10 ticks, 0x4399d0 with
+  0x42ad1c) and E-0319 (0x42ad1c adds ±0x7f0000 to UV word 1, six steps each way).
+- **What we checked:** the specs only.
+- **Blocks:** the engine scrolls `ecran` (the node it retextures `ROBI3` ↔ `ROBI3N`), six
+  steps of +0x7f0000 then six of −0x7f0000, counting 10 elapsed ticks per step. The node,
+  the first direction and the step counter's start are to be confirmed.
+- **Status:** open
+
+### Q-0402 — Alternating tracks: does the second track restart from frame 1?
+- **Context:** maisonet's bird (`oisaller` → `oisrturn` → `oisaller` …) and jardin's
+  butterfly (`papiyon1` → `papiyon2` → `papiyon1`). The docs say the first track restarts
+  "from frame 1" but not where the second one starts the next time; if its frame stayed at
+  its end it would end again at once and the loop would lose it.
+- **What we checked:** `maisonet.md`, `jardin.md`, E-0361, E-0362.
+- **Blocks:** the engine resets the second track's frame to 1 when it ends, so the
+  alternation shows both tracks every round.
+- **Status:** open
+
+### Q-0403 — The café mirror: what does 0x650fe0 hold before the first swap?
+- **Context:** `cafe.md` "The mirror": each frame the texture is swapped "from the current
+  one (name kept in 0x650fe0)" to the one for the camera's z.
+- **What we checked:** `cafe.md`, E-0331.
+- **Blocks:** the engine starts from the texture name of `mirroir`'s first face group as
+  loaded from the `.3DC`; a different initial name would leave the first swap without effect.
+- **Status:** open
+
+### Q-0404 — The museum star after it has been taken: hidden on the next visit?
+- **Context:** `musee.md` Init lists no step that hides `etoile` when 0x4aba44 (the star
+  taken) is set, and 0x4aeb24 (the star's track may pass frame 52) is not in the saved block.
+- **What we checked:** `musee.md`, E-0321.
+- **Blocks:** the engine follows the doc: `etoile` is visible and clickable again on every
+  museum load, and 0x4aeb24 starts at 0 on each load. If the original hides it (through its
+  track or elsewhere) the star can be taken twice here.
+- **Status:** open
+
+### Q-0405 — Carrying with a level-triggered click: does a long click drop the object at once?
+- **Context:** interaction.md "Mouse": `click` is the button's level each tick. cafe,
+  mangeurs and pont pick a node up on a click and drop it on the next click.
+- **What we checked:** interaction.md, `cafe.md`, `mangeurs.md`, `pont.md`.
+- **Blocks:** in the engine a click held over two 66 ms ticks picks the object up and puts
+  it back on the second tick. Whether the original guards the carry (or reads the button
+  less often) decides whether the engine needs an edge there.
+- **Status:** open
+
+### Q-0406 — Who clears 0x4e3120 (back from the option menu) and 0x4e30f4 (back from zone 11)?
+- **Context:** `musee.md` "Back from the option menu" reads 0x4e3120 (set by 0x42f515);
+  `chambreb.md` Entry step 12 reads 0x4e30f4 (set by 0x42f2c2 for zone 11 while 0x4abd5c = 0).
+  Neither doc says when the flag goes back to 0.
+- **What we checked:** `musee.md`, `chambreb.md`, scene.md, E-0321, E-0332.
+- **Blocks:** the engine clears each flag where it is used (the museum frame, the bedroom
+  entry). If the original never clears 0x4e3120, the museum would reset the robot's
+  speech on every frame after the first option menu; if it is cleared elsewhere (e.g. when
+  the menu is opened outside the museum), a flag left over from another scene would not
+  reach the museum.
+- **Status:** open
