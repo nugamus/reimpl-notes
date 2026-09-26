@@ -465,3 +465,45 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   per frame (the EXE: 80, E-0203).
 - **Method:** read the ScummVM sources; `hnm.py`.
 - **Confidence:** strong (no frame decoded here; the header and stream bounds match)
+
+### E-0204 — CVY: frame count, buffer size, offset table, one HLZ stream per frame; the movie table decides which movie uses one
+- **Binary/file:** `/MISSION.EXE`; `Data/MOVIES/*.CVY` (37)
+- **Evidence:** Hnm_Open (0x40ba64), when the movie record's u32 at +0xC is set, opens
+  `%sDATA\MOVIES\%s.CVY`, reads `u32 count`, `u32 size` (m__malloc(size): "could not
+  alloc CVY buffer"), `count * 4` bytes of table ("CVY table"), and the rest of the file
+  (file size - `count * 4 - 8`: "CVY lz-buffer"). Cvy_UnpackFrame (0x40c759) unpacks
+  `lz + table[n]` into the buffer with 0x40918c → Hlz_Unpack 0x430700 (E-0101); Hnm_Open
+  calls it for frame 0 and Hnm_Stream for each next frame. The records are the table at
+  0x4a7a08 (stride 0x24, 68 entries; Movie_Open 0x414ace: `record = 0x4a7a08 + n * 0x24`):
+  name, has_cvy (+0xC), x (+0x10), y (+0x14), w (+0x18), h (+0x1C), and +0x20 written by
+  Hnm_Open (1 when the movie has sound). Movie_Open / Movie_Step (0x414bf8) blit the
+  frame with Blit_SetMovieRect (0x46f716: `dst += y * pitch + x * 2`, source stride
+  640 * 2) and Blit_MovieFrame (0x46fe55: copies `w` pixels by `h` lines from the start of
+  the frame buffer), then, if has_cvy, Blit_CvyMask on the same rectangle. Movie_Step
+  closes the movie early when Movie_Open's third argument was 0 and 0x40e4ef returns
+  non-zero (not yet identified; probably input). Corpus
+  (`cvy.py`): 37/37 files, every byte consumed (offsets multiples of 4, each stream ends
+  0..3 bytes before the next offset or EOF, unpacked size <= `buffer_size`), 2,900
+  frames; 24 table entries have has_cvy = 1 and a CVY file; 13 files are only in entries
+  with has_cvy = 0; mask counts = HNM frame counts except `A03_023A` 44/118, `A03_023K`
+  44/70, `A14_032A` 447/480 (all unused) and `A13_052B` 101/94.
+- **Method:** decompiled 0x40ba64, 0x40c759, 0x414ace, 0x414bf8, 0x414cd9, 0x414d60;
+  disassembled 0x46f716..0x46ff9d; table read from `Data/mission.___` (same MD5 as the
+  Ghidra copy); `engines/peintre/tools/parsers/cvy.py`.
+- **Confidence:** proven
+
+### E-0205 — A CVY frame is a line-run mask painted in one colour (0x116A / 0x08AA) over the movie rectangle
+- **Binary/file:** `/MISSION.EXE`; `Data/MOVIES/*.CVY`
+- **Evidence:** Blit_CvyMask (0x46f78b → 0x46ff0d, assembly): colour in EAX doubled to a
+  u32; `EDI = screen + y * pitch + x * 2`, `EBX = h`; per record byte `DL`: `DL > 0`
+  → `EDI += DL * pitch`, `EBX -= DL`, stop when `EBX <= 0`; `DL = 0` → run the line saved
+  at 0x4d3d1c again; `DL < 0` → save it, `DL & 0x7F` run bytes `CL`: `CL < 0` →
+  `REP STOSD (CL & 0x7F) + 1`, else `EDI += (CL + 1) * 4`; then `EBX -= 1`. There is
+  no end marker: the loop ends on the height. The callers (0x414ace, 0x414bf8, 0x414cd9,
+  0x414d60) pass 0x116A when 0x6516bc = 0, else 0x08AA (the only uses of these constants in
+  `.text`). Corpus: every mask line's runs add up to 320 u32 (a full 640-pixel line, so
+  each line starts at x again); no mask starts with a repeat; bytes after 480 lines are
+  zero padding (the empty masks); for the 24 opened files every mask covers >= h lines
+  and paints only lines < h.
+- **Method:** disassembly of 0x46ff0d; `cvy.py`.
+- **Confidence:** proven (what the colour is for: Q-0150)

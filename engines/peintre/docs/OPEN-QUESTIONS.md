@@ -57,3 +57,22 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Observed range:** 0x24, 0, 0, 256, 1, 614400 in every file.
 - **Blocks:** nothing (the engine ignores them); they stay `unk_*` in `tgp.ksy`.
 - **Status:** open
+
+### Q-0150 — What does the CVY mask colour (0x116A / 0x08AA) do after it is painted over a movie?
+- **Context:** E-0205. Blit_CvyMask paints parts of the movie rectangle in one dark blue
+  on the back buffer (0x6516a8) every frame.
+- **What we checked:** the constants occur only at the four mask calls; no other code
+  compares pixels with them (byte search of `.text`). Whether the colour is simply the
+  interface background (masking the video to a non-rectangular window) or a key for a
+  later pass (sprites, 3D) is not established.
+- **Blocks:** nothing for decoding; the engine can paint the same colour. A capture of
+  one masked movie (e.g. `A01_032A`) would settle what shows there.
+- **Status:** open
+
+### Q-0151 — Which movie does A13_052B.CVY belong to: A13_052B.HNM (94 frames) or the extensionless A13_052B (101)?
+- **Context:** E-0204. The CVY has 101 masks; table entry `A13_052b` has has_cvy = 1 and
+  the EXE opens `A13_052B.HNM` (94 frames), so masks 0..93 are used.
+- **What we checked:** frame counts; the EXE never opens a file without `.HNM`.
+- **Blocks:** whether masks line up with the 94-frame movie (a capture or a decoded frame
+  comparison would show it).
+- **Status:** open

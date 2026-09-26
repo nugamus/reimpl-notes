@@ -16,6 +16,7 @@ validator in `engines/peintre/tools/parsers/<fmt>.py` (with `--selftest`), the p
 | `.SPR` sprite bank | 289 (12 RLE, 115 band, 10 raw8, 152 raw16; 5,827 frames) | `spr.py` | `spr.ksy` | E-0102, E-0103 | done |
 | `.TGA` 2D overlay / cursor | 104 (11 with TGA 2.0 footer) | `tga.py` | `tga.ksy` | E-0104 | done |
 | `.HNM` movie (Cryo HNM6) | 95 (94 `.HNM` + extensionless `A13_052B`; 21,363 IX, 80 AA, 18,208 BB chunks) | `hnm.py` | `hnm.ksy` | E-0200..E-0203, E-0206 | done |
+| `.CVY` movie mask | 37 (2,900 frames; 24 opened by the game, 13 never) | `cvy.py` | `cvy.ksy` | E-0204, E-0205 | done (colour meaning Q-0150) |
 | `.AWF` bitmap font | 2 (1 fixed, 1 proportional) | `awf.py` | `awf.ksy` | E-0105 | done |
 
 ## `.BFG` — scene bundle (E-0013)
@@ -136,4 +137,25 @@ delay); with sound the EXE runs a `1000 / fps` ms timer (83 ms; 80 ms for `a03_0
 samples per frame) where ScummVM clocks frames by the samples (1,836 mono or 1,837
 stereo per frame, 83.3 ms). Movies with a table entry are drawn into a rectangle with a
 CVY mask on top (below).
+
+## `.CVY` — per-frame movie masks (E-0204, E-0205)
+
+`u32 frame_count, u32 buffer_size, u32 offsets[frame_count]`, then one Cryo HLZ stream
+per movie frame (the TGP packing, E-0101), each padded to 4 bytes with leftover memory.
+A frame unpacks to a run mask: a byte `1..0x7F` skips lines, `0` repeats the previous
+line, `0x80 | n` starts a line of `n` run bytes (`0x80 | k` paints `k + 1` u32 = two
+pixels each, else skips `k + 1` u32); every line's runs add up to 320 u32 (640 pixels),
+counted from the movie rectangle's origin. 130 of the 2,900 masks paint nothing (`7F 7F
+7F 63`, 480 lines skipped).
+
+The game's movie table (0x4a7a08, 68 entries `{char name[12]; u32 has_cvy; u32 x, y, w,
+h; u32 sound_on}`) says which movie has a mask: Movie_Open (0x414ace) plays the HNM
+into the rectangle (the top-left `w x h` of the 640x480 frame is copied to `(x, y)`) and
+paints mask `n` over frame `n` in colour 0x116A (5-6-5) or 0x08AA (5-5-5), the same dark
+blue, RGB about (16, 44, 82). 24 table entries have a CVY and all 24 files exist; 13 CVY
+files (`A03_023A`..`L`, `A14_032A`) belong to entries with `has_cvy = 0` and are never
+opened. Frame counts equal the HNM's except in four files: `A13_052B.CVY` has 101 masks
+for the 94-frame `A13_052B.HNM` (the extensionless `A13_052B` has 101 frames, Q-0151),
+and three of the unused ones. For the 24 opened files every mask covers at least the
+rectangle's height and paints nothing below it.
 
