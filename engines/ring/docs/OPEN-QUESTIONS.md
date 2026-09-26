@@ -116,3 +116,21 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** nothing; the engine uses the closest cell, 13 (8 points). One screenshot of
   the original's new-game question would settle it (text height of 11-pixel capitals).
 - **Status:** open
+
+### Q-0011 — How many frames per second does the original run, for the pan speed?
+- **Context:** `spec/rotation.md`: looking around adds a fixed amount to alpha and beta per
+  frame (0x4107f0), so the turning speed depends on the frame rate. The frame (0x40e9f0) is
+  once per idle loop; whether `Flip` waits for the vertical blank (and at what refresh
+  rate the game's 640 × 480 × 16 mode runs) is not established.
+- **What we checked:** the pan code (E-0046); not the DirectDraw flip flags.
+- **Blocks:** nothing; the engine runs the view at 60 frames per second meanwhile.
+- **Status:** open
+
+### Q-0012 — What is a rotation's byte +0x67 before a saved game sets it?
+- **Context:** `spec/rotation.md`: +0x67 set disables looking around with the mouse. Only
+  the saved-game restore writes it (0x40d34d / 0x40d359); the constructor (0x41da10)
+  does not, and the object comes from `operator new` (not zeroed in a release build).
+- **What we checked:** every byte store to +0x67 in `.text` (E-0046).
+- **Blocks:** nothing; the engine takes 0 (the view turns), which is how the game is
+  known to play.
+- **Status:** open

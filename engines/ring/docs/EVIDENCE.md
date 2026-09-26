@@ -743,3 +743,34 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
 - **Confidence:** proven
 - Supersedes the order in E-0033's summary of the key path ("first the zone's key handler,
   otherwise the current puzzle"): the handler is skipped while puzzle 1 is in mode 2.
+
+### E-0046 — Rotation rendering, looking around and rotation hot-spot coordinates (DVD)
+- **Binary/file:** `RING_DVD.EXE` renderer state at 0x495710 (grid u at +8, v at +0x4008,
+  64 words per row; columns +0x8028, rows +0x802c; corners +0x8030..+0x805c; ranges
+  0x49d794..0x49d7b0): 0x40f900 (40 × 28 blocks, 640 × 448), 0x40f7d0.. defaults,
+  0x40f9e0 (camera: ran clamp 30/87 at 0x47e2fc/0x47e2f8, `ran × π / 360`, alpha wrap
+  0/360 at 0x47e278/0x47e27c, beta margin 5 at 0x47e2e0, forward from alpha/beta with
+  1/180 at 0x47e2dc, 0x410a20 look-at, 0x410bb0), 0x411c90 (grid: asin = 0x46fd50, which is
+  `fpatan(x, sqrt((1+x)(1−x)))`; the quadrant fix at 0x41203b..0x41206c; scale 2048 at
+  0x4862d8 and 65536 at 0x47e330), 0x412180 / 0x4123c0 (v clamp), 0x412230 / 0x4116e0
+  (block fill; sampler at 0x41177a: `(v & 0xfff0000) >> 5` plus `(u & 0x7ff0000) >> 16`,
+  `>> 2` into the index array at +0x1fa40, `x & 3` into the table entry), 0x410410 / 0x412640
+  (header words at stream+8, table at +0x3c, indices 0x1fa40 after it), 0x4107f0 (panning:
+  1/640 0x47e32c, 1/480 0x47e328, 0.25 0x47e320, 48 0x47e318; `VK_UP`/`VK_DOWN`), 0x4119e0
+  and 0x412360 (mouse to panorama, tenths of a degree: factor 10 at 0x47e358),
+  `RotSetAlp` 0x405920 (−135 at 0x47e280), `RotSetBet` 0x4059b0, `RotSetRan` 0x405a30,
+  `aApplication::RotSetAct` 0x4025b0 (`SetCursorPos(0x140, 0xf0)`), frame 0x40e9f0 (draw
+  at `pitch × 16`); AS entry 0x437ba0 case 999: `RotSetAlp(80001, 90)`,
+  `RotSetRan(80001, 85.3)`, `RotSetAct(80001, 1, 1)`, timers 2, 3, 4
+- **Evidence:** as written in `spec/rotation.md`, from the decompiles and disassembly in
+  `engines/ring/notes/decomp/rot/` (and `as/`). Hot-spot x values in the zone set-ups
+  reach 3,596 (`notes/zones/*.md`), consistent with tenths of a degree, not columns.
+  Writes to rotation byte +0x67 in the whole `.text` (linear capstone sweep): only
+  0x40d34d and 0x40d359.
+- **Reference:** Templier's `base/rotation.cpp` (`updateView`, `setCoordinates`) names the
+  same constants; his renderer (`ImageHeaderEntry::drawBuffer`) is unimplemented. Not used
+  as proof.
+- **Method:** decompiles, disassembly (capstone), constant reads with `pefile`.
+- **Confidence:** proven for the formulas; the pan speed's time base is Q-0011.
+- Supersedes the api.md reading (under E-0031) of `ObjAddRotAcc` coordinates as "the
+  panorama's 2048-wide space"; the row is corrected.

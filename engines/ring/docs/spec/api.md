@@ -52,7 +52,7 @@ Rotation angles, "ran" and the transition kind byte are specified with the rende
 | `SetComBufLen` | 0x405fc0 | int rotation, int bytes | the rotation's decompression buffer size |
 | `AddObj` | 0x402900 | int id, str name, str icon, u8 unk_flag | an object; name and icon come from `aObj.ini` by id when present (0x402c00, 0x402c20), else from the arguments |
 | `ObjAddPuzAcc` | 0x402c40 | int object, int puzzle, int x1, y1, x2, y2, u8 enabled, int cursor, int unk_9 | an accessibility of the object on the puzzle |
-| `ObjAddRotAcc` | 0x402da0 | int object, int rotation, int x1, y1, x2, y2, u8 enabled, int cursor, int unk_9 | the same on a rotation (x in the panorama's 2048-wide space; y may be negative) |
+| `ObjAddRotAcc` | 0x402da0 | int object, int rotation, int x1, y1, x2, y2, u8 enabled, int cursor, int unk_9 | the same on a rotation, in tenths of a degree (x 0..3600, y negative above the horizon; `spec/rotation.md`) |
 | `ObjSetPuzAccKey` | 0x402d60 | int object, int index, int key | the key of the object's index-th accessibility (0x423940) |
 | `ObjSetAccOff` | 0x403090 | int object, int from, int to | `ObjSetAccOnOrOff(object, 0, from, to)`: disables accessibilities from..to |
 | `ObjAddPre` | 0x4032f0 | int object | appends a presentation to the object |
