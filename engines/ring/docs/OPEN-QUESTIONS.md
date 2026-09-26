@@ -59,3 +59,11 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   to the resumed chain, or fall back to another language's file). One precise run of the
   original DVD in Spanish on `AS/SOUND/SPA/1104.WAC` would answer what the player hears.
 - **Status:** open
+
+### Q-0005 — How does the ISO version play fos03n02_s05n01.cnm with its damaged frame 132?
+- **Context:** E-0024: the chunk at the table's frame-132 video offset is not a chunk.
+  If Play reads sequentially, the chain breaks there ("Error in typeCinData"); if it seeks
+  by the table, only that frame is lost.
+- **What we checked:** the file; the ISO EXE's Play has not been read yet.
+- **Blocks:** faithful playback of one ISO-version video (FO zone transition).
+- **Status:** open

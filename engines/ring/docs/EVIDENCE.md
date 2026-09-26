@@ -359,3 +359,32 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   and "single entry" do not.
 - **Method:** raw dwords at 0x47f0a0, decompile of `aSecComSou::Init`.
 - **Confidence:** proven
+
+### E-0024 — Video containers: "CNM HBR" (Ring DVD/CD) and "CNM UNR" (Ring ISO, Prophet)
+- **Binary/file:** `RING_DVD.EXE` `aCinMov::Init` 0x415340, `aCinMov::Play` 0x415990,
+  `aCinMov::SkipSound` 0x4158c0, header read 0x42a6b0 (0x40 bytes), `aCin::SControl`
+  0x42ccf0, TControl 0x42cbf0, `aCin::Decompress` 0x42cb90; `LEGEND.EXE`
+  `aImageFileCinema::ReadHeader` 0x421c30, SControl 0x422fc0, TControl 0x423170,
+  `aCinemaCompression::SkipFrame` 0x422f20, `aCinMov::Play` 0x4a51c0; every `.cnm`, `.ci2`
+  and every `.at3` member
+- **Evidence:** HBR: Play reads one type byte per chunk: 0x41/0x42/0x5a sound (SkipSound:
+  u32 size, skip), 0x53 image (Decompress/SControl read a 0x14-byte header whose first
+  dword is the payload size), 0x54 tiles (TControl reads 0xd bytes, then size + 2·b + 2
+  with b the header's last byte); it stops when the image count reaches the header
+  dword at +0xe; width/height at +0x17/+0x1b (0x42a6b0). UNR: ReadHeader reads 0xc0
+  bytes (width +0x11, height +0x15, tracks byte +0x1b ≤ 3, table count +0x1c), tracks ×
+  16 bytes, table count × 8 bytes; Play's chunk types are 'A' 'B' 'S' 'U' 'T' 'Z'; S/U
+  read a 0x2f-byte header, T an 8-byte header, each followed by its first dword's size.
+  Corpus: Ring DVD 452 and CD 443 `.cnm` are HBR; Ring ISO 456 `.cnm`, Prophet 67 `.ci2`
+  and 2,045 `.at3` members are UNR. 3,462 files (2,780 distinct) walk to the last byte with
+  image chunks = frame count; HBR headers: 1 channel, 16 bits, 22,050 Hz, 640×448, +0x12 =
+  1250; UNR: Ring ISO tables point at the chunk chain; Prophet `.ci2` and members have
+  +0x28 = 1 and an all-zero table. One HBR content (`DVD RH/PLA/1672.CNM` = CD
+  `RHS05N01_S05N02.cnm`) has a 300th image chunk cut off by the end of the file after its
+  299 frames (never read: Play stops at 299). ISO disc 4 `fo/Pla/fos03n02_s05n01.cnm`
+  (MD5 `c1827c4f…`) has no valid chunk at the table's frame-132 video offset 0x6d4d29.
+- **Reference:** `reference/multimedia_cx/Game_Formats/CNM.md` (container, chunk types,
+  codec description); Templier's `graphics/movies/cinematic*.cpp`.
+- **Method:** decompiles in `engines/ring/notes/decomp/`; `python
+  engines/ring/tools/parsers/cnm.py`: 100% at container level.
+- **Confidence:** proven (container); the frame codec is not yet specified.

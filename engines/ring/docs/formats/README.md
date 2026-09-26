@@ -19,6 +19,7 @@ The corpus of a type is its loose files and the members of every archive of that
 | `.aqc` panorama node | 587 (351) | `aqc.py` | `aqc.ksy` | E-0020 | done (1 file with trailing bytes, Q-0003) |
 | `.wac` / `.was` packed sound | 4,637 (2,638) + 53 damaged | `wac.py` (+ `wac_damaged.txt`) | `wac.ksy` | E-0021 | done (damaged DVD files: Q-0004) |
 | `.wav` | 744 (210) | `wav.py` | below | E-0022 | done |
+| `.cnm` / `.ci2` video, `CNM UNR` images in `.at3` | 3,462 (2,780) + 1 damaged | `cnm.py` | `cnm.ksy` | E-0024 | container done; codec not yet decoded (Q-0005 for the damaged file) |
 
 ## Packed bit stream
 
@@ -59,4 +60,5 @@ them (E-0017). The validators report them as "not this type".
 53 `.wac` files of the DVD's added languages (SPA 18, ITA 13, HOL 11, SWE 11) are damaged
 on the disc: 52 have a run of undecodable bytes (about 4 KB) after a chunk that crosses a
 64 KiB file offset, one (`N2/SOUND/ITA/1437.WAC`) has no WAV header. `wac_damaged.txt`
-lists them; `wac.py` reports them as excluded (E-0021, Q-0004).
+lists them; `wac.py` reports them as excluded (E-0021, Q-0004). One ISO video
+(`disc4/data/fo/Pla/fos03n02_s05n01.cnm`) has a damaged chunk at frame 132 (E-0024, Q-0005).
