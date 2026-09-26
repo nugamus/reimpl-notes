@@ -28,3 +28,9 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   engine by 4X Technologies with Direct3D (engines/x3d), not this software renderer.
 - **Blocks:** nothing now; a rename before upstreaming if a second game turns up.
 - **Status:** open
+
+### Q-0002 — What is the assembly at 0x455470–0x465bcf, and how is it entered?
+- **Context:** E-0012. No function starts there after Ghidra's analysis.
+- **What we checked:** raw disassembly of a few addresses only.
+- **Blocks:** the rasteriser spec (texture mapping, shading) if it lives there.
+- **Status:** open

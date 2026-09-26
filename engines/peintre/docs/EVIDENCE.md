@@ -134,3 +134,50 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   rather than the game's or Cryo's (Q-0001).
 - **Method:** string scan; decision recorded here.
 - **Confidence:** strong
+
+### E-0009 — Ghidra project Peintre.gpr holds /MISSION.EXE, analysed: 1,191 functions
+- **Binary/file:** `ghidra_projects/Peintre.gpr`, program `/MISSION.EXE` (copy of
+  `Data/mission.___` in `build/peintre-import/`, MD5 as E-0002)
+- **Evidence:** auto-analysis completed (`logs/peintre-import.log`, 36 s; no PDB found, as
+  expected). 1,191 non-thunk functions; the incremental-link jump table at
+  0x401000–0x4022bf holds the thunks every call goes through. Per-function strings,
+  imports, callers and callees in `engines/peintre/notes/function-dump.tsv`.
+- **Method:** PyGhidra headless `-import … -overwrite`, then
+  `tools/ghidra/scripts/func_dump.py` (read-only).
+- **Confidence:** proven
+
+### E-0010 — The code is laid out by object file: shell, sound, users, 3D scenes in alphabetical order, 3D engine, Cryo libraries, CRT
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** module ranges and the strings that prove each in
+  `engines/peintre/notes/module-map.md`. The 3D scene code runs auberge (0x419f0e
+  `LoadBoxAuberge`), cafe (0x41b6ab), chambreb (0x41c8a7), chambrev (0x41dcad), champ
+  (0x41e2b1), then the world/INI code (0x41ed13 `\PEINTRE.INI`, 0x421e56
+  `C_Monde::LoadScene`), then eglise (0x42421b), hopiext (0x424978), hopiint (0x425420),
+  jardin (0x426bf8), maisonet (0x4278d1), maisonj (0x4286e2), mangeurs (0x429813), musee
+  (0x42aab8), pont (0x42ce08), terrasse (0x42dced): alphabetical, one object per scene.
+  The Cryo libraries sit together at 0x465bd0–0x4746ff (APC codec, then file, fonts,
+  memory manager, DirectDraw, DirectInput, DirectSound), before the CRT.
+- **Method:** `func_dump.py` + `engines/peintre/tools/funcmap.py`.
+- **Confidence:** strong (ranges are contiguous and every named function falls in its
+  range; boundaries between unnamed functions are approximate)
+
+### E-0011 — 83 functions named from their strings; the Cryo memory manager names itself
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** `engines/peintre/notes/function-map.csv` (address, module, name,
+  evidence string). The Mem-Lib debug log strings give the memory functions' own names:
+  0x4709e0 "> m__purge ()", 0x470a80 "> m__malloc (%u)", 0x470ba0 "> m__calloc (%u,
+  %u)", 0x470e10 "> m__free (0x%08X)", 0x470ea0 "> m__defrag()". The scene loaders name
+  themselves in their error strings (`LoadBox<Scene> => %s`, `LoadAnims<scene>::%s
+  manque`), as does `C_Monde::LoadScene` (0x421e56). The other names are ours, each with
+  the string that motivated it.
+- **Method:** `funcmap.py` → `tools/ghidra/scripts/apply_names.py` (renamed in the project).
+- **Confidence:** proven for the self-named ones, strong for the rest
+
+### E-0012 — 64 KB of assembly at 0x455470–0x465bcf has no C functions
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** no function starts in the range after auto-analysis; the code is
+  NOP-padded between routines (e.g. 0x4554e8) and register-only, e.g. 0x456000 `mov bl,
+  al; mov cl, ah; shr eax, 5` (5-6-5 pixel packing shape). The 3D engine is software
+  (E-0004), so this is the likely home of the span loops; not yet proven (Q-0002).
+- **Method:** capstone disassembly of the raw bytes.
+- **Confidence:** tentative (Q-0002)
