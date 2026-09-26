@@ -1,0 +1,373 @@
+{"fn": "FUN_004635a0", "at": "004635a5", "callee": "FUN_00402210", "addr": "00402210", "args": [7], "purge": 4}
+{"fn": "FUN_004635a0", "at": "004635b9", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [80001], "purge": 4}
+{"fn": "FUN_004635a0", "at": "004635d0", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [80001, {"str": "Old_Ish.bma"}, 0, 16, 1], "purge": 20}
+{"fn": "FUN_004635a0", "at": "004635dc", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [80011], "purge": 4}
+{"fn": "FUN_004635a0", "at": "004635f3", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [80011, {"str": "DRIL_02.bma"}, 0, 16, 1], "purge": 20}
+{"fn": "FUN_004635a0", "at": "004635ff", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [80012], "purge": 4}
+{"fn": "FUN_004635a0", "at": "00463616", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [80012, {"str": "DRIL_03.bma"}, 0, 16, 1], "purge": 20}
+{"fn": "FUN_004635a0", "at": "00463622", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [80013], "purge": 4}
+{"fn": "FUN_004635a0", "at": "00463639", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [80013, {"str": "DRIL_05.bma"}, 0, 16, 1], "purge": 20}
+{"fn": "FUN_004635a0", "at": "00463645", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [80014], "purge": 4}
+{"fn": "FUN_004635a0", "at": "0046365c", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [80014, {"str": "DRIL_06.bma"}, 0, 16, 1], "purge": 20}
+{"fn": "FUN_004635a0", "at": "00463668", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [80002], "purge": 4}
+{"fn": "FUN_004635a0", "at": "0046367f", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [80002, {"str": "ASV01.bma"}, 0, 16, 1], "purge": 20}
+{"fn": "FUN_004635a0", "at": "0046368b", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [80003], "purge": 4}
+{"fn": "FUN_004635a0", "at": "004636a2", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [80003, {"str": "ASV02.bma"}, 0, 16, 1], "purge": 20}
+{"fn": "FUN_004635a0", "at": "004636ae", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [80004], "purge": 4}
+{"fn": "FUN_004635a0", "at": "004636c5", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [80004, {"str": "ASV03.bma"}, 0, 16, 1], "purge": 20}
+{"fn": "FUN_004635a0", "at": "004636d1", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [80005], "purge": 4}
+{"fn": "FUN_004635a0", "at": "004636e8", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [80005, {"str": "ASV04.bma"}, 0, 16, 1], "purge": 20}
+{"fn": "FUN_004635a0", "at": "004636f4", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [80008], "purge": 4}
+{"fn": "FUN_004635a0", "at": "0046370b", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [80008, {"str": "ASP04L01.bma"}, 0, 16, 1], "purge": 20}
+{"fn": "FUN_004635a0", "at": "00463717", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [80010], "purge": 4}
+{"fn": "FUN_004635a0", "at": "0046372e", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [80010, {"str": "ASP05L01.bma"}, 0, 16, 1], "purge": 20}
+{"fn": "FUN_004635a0", "at": "0046373a", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [80009], "purge": 4}
+{"fn": "FUN_004635a0", "at": "00463751", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [80009, {"str": "ASP03L01.bma"}, 0, 16, 1], "purge": 20}
+{"fn": "FUN_004635a0", "at": "0046375d", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [80006], "purge": 4}
+{"fn": "FUN_004635a0", "at": "00463774", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [80006, {"str": "ASP01L01.bma"}, 0, 16, 1], "purge": 20}
+{"fn": "FUN_004635a0", "at": "00463780", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [80007], "purge": 4}
+{"fn": "FUN_004635a0", "at": "00463797", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [80007, {"str": "ASP02L01.bma"}, 0, 16, 1], "purge": 20}
+{"fn": "FUN_004635a0", "at": "004637bb", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [80001, {"str": "ASS00N01"}, 0, 1], "purge": 16}
+{"fn": "FUN_004635a0", "at": "004637d0", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [80002, {"str": "ASS00N02"}, 0, 1], "purge": 16}
+{"fn": "FUN_004635a0", "at": "004637e5", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [80003, {"str": "ASS00N03"}, 0, 1], "purge": 16}
+{"fn": "FUN_004635a0", "at": "004637fa", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [80004, {"str": "ASS00N04"}, 0, 1], "purge": 16}
+{"fn": "FUN_004635a0", "at": "0046380f", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [80005, {"str": "ASS00N05"}, 0, 1], "purge": 16}
+{"fn": "FUN_004635a0", "at": "00463824", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [80006, {"str": "ASS00N06"}, 0, 1], "purge": 16}
+{"fn": "FUN_004635a0", "at": "00463839", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [80007, {"str": "ASS00N07"}, 0, 1], "purge": 16}
+{"fn": "FUN_004635a0", "at": "0046384e", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [80008, {"str": "ASS00N08"}, 0, 1], "purge": 16}
+{"fn": "FUN_004635a0", "at": "00463863", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [80009, {"str": "ASS00N09"}, 0, 1], "purge": 16}
+{"fn": "FUN_004635a0", "at": "00463878", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [80010, {"str": "ASS00N10"}, 0, 1], "purge": 16}
+{"fn": "FUN_004635a0", "at": "0046388d", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [80011, {"str": "ASS00N11"}, 0, 1], "purge": 16}
+{"fn": "FUN_004635a0", "at": "004638a2", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [80013, {"str": "ASS00N13"}, 0, 1], "purge": 16}
+{"fn": "FUN_004635a0", "at": "004638b7", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [80014, {"str": "ASS00N14"}, 0, 1], "purge": 16}
+{"fn": "FUN_004635a0", "at": "004638cc", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [80015, {"str": "ASS00N15"}, 0, 1], "purge": 16}
+{"fn": "FUN_004635a0", "at": "004638e5", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [80101, {"str": "ASS01N01"}, 0, 6], "purge": 16}
+{"fn": "FUN_004635a0", "at": "004638fa", "callee": "aApplication::SetComBufLen", "addr": "00405fc0", "args": [80101, 1800000], "purge": 8}
+{"fn": "FUN_004635a0", "at": "00463924", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80001, 80002, {"str": "1001"}, 757, 4294967225, 928, 85, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "0046394e", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80001, 0, 1112539136, 0, 1118476698, 0, 0, 1112539136, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463978", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80001, 80003, {"str": "1002"}, 1251, 4294967232, 1444, 95, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004639a2", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80001, 1, 1119092736, 0, 1118476698, 0, 0, 1119092736, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004639cc", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80001, 80004, {"str": "1003"}, 1784, 4294967234, 1982, 90, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004639f6", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80001, 2, 1124073472, 0, 1118476698, 0, 0, 1124073472, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463a23", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80002, 80001, {"str": "1004"}, 2696, 4294967129, 2956, 81, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463a4d", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80002, 0, 1130889216, 0, 1118476698, 0, 0, 1130889216, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463a7a", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80002, 80003, {"str": "1005"}, 2130, 4294967218, 2366, 130, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463aa4", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80002, 1, 1127612416, 0, 1118476698, 0, 0, 1127612416, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463ace", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80002, 80005, {"str": "1006"}, 1634, 4294967232, 1910, 87, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463af8", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80002, 2, 1124270080, 0, 1118476698, 0, 0, 1124270080, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463b22", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80003, 80002, {"str": "1007"}, 321, 4294967227, 548, 108, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463b4c", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80003, 0, 1073741824, 0, 1118476698, 0, 0, 1073741824, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463b76", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80003, 80005, {"str": "1008"}, 1168, 4294967227, 1538, 106, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463ba0", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80003, 1, 1119092736, 0, 1118476698, 0, 0, 1119092736, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463bca", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80003, 80004, {"str": "1009"}, 2137, 4294967230, 2394, 99, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463bf4", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80003, 2, 1127350272, 0, 1118476698, 0, 0, 1127350272, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463c24", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80003, 80013, {"str": "1010"}, 2721, 4294966979, 2882, 4294967098, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463c51", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80003, 3, 1130823680, 3251634176, 1118476698, 0, 0, 1132920832, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463c81", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80003, 80014, {"str": "1011"}, 3406, 4294966977, 3578, 4294967092, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463cae", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80003, 4, 1134198784, 3251634176, 1118476698, 0, 0, 1132920832, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463cd8", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80003, 80001, {"str": "1012"}, 3053, 4294967199, 3246, 57, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463d02", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80003, 5, 1132920832, 0, 1118476698, 0, 0, 1132920832, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463d32", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80003, 80101, {"str": "1013"}, 952, 326, 1798, 590, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463d5f", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80003, 6, 1119092736, 1104150528, 1118476698, 0, 0, 1119092736, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463d8f", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80003, 80015, {"str": "1014"}, 1306, 4294967026, 1397, 4294967134, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463dbc", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80003, 7, 1119092736, 3250585600, 1118476698, 0, 0, 1119092736, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463de6", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80004, 80001, {"str": "1015"}, 3387, 4294967201, 3596, 69, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463e10", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80004, 0, 1134166016, 0, 1118476698, 0, 0, 1134166016, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463e3a", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80004, 80003, {"str": "1016"}, 374, 4294967274, 541, 104, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463e64", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80004, 1, 1135804416, 0, 1118476698, 0, 0, 1135804416, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463e8e", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80004, 80005, {"str": "1017"}, 810, 4294967269, 1089, 73, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463eb8", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80004, 2, 1111752704, 0, 1118476698, 0, 0, 1111752704, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463ee5", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80005, 80003, {"str": "1018"}, 3053, 4294967143, 3244, 4294967290, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463f0f", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80005, 0, 1132920832, 0, 1118476698, 0, 0, 1132920832, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463f3c", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80005, 80003, {"str": "1018"}, 2984, 4294967272, 3090, 172, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463f66", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80005, 1, 1132920832, 0, 1118476698, 0, 0, 1132920832, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463f93", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80005, 80003, {"str": "1018"}, 3230, 4294967272, 3336, 172, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463fbd", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80005, 2, 1132920832, 0, 1118476698, 0, 0, 1132920832, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00463fe7", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80005, 80002, {"str": "1019"}, 3408, 4294967181, 3600, 102, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464011", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80005, 3, 1134264320, 0, 1118476698, 0, 0, 1134264320, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464038", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80005, 80002, {"str": "1019"}, 0, 4294967181, 135, 102, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464062", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80005, 4, 1134264320, 0, 1118476698, 0, 0, 1134264320, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "0046408c", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80005, 80004, {"str": "1020"}, 2617, 4294967225, 2870, 83, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004640b6", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80005, 5, 1130692608, 0, 1118476698, 0, 0, 1130692608, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004640e3", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80005, 80008, {"str": "1021"}, 1209, 4294967187, 1313, 181, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "0046410d", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80005, 6, 1119092736, 0, 1118476698, 0, 0, 1119092736, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "0046413d", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80005, 80008, {"str": "1021"}, 1397, 4294967166, 1509, 181, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464167", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80005, 7, 1119092736, 0, 1118476698, 0, 0, 1119092736, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464197", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80006, 80007, {"str": "1022"}, 2026, 413, 2387, 586, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004641c4", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80006, 0, 1127481344, 1104150528, 1118476698, 0, 0, 1127481344, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004641ee", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80006, 80011, {"str": "1023"}, 1740, 4294967263, 1875, 102, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464218", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80006, 1, 1124663296, 0, 1118476698, 0, 0, 1119092736, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464245", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80007, 80006, {"str": "1024"}, 29, 4294966756, 639, 4294966908, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "0046426c", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80007, 0, 0, 3251634176, 1118476698, 0, 0, 0, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464299", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80007, 80008, {"str": "1025"}, 2047, 4294967262, 2427, 163, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004642c3", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80007, 1, 1127481344, 0, 1118476698, 0, 0, 1127481344, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004642ed", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80008, 80007, {"str": "1026"}, 305, 4294967248, 622, 122, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464311", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80008, 0, 0, 0, 1118476698, 0, 0, 0, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "0046433e", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80008, 80011, {"str": "1027"}, 1274, 4294967024, 1429, 50, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "0046436b", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80008, 1, 1119092736, 3251634176, 1118476698, 0, 0, 1119092736, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464398", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80008, 80009, {"str": "1028"}, 2102, 4294967225, 2431, 136, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004643c2", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80008, 2, 1127481344, 0, 1118476698, 0, 0, 1127481344, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004643ef", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80008, 80005, {"str": "1029"}, 3000, 4294967223, 3100, 218, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464419", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80008, 3, 1132920832, 0, 1118476698, 0, 0, 1132920832, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464446", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80008, 80005, {"str": "1029"}, 3200, 4294967223, 3300, 218, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464470", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80008, 4, 1132920832, 0, 1118476698, 0, 0, 1132920832, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "0046449a", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80008, 80005, {"str": "1029"}, 3100, 4294967223, 3200, 4294967262, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004644c4", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80008, 5, 1132920832, 0, 1118476698, 0, 0, 1132920832, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004644f1", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80009, 80008, {"str": "1031"}, 333, 4294967263, 678, 176, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464515", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80009, 0, 0, 0, 1118476698, 0, 0, 0, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464545", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80009, 80010, {"str": "1032"}, 1745, 4294966801, 2478, 4294966927, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464572", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80009, 1, 1127481344, 3251634176, 1118476698, 0, 0, 1127481344, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004645a2", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80010, 80009, {"str": "1033"}, 182, 422, 745, 552, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004645c9", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80010, 0, 0, 1104150528, 1118476698, 0, 0, 0, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004645f3", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80010, 80011, {"str": "1034"}, 849, 4294967213, 1091, 104, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "0046461d", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80010, 1, 1110179840, 0, 1118476698, 0, 0, 1119092736, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464647", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80011, 80006, {"str": "1035"}, 3531, 4294967249, 3600, 95, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464671", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80011, 0, 1134460928, 0, 1118476698, 0, 0, 1134460928, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464698", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80011, 80006, {"str": "1035"}, 0, 4294967249, 249, 95, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004646c2", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80011, 1, 1134460928, 0, 1118476698, 0, 0, 1134460928, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004646f2", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80011, 80008, {"str": "1036"}, 3009, 280, 3320, 469, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "0046471f", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80011, 2, 1132920832, 1104150528, 1118476698, 0, 0, 1132920832, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464749", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80011, 80010, {"str": "1037"}, 2571, 4294967267, 2784, 80, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464773", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80011, 3, 1130299392, 0, 1118476698, 0, 0, 1130299392, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "0046479d", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80013, 80014, {"str": "1038"}, 342, 4294967241, 444, 47, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004647c1", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80013, 0, 0, 0, 1118476698, 0, 0, 0, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004647eb", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80013, 80015, {"str": "1039"}, 1149, 4294967265, 1225, 27, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464815", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80013, 1, 1116864512, 0, 1118476698, 0, 0, 1116864512, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464845", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80013, 80003, {"str": "1040"}, 892, 244, 1045, 348, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464872", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80013, 2, 1112276992, 1104150528, 1118476698, 0, 0, 1112276992, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "0046489c", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80014, 80013, {"str": "1041"}, 2253, 4294967239, 2366, 52, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004648c6", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80014, 0, 1127481344, 0, 1118476698, 0, 0, 1127481344, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004648f0", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80014, 80015, {"str": "1042"}, 1478, 4294967255, 1550, 34, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "0046491a", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80014, 1, 1121320960, 0, 1118476698, 0, 0, 1121320960, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "0046494a", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80014, 80003, {"str": "1043"}, 1668, 238, 1814, 359, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464977", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80014, 2, 1124139008, 1104150528, 1118476698, 0, 0, 1124139008, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004649a1", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80015, 80013, {"str": "1044"}, 2951, 4294967260, 3019, 34, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004649cb", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80015, 0, 1132265472, 0, 1118476698, 0, 0, 1132265472, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "004649f5", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80015, 80014, {"str": "1045"}, 3276, 4294967267, 3355, 29, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464a1f", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80015, 1, 1133477888, 0, 1118476698, 0, 0, 1133477888, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464a4f", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [80015, 80003, {"str": "1046"}, 3079, 212, 3236, 345, 1, 53, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464a7c", "callee": "RotSetMovToRot", "addr": "00405250", "args": [80015, 2, 1132920832, 1104150528, 1118476698, 0, 0, 1132920832, 0, 1118476698], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464aa9", "callee": "aApplication::PuzAddMovToRot", "addr": "00404450", "args": [80002, 80101, {"str": ""}, 0, 420, 640, 464, 1, 55, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464ac3", "callee": "PuzSetMovToRot", "addr": "004045c0", "args": [80002, 0, 1112276992, 0, 1118476698], "purge": 20}
+{"fn": "FUN_004635a0", "at": "00464af0", "callee": "aApplication::PuzAddMovToRot", "addr": "00404450", "args": [80003, 80101, {"str": ""}, 0, 420, 640, 464, 1, 55, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464b0a", "callee": "PuzSetMovToRot", "addr": "004045c0", "args": [80003, 0, 1117126656, 0, 1118476698], "purge": 20}
+{"fn": "FUN_004635a0", "at": "00464b37", "callee": "aApplication::PuzAddMovToRot", "addr": "00404450", "args": [80004, 80101, {"str": ""}, 0, 420, 640, 464, 1, 55, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464b51", "callee": "PuzSetMovToRot", "addr": "004045c0", "args": [80004, 0, 1120665600, 0, 1118476698], "purge": 20}
+{"fn": "FUN_004635a0", "at": "00464b7e", "callee": "aApplication::PuzAddMovToRot", "addr": "00404450", "args": [80005, 80101, {"str": ""}, 0, 420, 640, 464, 1, 55, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464b98", "callee": "PuzSetMovToRot", "addr": "004045c0", "args": [80005, 0, 1124204544, 0, 1118476698], "purge": 20}
+{"fn": "FUN_004635a0", "at": "00464bc5", "callee": "aApplication::PuzAddMovToRot", "addr": "00404450", "args": [80006, 80101, {"str": ""}, 0, 420, 640, 464, 1, 55, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464be2", "callee": "PuzSetMovToRot", "addr": "004045c0", "args": [80006, 0, 1119092736, 1099431936, 1118476698], "purge": 20}
+{"fn": "FUN_004635a0", "at": "00464c0f", "callee": "aApplication::PuzAddMovToRot", "addr": "00404450", "args": [80007, 80101, {"str": ""}, 0, 420, 640, 464, 1, 55, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464c2c", "callee": "PuzSetMovToRot", "addr": "004045c0", "args": [80007, 0, 1119092736, 1099431936, 1118476698], "purge": 20}
+{"fn": "FUN_004635a0", "at": "00464c59", "callee": "aApplication::PuzAddMovToRot", "addr": "00404450", "args": [80008, 80101, {"str": ""}, 0, 420, 640, 464, 1, 55, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464c76", "callee": "PuzSetMovToRot", "addr": "004045c0", "args": [80008, 0, 1119092736, 1099431936, 1118476698], "purge": 20}
+{"fn": "FUN_004635a0", "at": "00464ca3", "callee": "aApplication::PuzAddMovToRot", "addr": "00404450", "args": [80009, 80101, {"str": ""}, 0, 420, 640, 464, 1, 55, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464cc0", "callee": "PuzSetMovToRot", "addr": "004045c0", "args": [80009, 0, 1119092736, 1099431936, 1118476698], "purge": 20}
+{"fn": "FUN_004635a0", "at": "00464ced", "callee": "aApplication::PuzAddMovToRot", "addr": "00404450", "args": [80010, 80101, {"str": ""}, 0, 420, 640, 464, 1, 55, 0], "purge": 40}
+{"fn": "FUN_004635a0", "at": "00464d0a", "callee": "PuzSetMovToRot", "addr": "004045c0", "args": [80010, 0, 1119092736, 1099431936, 1118476698], "purge": 20}
+{"fn": "FUN_004635a0", "at": "00464d22", "callee": "aApplication::AddObj", "addr": "00402900", "args": [80017, {"str": ""}, {"str": ""}, 1], "purge": 16}
+{"fn": "FUN_004635a0", "at": "00464d3a", "callee": "aApplication::AddObj", "addr": "00402900", "args": [80007, {"str": ""}, {"str": ""}, 1], "purge": 16}
+{"fn": "FUN_004635a0", "at": "00464d65", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [80007, 80101, 1314, 183, 1397, 226, 1, 52, 0], "purge": 36}
+{"fn": "FUN_004635a0", "at": "00464d7d", "callee": "aApplication::AddObj", "addr": "00402900", "args": [80020, {"str": "Death"}, {"str": "AS_Nor_d"}, 1], "purge": 16}
+{"fn": "FUN_004635a0", "at": "00464d96", "callee": "aApplication::ObjAddBagAni", "addr": "00402ed0", "args": [80020, 1, 3, 20, 1095237632, 4], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00464db3", "callee": "ObjSetActCur", "addr": "00404030", "args": [80020, 22, 22, 20, 4, 1095237632, 4, 4], "purge": 32}
+{"fn": "FUN_004635a0", "at": "00464dcd", "callee": "ObjSetPasCur", "addr": "00403f80", "args": [80020, 22, 22, 0, 3, 0, 0, 3], "purge": 32}
+{"fn": "FUN_004635a0", "at": "00464de5", "callee": "aApplication::AddObj", "addr": "00402900", "args": [80012, {"str": ""}, {"str": ""}, 1], "purge": 16}
+{"fn": "FUN_004635a0", "at": "00464e0d", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [80012, 80005, 3097, 4294967295, 3197, 176, 1, 52, 0], "purge": 36}
+{"fn": "FUN_004635a0", "at": "00464e35", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [80012, 80005, 1318, 4294967230, 1381, 191, 1, 52, 1], "purge": 36}
+{"fn": "FUN_004635a0", "at": "00464e5a", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [80012, 80008, 3095, 4294967269, 3215, 73, 1, 52, 2], "purge": 36}
+{"fn": "FUN_004635a0", "at": "00464e82", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [80012, 80005, 384, 4294967235, 478, 197, 1, 52, 3], "purge": 36}
+{"fn": "FUN_004635a0", "at": "00464eaa", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [80012, 80005, 2225, 4294967237, 2308, 190, 1, 52, 4], "purge": 36}
+{"fn": "FUN_004635a0", "at": "00464ed2", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [80012, 80005, 467, 4294967101, 606, 3, 1, 52, 5], "purge": 36}
+{"fn": "FUN_004635a0", "at": "00464efa", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [80012, 80005, 2088, 4294967129, 2235, 8, 1, 52, 6], "purge": 36}
+{"fn": "FUN_004635a0", "at": "00464f25", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [80012, 80011, 1202, 4294967140, 1552, 355, 1, 52, 7], "purge": 36}
+{"fn": "FUN_004635a0", "at": "00464f3d", "callee": "aApplication::AddObj", "addr": "00402900", "args": [80016, {"str": ""}, {"str": ""}, 1], "purge": 16}
+{"fn": "FUN_004635a0", "at": "00464f49", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [80016], "purge": 4}
+{"fn": "FUN_004635a0", "at": "00464f5e", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [80016, 0, 80001, 0], "purge": 16}
+{"fn": "FUN_004635a0", "at": "00464f6a", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [80016], "purge": 4}
+{"fn": "FUN_004635a0", "at": "00464f7f", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [80016, 1, 80002, 0], "purge": 16}
+{"fn": "FUN_004635a0", "at": "00464f8b", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [80016], "purge": 4}
+{"fn": "FUN_004635a0", "at": "00464fa0", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [80016, 2, 80003, 0], "purge": 16}
+{"fn": "FUN_004635a0", "at": "00464fac", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [80016], "purge": 4}
+{"fn": "FUN_004635a0", "at": "00464fc1", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [80016, 3, 80004, 0], "purge": 16}
+{"fn": "FUN_004635a0", "at": "00464fcd", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [80016], "purge": 4}
+{"fn": "FUN_004635a0", "at": "00464fe2", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [80016, 4, 80005, 0], "purge": 16}
+{"fn": "FUN_004635a0", "at": "00464fee", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [80016], "purge": 4}
+{"fn": "FUN_004635a0", "at": "00465003", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [80016, 5, 80006, 0], "purge": 16}
+{"fn": "FUN_004635a0", "at": "0046500f", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [80016], "purge": 4}
+{"fn": "FUN_004635a0", "at": "00465024", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [80016, 6, 80007, 0], "purge": 16}
+{"fn": "FUN_004635a0", "at": "00465030", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [80016], "purge": 4}
+{"fn": "FUN_004635a0", "at": "00465045", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [80016, 7, 80008, 0], "purge": 16}
+{"fn": "FUN_004635a0", "at": "00465051", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [80016], "purge": 4}
+{"fn": "FUN_004635a0", "at": "00465066", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [80016, 8, 80009, 0], "purge": 16}
+{"fn": "FUN_004635a0", "at": "00465072", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [80016], "purge": 4}
+{"fn": "FUN_004635a0", "at": "00465087", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [80016, 9, 80010, 0], "purge": 16}
+{"fn": "FUN_004635a0", "at": "00465093", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [80016], "purge": 4}
+{"fn": "FUN_004635a0", "at": "004650a8", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [80016, 10, 80011, 0], "purge": 16}
+{"fn": "FUN_004635a0", "at": "004650b4", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [80016], "purge": 4}
+{"fn": "FUN_004635a0", "at": "004650c9", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [80016, 11, 80013, 0], "purge": 16}
+{"fn": "FUN_004635a0", "at": "004650d5", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [80016], "purge": 4}
+{"fn": "FUN_004635a0", "at": "004650ea", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [80016, 12, 80014, 0], "purge": 16}
+{"fn": "FUN_004635a0", "at": "004650f6", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [80016], "purge": 4}
+{"fn": "FUN_004635a0", "at": "0046510b", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [80016, 13, 80015, 0], "purge": 16}
+{"fn": "FUN_004635a0", "at": "00465123", "callee": "aApplication::AddObj", "addr": "00402900", "args": [80018, {"str": ""}, {"str": ""}, 1], "purge": 16}
+{"fn": "FUN_004635a0", "at": "0046514b", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [80018, 80101, 843, 4294967230, 1008, 188, 0, 52, 0], "purge": 36}
+{"fn": "FUN_004635a0", "at": "00465173", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [80018, 80101, 1147, 4294967192, 1277, 136, 0, 52, 1], "purge": 36}
+{"fn": "FUN_004635a0", "at": "0046519b", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [80018, 80101, 1418, 4294967199, 1562, 130, 0, 52, 2], "purge": 36}
+{"fn": "FUN_004635a0", "at": "004651c3", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [80018, 80101, 1698, 4294967197, 1849, 186, 0, 52, 3], "purge": 36}
+{"fn": "FUN_004635a0", "at": "004651cf", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [80018], "purge": 4}
+{"fn": "FUN_004635a0", "at": "004651e4", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [80018, 0, 80101, 0], "purge": 16}
+{"fn": "FUN_004635a0", "at": "004651f0", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [80018], "purge": 4}
+{"fn": "FUN_004635a0", "at": "0046520e", "callee": "aApplication::ObjPreAddAniToRot", "addr": "00403660", "args": [80018, 1, 80101, 1, 49, 1095237632, 4], "purge": 28}
+{"fn": "FUN_004635a0", "at": "00465223", "callee": "aApplication::ObjPreSetAniIdeOnRot", "addr": "00403920", "args": [80018, 1, 0, 80001], "purge": 16}
+{"fn": "FUN_004635a0", "at": "00465231", "callee": "ObjPreSho", "addr": "00403c80", "args": [80018, 1], "purge": 8}
+{"fn": "FUN_004635a0", "at": "0046523f", "callee": "aApplication::ObjPrePauAni", "addr": "00403a40", "args": [80018, 1], "purge": 8}
+{"fn": "FUN_004635a0", "at": "0046524b", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [80018], "purge": 4}
+{"fn": "FUN_004635a0", "at": "00465260", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [80018, 2, 80101, 2], "purge": 16}
+{"fn": "FUN_004635a0", "at": "0046526c", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [80018], "purge": 4}
+{"fn": "FUN_004635a0", "at": "00465281", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [80018, 3, 80101, 3], "purge": 16}
+{"fn": "FUN_004635a0", "at": "0046528d", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [80018], "purge": 4}
+{"fn": "FUN_004635a0", "at": "004652a2", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [80018, 4, 80101, 4], "purge": 16}
+{"fn": "FUN_004635a0", "at": "004652ae", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [80018], "purge": 4}
+{"fn": "FUN_004635a0", "at": "004652c3", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [80018, 5, 80101, 5], "purge": 16}
+{"fn": "FUN_004635a0", "at": "004652db", "callee": "aApplication::AddObj", "addr": "00402900", "args": [80019, {"str": ""}, {"str": ""}, 1], "purge": 16}
+{"fn": "FUN_004635a0", "at": "00465306", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [80019, 80006, 159, 161, 477, 393, 1, 52, 0], "purge": 36}
+{"fn": "FUN_004635a0", "at": "00465331", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [80019, 80006, 159, 161, 477, 393, 0, 52, 1], "purge": 36}
+{"fn": "FUN_004635a0", "at": "0046535c", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [80019, 80007, 159, 161, 477, 393, 1, 52, 2], "purge": 36}
+{"fn": "FUN_004635a0", "at": "00465387", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [80019, 80008, 159, 161, 477, 393, 1, 52, 3], "purge": 36}
+{"fn": "FUN_004635a0", "at": "004653b2", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [80019, 80009, 159, 161, 477, 393, 1, 52, 4], "purge": 36}
+{"fn": "FUN_004635a0", "at": "004653dd", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [80019, 80010, 159, 161, 477, 393, 1, 52, 5], "purge": 36}
+{"fn": "FUN_004635a0", "at": "004653ed", "callee": "FUN_00403090", "addr": "00403090", "args": [80019, 1, 1], "purge": 12}
+{"fn": "FUN_004635a0", "at": "00465405", "callee": "aApplication::AddObj", "addr": "00402900", "args": [80021, {"str": ""}, {"str": ""}, 1], "purge": 16}
+{"fn": "FUN_004635a0", "at": "00465430", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [80021, 80101, 1248, 235, 1466, 348, 1, 52, 0], "purge": 36}
+{"fn": "FUN_004635a0", "at": "0046545b", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [80021, 80101, 1089, 170, 1232, 268, 1, 52, 1], "purge": 36}
+{"fn": "FUN_004635a0", "at": "00465483", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [80021, 80101, 1181, 125, 1341, 190, 1, 52, 2], "purge": 36}
+{"fn": "FUN_004635a0", "at": "004654ae", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [80021, 80101, 1353, 130, 1552, 183, 1, 52, 3], "purge": 36}
+{"fn": "FUN_004635a0", "at": "004654d9", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [80021, 80101, 1444, 183, 1620, 249, 1, 52, 4], "purge": 36}
+{"fn": "FUN_004635a0", "at": "004654e5", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [80019], "purge": 4}
+{"fn": "FUN_004635a0", "at": "00465512", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [80019, 0, 80006, {"str": "ASP01L02.bma"}, 0, 16, 1, 1, 1000], "purge": 36}
+{"fn": "FUN_004635a0", "at": "00465539", "callee": "aApplication::AddObj", "addr": "00402900", "args": [80022, {"str": ""}, {"str": ""}, 1], "purge": 16}
+{"fn": "FUN_004635a0", "at": "00465561", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [80022, 80101, 0, 4294966716, 3600, 4294967017, 1, 53, 0], "purge": 36}
+{"fn": "FUN_004635a0", "at": "0046557e", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80200, 2, {"str": "1048.was"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "0046559b", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80201, 2, {"str": "1049.was"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "004655b8", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80203, 2, {"str": "1050.was"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "004655d5", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80204, 2, {"str": "1051.was"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "004655f2", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80205, 2, {"str": "1052.was"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "0046560f", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80207, 2, {"str": "1053.wav"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "0046562a", "callee": "aApplication::RotAddAmbSou", "addr": "00405d50", "args": [80001, 80200, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "00465645", "callee": "aApplication::RotAddAmbSou", "addr": "00405d50", "args": [80002, 80200, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "00465660", "callee": "aApplication::RotAddAmbSou", "addr": "00405d50", "args": [80003, 80200, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "0046567b", "callee": "aApplication::RotAddAmbSou", "addr": "00405d50", "args": [80004, 80200, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "00465696", "callee": "aApplication::RotAddAmbSou", "addr": "00405d50", "args": [80005, 80200, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "004656b1", "callee": "aApplication::RotAddAmbSou", "addr": "00405d50", "args": [80006, 80200, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "004656cc", "callee": "aApplication::RotAddAmbSou", "addr": "00405d50", "args": [80007, 80200, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "004656e7", "callee": "aApplication::RotAddAmbSou", "addr": "00405d50", "args": [80008, 80200, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "00465702", "callee": "aApplication::RotAddAmbSou", "addr": "00405d50", "args": [80009, 80200, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "0046571d", "callee": "aApplication::RotAddAmbSou", "addr": "00405d50", "args": [80010, 80200, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "00465738", "callee": "aApplication::RotAddAmbSou", "addr": "00405d50", "args": [80011, 80200, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "00465753", "callee": "aApplication::RotAddAmbSou", "addr": "00405d50", "args": [80013, 80200, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "0046576e", "callee": "aApplication::RotAddAmbSou", "addr": "00405d50", "args": [80014, 80200, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "00465789", "callee": "aApplication::RotAddAmbSou", "addr": "00405d50", "args": [80015, 80200, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "004657a4", "callee": "aApplication::RotAddAmbSou", "addr": "00405d50", "args": [80101, 80200, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "004657bf", "callee": "aApplication::RotAddAmbSou", "addr": "00405d50", "args": [80101, 80207, 100, 0, 1, 1, 20], "purge": 28}
+{"fn": "FUN_004635a0", "at": "004657da", "callee": "aApplication::PuzAddAmbSou", "addr": "00404b00", "args": [80002, 80201, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "004657f5", "callee": "aApplication::PuzAddAmbSou", "addr": "00404b00", "args": [80003, 80203, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "00465810", "callee": "aApplication::PuzAddAmbSou", "addr": "00404b00", "args": [80004, 80204, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "0046582b", "callee": "aApplication::PuzAddAmbSou", "addr": "00404b00", "args": [80005, 80205, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "00465846", "callee": "aApplication::PuzAddAmbSou", "addr": "00404b00", "args": [80006, 80207, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "00465861", "callee": "aApplication::PuzAddAmbSou", "addr": "00404b00", "args": [80007, 80207, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "0046587c", "callee": "aApplication::PuzAddAmbSou", "addr": "00404b00", "args": [80008, 80207, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "00465897", "callee": "aApplication::PuzAddAmbSou", "addr": "00404b00", "args": [80010, 80207, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "004658b2", "callee": "aApplication::PuzAddAmbSou", "addr": "00404b00", "args": [80009, 80207, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "004658cd", "callee": "aApplication::PuzAddAmbSou", "addr": "00404b00", "args": [80006, 80200, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "004658e8", "callee": "aApplication::PuzAddAmbSou", "addr": "00404b00", "args": [80007, 80200, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "00465903", "callee": "aApplication::PuzAddAmbSou", "addr": "00404b00", "args": [80008, 80200, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "0046591e", "callee": "aApplication::PuzAddAmbSou", "addr": "00404b00", "args": [80010, 80200, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "00465939", "callee": "aApplication::PuzAddAmbSou", "addr": "00404b00", "args": [80009, 80200, 100, 0, 1, 1, 10], "purge": 28}
+{"fn": "FUN_004635a0", "at": "00465956", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80206, 3, {"str": "1053.wav"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465973", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80018, 3, {"str": "1054.wav"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465990", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80019, 3, {"str": "1055.was"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "004659ad", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80020, 3, {"str": "1056.was"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "004659ca", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80208, 3, {"str": "1057.wav"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "004659e7", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80209, 3, {"str": "1058.wav"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465a04", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80210, 3, {"str": "1059.wav"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465a12", "callee": "FUN_00406e20", "addr": "00406e20", "args": [80210, 90], "purge": 8}
+{"fn": "FUN_004635a0", "at": "00465a2f", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80004, 5, {"str": "1060.was"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465a4c", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80005, 5, {"str": "1061.was"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465a69", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80006, 5, {"str": "1062.was"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465a86", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80007, 5, {"str": "1063.was"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465aa3", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80008, 5, {"str": "1064.was"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465ac0", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80009, 5, {"str": "1065.was"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465add", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80010, 5, {"str": "1066.was"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465afa", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80011, 5, {"str": "1067.was"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465b17", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80012, 5, {"str": "1068.was"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465b34", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80013, 5, {"str": "1069.was"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465b51", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80014, 5, {"str": "1070.was"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465b6e", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80015, 5, {"str": "1071.was"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465b8b", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80040, 5, {"str": "1072.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465ba8", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80041, 5, {"str": "1073.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465bc5", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80042, 5, {"str": "1074.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465be2", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80043, 5, {"str": "1075.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465bff", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80044, 5, {"str": "1076.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465c1c", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80045, 5, {"str": "1077.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465c39", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80046, 5, {"str": "1078.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465c56", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80047, 5, {"str": "1079.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465c73", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80048, 5, {"str": "1080.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465c90", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80049, 5, {"str": "1081.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465cad", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80050, 5, {"str": "1082.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465cca", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80051, 5, {"str": "1083.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465ce7", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80052, 5, {"str": "1084.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465d04", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80053, 5, {"str": "1085.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465d21", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80054, 5, {"str": "1086.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465d3e", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80055, 5, {"str": "1087.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465d5b", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80056, 5, {"str": "1088.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465d78", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80057, 5, {"str": "1089.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465d95", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80058, 5, {"str": "1090.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465db2", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80059, 5, {"str": "1091.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465dcf", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80060, 5, {"str": "1092.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465dec", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80061, 5, {"str": "1093.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465e09", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80062, 5, {"str": "1094.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465e26", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80063, 5, {"str": "1095.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465e43", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80064, 5, {"str": "1096.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465e60", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80065, 5, {"str": "1097.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465e7d", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80066, 5, {"str": "1098.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465e9a", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80067, 5, {"str": "1099.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465eb7", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80068, 5, {"str": "1100.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465ed4", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80069, 5, {"str": "1101.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465ef1", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80070, 5, {"str": "1102.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465f0e", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80071, 5, {"str": "1103.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465f2b", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80072, 5, {"str": "1104.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465f48", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80073, 5, {"str": "1105.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465f65", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80074, 5, {"str": "1106.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465f82", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80075, 5, {"str": "1107.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465f9f", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80076, 5, {"str": "1108.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465fbc", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80077, 5, {"str": "1109.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465fd9", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80078, 5, {"str": "1110.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00465ff6", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80079, 5, {"str": "1111.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00466013", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80080, 5, {"str": "1112.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00466030", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80021, 5, {"str": "1125.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "0046604d", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80022, 5, {"str": "1126.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "0046606a", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80023, 5, {"str": "1127.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00466087", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80024, 5, {"str": "1128.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "004660a4", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80025, 5, {"str": "1129.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "004660c1", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80026, 5, {"str": "1130.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "004660de", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80027, 5, {"str": "1131.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "004660fb", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80028, 5, {"str": "1132.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00466118", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80100, 5, {"str": "1133.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00466135", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80101, 5, {"str": "1134.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00466152", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80102, 5, {"str": "1135.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "0046616f", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80103, 5, {"str": "1136.wav"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "0046618c", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80104, 5, {"str": "1137.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "004661a9", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80105, 5, {"str": "1138.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "004661c6", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80106, 5, {"str": "1139.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "004661e3", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [80107, 5, {"str": "1140.wac"}, "?", 2, "?"], "purge": 24}
+{"fn": "FUN_004635a0", "at": "00466203", "callee": "FUN_00405e80", "addr": "00405e80", "args": [80001, 80206, 1, 1, 10, 90, 1132920832, 20], "purge": 32}
+{"fn": "FUN_004635a0", "at": "00466211", "callee": "FUN_00406080", "addr": "00406080", "args": [80000, 0], "purge": 8}
+{"fn": "FUN_004635a0", "at": "0046621f", "callee": "FUN_00406080", "addr": "00406080", "args": [80001, 0], "purge": 8}
+{"fn": "FUN_004635a0", "at": "0046622d", "callee": "FUN_00406080", "addr": "00406080", "args": [80002, 1], "purge": 8}
+{"fn": "FUN_004635a0", "at": "0046623b", "callee": "FUN_00406080", "addr": "00406080", "args": [80003, 0], "purge": 8}
+{"fn": "FUN_004635a0", "at": "00466249", "callee": "FUN_00406080", "addr": "00406080", "args": [80004, 1], "purge": 8}
+{"fn": "FUN_004635a0", "at": "00466257", "callee": "FUN_00406080", "addr": "00406080", "args": [80005, 0], "purge": 8}
+{"fn": "FUN_004635a0", "at": "00466268", "callee": "FUN_00406200", "addr": "00406200", "args": [80001, 1065353216], "purge": 8}
+{"fn": "FUN_004635a0", "at": "00466279", "callee": "FUN_00406200", "addr": "00406200", "args": [80002, 1073741824], "purge": 8}
+{"fn": "FUN_004635a0", "at": "0046628a", "callee": "FUN_00406200", "addr": "00406200", "args": [80003, 1120403456], "purge": 8}

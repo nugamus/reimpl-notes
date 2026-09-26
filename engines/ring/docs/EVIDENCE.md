@@ -491,3 +491,29 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
 - **Method:** decompiles in `engines/ring/notes/decomp/` (define_and_decompile for the
   window procedure and 0x40e9f0).
 - **Confidence:** proven
+
+### E-0031 — The zone API: declarations, their wrappers and the model classes (DVD)
+- **Binary/file:** `RING_DVD.EXE`: the 58 callees of the eight zone set-ups (0x4662a0 SY,
+  0x4635a0 AS, 0x45eb30 NI, 0x45b610 N2, 0x458a90 RO, 0x455a50 RH, 0x44f3e0 FO, 0x44ab00
+  WA; E-0030); ctors `aPuzzle` 0x41b740, rotation 0x41da10, `aObject` 0x41f940,
+  `aAccesibility` 0x4230c0, `aMovability` 0x423280, hot spot 0x423770, transition setter
+  0x423730, `aSoundItem::Init` 0x41a150, sound list 0x4683c0
+- **Evidence:** `ring_calls.py` lists 4,146 calls in the eight set-ups
+  (`engines/ring/notes/calls/*_setup.jsonl`); each callee decompiled
+  (`engines/ring/notes/decomp/api/`, `…/model/`) and its argument flow written in
+  `spec/api.md`: the id lookups (objects app+0x79, puzzles app+0x7d, rotations app+0x85),
+  the delegate calls and their argument order, the constructors' field offsets, the
+  movability kinds passed by the four `…AddMov…` wrappers (0, 1, 2, 3), the default
+  transition (0, 0, 0x42aa0000, 0, 2, 0, 0, 0x42aa0000), the transition layouts set by
+  `PuzSetMovToRot`/`RotSetMovToPuz`/`RotSetMovToRot`, the fade check of `aSoundItem::Init`
+  (`1 < fade`, stored `fade − 1`). The unnamed wrappers delegate as follows and are named
+  after it (Ghidra, `rename.py`): 0x402210 SetZone, 0x403090 → `ObjSetAccOnOrOff(…, 0, …)`,
+  0x405850 → `RotSetMovOnOrOff(…, 0, …)`, 0x406080/0x4060b0/0x406100/0x406180/0x406200/
+  0x406280 → `aVar::VarDefByte`/`VarSetByte`/`VarDefWord`/`VarDefDwrd`/`VarDefFloa`/
+  `VarDefStrg`, 0x405e80 (strings `RotAdd3DSou`) → `aRotation::Add3DSound`.
+- **Reference:** Templier's `Application` has the same set under long names
+  (`objectAddPuzzleAccessibility`, …) and names several parameters (volume, pan, frame
+  count, frame rate, amplitude/speed); those names are not taken over where the binary
+  does not show the use (they stay `unk_*` in `spec/api.md`).
+- **Method:** decompiles; `tools/ghidra/scripts/ring_calls.py`.
+- **Confidence:** proven for what `spec/api.md` states; `unk_*` are open.
