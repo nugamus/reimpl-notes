@@ -24,8 +24,8 @@ logs/
 
 # Proxy traces: large, machine-specific, regenerated per run. Golden traces that a test
 # depends on get force-added and named engines/x3d/traces/golden-*.log.
-engines/x3d/traces/*.log
-!engines/x3d/traces/golden-*.log
+engines/*/traces/*.log
+!engines/*/traces/golden-*.log
 
 # Build output
 build/
@@ -52,7 +52,7 @@ Thumbs.db
 desktop.ini
 
 # Captures of the original (game imagery, not ours to redistribute)
-engines/x3d/traces/*.png
+engines/*/traces/*.png
 
 # Save files copied from runs of the original (binary, machine-specific).
 engines/x3d/traces/save/
