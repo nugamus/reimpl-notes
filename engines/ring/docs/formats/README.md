@@ -6,5 +6,43 @@ validator in `engines/ring/tools/parsers/<fmt>.py` (with `--selftest`), the proo
 every version in `games/ring/discs/` and `games/prophet-and-assassin/discs/`, every byte
 consumed.
 
-| Format | Files | Validator | Spec | Evidence | Status |
+The corpus of a type is its loose files and the members of every archive of that type
+(`parsers/common.py`); identical contents are parsed once. "Files" counts every instance,
+"distinct" the contents parsed.
+
+| Format | Files (distinct) | Validator | Spec | Evidence | Status |
 |---|---:|---|---|---|---|
+| `.at2` / `.at3` archive | 41 (23) | `at2.py` | `at2.ksy` | E-0016 | done |
+| Packed image (BMA): loose `.bma`, `.bmp` members of `.at2` | 14,408 (4,895) + 6 misnamed text | `bma.py` | `bma.ksy` | E-0017 | done |
+| Packed TGA (TGC): `.tga` members of `.at2` | 22,868 (1,501) | `tgc.py` | `tgc.ksy` | E-0018 | done |
+| Plain BMP / TGA on disk | 53 (21) + 3 misnamed text | `bmp.py` | below | E-0019 | done |
+
+## Packed bit stream
+
+Shared by the packed images, and per Templier's engine by panoramas and sound
+(`RING_DVD.EXE` 0x4308e0, E-0017; `parsers/bitstream.py`, C build `parsers/ringdec.c`).
+Arguments: a literal width `v`, an index width `i` (always 6 so far), a start and an end
+bit. Bits are read MSB first (a big-endian dword at byte `pos >> 3`). A cache of 64
+(value, stamp) slots starts zeroed, the replacement slot `r` and the last slot `l` at 0.
+
+- `0` + `v` bits: literal; emitted, stored in slot `r`, `l = r` (no stamp).
+- `10` + `i` bits: slot index `s`; its value is emitted, its stamp set to the bit position
+  after the code, `l = s`; if `s == r`, `r` becomes the slot with the smallest stamp
+  (lowest index on ties).
+- `11`: the previous value again; slot `l` stamped; if `l == r`, `r` is recomputed.
+
+Decoding runs while the position is below the end bit, so a stream may yield one extra
+code from its padding bits.
+
+## Plain BMP / TGA
+
+On disk only (`aImage::Load` with 'e'): BMP = 'BM', 40-byte info header, 24 bpp, BI_RGB,
+rows padded to 4 bytes, bottom-up, optionally 2 zero bytes after the pixels that the
+file-size field counts. TGA = type 2, 24 or 32 bpp, no id, no colour map, optional TGA 2.0
+footer.
+
+## Not this type
+
+`BOGUS.BMA`, `BOGUS2.BMA`, `BOGUS2.BMP` in `DATA/SY/IMAGE` of the DVD, CD disc 1 and ISO
+disc 1 (MD5 `00a84375…`, 181 bytes) hold the text of a `.dia` subtitle file; no EXE names
+them (E-0017). The validators report them as "not this type".

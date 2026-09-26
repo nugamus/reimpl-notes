@@ -56,15 +56,15 @@ def decompile(program, func, out_dir: Path, timeout: int = 120) -> dict:
 
     entry = func.getEntryPoint()
     callees = sorted(
-        "%s @ %s" % (c.getName(), c.getEntryPoint())
+        "%s @ %s" % (c.getName(True), c.getEntryPoint())
         for c in func.getCalledFunctions(None)
     )
 
-    safe = re.sub(r"[^A-Za-z0-9_.-]", "_", func.getName())
+    safe = re.sub(r"[^A-Za-z0-9_.-]", "_", func.getName(True))
     path = out_dir / ("%s__%s.c" % (program.getName(), safe))
     header = [
         "/* %s!%s at 0x%s, %d bytes"
-        % (program.getName(), func.getName(), entry, func.getBody().getNumAddresses()),
+        % (program.getName(), func.getName(True), entry, func.getBody().getNumAddresses()),
         " *",
         " * Ghidra decompiler output. Reference only — never paste into engine/",
         " * (CLAUDE.md rule 3). Regenerate with tools/ghidra/scripts/decompile_one.py.",

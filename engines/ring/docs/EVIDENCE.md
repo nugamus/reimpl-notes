@@ -212,3 +212,75 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   `engines/ring/notes/decomp/`).
 - **Confidence:** strong (the control flow is proven; the parameter meanings are the
   reference's until the zone setup functions are read)
+
+### E-0016 — .at2/.at3 archive layout; 41 archives parse completely
+- **Binary/file:** every `.at2` (35) and `.at3` (6) in the corpus (23 distinct contents);
+  `RING_DVD.EXE` `aArt::Init` 0x4194d0, `aArt::GetRec` 0x4198e0; `LEGEND.EXE` 0x41e470,
+  0x41e880
+- **Evidence:** `aArt::Init` reads 0x20 header bytes into the object at +4 and loops
+  `*(this+0x10)` (header +0xc) times reading 0xff-byte records whose dwords at +0xf3,
+  +0xf7, +0xfb it keeps; `GetRec` seeks to the record's +0xf3 and reads +0xf7 bytes (and
+  rejects more than 10,000,000). Prophet's pair is the same. In the data: magic
+  `AT_II\0\0\0` (.at2) / `ATIII\0\0\0` (.at3), u32 dir size = count × 255, u32 count, u32 255,
+  three u32 zeros; members follow the directory contiguously in directory order to EOF;
+  names are unique. 37,183 Ring members (14,315 `.bmp`, 22,868 `.tga`) and 2,045 Prophet
+  members (1,214 `.bmp`, 831 `.tga`); in every one the third dword differs from the size, and
+  it is the unpacked size (921,654 for `\image\end.bmp` = a 640×480×24 BMP). Ring members
+  begin with a 16-byte header then `BM`; Prophet members begin with `CNM UNR\0`.
+- **Reference:** `reference/templier-scummvm-ring/engines/ring/base/art.cpp` `Art::init`
+  (same layout; he names the third dword `field_FB`).
+- **Method:** decompiled the four functions (`engines/ring/notes/decomp/`);
+  `python engines/ring/tools/parsers/at2.py`: files 41, distinct 23, passed 23, 100%.
+- **Confidence:** proven
+
+### E-0017 — Packed images (BMA) and the engine's packed bit stream
+- **Binary/file:** `RING_DVD.EXE` `aImage::Load` 0x413150, `aImageFileBma::Init` 0x42ba40,
+  header copy 0x42bb90, `aImageFileBma::ReadImage` 0x42bbf0, bit decoder 0x4308e0; every
+  loose `.bma` and every `.bmp` member of every `.at2`
+- **Evidence:** `aImage::Load` picks the loader by the last three letters of the name
+  (strings 0x485b00 `bmp`, 0x485afc `tga`, 0x485af0 `bma`, 0x485aec `tgc`, 0x485af4 `cnm`):
+  from an archive ('f') `bmp`/`bma` go to the Bma loader (ctor 0x42b980) and `tga`/`tgc` to
+  the Tgc loader (ctor 0x42b120); from disk ('e') `bmp` goes to the plain BMP loader
+  (0x42a860). The header copy reads dwords at +4, +8, +0xc, +0x10 and a word at +0x14 of the
+  member; ReadImage decodes bits 0x260 .. 0x260 + 8·seq_size with literal width = bit length
+  of the word at +4 and index width 6, then from byte 0x50 + seq_size a 16-bit stream of
+  (dword at 0x4c + seq_size) bytes; it expands each index to 3 pixels of a 16-bit image
+  created with `aImage::Create(16, …)`, and copies the 6 header bytes at +0x10 over the last
+  3 pixels. Decoder 0x4308e0: MSB-first bits, 64-slot cache with bit-position stamps, codes
+  `0`+literal, `10`+index, `11` repeat (README "Packed bit stream"). Corpus: 14,414 files,
+  6 of them `BOGUS*.BMA`, which hold `.dia` text (MD5 `00a84375…`, the string "bogus" is in
+  no EXE except as Borland RTL text in the CD one); the other 14,408 (4,895 distinct) end
+  exactly after the core stream, have 3 pixels per entry, indices below core_count, and
+  each stream yields its expected code count or one more. Decoded pixels shown as RGB555,
+  rows bottom-up, give a coherent picture (`DATA/AS/IMAGE/ASV01.BMA`); as RGB565 they do
+  not.
+- **Reference:** `reference/templier-scummvm-ring/engines/ring/base/stream.cpp`
+  `CompressedStream::decode` / `decompressIndexed` (same algorithm and offsets 608/640).
+- **Method:** decompiles in `engines/ring/notes/decomp/`; `python
+  engines/ring/tools/parsers/bma.py` (C decoder `ringdec.c` checked against the Python one
+  by `bitstream.py --selftest`): 100%.
+- **Confidence:** proven (layout, decoder); strong (RGB555, from the picture, see Q-0002)
+
+### E-0018 — Packed TGA (TGC): chunks of bit stream that unpack to a 32-bit TGA
+- **Binary/file:** `RING_DVD.EXE` 0x42b230 (strings `aImageFileTgc::Init`), `ReadInfo`
+  0x42b540, `ReadImage` 0x42b600; every `.tga` member of every `.at2`
+- **Evidence:** Init reads u32 chunk count, u32 output size, then per chunk u32 packed
+  size, u32 unpacked size and decodes the packed bytes (16-bit literals, 6-bit indices)
+  to the output, advancing by the unpacked size. ReadInfo takes the TGA header from the
+  output and rejects type ≠ 2 and fewer than 32 bits; ReadImage copies rows from the last
+  one up (8, 24, 32 bpp cases). Corpus: 22,868 members (1,501 distinct), chunk counts 1..18;
+  every chunk yields its size or one extra code; the unpacked sizes sum to the header
+  size, which is the archive's unpacked size; each result is an 18-byte header, type 2,
+  32 bpp, w·h·4 pixel bytes and, in 24 distinct files, the 26-byte TGA 2.0 footer.
+- **Method:** decompiles; `python engines/ring/tools/parsers/tgc.py`: 100%.
+- **Confidence:** proven
+
+### E-0019 — Plain BMP and TGA files on disk
+- **Binary/file:** loose `.bmp`/`.tga` (DVD `DATA/SY/IMAGE/BEG0..6.BMP`,
+  `DATA/SAVE/DUMMYLS.BMP`, `DATA/SY/VISUAL/*.TGA`, Prophet `data/sy/image/osc.bmp`,
+  `data/sy/visual/*.bmp`, and the CD/ISO copies)
+- **Evidence:** 56 files: 3 are `BOGUS2.BMP` (E-0017); the other 53 (21 distinct) are 24-bit
+  BI_RGB BMPs with a 40-byte header (6 distinct end with two zero bytes counted by the size
+  field) or type-2 TGAs; all consumed to the last byte. Loader choice as E-0017.
+- **Method:** `python engines/ring/tools/parsers/bmp.py`: 100%.
+- **Confidence:** proven

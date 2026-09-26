@@ -30,3 +30,12 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   built site by site from the diff (same call site, IAT slot in the crack) without using the
   crack's code.
 - **Status:** open
+
+### Q-0002 — Where does the engine convert RGB555 image data to the display's 16-bit layout?
+- **Context:** E-0017: packed images decode to 16-bit pixels that look right as RGB555.
+  `RING_DVD.EXE` 0x414410 (string `aVideoDeviceRaw::CalculateMask…`) sets channel masks
+  for four display layouts (555, 565, 655, 556), so the engine adapts to the surface.
+- **What we checked:** the Bma loader copies table entries without conversion.
+- **Blocks:** nothing for ScummVM (we pick the pixel format), but the spec of image
+  loading should name the conversion step.
+- **Status:** open
