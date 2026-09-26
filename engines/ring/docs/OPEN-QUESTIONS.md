@@ -95,3 +95,15 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   prefix in the install path.
 - **Blocks:** ScummVM picks `DATA/<LAN>/SY.AT2` by the chosen language meanwhile.
 - **Status:** open
+
+### Q-0009 — Are the main menu's hot spots really 16 pixels above their pictures?
+- **Context:** `games/ring/docs/sy.md`: object 90000's hot spot is (148, 69)–(500, 99)
+  but its lit picture is drawn at (148, 85) and 30 pixels tall; the same 16-pixel shift
+  holds for all seven entries. The dialogues on puzzle 1 and the other SY screens line up
+  with their pictures.
+- **What we checked:** the hit test (0x4238b0), the mouse globals (raw `GetCursorPos`),
+  the hot spot and accessibility constructors, the presentation position (0x42d320) and
+  puzzle drawing (0x41c320): no offset anywhere (E-0040).
+- **Blocks:** nothing; the engine follows the data. One run of the original (move the
+  mouse to y = 70 over "new game" and see whether it lights) would confirm it.
+- **Status:** open

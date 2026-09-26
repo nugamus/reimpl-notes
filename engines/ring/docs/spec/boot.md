@@ -111,7 +111,7 @@ then by the application's mode (0x40b7c0):
 
 Then puzzle 1 (SY's dialog puzzle, looked up by id with 0x40b760) is drawn on top, the bag if shown, the drag
 cursor (0x409520) while the left button is down, hotspot tracking (0x408dd0),
-dialogs (0x427c70), the cursor (0x423a60), and the frame is flipped. A frame counter
+dialogs (0x427c70), the cursor (0x41f720, `spec/cursor.md`), and the frame is flipped. A frame counter
 gives the fps each second.
 
 ## Input (window procedure 0x40eec0)

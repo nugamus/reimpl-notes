@@ -618,3 +618,74 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   `aCinMov::Init(path, name, device, 1, 0)`: channel 0.
 - **Method:** decompile.
 - **Confidence:** proven
+
+### E-0039 — Cursor kinds, files, animation clock and drawing (DVD)
+- **Binary/file:** `RING_DVD.EXE`: `CurAdd` 0x402750 / 0x4027c0, `CurSet` 0x402840,
+  `CurSetOffset` 0x402860, `aCursorHandler::Add` 0x41efb0, `Set` 0x41f7a0, draw overload
+  `Set(HDC, x, y)` 0x41f720, `SetOffset` 0x41f820, `GetType` 0x41f8c0; cursor vtables
+  0x47e588 (kinds 1/2: 0x42fd70 load, 0x430250 `SetCursor`, 0x430270 `DrawIcon`),
+  0x47e544 (kind 3: `aCursorImage::Alloc` 0x42fb80, draw 0x42fc20), 0x47e504 (kind 4:
+  `aCursorAnimation::Init` 0x42f8f0, draw 0x42f9d0 → 0x423030 = 0x416850 + 0x422950);
+  base slots 0x423bb0 (id, +4), 0x423660 (kind, +0xc), 0x430e90 (offset +0x10/+0x14);
+  `aAnimation::Init` 0x416450, `SetStartFrame` 0x416bd0, advance 0x416870, start 0x416670,
+  `aAnimationImage::Init` 0x4219f0, `aAnimation::Alloc` 0x421d10; strings 0x488200,
+  0x488214, 0x488228, 0x488eb4, 0x488ee4, 0x48cd50..0x48cd8c (`IDC_*`); frame 0x40ede5
+  (disassembly); `DATA/ENG/SY.AT2` member list
+- **Evidence:** Add switches on the kind: 1/2 → ctor 0x42fc70, 3 → 0x42f9f0, 4 →
+  0x42f7d0 + `aCursorAnimation::Init`; kind 3 builds `\%s\%s.tga` (archive) or
+  `%s%s\%s.tga` / `dummy_p.tga` (disk) only when its 8th argument is 3 or 4. 0x402750
+  refuses kind 4 and passes `(id, name, kind, a4, 0, 0, 0, a5, a6)`; 0x4027c0 accepts only
+  kind 4 and passes all nine. Disassembly of 0x42f8f0: `aAnimationImage::Init(name, 1, 0,
+  0, 0, 3, frames, fps, 1, flags, a4, 0, a8, a9)`, which calls `aAnimation::Init(frames,
+  fps, 1, flags, 0)` and stores the 6th argument (3) as the draw type (+0x7d) and a4 at
+  +0x81 (1 → `Alloc` at once). `aAnimation::Init`: +8 frames, +0xc fps, flags 4/8/0x10/0x20
+  → +0x14 loop mode, bit 2 → +0x2d; +0x53 = `__ftol(1000.0 / fps)` (fdivr of 0x47e270).
+  `SetStartFrame(n)` stores n − 1 at +0x10 and +0x22. 0x416870 (+0x21 = 1): when `now −
+  last > +0x53` the index moves by 1 and `last = now`; mode 4 wraps to +0x10 after the
+  last frame. 0x422950 loads frame `+0x22 + 1` with `%04d` and draws it through the device
+  slot 0x24 with the draw type +0x7d. 0x42fc20 draws the kind-3 image at (x − +0x10,
+  y − +0x14) with type 3; 0x42f9d0 the same offsets for kind 4. The frame (0x40ede5 on)
+  calls `GetType` and, for 3 or 4, 0x41f720(0, mouse x, mouse y). 0x42fd70: kind 1
+  compares the name with the `IDC_*` strings and calls `LoadCursorA(0, IDC_…)`, else
+  `LoadCursorA(hInstance, name)`. The archive holds `cur_idle.0001..0015`,
+  `cur_muv.0001..0020`, `cur_hotspot.0001..0019`.
+- **Method:** decompiles (`engines/ring/notes/decomp/cursor/`), capstone disassembly of
+  the call sites, archive listing.
+- **Confidence:** proven
+- **Reference:** Templier's `base/cursor.cpp` has the same kinds; not used for any value.
+
+### E-0040 — Hot-spot tracking and left click search order (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x408dd0 (tracking), `MouseLeftEvent` 0x409d90,
+  hot spot getters 0x4238b0 (contains), 0x423910 (+0x15 cursor), 0x423920 (+0x19),
+  0x423930 (+0x10 enabled), 0x40f6c0 (`GetCursorPos` → 0x4956a4/0x4956a8 and
+  0x495584/0x495594, then the frame 0x40e9f0), 0x406530, 0x40e610
+- **Evidence:** 0x4238b0: enabled && x1 ≤ x < x2 && y1 ≤ y < y2 (`jl`/`jge`).
+  0x408dd0: bag shown (app+0x8d +0x94) → 0x418a70; else puzzle 1 (0x40b760(1)):
+  accessibilities (mode +0x24 = 2 and object ≠ +0x29 → break), hit → `CurSet(hot spot
+  cursor)` and 0x40ca80(object, +0x19, puzzle id, 1, x, y); mode 1 → movabilities → 0x40cc10;
+  mode 2 → `CurSet(0x32)` + 0x433bc0, return; then app+0x89 (when +0x28 = 0) with
+  0x41e370/0x41e470 lists, fifth argument 0; then app+0x81 (0x41d7a0 first); none →
+  `CurSet(0x32)` and 0x40cde0. Drag (app+0x99 +0x20) → 3/4; 0x406530 (app+0x8d +0x95 ≠ 0)
+  → 2 / 1. `MouseLeftEvent` walks puzzle 1 then app+0x81 the same way and calls 0x40bbb0
+  when the object's byte +0xc has bit 0, 0x40bed0 for bit 3, then 0x408dd0. The two
+  mouse globals are both the raw `GetCursorPos` result; no path adds or subtracts 16.
+- **Method:** decompiles, disassembly (0x40f6c0, the hot spot getters, a scan of the
+  input paths for `0x10` adjustments).
+- **Confidence:** proven
+- Supersedes the event names "hot spot entered / left" of E-0033 for 0x40ca80 / 0x40cc10
+  (routing unchanged).
+
+### E-0041 — Zone SY: main menu, dialogues and their handlers (DVD)
+- **Binary/file:** `RING_DVD.EXE` `aApplication::StartMenu` 0x40dc80, `PuzSetAct`
+  0x402490, `PuzSetMod` 0x404ab0 → 0x41d000, `ObjPreSho` 0x403c80, `ObjPreHid` 0x403d00,
+  `ObjPreHidDeaPuz` 0x403f00 → 0x420b30, `ObjSetAccOnOrOff` 0x4030b0 (0x403030 on,
+  0x403050 off), question 0x40e090 / 0x40e120, warning 0x40dfd0 / 0x40e060,
+  `aApplication::Init` 0x431140; SY handlers 0x4335a0, 0x433b80, 0x433bc0, 0x431660;
+  `DATA/ENG/SY.AT2` pictures
+- **Evidence:** as listed in `games/ring/docs/sy.md` from the decompiles in
+  `engines/ring/notes/decomp/sy/`. 0x431660's new-game branch falls through into the
+  `unk_19` 3 case (disassembly 0x431807..0x43181b: `Init`, then 0x40e120(2)).
+  0x431140 loads the preferences and calls 0x402280(7, 999). The `gm_*.bmp` pictures are
+  BMA 352×30 (`bma.py`), `Exit.bmp` 320×150 with the question drawn in, `ex_yes.bmp` 56×24.
+- **Method:** decompiles, disassembly, rendering the pictures with the validators.
+- **Confidence:** proven (the handlers); the unexplained 16-pixel offset is Q-0009.
