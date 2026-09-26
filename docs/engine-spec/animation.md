@@ -140,6 +140,35 @@ is frozen.
 - The mayor's `U01_01/ATTENTE.A3D` spans frames 1..10 with keys at 0 and 1 only: it
   loops but always shows key 1's pose.
 
+## Transitions (E-0500, E-0501)
+
+`Transition(object, A at fa, B at fb, t, usePivot, recurse)` poses an object between two
+clips. Only U03 calls it (`U03::AnimateTransition`), always with usePivot = recurse = 1.
+Per object, and per track only when **both** clips have keys on it:
+- Key lookup as above (never the spline): sA, sB from each clip's bracketing keys.
+- Translation, scale: vA = lerp(A keys, sA), vB = lerp(B keys, sB); value = vA + t (vB − vA).
+- Rotation: q = slerp(slerp(A qᵢ, A qⱼ, sA), slerp(B qᵢ, B qⱼ, sB), t), the slerp above
+  (no sign flip), converted to M.
+- Morph: every morph value (positions, normals, bounds) as translation.
+- Hide: only while t < 0.5: apply A's step value at fa, then B's at fb (B wins where it has
+  keys); at t ≥ 0.5 leave it.
+- Pivot: (1 − t)·A pivot + t·B pivot (usePivot = 1).
+- Recursion pairs children by position, as `Animate` does. A negative frame makes the
+  call fail (not reachable from U03).
+
+`U03::AnimateTransition(a, b, n, fa, fb)` (a, b: slots on the same object; fa, fb = −1
+take each slot's current frame once, before the loop). For i = 1..n:
+1. Animation tick (every node advances and poses its object).
+2. `Transition(object, a at fa, b at fb, i/n, 1, 1)`.
+3. `RunFor(0)`: animation tick again, render, pump.
+
+Step 3's tick re-poses the object from its active slot, which in every U03 call is a or b,
+so the blended pose of step 2 is **never drawn**: what the player sees is n frames of the
+active clip at its own frame, while every running node in the scene advances twice per
+frame (both ticks use the same dt). An engine reproduces the original with n × (tick,
+tick, render); computing the blend is optional, and a real crossfade would be an
+enhancement, not parity.
+
 ## Welded objects (E-0054)
 
 In a welded hierarchy the top object holds the only vertex array (N =

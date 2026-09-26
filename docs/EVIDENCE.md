@@ -4063,3 +4063,125 @@ An entry at `tentative` confidence must also have a matching line in
 - **Method:** numpy over the captures.
 - **Confidence:** proven (the key colour survives 16-bit rounding and filtering nearly
   exactly).
+
+### E-0500 — `X3d_Object_Animate_Transition`: per clip linear sampling, then lerp (translation, scale, morph), nested slerp (rotation), lerped pivot, hide only for t < 0.5
+- **Binary/file:** `x3d.dll`.
+- **Evidence:** `X3d_Object_Animate_Transition(obj, A, fa, B, fb, t, usePivot, recurse)`
+  (`0x10001032`) calls, stopping at the first that returns 0:
+  `Anim_TransitionTranslation` (`0x10004d70`), `Anim_TransitionScale` (`0x10005550`),
+  `Anim_TransitionRotation` (`0x10005cf0`), `Anim_TransitionMorph` (`0x100069a0`); then, only
+  if t < 0.5, `Anim_ApplyHide(obj, A, fa, recurse)` and `Anim_ApplyHide(obj, B, fb, recurse)`
+  (`0x10004860`, the same function `X3d_Object_Animate` uses, E-0055); then
+  `Anim_TransitionPivot(obj, A, B, t, usePivot, recurse)` (`0x1001da70`). Each track
+  function acts only when both A and B have keys on that track (count ≠ 0); a negative fa
+  or fb logs "Frame %d in translation/scale/rotation/morph transition" (level 6) and
+  returns 0. Keys come from `Anim_FindKeysLinear` (`0x10002780`, E-0055's lookup); per clip
+  s = (f − fᵢ)/(fⱼ − fᵢ), or 0 when equal. Translation: pA = lerp(A keys, sA), pB = lerp(B
+  keys, sB), transform `+0x34..+0x3c` = pA + t (pB − pA) (linear, not the spline). Scale:
+  the same into `+0x54..+0x5c`. Rotation (capstone `0x10005ddd..0x10005f14`; the decompiler
+  drops the first weight, but `[esp+0x14]` = sA is pushed at `0x10005e96`):
+  qA = `X3d_Quaternion_Slerp`(A qᵢ, A qⱼ, sA), qB = slerp(B qᵢ, B qⱼ, sB), q = slerp(qA, qB,
+  t), `X3d_Quaternion_To_Matrice` into `+0x74`, copied to `+0xb4`. Morph: for the object's
+  vertex range (start `+0x48`, count `+0x44`) positions `+0x4c` and normals `+0x50`, the
+  object floats `+0x68/+0x6c/+0x70/+0x78` (key floats 0, 1, 2, 4) and the 8 box corners
+  from `+0x7c`, each lerp(lerp(A, sA), lerp(B, sB), t). Hide: object `+0x5c` = key i's u32
+  (step), A then B, so B's value wins where B has hide keys; for t ≥ 0.5 nothing is
+  written. Pivot: usePivot ≠ 0 → transform `+4..+0xc` = (1 − t)·A pivot (`+0xb4`) + t·B
+  pivot, else the init pivot `+0x14`; then dirty `+0x174` = 1. With recurse ≠ 0 each track
+  walks the object, A and B trees in parallel (first child `+0x24`, next sibling `+0x28`,
+  by position; `FUN_10004940`, `FUN_10005120`, `FUN_10005900`, `FUN_10006040`,
+  `FUN_10004740`, `FUN_1001d930`), also below a node whose track is skipped; the morph walk
+  below a skipped root ignores recurse. The corpus has no hide or morph keys (E-0055).
+- **Method:** MCP decompile; disassembly of `0x10005cf0` for the slerp arguments.
+- **Confidence:** proven. Functions renamed in `x3d.dll`.
+
+### E-0501 — `U03::AnimateTransition`'s blended pose is overwritten before it is drawn; each step ticks the animations twice
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `U03::AnimateTransition(scene, a, b, n, fa, fb)` (`0x00406f90`): fa = −1 →
+  node a `+0x74` (its frame), fb likewise from b, captured once; for i = 1..n: scene
+  vtable `+0x24`, `X3d_Object_Animate_Transition(a +0x80 (object), a +0x7c (animation), fa,
+  b +0x7c, fb, i · (1/n), 1, 1)`, `Scene_RunFor(0)`. U03's vtable (`0x004394e4`) and the
+  base both have `+0x24` = `Scene_TickAnimations` (`0x0041c350`): `Talker_Tick`, then
+  `AnimNode_TickList` (`0x0041fe90`) over scene `+0x158`, then
+  `Hotspots_ApplyStoredMatrices`. `Scene_RunFor(0)` (`0x0041bf70`) is one
+  `Scene_TickAnimations`, `Scene_RenderFrame`, `FUN_00416990`. `AnimNode_TickList`: a node
+  with slots and an active slot ≠ 0 recurses into that slot; otherwise, when enabled
+  (`+0x64` ≠ 0), `AnimNode_Advance` (`0x0041ff20`) if not paused (`+0x60` = 0), then
+  `X3d_Object_Animate_Spline(object, animation, frame, 0, 1)` on every tick, paused or
+  not. In every U03 call the object's active slot is clip a or clip b (`FlicSalut`
+  `0x00405e90`: `salut` is added with active 0, so `AttenteHorloge` stays active; on the
+  way back `salut` was made active by `FUN_00420080(salut, 1)`; `refelction` and `marche`
+  are added active, u03.md), so the tick inside `RunFor(0)` re-poses the object from the
+  active clip at that clip's own frame, on every track both clips key, before
+  `Scene_RenderFrame`. Both ticks use the one dt global (`0x0046ebe0`), written only in
+  `Scene_RenderFrame`, so every running node advances 2·dt·fps per rendered frame during
+  the n steps.
+- **Method:** MCP decompile; `pefile` dump of both vtables.
+- **Confidence:** proven statically; a trace of the salute would confirm it visually.
+  Functions renamed.
+
+### E-0502 — Unit class 50 (the gallery's 3D view): a camera cut per painting, free walking, no hover or clicks, the unit's ambient
+- **Binary/file:** `MissionMonet.exe`; `Data/U0?/U0?D.X3D`, `Data/U33/U33D.x3d`,
+  `Data/U01/static/U01.o3d`.
+- **Evidence:** vtable `0x0043983c` (22 entries; `+0x58` is the game vtable
+  `0x00439894`): `+0x10` `U50_OnLoadGalleryAmbient` (`0x00412410`), `+0x14`
+  `U50_StartGalleryView` (`0x00412530`), `+0x30/+0x34/+0x38` `U50_IgnoreMouse`
+  (`0x00412aa0`, returns 1), `+0x44` `U50_StorePick` (`0x00412ab0`: `X3d_Scene_Pick_Object`
+  into scene `+0x1a8`, nothing else); the others are the base's: `+0x1c`
+  `Scene_RenderFrame` (`0x0041b130`, no unit logic), `+0x24` `Scene_TickAnimations`, `+0x40`
+  `Scene_HandleInput` (`0x0041b7f0`: `Camera_HandleKeys` and the rest, movement.md),
+  `+0x4c` `0x0041bc00` (`<dir>Sound/<name>.WAV`, group 1, volume 85, loop as passed).
+  OnLoad: k = index of the first of the 18 names at `0x00440d48` whose 6 characters equal
+  game `+0x174` (no match leaves k = 17), stored at `+0x6c8`; by the u16 unit at
+  `0x00440d90 + 2k`: 1 → `+0x4c("U01", 1)`, 2 → `"s1_15"`, 3 and 33 → `"s2_01"`, 4 →
+  `"s3_01"`, 5 → `"s4_01a"`, 6 → `"s4_11"`; then `XScene_124` (`0x0041acf0`, the generic
+  load). Start: per unit `U50_FixupU01..U05` (`0x00412710`, `0x00412740`, `0x004128e0`,
+  `0x004129a0`, `0x00412a60`; 6 → `0x00412a90`, empty), then `Scene_StartGeneric`
+  (`0x0041ae10`: vtable `+8(0)` = `Scene_RestoreState(NULL)`, the directory's `INFOOBJ.BIN`
+  and actions; `+0x2c` lights; `FUN_004144b0(0, 0, 0)`); if k = 2 (not unit 2): `*U02_05`
+  shown (`+0x5c` = 0), hotspot list `+0x28("*U02_05", 1, 1)`, its node enabled, running,
+  looping (`+0x68` = 1); camera cut `FUN_00419520(x, y, z)`, `FUN_00419550(yaw, pitch)`
+  from the 20-byte row k at `0x00440db4`; for unit 3 or 33: `*U03_13` and `*Ecran10`
+  `+0x5c` = 1, `+0x118` = 1. Fix-ups: U01 `X3d_Scene_Get_Object("Tapiroug*")` → `+0x5c` =
+  1, but `static/U01.o3d`'s object `Tapiroug*` was already cut to `*` by `FUN_0041b010`
+  in the load (E-0271) and `X3d_Object_Get_Son` compares with `strcmp` (E-0070), so
+  nothing is hidden. U02: `*U02_01` → `*U02_06`, `lourde05` → `*U02_12` (object only),
+  `*U02_07` → `*U02_07b`, the next `*U02_07` → `*U02_07a`, `*ZonePlanc` → `*U02_13`,
+  `*colplanch` → `*U02_14`; `*U02_05` shown and its node enabled. U03/U33: `*Ecran01..09`
+  hidden; hidden and out of collision: the 24 names at `0x00440f1c` (`table03`, `trépied`,
+  `*U03_11`, `*U03_12`, `*U03_13`, `objectif0`, `objectif`, `Box206`, `Box207`, `Box187`,
+  `Cylinder28/31/32/33/34/36/37/38/39`, `Sphere03`, `Sphere06`, `Tube16/17/18`) and
+  `*U03_13`; `Box186` hidden. U04: `U04_FixObjectNames` (E-0230); `*U04_05`, then the 3
+  names at `0x00440f7c` (`*U04_05`, `*U04_31`, `*U04_32`) and `*U04_31` hidden and out of
+  collision; sphere radius 5.0, Z offset 0.0. U05: radius 19.0, Z offset 29.0. Rows:
+
+  | k | painting | unit | x, y, z | yaw | pitch |
+  |---|---|---|---|---|---|
+  | 0 | U11_01 | 1 | 308.53, −508.20, 29.55 | 1.56 | π/2 |
+  | 1 | U11_02 | 2 | 652.36, 153.88, 78.93 | −6.24 | π/2 |
+  | 2 | U11_03 | 2 | 408.00, −831.52, 52.53 | −4.44 | π/2 |
+  | 3 | U12_03 | 3 | 449.35, −232.52, 68.83 | −8.04 | 2.11 |
+  | 4 | U12_04 | 33 | 320.98, −92.88, 68.83 | −1.68 | 2.05 |
+  | 5 | U13_01 | 4 | −26.42, 37.10, −3.60 | 2.98 | π/2 |
+  | 6 | U13_03 | 4 | 53.62, 132.69, −4.60 | 7.66 | π/2 |
+  | 7 | U13_04 | 4 | 196.00, 284.00, 15.00 | −0.07 | π/2 |
+  | 8 | U13_05 | 4 | 44.25, 150.98, −3.63 | 4.807 | π/2 |
+  | 9 | U13_06 | 4 | 165.60, 291.76, 15.00 | 3.307 | π/2 |
+  | 10 | U13_11 | 4 | 176.40, 311.57, 15.00 | 3.37 | π/2 |
+  | 11 | U13_12 | 4 | 137.41, 123.18, −4.61 | 2.647 | 1.21 |
+  | 12 | U13_13 | 4 | 110.47, −48.46, −4.61 | −6.29 | π/2 |
+  | 13 | U13_14 | 4 | 108.50, 286.05, 15.00 | −2.93 | π/2 |
+  | 14 | U13_15 | 5 | 226.37, −1075.79, 47.58 | −3.37 | π/2 |
+  | 15 | U14_01 | 5 | 680.45, −135.73, 45.83 | −3.19 | π/2 |
+  | 16 | U14_03 | 6 | −1033.06, 146.35, 25.41 | −3.66 | π/2 |
+  | 17 | U14_07 | 6 | −1104.90, −1042.33, 25.41 | −2.586 | π/2 |
+
+  (π/2 is stored as the float 1.570796.) `U14_02` and `U14_05` have no row; their 3D
+  button is hidden (E-0453). The ambient files exist (`U01/Sound/u01.wav`,
+  `U02/Sound/s1_15.wav`, `U03` and `U33/Sound/s2_01.wav`, `U04/Sound/s3_01.wav`,
+  `U05/Sound/s4_01a.wav`, `U06/Sound/s4_11.wav`), as do `INFOOBJ.BIN` and `SCENE.BIN` in
+  every unit directory. `U07D.X3D` exists but no row leads to it. The camera is built
+  per scene by `XScene_70` (the only caller of the constructor `FUN_004184b0`), so it
+  starts with can move = can turn = 1 and no unit code changes them.
+- **Method:** MCP decompile; `pefile` table dumps; byte search of `U01.o3d`.
+- **Confidence:** proven statically. Functions renamed.

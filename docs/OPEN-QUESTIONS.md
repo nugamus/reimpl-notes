@@ -752,7 +752,9 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   policeman's salute and reflection).
 - **Next to try:** decompile `FUN_10005550`, `FUN_10005cf0`, `FUN_100069a0`,
   `FUN_10004860` in `x3d.dll`.
-- **Status:** open
+- **Status:** answered by E-0500 (scale and morph lerp, rotation slerp of the two slerped
+  clip poses, hide B-over-A only for t < 0.5, lerped pivot) and E-0501 (in U03 the blended
+  pose is overwritten by the next tick before rendering); `animation.md` "Transitions".
 
 ### Q-0170 — What does U06's clown look like after he first turns?
 - **Context:** E-0391. `Hotspot_TurnToYaw` builds M = (local matrix at hotspot creation) ·
@@ -873,7 +875,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** the gallery's "3D" button.
 - **Next to try:** decompile the class-50 vtable (`0x004123c0`): start, input, camera, and
   whether it shows the painting's viewpoint.
-- **Status:** open
+- **Status:** answered by E-0502: ambient, per-unit fix-ups, a camera cut from an 18-row
+  pose table, free keyboard movement, mouse ignored; `ui.md` "3D view".
 
 ### Q-0193 — Which saved unit numbers can reach the gallery's case 33?
 - **Context:** E-0452 unlocks 5 paintings for unit 33, but loading `U33.X3D` sets game

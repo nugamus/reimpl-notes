@@ -324,9 +324,59 @@ a zone, at the same 80 ms rate.
 **3D view** (`GotoScene3D` on `Tableau`): discard the gallery, load the painting's scene as
 unit class 50: `U01D.X3D` (`U11_01`), `U02D.X3D` (`U11_02`, `U11_03`), `U03D.X3D`
 (`U12_03`), `U33D.X3D` (`U12_04`), `U04D.X3D` (the nine `U13_0x/1x` except `U13_15`),
-`U05D.X3D` (`U13_15`, `U14_01`), `U06D.X3D` (`U14_02/03/05/07`); app mode 0. What the
-scene does: Q-0192. Escape there: stop group 1, open the Option menu, open `Galerie` then
-`Tableau` of the same painting, app mode 2.
+`U05D.X3D` (`U13_15`, `U14_01`), `U06D.X3D` (`U14_02/03/05/07`); app mode 0. Escape
+there: stop group 1, open the Option menu, open `Galerie` then `Tableau` of the same
+painting, app mode 2.
+
+What the scene does (unit class 50, E-0502):
+1. **Load:** start the painting's unit ambient (group 1, looping, `sound.md`): unit 1
+   `U01`, 2 `s1_15`, 3 and 33 `s2_01`, 4 `s3_01`, 5 `s4_01a`, 6 `s4_11`, from the scene's
+   own `Sound/`. Then the generic load (`scene.md`; asset directory from the scene name,
+   so `U33D.X3D` uses `Data/U33/`).
+2. **Fix-ups** by unit, before the objects' info is read:
+   - 1: none (the original hides `Tapiroug*`, which no longer exists under that name).
+   - 2: renames `*U02_01` → `*U02_06`, `lourde05` → `*U02_12` (object only), first
+     `*U02_07` → `*U02_07b`, next `*U02_07` → `*U02_07a`, `*ZonePlanc` → `*U02_13`,
+     `*colplanch` → `*U02_14`; show `*U02_05` and enable its node.
+   - 3 and 33: hide `*Ecran01`..`*Ecran09` and `Box186`; hide and remove from collision
+     `table03`, `trépied`, `*U03_11`, `*U03_12`, `*U03_13`, `objectif0`, `objectif`,
+     `Box206`, `Box207`, `Box187`, `Cylinder28/31/32/33/34/36/37/38/39`, `Sphere03`,
+     `Sphere06`, `Tube16/17/18`.
+   - 4: `U04_FixObjectNames` (`u00.md` step 0); hide and remove from collision `*U04_05`,
+     `*U04_31`, `*U04_32`; collision sphere radius 5, Z offset 0.
+   - 5: collision sphere radius 19, Z offset 29.
+   - 6: none.
+3. **Start:** the scene's `INFOOBJ.BIN` and actions as for a new unit (hotspot and node
+   states), the lights. For `U11_03` only (not `U11_02`): show `*U02_05`, show its hotspot,
+   its node running and looping.
+4. **Camera cut** to the painting's pose (eye x, y, z; yaw; pitch):
+
+   | Painting | Eye | Yaw | Pitch |
+   |---|---|---|---|
+   | U11_01 | 308.53, −508.20, 29.55 | 1.56 | π/2 |
+   | U11_02 | 652.36, 153.88, 78.93 | −6.24 | π/2 |
+   | U11_03 | 408.00, −831.52, 52.53 | −4.44 | π/2 |
+   | U12_03 | 449.35, −232.52, 68.83 | −8.04 | 2.11 |
+   | U12_04 | 320.98, −92.88, 68.83 | −1.68 | 2.05 |
+   | U13_01 | −26.42, 37.10, −3.60 | 2.98 | π/2 |
+   | U13_03 | 53.62, 132.69, −4.60 | 7.66 | π/2 |
+   | U13_04 | 196.00, 284.00, 15.00 | −0.07 | π/2 |
+   | U13_05 | 44.25, 150.98, −3.63 | 4.807 | π/2 |
+   | U13_06 | 165.60, 291.76, 15.00 | 3.307 | π/2 |
+   | U13_11 | 176.40, 311.57, 15.00 | 3.37 | π/2 |
+   | U13_12 | 137.41, 123.18, −4.61 | 2.647 | 1.21 |
+   | U13_13 | 110.47, −48.46, −4.61 | −6.29 | π/2 |
+   | U13_14 | 108.50, 286.05, 15.00 | −2.93 | π/2 |
+   | U13_15 | 226.37, −1075.79, 47.58 | −3.37 | π/2 |
+   | U14_01 | 680.45, −135.73, 45.83 | −3.19 | π/2 |
+   | U14_03 | −1033.06, 146.35, 25.41 | −3.66 | π/2 |
+   | U14_07 | −1104.90, −1042.33, 25.41 | −2.586 | π/2 |
+
+   (`U14_02`, `U14_05` have no 3D button.) Units 3 and 33 then hide and de-collide
+   `*U03_13` and `*Ecran10`.
+5. **Play:** the normal frame loop with no unit logic: keyboard movement and turning as in
+   a game unit (`movement.md`, with collision), animations and the ambient play. The mouse
+   does nothing: no hover cursor, no clicks. Escape as above.
 
 ## Other frames (E-0457)
 
