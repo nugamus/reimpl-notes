@@ -541,7 +541,7 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
 - **Confidence:** proven (routing); the event names in the table are from the callers
   and are refined in the zone specs.
 
-### E-0034 — Image and archive paths, decoder choice, archive lookup (DVD)
+### E-0034 — Image and archive paths, decoder choice, archive lookup (DVD) (SY count SUPERSEDED by E-0035)
 - **Binary/file:** `RING_DVD.EXE`: image handle ctor 0x42d260, `aPuzzle::Alloc` 0x41bdc0
   (disassembly 0x41bdc0..0x41bfa9), `aImage::Load` 0x413150, `aArtHandler::Open`
   0x419bc0, `GetData` 0x419e10, index 0x419b50, `aArt` name lookup 0x419890 with
@@ -559,4 +559,12 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   `osc.bmp` is neither), sounds are loose files.
 - **Method:** decompiles and disassembly; name census over `notes/calls/*_setup.jsonl`
   against the archives and `DATA/<zone>/`.
+- **Confidence:** proven
+
+### E-0035 — SY declares 57 distinct puzzle images, 56 of them in SY.AT2 (corrects E-0034)
+- **Binary/file:** `notes/calls/sy_setup.jsonl` (`PuzAddBgrImg`, `ObjPreAddImgToPuz`),
+  DVD `DATA/ENG/SY.AT2`
+- **Evidence:** 57 distinct names, 56 archive members; `osc.bmp` is not a member (it is a
+  loose file only in Prophet). NI 51/51, FO 72/72, WA 68/68 distinct stand.
+- **Method:** set comparison.
 - **Confidence:** proven
