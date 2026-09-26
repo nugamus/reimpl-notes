@@ -665,3 +665,20 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   tables read from .data through pefile's mapped image.
 - **Confidence:** proven
 - **Doc:** `games/mission-sunlight/docs/hopiint.md`
+
+### E-0361 — jardin (scene 11): 0x14/0x34-byte tables, gate box set, kite, butterfly timer, zone 19, three exits
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** init `0x426d9b`, per frame `0x427069`, anim step `0x426f34`, sounds
+  `0x426c7a`, box sets `0x426b70`/`0x426c56`, `LoadBoxJardin` `0x426bf8` (`BOX1.3DI`),
+  `LoadAnimsjardin` `0x426cc9`. Object table `0x4ad080`, 8 x 0x14 bytes (cursor +0xa, handle
+  +0xc, hidden +0x10: `0x426d9b`, `0x427069`); anim table `0x4ad128`, 5 x 0x34 (node name
+  +0xf, handle +0x20 .. playing +0x30: `LoadAnimsjardin`, `0x426f34`). Items: `rato` 30,
+  `fuzz`/`aild`/`ailg` 29. `partoche` zone 19; `porte01`/`porte02` → 11 → 1. Position exits:
+  z < 300 and x > 10000 → 11 → 13; z < -500 and x < -0x2454 → 11 → 12. Butterfly timer
+  `DAT_00599064`/`DAT_00599074` (5, += 0x14). `papiyon3.3da`'s playing word (`0x4ad228`) is
+  not written by any decompiled 3D function (Q-0236).
+- **Method:** decompiled with PyGhidra `decompile_one.py` (read-only copy of Peintre.gpr);
+  call arguments the decompiler dropped read from the pushes before each call (capstone);
+  tables read from .data through pefile's mapped image.
+- **Confidence:** proven
+- **Doc:** `games/mission-sunlight/docs/jardin.md`

@@ -88,3 +88,21 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** nothing in the 3D flow; possibly a mirror-breaking animation seen after
   zone 11.
 - **Status:** open
+
+### Q-0235 — Who sets DAT_004abc08 (mangeurs' cuckoo on entry)?
+- **Context:** mangeurs' init `0x4298e5` sets `DAT_00599044` := (`DAT_004abc08` = 0); the
+  frame plays `coucou` and clears `DAT_004abc08` when it was non-zero (E-0364).
+- **What we checked:** all decompiled game3d functions; no other write. It lies in the saved
+  block `0x4aba40` passed to the 2D side (E-0312), so a 2D zone may set it.
+- **Blocks:** when the cuckoo sounds.
+- **Status:** open
+
+### Q-0236 — Are the never-started 3D tracks started elsewhere?
+- **Context:** loaded tracks whose playing word no decompiled 3D function sets to 1:
+  jardin `papiyon3.3da` (`0x4ad228`), maisonj `nuages.3da` (`0x4adba4`), mangeurs
+  `buche.3da`, `chaise.3da`, `fagot.3da` (`0x4ae3ac`, `0x4ae424`, `0x4ae49c`) (E-0361,
+  E-0363, E-0364).
+- **What we checked:** the decompiled game3d functions (0x419f0e-0x42fbd5).
+- **Blocks:** nothing for playback (they stay at their loaded pose); mangeurs' track ends
+  hide the log/faggot and scroll `fire`, which would matter if they ran.
+- **Status:** open

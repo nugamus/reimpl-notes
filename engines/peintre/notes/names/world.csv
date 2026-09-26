@@ -34,3 +34,9 @@ address,name,evidence
 0x00425541,Hopiint_Init,scene hopiint code; E-0360
 0x004256af,Hopiint_StepAnim,scene hopiint code; E-0360
 0x0042579a,Hopiint_Frame,scene hopiint code; E-0360
+0x00426b70,Jardin_SetBoxSet,scene jardin code; E-0361
+0x00426c56,Jardin_BoxSetForGate,scene jardin code; E-0361
+0x00426c7a,Jardin_LoadSounds,scene jardin code; E-0361
+0x00426d9b,Jardin_Init,scene jardin code; E-0361
+0x00426f34,Jardin_StepAnim,scene jardin code; E-0361
+0x00427069,Jardin_Frame,scene jardin code; E-0361
