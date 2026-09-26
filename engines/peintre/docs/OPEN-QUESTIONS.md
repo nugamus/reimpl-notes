@@ -113,3 +113,25 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** every write of `DAT_004e3144` in the decompiled 3D functions of batch B.
 - **Blocks:** nothing; a missing exit would only drop an unused arrival.
 - **Status:** open
+
+### Q-0250 — Can the 3D side call Entry2D with zone 25?
+- **Context:** Entry2D 0x40fdc6 rejects only zones > 0x19, but the zone table 0x4a6b18 has 25
+  rows (0..24); row 25 would read the start of the object table (E-0408).
+- **What we checked:** the 2D side only; the values the 3D side stores in 0x502860 are the
+  world spec's.
+- **Blocks:** nothing if no scene passes 25; an engine can reject it.
+- **Status:** open
+
+### Q-0251 — What does leaving a zone with -3 (RetourM) do on the 3D side?
+- **Context:** 0x42f2c2 with -3 sets 0x50273c = 0, then 0x4e3144 (3D block +0x3C) = 0 and
+  runs 0x41fda9 (E-0414); the 2D side calls the button "RetourM".
+- **What we checked:** 0x42f2c2 only.
+- **Blocks:** `ui.md` describes the effect by variables, not in game terms; world spec.
+- **Status:** open
+
+### Q-0252 — The rest of the 0x36C-byte 3D state block in the saves
+- **Context:** `game.ksy` `state_3d`; E-0422 names only the fields the save glue touches.
+- **What we checked:** 0x42f755, 0x42f873, 0x42edef, 0x42f2c2, Load3DGame, Load3DGGame.
+- **Blocks:** nothing for loading and writing (the block is copied whole); naming the
+  fields belongs to the world spec.
+- **Status:** open
