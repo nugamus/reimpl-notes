@@ -6,7 +6,7 @@ with constant arguments (`engines/ring/notes/calls/*_setup.jsonl`, extracted by
 E-0031. Addresses are `RING_DVD.EXE`; names in `aApplication::` come from the error
 strings (E-0013) or, for the unnamed wrappers, from the method they delegate to (E-0031).
 Argument types: `int` 32-bit, `u8` a byte pushed as a dword, `f32` a float's bits pushed
-as a dword (e.g. 0x41480000 = 12.0), `str` a pointer to a constant string.
+as a dword (e.g. 0x41480000 = 12.5), `str` a pointer to a constant string.
 
 Ids are integers chosen by the game (e.g. 80001); each kind (object, puzzle, rotation,
 sound, variable) has its own list and a second declaration with the same id is refused
@@ -57,7 +57,7 @@ Rotation angles, "ran" and the transition kind byte are specified with the rende
 | `ObjSetAccOff` | 0x403090 | int object, int from, int to | `ObjSetAccOnOrOff(object, 0, from, to)`: disables accessibilities from..to |
 | `ObjAddPre` | 0x4032f0 | int object | appends a presentation to the object |
 | `ObjPreAddImgToPuz` | 0x403370 | int object, int presentation, int puzzle, str file, int x, int y, u8 unk_7, u8 unk_8, int priority | an image of the presentation on the puzzle (`aObject::addObjectImageToPuz` 0x4205d0) |
-| `ObjPreAddAniToPuz` | 0x403460 | int object, int presentation, int puzzle, str name, int unk_5, int unk_6, int unk_7, u8 unk_8, int unk_9, int unk_10, f32 unk_11, u8 unk_12 | an animation on the puzzle (`aObject::addAnimationToPuz` 0x420650 → `aAnimationImage::Init` 0x4219f0); bit 2 of unk_12 clear = the animation starts stopped (0x42e480). Observed: unk_10 13..25, unk_11 12.0 |
+| `ObjPreAddAniToPuz` | 0x403460 | int object, int presentation, int puzzle, str name, int unk_5, int unk_6, int unk_7, u8 unk_8, int unk_9, int unk_10, f32 unk_11, u8 unk_12 | an animation on the puzzle (`aObject::addAnimationToPuz` 0x420650 → `aAnimationImage::Init` 0x4219f0); bit 2 of unk_12 clear = the animation starts stopped (0x42e480). Observed: unk_10 13..25, unk_11 12.5 |
 | `ObjPreAddImgToRot` | 0x403560 | int object, int presentation, int rotation, int layer | the rotation layer's image as a presentation (`aObject::addImageToRot` 0x4206e0; layer < the rotation's layer count) |
 | `ObjPreAddAniToRot` | 0x403660 | int object, int presentation, int rotation, int layer, int unk_5, f32 unk_6, u8 unk_7 | the layer as an animation (`aObject::addAnimationToRot` 0x420750); layer < the rotation's layer count |
 | `ObjPreSetAniIdeOnPuz` / `…OnRot` | 0x4038d0 / 0x403920 | int object, int presentation, int unk_3, int unk_4 | `aObject::ObjPreSetAniIdeOnPuz`/`OnRot` (0x420eb0 / 0x420f20); unk_4 is an id of the same range as puzzles/rotations |
@@ -66,7 +66,7 @@ Rotation angles, "ran" and the transition kind byte are specified with the rende
 | `ObjPrePauAni` | 0x403a40 | int object, int presentation | pauses the animation |
 | `ObjPreAddTxtToPuz` | 0x403b10 | int object, int presentation, int puzzle, str text, then 9 arguments passed to `aText::Init` | a text on the puzzle (`aObjectPresentation::ObjPreAddTxtToPuz` 0x42f270) |
 | `ObjPreSho` | 0x403c80, 0x403e00 | int object[, int presentation] | shows the object's presentations (one or all) |
-| `ObjSetPasCur`, `ObjSetActCur`, `ObjSetPasDraCur`, `ObjSetActDraCur` | 0x403f80, 0x404030, 0x4040e0, 0x404190 | int object, then 7 dwords unk_2..unk_8 | the object's cursors, stored verbatim at +0x15/+0x32/+0x4f/+0x6c (0x420b70 …) with the load-from byte from `ART_BAG`. Observed: `22, 22, 20, 4, 12.0, 4, 4` (active), `22, 22, 0, 3, 0, 0, 3` (passive) |
+| `ObjSetPasCur`, `ObjSetActCur`, `ObjSetPasDraCur`, `ObjSetActDraCur` | 0x403f80, 0x404030, 0x4040e0, 0x404190 | int object, then 7 dwords unk_2..unk_8 | the object's cursors, stored verbatim at +0x15/+0x32/+0x4f/+0x6c (0x420b70 …) with the load-from byte from `ART_BAG`. Observed: `22, 22, 20, 4, 12.5, 4, 4` (active), `22, 22, 0, 3, 0, 0, 3` (passive) |
 | `ObjAddBagAni` | 0x402ed0 | int object, int unk_2, u8 unk_3, int unk_4, f32 unk_5, u8 unk_6 | the object's inventory animation (`aAnimationImage::Init` with the object's icon name 0x426cb0, from the bag archive per `ART_BAG`) |
 | `PuzAddMovToRot` | 0x404450 | int puzzle, int rotation, str ride, int x1, y1, x2, y2, u8 enabled, int cursor, int unk_10 | a movability of kind 2 |
 | `PuzAddMovToPuz` | 0x4046c0 | int puzzle, int puzzle, str ride, x1, y1, x2, y2, u8 enabled, int cursor, int unk_10 | kind 3 |

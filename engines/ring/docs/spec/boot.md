@@ -56,24 +56,24 @@ flag is set and the global mode at app+0x58 is not `'e'`, else `'e'` (disk). `AR
 
 ## Game set-up (0x430ed0)
 
-Switches to zone 1 (0x402280(1, 0)), registers the cursors (id, name, frame count,
-loaded from the SY archive or disk per `ART_CURSOR`), sets subtitle colours
-(text 255,255,255; background 50,50,50):
+Switches to zone 1 (0x402280(1, 0)), registers the cursors with `CurAdd` (id, name, then arguments of `aCursorHandler::Add`
+0x41efb0; the last is the load-from byte per `ART_CURSOR`) and 0x402860 (id, x, y),
+sets subtitle colours (text 255,255,255; background 50,50,50):
 
-| Id | Name | Kind | Frames | Offset |
-|---:|---|---|---:|---|
-| 0x36 | (empty) | 1 | — | — |
-| 0x33 | `CUR_busy` | 3 | — | — |
-| 10000 | `ni_handsel` | 3 | — | 15,15 |
-| 0x32 | `cur_idle` | 4 (animated) | 15, 12.0 fps | 10,6 |
-| 0x35 | `cur_muv` | 4 | 20, 12.0 fps | 10,6 |
-| 0x34 | `CUR_Hotspot` | 4 | 19, 12.0 fps | 10,6 |
-| 0x37 | `cur_back` | 3 | — | 10,20 |
-| 0x38 | `CUR_MenuIdle` | 3 | — | — |
-| 0x39 | `CUR_MenuActive` | 3 | — | — |
+| Id | Name | `CurAdd` arguments after the name | 0x402860 |
+|---:|---|---|---|
+| 0x36 | (empty) | 1, 1, 3 | — |
+| 0x33 | `CUR_busy` | 3, 1, 3 | — |
+| 10000 | `ni_handsel` | 3, 1, 3 | 15, 15 |
+| 0x32 | `cur_idle` | 4, 1, 15, 12.5 (f32), 4, 3 | 10, 6 |
+| 0x35 | `cur_muv` | 4, 1, 20, 12.5, 4, 3 | 10, 6 |
+| 0x34 | `CUR_Hotspot` | 4, 1, 19, 12.5, 4, 3 | 10, 6 |
+| 0x37 | `cur_back` | 3, 1, 3 | 10, 20 |
+| 0x38 | `CUR_MenuIdle` | 3, 1, 3 | — |
+| 0x39 | `CUR_MenuActive` | 3, 1, 3 | — |
 
-(0x41480000 = 12.0 as a float; the kind codes are `aCursorHandler`'s, to be specced with
-the cursor.)
+(Their meaning is the cursor spec's; `CurAdd`'s error strings distinguish animated and
+non-animated cursors.)
 
 ## Zone set-up (0x431040)
 
