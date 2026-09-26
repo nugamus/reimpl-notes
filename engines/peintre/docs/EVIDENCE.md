@@ -682,3 +682,18 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   tables read from .data through pefile's mapped image.
 - **Confidence:** proven
 - **Doc:** `games/mission-sunlight/docs/jardin.md`
+
+### E-0362 — maisonet (scene 3): hen and bird by distance, spade reveals the earth, zone 1, door within 5000
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** init `0x4279a3`, per frame `0x427e04`, anim step `0x427b98` (tracks 2, 3
+  step by elapsed >> 1, at least 1), sounds `0x427870`, `LoadAnimsMaisonet` `0x4278d1`.
+  Objects `0x4ad390` (7 x 0x40), tracks `0x4ad558` (`poule2`, `pelle`, `oisaller`,
+  `oisrturn`). Items: `plume` 2, `terre` 1. `nid` zone 1; `porte04` → 3 → 4 when the distance
+  < 5000.0 (`0x4a2544`). Hen starts within 2000.0 (`0x4a2548`) of `poule`; bird within 5000
+  of `nid` (handle `0x4ad508`). The "dug" pose adds track 0's length (`DAT_004ad5c4`) to
+  track 1's base (`0x4279a3`).
+- **Method:** decompiled with PyGhidra `decompile_one.py` (read-only copy of Peintre.gpr);
+  call arguments the decompiler dropped read from the pushes before each call (capstone);
+  tables read from .data through pefile's mapped image.
+- **Confidence:** proven
+- **Doc:** `games/mission-sunlight/docs/maisonet.md`

@@ -40,3 +40,7 @@ address,name,evidence
 0x00426d9b,Jardin_Init,scene jardin code; E-0361
 0x00426f34,Jardin_StepAnim,scene jardin code; E-0361
 0x00427069,Jardin_Frame,scene jardin code; E-0361
+0x00427870,Maisonet_LoadSounds,scene maisonet code; E-0362
+0x004279a3,Maisonet_Init,scene maisonet code; E-0362
+0x00427b98,Maisonet_StepAnim,scene maisonet code; E-0362
+0x00427e04,Maisonet_Frame,scene maisonet code; E-0362
