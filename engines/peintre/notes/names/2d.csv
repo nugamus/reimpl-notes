@@ -1,0 +1,4 @@
+address,name,evidence
+0x00430700,Hlz_Unpack,Cryo HLZ LZ = ScummVM HLZDecoder; E-0101
+0x0040918c,Tgp_Unpack,thunk to Hlz_Unpack used by both TGP loaders; E-0100
+0x0040b266,Rgb565To555,(v>>1)&0x7FE0|v&0x1F over n pixels; E-0100

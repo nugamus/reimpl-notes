@@ -12,6 +12,7 @@ validator in `engines/peintre/tools/parsers/<fmt>.py` (with `--selftest`), the p
 | `.3DM` texture (in BFG) | 504 | `obj3d.py` | `obj3d.ksy` | E-0015 | done (4 odd sizes, Q-0003) |
 | `.3DA` animation (in BFG) | 48 | `obj3d.py` | `obj3d.ksy` | E-0016 | layout done; key meaning tentative (Q-0004) |
 | `.3DI` boxes (in BFG) | 27 | `obj3d.py` | `obj3d.ksy` | E-0016 | layout done; face record fields open |
+| `.TGP` full-screen / panorama image | 134 (110 single 640x480, 24 chunked panoramas) | `tgp.py` | `tgp.ksy` | E-0100, E-0101 | done |
 
 ## `.BFG` — scene bundle (E-0013)
 
@@ -48,3 +49,17 @@ vertices, 7,695 faces).
 - **3DA**: tracks of rotation keys (time, 4 x Q15) and position keys (time, xyz).
 - **3DI**: collision boxes (`BOX*.3DI`, loaded by `C_Monde::LoadScene` and
   `LoadBox<Scene>`): vertices, 0x60-byte faces that point at vertices, 12-byte items.
+
+## `.TGP` — full-screen and panorama images (E-0100, E-0101)
+
+`u32 width, u32 height`, then one of two bodies. The caller picks the loader, not the
+file; the magic tells them apart. **Chunked** (`Tgp_Load` 0x40d9c0, 24 files, panoramas
+of 1500 px on one side): `u32 count`, then `count` × `{u32 packed_size; u32
+unpacked_size; HLZ stream}`, unpacked back to back into `width*height*2` bytes.
+**Single** (`Tgp_Load2` 0x414779, 110 files, all 640×480): a 0x24-byte header from
+offset 8 (`unk 0x24`, `"LZWCRYO\0"`, `unk 0, 0, 256, 1`, unpacked size, packed size) and
+one HLZ stream to EOF; the engine uses only the packed size and unpacks straight into the
+640×480 screen buffer. Pixels are **RGB565**, top row first; on RGB555 surfaces the
+engine shifts red/green down (0x40b266). HLZ is Cryo's LZ (0x430700), bit for bit the
+one ScummVM already has as `Image::HLZDecoder::decodeFrameInPlace` (`image/codecs/hlz.h`):
+reuse it. Every stream ends with its end marker exactly at the end of its chunk.

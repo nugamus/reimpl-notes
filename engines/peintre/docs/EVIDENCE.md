@@ -256,3 +256,41 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
 - **Method:** as E-0014.
 - **Confidence:** proven (layouts); tentative (quaternion component order, track field 0 =
   length in frames: Q-0004)
+
+### E-0100 — TGP: width, height, then either HLZ chunks (Tgp_Load) or one LZWCRYO-headed HLZ stream (Tgp_Load2); RGB565 top-down
+- **Binary/file:** `/MISSION.EXE`; `Data/GFX/*.TGP` (134 files)
+- **Evidence:** `Tgp_Load` (0x40d9c0) opens `%sDATA\GFX\%s.TGP`, reads `u32 w`, `u32 h`,
+  allocates `w*h*2` (0x408c10), reads `u32 count`, then per chunk `u32 packed`, `u32
+  unpacked`, `packed` bytes, unpacks them with 0x40918c → 0x430700 at `dest + running
+  total` and adds `unpacked`; when DAT_006516bc is set it runs 0x40b266 over `w*h` pixels,
+  which maps `v` to `(v >> 1) & 0x7FE0 | v & 0x1F` (RGB565 → RGB555), so the pixels are
+  RGB565. `Tgp_Load2` (0x414779) seeks to 8, reads 0x24 bytes, uses only the last u32
+  (file offset 0x28) as the packed size, reads that many bytes and unpacks them into
+  DAT_006516a8, converting 0x4B000 = 640*480 pixels on 555 surfaces. Corpus: `tgp.py`
+  validates 134/134, every byte consumed: 110 files have `"LZWCRYO\0"` at 12 with
+  `w, h = 640, 480`, `u32 0x24` at 8, zeros at 0x14..0x1B, `256, 1` at 0x1C, unpacked
+  size 614,400 at 0x24 and packed size = file size − 0x2C at 0x28; the other 24 are
+  chunked (4 to 9 chunks of at most 600,000 unpacked bytes, one side 1,500 px), their
+  chunks sum to `w*h*2` and the last ends at EOF. Decoding A01_02.TGP (single) and
+  A01_02B.TGP (chunked) as RGB565 top-down gives the same painting, upright, in natural
+  colours. Callers: `Tgp_Load` from the shell main loop 0x4122bb and 0x411a28.
+- **Method:** decompiled the functions named (`notes/decomp/MISSION.EXE__Tgp_Load.c`,
+  `__Tgp_Load2.c`, `__FUN_0040b266.c`); `engines/peintre/tools/parsers/tgp.py`.
+- **Confidence:** proven (the meaning of the LZWCRYO header's constant fields is not
+  needed by the engine and stays `unk`)
+
+### E-0101 — TGP packing is Cryo HLZ, identical to ScummVM's Image::HLZDecoder
+- **Binary/file:** `/MISSION.EXE` 0x430700; `../scummvm/image/codecs/hlz.cpp`
+- **Evidence:** 0x430700 (hand-written asm, register calling convention) keeps a u32
+  bit register loaded little-endian with a sentinel bit and shifts out MSB first: bit 1
+  copies one literal byte; bits 01 read a u16 `v`, `offset = (v >> 3) | 0xFFFFE000`,
+  `count = v & 7`, and if 0 a count byte, where 0 ends the stream (returns bytes
+  written); bits 00 read two bits of count and one offset byte `| 0xFFFFFF00`; every
+  match copies `count + 2` bytes forward from `dest + offset`. This is exactly
+  `Image::HLZDecoder::decodeFrameInPlace` (`offset = (tmp >> 3) - 0x2000`, `stream.readByte()
+  - 0x100`, `repeat_count += 2`). `tgp.py` implements it and every one of the 110 + 149
+  streams in the corpus unpacks to exactly its stated size with its end marker on its
+  last byte.
+- **Method:** decompiled 0x430700 (`notes/decomp/MISSION.EXE__FUN_00430700.c`), compared
+  with the ScummVM source; corpus run of `tgp.py`.
+- **Confidence:** proven

@@ -89,7 +89,7 @@ address,module,name,ghidra,size,callers,evidence
 0x00408fe4,game/shell,,FUN_00408fe4,201,1,
 0x004090ad,game/shell,,FUN_004090ad,41,0,
 0x004090d6,game/shell,,FUN_004090d6,182,0,
-0x0040918c,game/shell,,FUN_0040918c,21,3,
+0x0040918c,game/shell,Tgp_Unpack,FUN_0040918c,21,3,thunk to Hlz_Unpack used by both TGP loaders; E-0100 (2d.csv)
 0x00409310,game/shell,,FUN_00409310,168,2,
 0x004093b8,game/shell,,FUN_004093b8,19,1,
 0x004093cb,game/shell,,FUN_004093cb,406,2,
@@ -127,7 +127,7 @@ address,module,name,ghidra,size,callers,evidence
 0x0040afe8,game/shell,,FUN_0040afe8,37,0,
 0x0040b00d,game/shell,,FUN_0040b00d,568,0,
 0x0040b245,game/shell,,FUN_0040b245,33,0,
-0x0040b266,game/shell,,FUN_0040b266,95,3,
+0x0040b266,game/shell,Rgb565To555,FUN_0040b266,95,3,(v>>1)&0x7FE0|v&0x1F over n pixels; E-0100 (2d.csv)
 0x0040b980,game/shell,,FUN_0040b980,18,0,
 0x0040b992,game/shell,Hnm_AllocDecBuffers,FUN_0040b992,121,7,'%s': could not allocate HNM dec buffers ...
 0x0040ba0b,game/shell,,FUN_0040ba0b,74,1,
@@ -476,7 +476,7 @@ address,module,name,ghidra,size,callers,evidence
 0x0042fb5e,game3d/app,Timer3D_Begin,FUN_0042fb5e,76,3,Could not begin timer 3D ...
 0x0042fbaa,game3d/app,Timer3D_End,FUN_0042fbaa,44,5,timeKillEvent + timeEndPeriod
 0x0042fbd6,game3d/cinematics,,FUN_0042fbd6,1238,0,
-0x00430700,engine3d,,FUN_00430700,140,1,
+0x00430700,engine3d,Hlz_Unpack,FUN_00430700,140,1,Cryo HLZ LZ = ScummVM HLZDecoder; E-0101 (2d.csv)
 0x00430980,engine3d,,FUN_00430980,23,1,
 0x004309a0,engine3d,,FUN_004309a0,34,2,
 0x004309d0,engine3d,,FUN_004309d0,23,1,
