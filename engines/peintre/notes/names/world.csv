@@ -58,3 +58,9 @@ address,name,evidence
 0x004298e5,Mangeurs_Init,scene mangeurs code; E-0364
 0x00429b94,Mangeurs_StepAnim,scene mangeurs code; E-0364
 0x00429dd6,Mangeurs_Frame,scene mangeurs code; E-0364
+0x0042cd80,Pont_SetBoxSet,scene pont code; E-0365
+0x0042ce66,Pont_LoadSounds,scene pont code; E-0365
+0x0042cf99,Pont_FitHandle,scene pont code; E-0365
+0x0042cfe2,Pont_Init,scene pont code; E-0365
+0x0042d26a,Pont_StepAnim,scene pont code; E-0365
+0x0042d489,Pont_Frame,scene pont code; E-0365

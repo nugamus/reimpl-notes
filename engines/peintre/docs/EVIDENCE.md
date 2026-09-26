@@ -734,3 +734,18 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   tables read from .data through pefile's mapped image.
 - **Confidence:** proven
 - **Doc:** `games/mission-sunlight/docs/mangeurs.md`
+
+### E-0365 — pont (scene 9): crank handle carried to the pulley lowers the bridge, trapdoor, apples by distance, zone 18
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** init `0x42cfe2`, per frame `0x42d489`, anim step `0x42d26a`, sounds
+  `0x42ce66`, `LoadBoxPont` `0x42ce08` (`BOX2.3DI` = set 1), box sets `0x42cd80`, handle fit
+  `0x42cf99`, `LoadAnimspont` `0x42cec7`. Objects `0x4af610` (7 x 0x3c), tracks `0x4af7b8`
+  (`pond`, `arbres` on `ciel`; `trappe`; `pommes` on `apple01`; `train` on `train01`). Items:
+  `apple01` 7, `encre01` 28; the `de` branch (item 26) is unreachable (`de` not in the
+  table). `chemise` zone 18. Apples within 2000.0 (`0x4a255c`). Exits: x > 12000 → 9 → 7;
+  x > 0x157c and z > 11000 → 9 → 2.
+- **Method:** decompiled with PyGhidra `decompile_one.py` (read-only copy of Peintre.gpr);
+  call arguments the decompiler dropped read from the pushes before each call (capstone);
+  tables read from .data through pefile's mapped image.
+- **Confidence:** proven
+- **Doc:** `games/mission-sunlight/docs/pont.md`
