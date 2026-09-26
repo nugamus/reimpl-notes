@@ -76,3 +76,15 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** whether masks line up with the 94-frame movie (a capture or a decoded frame
   comparison would show it).
 - **Status:** open
+
+### Q-0220 — chambreb: what starts the mirror track and the shoe track, and what are DAT_004abd60 / DAT_004abd70?
+- **Context:** E-0332. `mirroir.3da` (on `mirroircas`) is only ever posed at its end or
+  stopped by the 3D code; `chaussur.3da` has playing = 1 in .data and the entry clears it
+  whenever the shoes are in the room. `DAT_004abd60` is set to 1 at entry when it and
+  `DAT_004abd70` are 0 and `DAT_004abd14` = 1; nothing in the 3D code reads it.
+- **What we checked:** every decompiled function of 0x419e50..0x42fbd6 (grep for the
+  addresses). The 2D side receives the whole state block by pointer (E-0312) and may
+  write these words by offset.
+- **Blocks:** nothing in the 3D flow; possibly a mirror-breaking animation seen after
+  zone 11.
+- **Status:** open

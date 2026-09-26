@@ -1,0 +1,32 @@
+address,name,evidence
+0x00419e50,Auberge_SetBoxSet,swaps BOX/BOXBAS/BOXHAUT in collision; E-0330
+0x00419fb3,Auberge_LoadSounds,Snd_CreateStatic auberge; E-0330
+0x0041a0b0,Auberge_Init,scene 1 init callback; E-0330
+0x0041a2ab,Auberge_StepAnim,anim table step; E-0330
+0x0041a42b,Auberge_Frame,scene 1 frame callback; E-0330
+0x0041b5a0,Cafe_LoadSounds,billiard/cafe_int/pendule/serrure/tictac; E-0331
+0x0041b613,Cafe_ClockUv,orloge UV shift by clock state; E-0331
+0x0041b77d,Cafe_Init,scene 5 init callback; E-0331
+0x0041ba80,Cafe_StepAnim,anim table step; E-0331
+0x0041bbcf,Cafe_Frame,scene 5 frame callback; E-0331
+0x0041c810,Chambreb_LoadSounds,chambrVG...papier; E-0332
+0x0041c979,Chambreb_Init,scene 6 init callback; E-0332
+0x0041cee9,Chambreb_StepAnim,anim table step; E-0332
+0x0041d167,Chambreb_Frame,scene 6 frame callback; E-0332
+0x0041dc70,Chambrev_LoadSounds,chambrVG/placard; E-0333
+0x0041dd7f,Chambrev_Init,scene 6 (chambrev) init callback; E-0333
+0x0041de65,Chambrev_StepAnim,door track step; E-0333
+0x0041ded8,Chambrev_Frame,scene 6 (chambrev) frame callback; E-0333
+0x0041e250,Champ_LoadSounds,champ/faux/pistolet/corbeaux; E-0334
+0x0041e383,Champ_Init,scene 12 init callback; E-0334
+0x0041e4cc,Champ_StepAnim,anim table step; E-0334
+0x0041e5de,Champ_Frame,scene 12 frame callback; E-0334
+0x004241f0,Eglise_LoadSounds,eglise; E-0335
+0x004242ed,Eglise_Init,scene 13 init callback; E-0335
+0x004243cb,Eglise_StepAnim,anim step by elapsed/2; E-0335
+0x00424467,Eglise_Frame,scene 13 frame callback; E-0335
+0x004248f0,HopiExt_SetBoxSet,swaps BOX/BOX1 in collision; E-0336
+0x00424aa8,HopiExt_LoadSounds,hopi_ext/portail/cloche; E-0336
+0x00424af7,HopiExt_Init,scene 2 init callback; E-0336
+0x00424c4c,HopiExt_StepAnim,anim table step; E-0336
+0x00424d93,HopiExt_Frame,scene 2 frame callback; E-0336

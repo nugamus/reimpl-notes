@@ -561,3 +561,92 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   `fmt data smpl LIST` (7), `fmt data cue LIST plst` (1).
 - **Method:** decompiled 0x417084; `engines/peintre/tools/parsers/wav.py`.
 - **Confidence:** proven
+
+### E-0330 — auberge (scene 1): object/anim tables, entry, clicks, zones 20 and 21, box sets BOXBAS/BOXHAUT
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** init `0x41a0b0`, per frame `0x41a42b`, anim step `0x41a2ab`, sounds
+  `0x419fb3`, `LoadBoxAuberge` `0x419f0e`, `LoadAnimsauberge` `0x419fde`, box-set switch
+  `0x419e50` (removes the current set with `0x432e40`, registers `BOX.3DI` / `BOXBAS.3DI` /
+  `BOXHAUT.3DI` with `0x432e10`, keeps the index in `DAT_004e312c`). Object table
+  `0x4a9950` (12 × 0x3c, count `0x4a9948`), anim table `0x4a9c28` (3 × 0x78, count
+  `0x4a9c20`), dumped from .data. Click targets by name (`porte01`, `porte02`,
+  `saccoche`, `sac`, `sac01`, `stetoscop`, `casquette`, `tableau`, `portebas`,
+  `portehaut`) recovered with `build/pw-decomp/calls.py` at 0x41a4f0..0x41a66e; zone
+  numbers 0x14 and 0x15 written to `DAT_00502860` with mode 1. `portehaut`'s click writes
+  `DAT_004a9a72` (= `portebas` +0x32). Entry tests sunflowers = 5, the frame tests 0x22.
+- **Method:** decompiled the functions named (listings in `engines/peintre/notes/decomp/`);
+  table dumps with a .data reader over `Data/mission.___`.
+- **Confidence:** proven
+- **Doc:** `games/mission-sunlight/docs/auberge.md`
+
+### E-0331 — cafe (scene 5): tables, the key carry, the cue and shadow, the clock timer, the mirror by camera z, zones 4, 5, 6
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** init `0x41b77d`, per frame `0x41bbcf`, anim step `0x41ba80`, sounds
+  `0x41b5a0`, clock UV callback `0x41b613` (thunk `0x40160e`, applied through `0x4399d0`),
+  `LoadAnimscafe` `0x41b6ab`. Object table `0x4aa050` (15 × 0x3c), anim table `0x4aa3d8`
+  (`billard.3da` on `ke`, `portebar.3da` on `barporte`). Mirror texture thresholds on
+  `DAT_00651356`: 0xaf1, 0x8fd, 0x7d1, 0x321, 0x1f5, 0x72 (0x41c19d..0x41c35a); clock step
+  when `DAT_00650fd8 - DAT_00650fd4 > 199` (unsigned). Zones 5 (`gant`), 6 (`mirroir`,
+  cursor 3 or 0x3c), 4 (`lampe4`).
+- **Method:** as E-0330.
+- **Confidence:** proven
+- **Doc:** `games/mission-sunlight/docs/cafe.md`
+
+### E-0332 — chambreb (scene 6 with DAT_004abd14 = 1): 27 objects, 6 tracks, zones 7..11, shoes and mirror unlocked by the 2D returns
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** init `0x41c979`, per frame `0x41d167`, anim step `0x41cee9`, sounds
+  `0x41c810`, `LoadAnimschambreb` `0x41c8a7`. Object table `0x4aa880` (27 × 0x3c; entries
+  10 `mirroircas` and 19 `mirroirmor` start hidden), anim table `0x4aaed8` (`chaise`,
+  `chaussur` on `perpompe` with playing word 1 in .data, `mirroir` on `mirroircas`,
+  `papier`, `porte`, `tiroir`). Zones: `oreiller` 7, `tabpay` 8, `TIROIR` 9, `tab02` 10,
+  `tab01` 11. `DAT_004abd50` and `DAT_004abd4c`/`DAT_004e30f4` are set by the 2D return
+  `0x42f2c2` for zones 8 and 11. No write of `mirroir.3da`'s playing word (`0x4ab03c`) other
+  than := 0 in the decompiled 3D code (Q-0220).
+- **Method:** as E-0330.
+- **Confidence:** proven
+- **Doc:** `games/mission-sunlight/docs/chambreb.md`
+
+### E-0333 — chambrev (scene 6 with DAT_004abd14 = 0): one door track, exit to maisonj
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** init `0x41dd7f`, per frame `0x41ded8`, anim step `0x41de65`, sounds
+  `0x41dc70`, `LoadAnimschambrev` `0x41dcad`; objects `porte`, `porte02` (`0x4ab5c8`),
+  track `portev.3da` on `porte` (`0x4ab648`). The callbacks are installed only by
+  `0x41fda9`'s 7 → 6 case when `DAT_004abd14` = 0 (thunks `0x40188e` → 0x41dd7f,
+  `0x40111d` → 0x41ded8).
+- **Method:** as E-0330.
+- **Confidence:** proven
+- **Doc:** `games/mission-sunlight/docs/chambrev.md`
+
+### E-0334 — champ (scene 12): scythe, gun and crows, zones 22 and 24, walk-out exits
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** init `0x41e383`, per frame `0x41e5de`, anim step `0x41e4cc`, sounds
+  `0x41e250`, `LoadAnimschamp` `0x41e2b1`. Objects `faux`, `coclicot`, `gun`, `sabots`
+  (`0x4ab750`); tracks `korbeaux.3da` on `corbopere`, `faux.3da` on `animfaux01`
+  (`0x4ab848`). `faux` shown only when `DAT_004abbd4` = 4. Exits: `DAT_00651352` < −16000
+  → 12 → 13; `DAT_00651356` < −0x157c → 12 → 11.
+- **Method:** as E-0330.
+- **Confidence:** proven
+- **Doc:** `games/mission-sunlight/docs/champ.md`
+
+### E-0335 — eglise (scene 13): kite and sheaf, zone 23, walk-out exits
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** init `0x4242ed`, per frame `0x424467`, anim step `0x4243cb` (frame +=
+  elapsed >> 1, reset on equality), sounds `0x4241f0`, `LoadAnimsEglise` `0x42421b`.
+  Objects `cerf`, `gerbe`, `eglise10` (`0x4ac408`); track `eglise.3DA` on `cerf`, playing
+  word 1 in .data (`0x4ac534`). Exits: `DAT_00651352` > −2000 → 13 → 12; `DAT_00651356`
+  > 0x5fb4 → 13 → 11.
+- **Method:** as E-0330.
+- **Confidence:** proven
+- **Doc:** `games/mission-sunlight/docs/eglise.md`
+
+### E-0336 — hopiext (scene 2): bell, gate and box set BOX1, zone 14 within 1500, exits to hopiint and pont
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** init `0x424af7`, per frame `0x424d93`, anim step `0x424c4c`, sounds
+  `0x424aa8`, `LoadBoxHopiExt` `0x424978`, box-set switch `0x4248f0`,
+  `LoadAnimsHopiExt` `0x4249d6`. Objects (`0x4ac5e0`, 11 × 0x3c) and tracks `grille.3da`
+  on `ciel`, `cloche.3da` on `cloche` (`0x4ac878`). Distance limit: float 1500.0 at
+  `0x4a2534` compared with √(x² + z²) of `0x436200`'s output. Exit: `DAT_00651356` < −1000
+  → 2 → 9; `porteent` → 2 → 8.
+- **Method:** as E-0330.
+- **Confidence:** proven
+- **Doc:** `games/mission-sunlight/docs/hopiext.md`
