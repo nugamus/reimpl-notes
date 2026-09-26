@@ -774,3 +774,14 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
 - **Confidence:** proven for the formulas; the pan speed's time base is Q-0011.
 - Supersedes the api.md reading (under E-0031) of `ObjAddRotAcc` coordinates as "the
   panorama's 2048-wide space"; the row is corrected.
+
+### E-0047 — Clicking movabilities and animated turns (DVD)
+- **Binary/file:** `RING_DVD.EXE` `aApplication::MouseLeftEvent` 0x409d90 (rotation part
+  from 0x40ab.., puzzle part before it), 0x40af80 (sets app+0xa5), 0x4101c0 (animated
+  turn: −135 at 0x47e280, fold at 0xb4/0x168, factor 0.8 at 0x47e30c), 0x410170,
+  0x40c2b0 / 0x40c420 (events), `PlyCin` 0x401490
+- **Evidence:** as written in `spec/rotation.md` "Clicking a movability", from
+  `engines/ring/notes/decomp/flow/RING_DVD.EXE__aApplication__MouseLeftEvent.c`,
+  `notes/decomp/rot/range/RING_DVD.EXE__004101c0.c` and the disassembly of 0x4101c0.
+- **Method:** decompiles, disassembly.
+- **Confidence:** proven

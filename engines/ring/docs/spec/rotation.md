@@ -96,9 +96,44 @@ So `ObjAddRotAcc` and the `Rot*Mov*` rectangles are in tenths of a degree: x 0..
 the panorama, y from −600 (top) to 600 (bottom) for a ±60° node. E.g. AS rotation 80001's
 movabilities are at x 757..928, 1251..1444 and 1784..1982.
 
+## Clicking a movability (`MouseLeftEvent` 0x409d90, rotation part)
+
+After the rotation's accessibilities (clicked as in `spec/cursor.md`), the first enabled
+movability containing the panorama point is taken:
+
+1. The "movability clicked" event (0x40c2b0: rotation id, target id, movability index,
+   `unk_19`, kind) goes to the zone; if the mode is then 4 (a zone change), stop.
+2. The turn, chosen by the transition's kind byte (+0x28), or 2 for a Ctrl-click
+   (0x40afb0 clears app+0xa5, which 0x40af80 sets):
+   - 0: an animated turn to (alpha1, beta1, ran1) (0x4101c0, below);
+   - 1: alpha1, beta1, ran1 set at once (0x410170, alpha stored minus 135);
+   - 2: no turn.
+3. 0x40b650 (the current view is left), then for kind 0 (to a rotation) the target's
+   alpha is set to alpha2 (minus 135).
+4. Unless Ctrl-clicked, the ride video plays: `PlyCin(ride, 0)` (0x401490,
+   `spec/video.md`: `DATA\<zone>\PLA\<ride>.cnm`).
+5. Kind 0: `RotSetAct(target, 1, 1)`, then alpha2, beta2, ran2 set at once (0x410170);
+   kind 1: `PuzSetAct(target, 1, 1)`. Then the "movability done" event (0x40c420: the new
+   rotation or puzzle id, the old rotation id, index, `unk_19`, kind).
+
+Puzzle movabilities (kinds 2, 3) are clicked the same way from the current puzzle
+(the puzzle part of the same function): no turn; for kind 2 the target rotation's alpha is set to alpha2 first, then
+the ride plays (unless Ctrl-clicked), then `RotSetAct(target, 1, 1)` with alpha2, beta2,
+ran2 (kind 2) or `PuzSetAct(target, 1, 1)` (kind 3), and the "movability done" event.
+
+### Animated turn (0x4101c0)
+
+The target alpha is stored minus 135 (plus 360 when negative). Differences are truncated
+to integers: `dα = |target − alpha|`, folded to `360 − dα` when above 180; `dβ`, `dran`.
+The step count is `trunc(0.8 × max(dα, dβ, dran))`. When the target alpha is more than
+180 above the current one 360 is subtracted from it, more than 180 below 360 is added.
+For step i of n, with `t = i / (n − 1)` (t = 0 when n = 1): alpha, beta and ran are
+`target × t + start × (1 − t)` (alpha brought back below 360), +0x31 = 1 − t, then one
+frame is drawn (0x410610, 0x40f9e0, 0x4100a0 draws and flips). Held Escape only waits for
+its release. One step per frame (Q-0011).
+
 ## Not yet specified
 
 Layers (sections of the `.aqc`, drawn into the panorama by 0x410610 / 0x411530 / 0x4114c0),
-the juggle effect (+0x65, `RotSetJugOn`) and the wave (+0x66), animated turns (0x4101c0:
-alpha, beta, ran interpolated to a target, the target alpha also minus 135), movability
-rides, Space (+0x28).
+the juggle effect (+0x65, `RotSetJugOn`) and the wave (+0x66), Space (+0x28), the
+movability events' handlers per zone.
