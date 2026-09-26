@@ -174,7 +174,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   the puzzle at the next waiting step.
 - **Blocks:** whether Backspace pressed outside those steps is kept or lost; what else
   onAbort stops (voices, sounds, the movie).
-- **Status:** open
+- **Status:** RESOLVED (E-0444): onAbort latches a flag (per object in some zones), cleared by onPlace, tested only in the named steps
 
 ### Q-0351 — At what tick rate do Retour, CapsOP and POT animate?
 - **Context:** `ui.md` gives CapsAO (even ticks), CapsAC (odd ticks) and the magnifier (even
@@ -182,7 +182,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** the spec; the engine advances the three on odd ticks ("most sprite
   animations").
 - **Blocks:** exact animation speed of those three.
-- **Status:** open
+- **Status:** RESOLVED (E-0440): CapsOP every tick, POT odd ticks, Retour odd ticks only while hovered in idle
 
 ### Q-0352 — After an object flies back to the bar (states 0x10..0x12), who closes the bar?
 - **Context:** `ui.md` state 0xF opens the bar for the fly-back; state 0x12 waits "when the
@@ -191,7 +191,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** the spec; the engine goes to idle (5) with the bar open when it is
   open and still, and reopens the magnifier only when the bar is closed.
 - **Blocks:** whether the bar closes by itself after the fly-back.
-- **Status:** open
+- **Status:** RESOLVED (E-0441): the bar closes at the end of the flight; 0x12 then reopens the magnifier and Retour
 
 ### Q-0353 — The sunflower drag: the grab offsets, the drop test and the snap-back picture
 - **Context:** `ui.md` "The sunflower" and `a14.md` zone 0: `TOURN` "follows the cursor
@@ -203,7 +203,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   pot area; after a miss it shows `PA..a`'s last frame again. `TOURN`, `tourneso`, `POT`
   and `vase` in step 2 are taken as loads, played later.
 - **Blocks:** the exact look of the drag and of a miss.
-- **Status:** open
+- **Status:** RESOLVED (E-0442): offsets are TOURN's resting centre; the drop tests the sprite's point; a miss shows PA..a's last frame
 
 ### Q-0354 — Option menu buttons: press or release, and where frames 1..3 go
 - **Context:** `ui.md` "Option menu": "`options` frame b drawn at its position while
@@ -213,7 +213,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   sit at their rect's top-left, frames 1..3 at (187, 154). The engine draws them there and
   acts when the button is released over it.
 - **Blocks:** the draw position (to confirm in 0x40e976) and when a button acts.
-- **Status:** open
+- **Status:** RESOLVED (E-0443): frames at 0x4a6620 ((187, 154) for 1..3); a pressed button acts on the release anywhere
 
 ### Q-0355 — Load page order without file times
 - **Context:** `Save_ListGames` (0x40e78a) sorts slots 1..34 by last-write time, oldest
@@ -221,7 +221,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** nothing more; the engine lists the saves in slot order (roughly the
   order objects are placed).
 - **Blocks:** matching the original's order when objects are replayed out of order.
-- **Status:** open
+- **Status:** open (engine side only: the original order is file time, E-0419; ScummVM saves carry none)
 
 ### Q-0356 — Does zone 0's state 0 draw the slots?
 - **Context:** `ui.md` state 0: "zone 0: magnifier open, load the bar, `LoupeIn`, open the
@@ -229,7 +229,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   the player drops the object on.
 - **What we checked:** the spec; the engine draws the slots in both cases.
 - **Blocks:** nothing visible if the background already shows the empty slot.
-- **Status:** open
+- **Status:** RESOLVED (E-0440): state 0 draws the slots and the open magnifier in every zone
 
 ### Q-0357 — Does a click skip one credits picture or all of them?
 - **Context:** `ui.md` "Option menu" Credits: "each for 250 ticks or until a click or
@@ -237,7 +237,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** the specs; the engine skips one picture per click in the option menu
   and ends the end credits on a click.
 - **Blocks:** skipping behaviour of both.
-- **Status:** open
+- **Status:** RESOLVED (E-0443): one picture per click in the menu; the end credits end on a click
 
 ### Q-0358 — The fly-back: when `cf_clic3` plays and where a scrolled-off slot flies to
 - **Context:** `ui.md` "Result": the `OP` frame flies to "the bar slot" of its old list
@@ -245,7 +245,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** the spec; the engine plays `cf_clic3` when the flight starts and
   clamps the target to the visible bar slots 0..5.
 - **Blocks:** the sound's timing and the target when the old index is scrolled off.
-- **Status:** open
+- **Status:** RESOLVED (E-0441): cf_clic3 at the start of the flight, the list scrolled so the index is visible
 
 ### Q-0400 — When does a scene track end, and which frame is "its last frame"?
 - **Context:** the flow docs' animation tables ("stops at its end", "holds the last frame",
@@ -323,4 +323,4 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** the spec; the engine follows it literally, so the object slots on the
   left are blank from those steps until the run ends (seen in a click run).
 - **Blocks:** whether the slots stay visible during the moving-target step.
-- **Status:** open
+- **Status:** RESOLVED (E-0440): the slots are drawn

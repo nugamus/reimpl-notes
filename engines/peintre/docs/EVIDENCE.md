@@ -1766,3 +1766,83 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   `…__FUN_00429dd6.c` (lines 38–90, 222–223).
 - **Confidence:** proven for mangeurs (cafe 0x41bbcf and pont 0x42d489 follow the same
   pattern per E-0317; not re-read line by line)
+
+### E-0440 — Zone screen start, cursors and animation rates in MainWndProc
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** MainWndProc 0x4122bb (`notes/decomp/MISSION.EXE__MainWndProc.c`): state 0
+  calls `0x411807(0, -1, retour)` for every zone, which draws the last `LoupeOut` frame
+  (magnifier state 2) and the slots (0x41170e), and starts `Retour`/`RetourM` (0x409c25,
+  last argument 0 = looping) only when the third argument is 1 (zones ≠ 0); zone 0 then
+  loads the bar (0x414fbf) and plays `LoupeIn` (0x41195b) → state 7. States 0, 4, 10, 0xB,
+  0xC, 0xE, 0xF, 0x10..0x12, 0x16, 0x19..0x1D and 0x1F/0x1E set cursor 9 (0x40e25a(0, 9)).
+  State 10 steps `CapsOP` (0x4099a4) on every tick; 0xB steps `CapsAO` on even ticks; 0xC
+  and 0x1A step `CapsAC` on odd ticks; 0x1C steps `POT` on odd ticks. In state 5, `Retour`
+  / `RetourM` are stepped (0x4099a4) only on odd ticks, with the bar closed, when the hit
+  test (0x411454) returns 3 / 4, i.e. while the cursor is over them. Zone 4's puzzle 0x40241b
+  also draws the slots (0x41170e) after both backgrounds of its steps 3 and 4 (lines 112–122).
+- **Method:** decompiler listing lines 197–300, 476–520, 776–790; 0x411807; 0x40241b.
+- **Confidence:** proven
+
+### E-0441 — Result, fly-back and the end of a slot sequence
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** MainWndProc state 0xD: when the slot function returns, zones ≠ 0 reload the
+  background and call `0x411807(-1, slot, 0)` (magnifier state 3 without drawing, slots
+  with the run slot as `CapsAC`). State 0xF: result 0 on a just-placed object → `placed` =
+  0, bar opens (0x4e25c8 = 1), sound `bar_obj` → 0x10; otherwise `CapsAC` plays, `fermcaps`;
+  a zone ≠ 0 not yet done with every object placed → done = 1, state 0x1A (no magnifier);
+  else the magnifier opens if closed (0x4119c2) → 0xC. State 0x10, once the bar has stopped:
+  0x41138b re-inserts the object at its list index, `first` = index − 5 when index − first
+  > 5, the bar and slots are redrawn, the `OP` sprite is drawn at the fly origin and sound
+  0x4e265c (`cf_clic3`) plays → 0x11: 32 steps along the sine ease, then 0x411228,
+  0x411153 and the bar closes (0x4e25c8 = −1) → 0x12: once the bar has stopped, the
+  magnifier opens (0x4119c2), `Retour`/`RetourM` start → 5. State 0xC: zone 0 goes to the
+  autosave (0x21) as soon as `CapsAC` ends; other zones on an even tick with the magnifier
+  open (state 2) and `CapsAC` ended: 0x21 if just placed, else Retour → 5. State 0x21 after
+  `Save_WriteGame`: zone 0 → 0x20 (−1); others start Retour and open the magnifier if
+  closed → 5.
+- **Method:** decompiler listing lines 500–660, 845–860.
+- **Confidence:** proven
+- **Supersedes:** the fly-back and 0x12 description in E-0412 (the bar closing was missing).
+
+### E-0442 — Drags: rest position, sprite point and the sunflower drop
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x410ce4(mx, my, px, py, sprite, frame) stores the offset (px − mx, py − my)
+  and the sprite; 0x410d68 draws it every tick at cursor + offset; 0x410dfa returns cursor
+  + offset. State 0x17 calls 0x410ce4 with the cursor and 0x4a6ae8[TOURN index], so the
+  grab offsets are TOURN's resting centre. State 0x18 on release tests 0x410dfa's point
+  (the sprite's centre), not the cursor, against the pot area 0x4a6aa8; a miss draws
+  `PA..a`'s last frame again (0x409c12 − 1) and plays `cf_clic3` → 0x17. Zone 0's slot
+  function 0x411a28 does the same (0x410ce4, 0x410dfa, 0x4a6aa8; lines 163–193).
+- **Method:** `notes/decomp/MISSION.EXE__FUN_00410ce4.c`, `…00410d68.c`, `…00410dfa.c`
+  (decompiled from a read-only copy of the project), MainWndProc lines 683–775.
+- **Confidence:** proven
+
+### E-0443 — Option menu buttons, Quit and the credits skipping
+- **Binary/file:** `/MISSION.EXE`; `Data/mission.___`
+- **Evidence:** OptionMenu state 0: a click on button b (0x40e976; buttons 1..3 ignored
+  while the volume row is open) draws `options` frame b at 0x4a6620[b] = (186, 66),
+  (187, 154) × 3, (187, 243), (187, 331) → state 1, which on the release (any position)
+  hides it and goes to page b + 2. Quit page (states 0xB, 0xC): a click on Yes/No (0x40eb34)
+  draws frame 11 + i at 0x4a66e0[i] = (255, 281), (357, 281) → on release Yes writes the
+  flags, GGAME, USERS and returns −2, No reloads `option`. Menu credits (state 0xE): > 250
+  ticks, Space or the button down → next picture; after 16 back to `option`. End credits
+  0x409645: Space or the button down → end of all pictures (state 3 waits for the button
+  up, stops the sound).
+- **Method:** `notes/decomp/MISSION.EXE__OptionMenu.c`, `…__FUN_0040e976.c`,
+  `…__FUN_00409645.c`; tables read from `mission.___` (file offset = VA − 0x401000).
+- **Confidence:** proven
+
+### E-0444 — onAbort latches a per-zone flag; puzzles test it in their waiting steps
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** the eleven onAbort functions set a flag, some only for their puzzle's
+  object: 0x40d1ef (0x4e1f74 when object 3), 0x402376 (0x4e039c when 6), 0x402ac2 (12),
+  0x403ea1 (17), 0x404217 (21), 0x404b5f (24), unconditional 0x4034f2, 0x4056ac, 0x405f5b
+  (0x4e039c), 0x4076b2, 0x407dd1 (0x4e0528). Each onPlace clears it (e.g. 0x4022c0,
+  0x4029f5, 0x403346, 0x40d112, 0x407509, 0x407bc7). The flag is read only in the puzzle
+  steps the zone docs name (e.g. 0x40241b cases 2 and 6, 0x40d293 case 3, 0x408118 cases
+  1 and 6), which free the puzzle's sprites and sounds and return result 0; MainWndProc
+  0xD calls onAbort when Backspace fired (0x4e2678). A Backspace outside those steps stays
+  latched until the next such step.
+- **Method:** `notes/decomp/MISSION.EXE__FUN_*.c` for the functions named; grep of the flag
+  addresses over all listings.
+- **Confidence:** proven

@@ -152,36 +152,36 @@ while the bar is closed and not moving. Cursor 11 over them.
 
 | State | What happens | Next |
 |---:|---|---|
-| 0 | zone 0: magnifier open, load the bar, `LoupeIn`, open the bar; others: draw slots, magnifier, Retour buttons | 7 / 5 |
+| 0 | slots and the magnifier drawn open (last `LoupeOut` frame); zone 0: load the bar, `LoupeIn` → 7; others: Retour buttons → 5 (E-0440) | 7 / 5 |
 | 5 | **idle**, see "Idle" | many |
 | 2, 0x13, 1 | view B: `GFX\<zone>b.TGP` panorama (`Tgp_Load`), wait for release, run the panorama until a click (sound `clic_1`), redraw | 5 |
 | 4, 0x13, 3 | view A: `<zone>a` animation (below), redraw | 5 |
 | 6 | wait until the bar is closed; reopen the magnifier; Retour buttons | 5 |
 | 7 | load the bar; if the magnifier is closed, open the bar (sound `bar_obj`) | 5 |
 | 8, 0x15 | dragging an object from the bar (8: it belongs to this zone; 0x15: it does not) | 10 / 5 |
-| 10 | `CapsOP` plays at the slot; when done and the bar is closed | 0xE |
+| 10 | `CapsOP` plays at the slot (every tick); when done and the bar is closed | 0xE |
 | 0xB | `CapsAO` plays at the slot (even ticks); when done, bar closed, magnifier closed | 0xE |
 | 0xE | call the zone's `onPlace(object, slot)`; draw the slots | 0xD |
 | 0xD | run the slot (below) | 0xC / 0xF |
 | 0xF | the slot's result (below) | 0x10 / 0x1A / 0xC |
-| 0x10, 0x11 | the object flies back from the slot to the bar (below) | 0x12 |
-| 0x12 | when the bar is closed: magnifier, Retour buttons | 5 |
-| 0xC | `CapsAC` plays (odd ticks); when done and the magnifier is open: autosave if an object was just placed (state 0x21), else Retour buttons | 0x21 / 5 |
+| 0x10, 0x11 | the object flies back from the slot to the bar, then the bar closes (below) | 0x12 |
+| 0x12 | when the bar is closed: magnifier opens, Retour buttons | 5 |
+| 0xC | `CapsAC` plays (odd ticks); when done (zone 0) or done with the magnifier open (others): autosave if an object was just placed (state 0x21), else Retour buttons | 0x21 / 5 |
 | 0x1A..0x1D, 0x16..0x19, 0x1B | the sunflower (below) | 0x21 |
-| 0x21 | autosave `GAME<player><object>.BIN` (`save.md`); zone 0 then leaves | 5 / 0x20 |
+| 0x21 | autosave `GAME<player><object>.BIN` (`save.md`); zone 0 then leaves; others: Retour buttons, the magnifier opens if closed | 5 / 0x20 |
 | 0x1F, 0x1E | option menu (below) | 5 / 0x20 |
 | 0x22 | wait for the bar to close | 0x1F |
 | 0x23 | wait for the bar to close, centre the cursor | 0x20 |
 | 0x24 | zone 21's ending (`a14.md`) | 0x20 |
 | 0x20 | leave the zone (below) | - |
 
-After the state's step, on even ticks the magnifier animation advances (1 → 2 when
+The shell's own states show cursor 9 (all but 5, the drags, the views, the slot run and the sunflower's click and drag; E-0440). After the state's step, on even ticks the magnifier animation advances (1 → 2 when
 `LoupeOut` ends, 0 → 3 when `LoupeIn` ends); then the bar moves one step (0x410e30), a
 dragged sprite follows the cursor (0x410d68), the cursor is drawn and the page flipped.
 
 ### Idle (state 5)
 
-Cursor 0; 11 over the magnifier buttons and Retour buttons, 12 over a bar object.
+Cursor 0; 11 over the magnifier buttons and Retour buttons, 12 over a bar object. `Retour` / `RetourM` animate (odd ticks) only while the cursor is over them with the bar closed (E-0440).
 
 - **Backspace** (not while the bar moves): bar closed → centre the cursor, leave with -1;
   bar open → close it, then leave (0x23).
@@ -233,12 +233,13 @@ Two generic slot functions (E-0425):
 - **voice** (0x414dec): result 1; waits while the streamed voice plays; a click stops it.
 
 **Result** (state 0xF): result 0 on a just-placed object → it goes back: `placed` = 0,
-the bar opens (sound `bar_obj`), `OP` frame flies from `(40, 83 + d)` (d = 0, 89, 180 per
-slot) to the bar slot over 32 ticks along `p = from (1 - t) + to t`,
-`t = (sin(3π/2 - π n / 32) + 1) / 2`, n = 1..32 (sound `cf_clic3`), and it is re-inserted
-at its old list index. Otherwise `CapsAC` plays (sound `fermcaps`); if the zone is not
+the bar opens (sound `bar_obj`); once it is open the object is re-inserted at its old list
+index (the list scrolls so that index − first ≤ 5), sound `cf_clic3`, and the `OP` frame
+flies from `(40, 83 + d)` (d = 0, 89, 180 per slot) to its bar slot over 32 ticks along
+`p = from (1 - t) + to t`, `t = (sin(3π/2 - π n / 32) + 1) / 2`, n = 1..32; then the bar
+closes (E-0441). Otherwise `CapsAC` plays (sound `fermcaps`); if the zone is not
 `done` and every object of the zone is placed, the zone gets its sunflower (state 0x1A,
-`done` = 1).
+`done` = 1; the magnifier reopens only after the autosave), else the magnifier opens.
 
 ### The sunflower (E-0413)
 
@@ -250,9 +251,10 @@ at its old list index. Otherwise `CapsAC` plays (sound `fermcaps`); if the zone 
    1 (111, 244, 24, 32), 2 (148, 290, 30, 26); cursor 12 over it): `PA..b` frame 0, the bar
    opens (`bar_obj`), `TOURN` follows the cursor (grab offsets (122, 344), (132, 295),
    (166, 333)), sound `tourneso`, cursor 13.
-4. (0x18) Release on the pot area (590, 400, 45, 80): `POT` plays at (558, 422), sound
+4. (0x18) Release with the sprite's point (TOURN's resting centre moved with the cursor;
+   E-0442) in the pot area (590, 400, 45, 80): `POT` plays at (558, 422), sound
    `vase`, the counter frame follows it (0x1C); anywhere else the sunflower snaps back
-   (sound `cf_clic3`) and step 3 repeats.
+   (`PA..a`'s last frame again, sound `cf_clic3`) and step 3 repeats.
 5. (0x1C) When `POT` ends: the zone's counter + 1, the bar closes.
 6. (0x1D, 0x19) `PA..c` plays once (Van Gogh leaves), footsteps from frame 12; then the
    sprites are freed (0x1B) and the game autosaves (0x21).
@@ -294,8 +296,9 @@ rectangle over the current screen, with the `.CVY` mask when flagged (media spec
 
 Opened by Esc in a zone (state 0x1F: saves the screen) or from 3D (message 0x503).
 Background `option`; `options.SPR` (buttons), `cursopt.SPR` (volume knob), `lcaps.SPR`
-(load icons), font `trobo12`. Buttons (`options` frame b drawn at its position while
-pressed; cursor 11 over them):
+(load icons), font `trobo12`. Buttons (`options` frame b drawn while pressed at (186, 66), (187, 154) for b = 1..3,
+(187, 243), (187, 331); a pressed button acts when the mouse button is released, wherever
+the cursor is; cursor 11 over them; E-0443):
 
 | b | Rect | Opens |
 |---:|---|---|
@@ -322,11 +325,11 @@ v = volume % × 211 / 100; the player's volume is stored as DirectSound attenuat
   at (304, y + 5). Row i clicks at (194, 140 / 211 / 281 / 351, 57, 57); arrows (436, 135, 13, 12) and (436, 401, 13, 12) scroll by one. Clicking a row closes the
   menu with `player × 100 + slot`.
 - **Quit**: Yes (255, 281, 33, 17) / No (358, 281, 36, 17), `options` frame 11 + i at
-  (255, 281) / (357, 281); No preselected (frame 12). Yes: from a zone, the held flags go
+  (255, 281) / (357, 281); No preselected (frame 12); a click on either shows its frame and its release acts. Yes: from a zone, the held flags go
   into the 3D state; `GGAME` is written (first u32 = 1 from a zone, 0 from 3D),
   `USERS.BIN` rewritten, close with -2. No: back to the menu.
-- **Credits**: `Credit%02u` for 0..15, each for 250 ticks or until a click or Space;
-  then the menu.
+- **Credits**: `Credit%02u` for 0..15, each for 250 ticks or until a click or Space (one
+  picture per click); then the menu.
 - Esc anywhere in the menu goes back to its first page; Esc on the first page closes it
   (-1). Closing restores the screen, frees the sprites, applies volume and view size.
 
@@ -335,5 +338,5 @@ From 3D, closing the menu calls 0x42f515 (-2 quits, n loads, -1 resumes 3D).
 ## Credits after the end (E-0418)
 
 Message 0x504 (mode 1 after `cinefin2`): sound `Credits` looping; `Credit00`..`Credit15`
-full screen, 250 ticks each; a click or Space ends early; after the last, wait for the
+full screen, 250 ticks each; a click or Space ends them all; after the last, wait for the
 button to be up, stop the sound and quit the program (0x409600, 0x409645, 0x42f508).
