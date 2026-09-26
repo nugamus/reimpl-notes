@@ -399,7 +399,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 ### Q-0025 — Minor camera and collision fields
 - **Context:** `Camera_DistanceAhead` also skips objects with object `+0x40` ≠ 0; each walk or
   turn step sets camera `+0x50` and calls `FUN_004147a0(cursor, 1, 0)` and `FUN_0041bf30`
-  (3D sound update); which units enable run (`+0x48`) and jump (`+0x4c`), E-0047.
+  (3D sound update); which units enable run (`+0x48`) and jump (`+0x4c`), E-0047. (That part is answered by E-0613: every unit, until U33 changes them.)
 - **What we checked:** the call sites only.
 - **Blocks:** nothing in U01 beyond the halved speed near walls and the cursor while moving.
 - **Status:** open
@@ -966,4 +966,18 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** nothing if the reading holds; else the engine's pick needs the original's rule.
 - **Next to try:** the welded branch of the pick in `x3d.dll` (E-0070's function): whether
   it tests the per-weld hidden flag (object `+0x5c`) before a weld's face range.
+- **Status:** open
+
+### Q-0196 — Why did one posted Shift tap at U01's hand-over not jump?
+- **Context:** E-0613: in U01 after `TakeCard` (eye (−350.1, −254.2, 29.55), yaw 5.24) with
+  camera `+0x4c` = `+0x40` true, a posted Shift (VK 0x10, 80 ms) left the camera z unchanged
+  in reads about 1.5 s and 4.5 s later. The same jump works in U04 (Q-0121, E-0215). The
+  engine jumps there.
+- **What we checked:** `Camera_Jump` (`0x00419000`) returns before moving if eye z minus
+  the ground under the start position is below camera `+0x5c` (eye height); the eye stood
+  0.93 below the hand-over's z, so the ground there may be higher than eye − h. Not
+  checked: the ground height at that spot, or whether the key reached `held[0x10]`.
+- **Blocks:** nothing; the engine may jump in places where the original refuses.
+- **Next to try:** the engine's `where` at that spot for the ground height versus eye − 60;
+  in the original, read camera `+0x1c` and the ground ray (`FUN_00416000`) there.
 - **Status:** open
