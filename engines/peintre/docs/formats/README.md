@@ -20,6 +20,9 @@ validator in `engines/peintre/tools/parsers/<fmt>.py` (with `--selftest`), the p
 | `.APC` sound | 68 (all 22050 Hz mono, 17.4 min) | `apc.py` | `apc.ksy` | E-0207, E-0209 | done |
 | `.WAV` sound | 122 (PCM 16-bit 22050 Hz: 118 mono, 4 stereo) | `wav.py` | `wav.ksy` | E-0208, E-0209 | done |
 | `.AWF` bitmap font | 2 (1 fixed, 1 proportional) | `awf.py` | `awf.ksy` | E-0105 | done |
+| `USERS.BIN` player list | 0 (none on the CD) | none possible | `users.ksy` | E-0402, E-0432 | layout from the code; no validator (no files) |
+| `GAMEppss.BIN` game save | 0 | none possible | `game.ksy` | E-0419, E-0421, E-0422, E-0432 | layout from the code; 3D block mostly opaque (Q-0252) |
+| `GGAMEp.BIN` resume file | 0 | none possible | `ggame.ksy` | E-0420, E-0432 | layout from the code |
 
 ## `.BFG` — scene bundle (E-0013)
 
@@ -183,3 +186,12 @@ Plain RIFF WAVE: `fmt ` first, `data` second in all 122 files; 40 add `LIST`, `c
 bits from `fmt ` without checking the format tag, so anything but PCM would play as
 noise; none occurs. Streamed WAVs (`_` path) are forced to mono 22050 Hz, which all of
 them are. ScummVM's `Audio::makeWAVStream` reads every file.
+
+## Saves — `USERS.BIN`, `GAMEppss.BIN`, `GGAMEp.BIN` (E-0402, E-0419..E-0422, E-0432)
+
+Written by the game in `<Target>\SAVE\`; the CD holds none, so rule 2's validator cannot
+exist: the layouts come from the writers and readers only. `USERS.BIN`: `u32 count`, then
+40-byte records `{char name[32]; s32 volume; u32 view_size}`. `GAME`: the 0x36C-byte 3D
+state block, then the 0x100-byte 2D block (25 zone-done flags, 35 object-placed flags, 4
+sunflower counters). `GGAME`: `u32 in_2d` then the same two blocks. Meaning and life
+cycle: `docs/spec/save.md`.
