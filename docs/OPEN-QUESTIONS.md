@@ -942,3 +942,19 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Next to try:** a capture of those faces in the original (U04 house window, U05 coke
   building).
 - **Status:** open
+
+### Q-0195 — Does the pick skip a hidden welded object's faces?
+- **Context:** `interaction.md` "Picking" skips hidden objects and tests welded objects
+  through their hierarchy top's mesh; it does not say whether a hidden welded object's own
+  faces are still tested when its top is visible. U02's coin `*U02_09a` (`U02_09A.O3D`:
+  welded, 0 own vertices, 20 faces, under `$$$DUMMY.#SCENE`) is hidden by INFOOBJ until the
+  magpie drops it; M18 (take it) is `TRUE`. Testing its faces made the coin takeable from
+  the barrier before `MarronToPie`, which skips the magpie puzzle.
+- **What we checked:** the engine playthrough (2026-09-26): it now skips each welded object
+  by its own hidden flag, as its draw does, and a top's hidden flag no longer hides its
+  welded children from the pick. Not checked in the binary (`X3d_Object_Pick` over welded
+  ranges) or the original.
+- **Blocks:** nothing if the reading holds; else the engine's pick needs the original's rule.
+- **Next to try:** the welded branch of the pick in `x3d.dll` (E-0070's function): whether
+  it tests the per-weld hidden flag (object `+0x5c`) before a weld's face range.
+- **Status:** open
