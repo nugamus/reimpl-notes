@@ -18,3 +18,10 @@ address,name,evidence
 0x0041aae0,Rgb555To565,after LoadTga when DAT_005b7fa4 == 16; E-0104
 0x0041b061,Blit16,opaque clipped copy; E-0104
 0x0041b1d5,Blit16Keyed,skips 0x03E0/0x07C0 (pure green); E-0104
+0x0046ff9e,Font_DrawText,1-bpp glyphs from y - baseline; E-0105
+0x00470110,Font_DrawTextShadow,as Font_DrawText plus black pixel down-right; E-0105
+0x0047029e,Font_MeasureText,fixed (w+1) per char or sum of advances; E-0105
+0x0040af8c,Font_Draw,slot -> 0x46f457; E-0105
+0x0040afba,Font_DrawShadow,slot -> 0x46f4c0; E-0105
+0x0040afe8,Font_Measure,slot -> 0x46f529; E-0105
+0x0040af53,Font_Free,m__free of the slot's data block; E-0105

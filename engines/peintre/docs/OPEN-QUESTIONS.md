@@ -48,3 +48,12 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** data only (unit-length keys, times 0..30, word 0 = 30 in portev).
 - **Blocks:** animation playback spec.
 - **Status:** open
+
+### Q-0100 — What do the constant fields of the TGP "LZWCRYO" header mean?
+- **Context:** `.TGP` single body (E-0100): `u32 0x24` at 8, two zero u32 at 0x14, `256`
+  at 0x1C, `1` at 0x20, unpacked size at 0x24. `Tgp_Load2` (0x414779) reads them and
+  uses only the packed size at 0x28.
+- **What we checked:** the loader; all 110 files (the values never vary).
+- **Observed range:** 0x24, 0, 0, 256, 1, 614400 in every file.
+- **Blocks:** nothing (the engine ignores them); they stay `unk_*` in `tgp.ksy`.
+- **Status:** open

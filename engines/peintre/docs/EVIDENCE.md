@@ -358,3 +358,33 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   alpha, then key on 0x03E0.
 - **Method:** decompiled the functions named (`notes/decomp/`); `engines/peintre/tools/parsers/tga.py`.
 - **Confidence:** proven
+
+### E-0105 — AWF: 38-byte font record + data (glyph offset table, 1-bpp glyphs MSB first, width/spacing tables when proportional)
+- **Binary/file:** `/MISSION.EXE`; `Data/FONTS/TOPAZ8.AWF`, `TROBO12.AWF`
+- **Evidence:** `Font_LoadAwf` (0x40acde; 6 slots, stride 0x26 at DAT_004e1ad0) opens
+  `%sDATA\FONTS\%s.AWF`, reads 0x26 bytes into the slot, the remaining `size − 0x26`
+  bytes into one `m__malloc` block stored at slot+4, and adds the block address to the
+  u32s at +8, +0xC, +0x10, +0x14, +0x18. The draw wrappers 0x40af8c / 0x40afba and the
+  measure wrapper 0x40afe8 pass the slot to 0x46f457 / 0x46f4c0 / 0x46f529, which copy
+  +8 (glyph base), +0xC (glyph offset table), +0x10, +0x14, +0x18 (three byte tables),
+  byte +0x1C (first char), byte +0x1D (count, measure only), byte +0x1E (subtracted from
+  y), u16 +0x20 (bit 0 tested), u16 +0x22 (fixed width), u16 +0x24 (rows) into the
+  library's globals. Drawing (0x46ff9e) starts at `(x, y − [+0x1E])` and for each byte
+  `c >= first` (a zero byte ends the string) takes glyph `base + table[c − first]`,
+  height rows of `(w + 7) >> 3` bytes, writing the text colour for each set bit, MSB
+  first; `w` is +0x22 when bit 0 is clear, else `table10[i]`, and the pen advances by
+  +0x22, or by `(u8)(table18[i] + table14[i]) + table10[i]`. 0x470110 is the same and
+  also writes 0 one row down and one pixel right of every ink pixel (a black shadow; the
+  proportional path writes a u32 there, two pixels). 0x47029e returns the width:
+  `chars × (+0x22 + 1)` for fixed fonts (one more than the draw advance), else the sum of advances over chars with
+  `0 <= c − first <= [+0x1D]` (table18 read as signed). Corpus: `awf.py` validates 2/2,
+  every byte consumed: TOPAZ8 fixed 8×8, chars 32..165, baseline 6, three table
+  offsets 0, data = 134 u32 offsets + 134 × 8 bytes; TROBO12 proportional, height 17,
+  chars 32..122, baseline 12, data = 91 u32 offsets, bitmaps up to +0x10 = 0x8DC, then
+  three 91-byte tables to EOF (every +0x14 entry is 2, every +0x18 entry 0); glyph
+  offsets are contiguous in both. Rendering both gives
+  readable text (TROBO12 draws a placeholder `x` for its missing punctuation). The Cryo
+  font format ScummVM has (`engines/cryomni3d/fonts/cryofont.cpp`, big-endian,
+  `CRYOFONT` magic) is a different format.
+- **Method:** decompiled the functions named (`notes/decomp/`); `engines/peintre/tools/parsers/awf.py`.
+- **Confidence:** proven

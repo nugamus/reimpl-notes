@@ -121,10 +121,10 @@ address,module,name,ghidra,size,callers,evidence
 0x0040a766,game/shell,Sprite_LoadFile,FUN_0040a766,1262,1,%sDATA\SPRITES\%s.SPR
 0x0040ac54,game/shell,,FUN_0040ac54,138,3,
 0x0040acde,game/shell,Font_LoadAwf,FUN_0040acde,629,2,%sDATA\FONTS\%s.AWF
-0x0040af53,game/shell,,FUN_0040af53,57,3,
-0x0040af8c,game/shell,,FUN_0040af8c,46,1,
-0x0040afba,game/shell,,FUN_0040afba,46,0,
-0x0040afe8,game/shell,,FUN_0040afe8,37,0,
+0x0040af53,game/shell,Font_Free,FUN_0040af53,57,3,m__free of the slot's data block; E-0105 (2d.csv)
+0x0040af8c,game/shell,Font_Draw,FUN_0040af8c,46,1,slot -> 0x46f457; E-0105 (2d.csv)
+0x0040afba,game/shell,Font_DrawShadow,FUN_0040afba,46,0,slot -> 0x46f4c0; E-0105 (2d.csv)
+0x0040afe8,game/shell,Font_Measure,FUN_0040afe8,37,0,slot -> 0x46f529; E-0105 (2d.csv)
 0x0040b00d,game/shell,,FUN_0040b00d,568,0,
 0x0040b245,game/shell,,FUN_0040b245,33,0,
 0x0040b266,game/shell,Rgb565To555,FUN_0040b266,95,3,(v>>1)&0x7FE0|v&0x1F over n pixels; E-0100 (2d.csv)
@@ -761,9 +761,9 @@ address,module,name,ghidra,size,callers,evidence
 0x0046fe31,cryo/misc,,FUN_0046fe31,36,1,
 0x0046fe55,cryo/misc,,FUN_0046fe55,184,1,
 0x0046ff0d,cryo/misc,,FUN_0046ff0d,145,1,
-0x0046ff9e,cryo/misc,,FUN_0046ff9e,370,1,
-0x00470110,cryo/misc,,FUN_00470110,398,1,
-0x0047029e,cryo/misc,,FUN_0047029e,117,1,
+0x0046ff9e,cryo/misc,Font_DrawText,FUN_0046ff9e,370,1,1-bpp glyphs from y - baseline; E-0105 (2d.csv)
+0x00470110,cryo/misc,Font_DrawTextShadow,FUN_00470110,398,1,as Font_DrawText plus black pixel down-right; E-0105 (2d.csv)
+0x0047029e,cryo/misc,Font_MeasureText,FUN_0047029e,117,1,fixed (w+1) per char or sum of advances; E-0105 (2d.csv)
 0x0047037a,cryo/misc,,FUN_0047037a,34,1,
 0x0047039c,cryo/misc,,FUN_0047039c,34,1,
 0x004703be,cryo/misc,SprLib_DrawRle,FUN_004703be,220,1,centred RLE over palette; E-0103 (2d.csv)

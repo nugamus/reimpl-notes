@@ -12,9 +12,10 @@ validator in `engines/peintre/tools/parsers/<fmt>.py` (with `--selftest`), the p
 | `.3DM` texture (in BFG) | 504 | `obj3d.py` | `obj3d.ksy` | E-0015 | done (4 odd sizes, Q-0003) |
 | `.3DA` animation (in BFG) | 48 | `obj3d.py` | `obj3d.ksy` | E-0016 | layout done; key meaning tentative (Q-0004) |
 | `.3DI` boxes (in BFG) | 27 | `obj3d.py` | `obj3d.ksy` | E-0016 | layout done; face record fields open |
-| `.TGP` full-screen / panorama image | 134 (110 single 640x480, 24 chunked panoramas) | `tgp.py` | `tgp.ksy` | E-0100, E-0101 | done |
+| `.TGP` full-screen / panorama image | 134 (110 single 640x480, 24 chunked panoramas) | `tgp.py` | `tgp.ksy` | E-0100, E-0101 | done (LZWCRYO constants open, Q-0100) |
 | `.SPR` sprite bank | 289 (12 RLE, 115 band, 10 raw8, 152 raw16; 5,827 frames) | `spr.py` | `spr.ksy` | E-0102, E-0103 | done |
 | `.TGA` 2D overlay / cursor | 104 (11 with TGA 2.0 footer) | `tga.py` | `tga.ksy` | E-0104 | done |
+| `.AWF` bitmap font | 2 (1 fixed, 1 proportional) | `awf.py` | `awf.ksy` | E-0105 | done |
 
 ## `.BFG` — scene bundle (E-0013)
 
@@ -95,3 +96,19 @@ descriptor 0 or 1, pixels **X1R5G5B5 bottom row first**, then optionally (11 fil
 **pure green** (0x03E0 in 555, 0x07C0 in 565). ScummVM's `Image::TGADecoder` parses it,
 but treats the descriptor-1 files as ARGB1555 with bit 15 = 0, i.e. fully transparent:
 convert its surface as RGB555 ignoring alpha (or read the 18-byte header directly).
+
+## `.AWF` — bitmap fonts (E-0105)
+
+A 38-byte header that the engine keeps as the font record (five u32 offsets into the data:
+glyphs, glyph table, widths, spacing a, spacing b; then `u8 first_char, count, baseline,
+unk_1f; u16 flags` (bit 0 = proportional)`, fixed_width, height`), then the data: `u32
+glyph_table[count]` (offsets from the glyph base), 1-bpp glyphs (`height` rows of
+`ceil(w/8)` bytes, MSB = leftmost, set bit = text colour, clear = untouched), and for a
+proportional font three `count`-byte tables: width, spacing a (u8), spacing b (s8).
+Text is drawn from `y − baseline`; the pen advances by `fixed_width`, or by
+`width + spacing_a + spacing_b`; bytes below `first_char` draw nothing and do not advance.
+A shadow variant also blacks the pixel one down and one right of each ink pixel. The
+measure routine counts `fixed_width + 1` per char for a fixed font, one more than drawing.
+TOPAZ8: fixed 8×8, chars 32..165. TROBO12: proportional, 17 rows, chars 32..122 (next to
+it, `TROBO.TTF` is a TrueType font, not read by this loader). ScummVM's Cryo font reader
+(`CRYOFONT`) is a different format.
