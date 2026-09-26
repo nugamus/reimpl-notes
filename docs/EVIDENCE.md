@@ -4763,3 +4763,23 @@ An entry at `tentative` confidence must also have a matching line in
   identity test the same input walks on, and standing on the car at (318, 380) still rides.
 - **Method:** `o3d.py` over U01's files; engine `dev_commands` runs.
 - **Confidence:** proven.
+
+### E-0615 — U00's boat test is by name (one `*U04_32` loaded); U01's hook turns collision on only in train mode and re-reads the ground before stopping the train sound
+- **Binary/file:** `MissionMonet.exe`; `Data/U00/U00.x3d`, `Data/U04/**/*.O3D`.
+- **Evidence:** `U00_ProcessTutorialKeys` (`0x00409b40`) calls `U00_StepOntoStone` after
+  `Scene_HandleInput` when `+0x6d8` = 0 and `_stricmp(camera+0x3c name, "*U04_32")` = 0
+  (E-0231): a name compare. `o3d.py` over `Data/U04`: `*U04_32` is the top object of
+  `Anim/BARKE_PLACEMENT.O3D`, `Anim/BARKE_TRAJECTOIRE1.O3D` and `Static/BARKE_PLACEMENT.O3D`
+  only; `U00.x3d` loads only `Anim\barke_placement.o3d` of them, so U00's scene holds one
+  object of that name. U01 input hook (`0x00401940`, capstone): `+0x6e8` := (camera `+0x3c`
+  == `[+0x6dc]+0x60`); only when set: camera `+0x70` := 0 (`0x0040198b`), `GetAsyncKeyState
+  (0x26)` → `U01_RideTrain` or `0x00418970`, ground probe `0x0041a270`, and camera `+0x70`
+  := 1 if `+0x3c` ≠ the train (`0x004019ed`). Off the train the hook jumps straight to
+  `Scene_HandleInput` (`0x004019f4`): no collision write. After it, `+0x3c` is read again
+  (`0x004019fb..0x00401a0d`) and only if it equals the train object and Up is not held is
+  the effects group stopped (`0x00401a25`). U01's click handler (`0x00401d30`) repeats
+  the climb when actions `+0x460` ≠ 0, a hovered hotspot (`[+0x1a4]`) named `*U01_09`
+  (`_stricmp` on hotspot `+0xc`) and camera `+0x1c` (eye z) < 100.0; U00's (`0x00409aa0`)
+  only drains `DonnerLunettes` / `TakeLunettes`.
+- **Method:** MCP decompile and disassembly; `o3d.py` duplicate scan; `U00.x3d` object list.
+- **Confidence:** proven.
