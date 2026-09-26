@@ -540,3 +540,23 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
 - **Method:** decompiles; `tools/ghidra/scripts/callers.py`.
 - **Confidence:** proven (routing); the event names in the table are from the callers
   and are refined in the zone specs.
+
+### E-0034 — Image and archive paths, decoder choice, archive lookup (DVD)
+- **Binary/file:** `RING_DVD.EXE`: image handle ctor 0x42d260, `aPuzzle::Alloc` 0x41bdc0
+  (disassembly 0x41bdc0..0x41bfa9), `aImage::Load` 0x413150, `aArtHandler::Open`
+  0x419bc0, `GetData` 0x419e10, index 0x419b50, `aArt` name lookup 0x419890 with
+  0x479410, `GameSetZone` 0x40d220; the DVD's `DATA/AS/IMAGE/*.BMA` and `DATA/AS.AT2`
+- **Evidence:** the ctor stores zone (+0x79), app+0x5d (+0x7a) and load-from (+0x7b);
+  Alloc builds `sprintf("%s%s\%s\%s\%s", 0x402470()|0x402480(), "DATA",
+  0x402010(zone), "IMAGE", name)` for `'e'` with +0x7a = 1|2, `sprintf("\%s\%s",
+  "IMAGE", name)` for `'f'`, `sprintf("%s%s", 0x42d710(), name)` for kind 5, then
+  `aImage::Load(path, loadFrom, zone, kind)`. Open builds `sprintf("%s%s\%s.at2", prefix,
+  "DATA", 0x402010(zone))`. 0x419b50 maps kinds 2..5 to (zone 1, kind 2). 0x479410 is a
+  case-folding compare. `GameSetZone` opens the zone's archive with kind 1 when
+  `GetreadFrom(zone) == 'f'` and the zone is not 1. Corpus: of the image names the AS
+  set-up declares, 96 of 96 exist only as loose files; in NI, FO, WA and SY the declared
+  images are archive members (NI 51 of 51, FO 72 of 72, WA 68 of 68, SY 66 of 67; SY's
+  `osc.bmp` is neither), sounds are loose files.
+- **Method:** decompiles and disassembly; name census over `notes/calls/*_setup.jsonl`
+  against the archives and `DATA/<zone>/`.
+- **Confidence:** proven

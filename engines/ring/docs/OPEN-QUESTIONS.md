@@ -76,3 +76,22 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** nothing for ScummVM (everything is under one game directory), but the spec
   of file lookup should say which prefix each kind of file uses.
 - **Status:** open
+
+### Q-0007 — How does the DVD find the AS zone's backgrounds?
+- **Context:** E-0034: the AS set-up declares `.bma` backgrounds that exist only loose in
+  `DATA/AS/IMAGE`, the DVD `fl.ini` has `ART_AS: 1` (archive), and a lookup in `AS.AT2`
+  by those names fails (the archive holds the same pictures as `\image\old_ish.bmp`,
+  `\image\ass01n01_v01.bmp`, …).
+- **What we checked:** GetreadFrom, the ART flag parsing (atoi), the loader choice, the
+  archive lookup; the installer only rewrites `CDPATH` in `fl.ini`.
+- **Blocks:** nothing for our engine if it falls back to the loose file; whether the
+  original shows these pictures at all (dead puzzles?) is unknown.
+- **Status:** open (one run of the original DVD entering AS would answer it)
+
+### Q-0008 — Which SY.AT2 does an installed DVD game read?
+- **Context:** `aArtHandler::Open(1, 2)` builds `<install>DATA\sy.at2`; the DVD has
+  `DATA/<LAN>/SY.AT2` for seven languages and no `DATA/SY.AT2`.
+- **What we checked:** Open's format; not yet the installer's copy step or a language
+  prefix in the install path.
+- **Blocks:** ScummVM picks `DATA/<LAN>/SY.AT2` by the chosen language meanwhile.
+- **Status:** open
