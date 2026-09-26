@@ -164,6 +164,89 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** nothing for drawing.
 - **Status:** open
 
+### Q-0350 — What do the zones' onAbort functions do, and does Backspace latch until a puzzle step tests it?
+- **Context:** `ui.md` "Running a slot": Backspace during a run calls the zone's `onAbort`
+  (0x40d1ef, 0x402376, 0x402ac2, 0x4034f2, 0x403ea1, 0x404217, 0x404b5f, 0x4056ac,
+  0x405f5b, 0x4076b2, 0x407dd1) and "puzzles then end on their next step with result 0";
+  the puzzle docs say "Backspace ends the slot" only in some steps.
+- **What we checked:** the specs only; the engine latches a flag set by Backspace and tests
+  it in the steps the puzzle docs name, so a Backspace during a movie or voice step ends
+  the puzzle at the next waiting step.
+- **Blocks:** whether Backspace pressed outside those steps is kept or lost; what else
+  onAbort stops (voices, sounds, the movie).
+- **Status:** open
+
+### Q-0351 — At what tick rate do Retour, CapsOP and POT animate?
+- **Context:** `ui.md` gives CapsAO (even ticks), CapsAC (odd ticks) and the magnifier (even
+  ticks), not `Retour` (looping), `CapsOP` (state 10) or `POT` (state 0x1C).
+- **What we checked:** the spec; the engine advances the three on odd ticks ("most sprite
+  animations").
+- **Blocks:** exact animation speed of those three.
+- **Status:** open
+
+### Q-0352 — After an object flies back to the bar (states 0x10..0x12), who closes the bar?
+- **Context:** `ui.md` state 0xF opens the bar for the fly-back; state 0x12 waits "when the
+  bar is closed" before redrawing the magnifier and the Retour buttons. Nothing in the spec
+  closes it in between.
+- **What we checked:** the spec; the engine goes to idle (5) with the bar open when it is
+  open and still, and reopens the magnifier only when the bar is closed.
+- **Blocks:** whether the bar closes by itself after the fly-back.
+- **Status:** open
+
+### Q-0353 — The sunflower drag: the grab offsets, the drop test and the snap-back picture
+- **Context:** `ui.md` "The sunflower" and `a14.md` zone 0: `TOURN` "follows the cursor
+  (grab offsets (122, 344), (132, 295), (166, 333))"; the drop is tested against the pot
+  area (590, 400, 45, 80); a missed drop "snaps back".
+- **What we checked:** the spec and the sprites: TOURN0..2 are RLE (centred) frames and each
+  offset lies just below its sunflower rect, so the engine takes the offset as the resting
+  centre and moves it with the cursor; it tests the cursor (not the sprite) against the
+  pot area; after a miss it shows `PA..a`'s last frame again. `TOURN`, `tourneso`, `POT`
+  and `vase` in step 2 are taken as loads, played later.
+- **Blocks:** the exact look of the drag and of a miss.
+- **Status:** open
+
+### Q-0354 — Option menu buttons: press or release, and where frames 1..3 go
+- **Context:** `ui.md` "Option menu": "`options` frame b drawn at its position while
+  pressed". Frames 1..3 are the whole 267×85 Options panel with one row lit, not the
+  128×19 rows of buttons 1..3.
+- **What we checked:** a template match of `OPTIONS.SPR` on `GFX/OPTION.TGP`: frames 0, 4, 5
+  sit at their rect's top-left, frames 1..3 at (187, 154). The engine draws them there and
+  acts when the button is released over it.
+- **Blocks:** the draw position (to confirm in 0x40e976) and when a button acts.
+- **Status:** open
+
+### Q-0355 — Load page order without file times
+- **Context:** `Save_ListGames` (0x40e78a) sorts slots 1..34 by last-write time, oldest
+  first (E-0419). ScummVM's save-file manager has no file times.
+- **What we checked:** nothing more; the engine lists the saves in slot order (roughly the
+  order objects are placed).
+- **Blocks:** matching the original's order when objects are replayed out of order.
+- **Status:** open
+
+### Q-0356 — Does zone 0's state 0 draw the slots?
+- **Context:** `ui.md` state 0: "zone 0: magnifier open, load the bar, `LoupeIn`, open the
+  bar; others: draw slots, magnifier, Retour buttons". Zone 0 has object 0's slot, which
+  the player drops the object on.
+- **What we checked:** the spec; the engine draws the slots in both cases.
+- **Blocks:** nothing visible if the background already shows the empty slot.
+- **Status:** open
+
+### Q-0357 — Does a click skip one credits picture or all of them?
+- **Context:** `ui.md` "Option menu" Credits: "each for 250 ticks or until a click or
+  Space"; E-0418 (end credits, 0x409645): "a click or Space → end".
+- **What we checked:** the specs; the engine skips one picture per click in the option menu
+  and ends the end credits on a click.
+- **Blocks:** skipping behaviour of both.
+- **Status:** open
+
+### Q-0358 — The fly-back: when `cf_clic3` plays and where a scrolled-off slot flies to
+- **Context:** `ui.md` "Result": the `OP` frame flies to "the bar slot" of its old list
+  index over 32 ticks, "(sound `cf_clic3`)".
+- **What we checked:** the spec; the engine plays `cf_clic3` when the flight starts and
+  clamps the target to the visible bar slots 0..5.
+- **Blocks:** the sound's timing and the target when the old index is scrolled off.
+- **Status:** open
+
 ### Q-0400 — When does a scene track end, and which frame is "its last frame"?
 - **Context:** the flow docs' animation tables ("stops at its end", "holds the last frame",
   "pose track n at its last frame", auberge's "length / 2"); scene.md "What a scene is made
