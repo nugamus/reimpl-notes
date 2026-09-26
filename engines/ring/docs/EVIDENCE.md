@@ -426,3 +426,28 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   unterminated spaces; the engine parses neither (E-0025).
 - **Method:** census over `dia.py`'s `ignored_tail`.
 - **Confidence:** proven
+
+### E-0028 — The HBR video codec (Ring DVD and CD version), all 453 distinct files decoded
+- **Binary/file:** `RING_DVD.EXE` `aImageFileCin::ReadImage` 0x42a6f0 (`aImage::Create`
+  once, then `aCin::SControl` into the same image every frame), `aCin::SControl` 0x42ccf0,
+  TControl 0x42cbf0, stream decoder 0x42ce30; `aCinMov::Play` 0x415990 allocates the image
+  once before its loop; every HBR `.cnm`
+- **Evidence:** 0x42ce30 reads bytes and nibbles as in README "HBR video codec": ring of
+  128 dwords at `this+0x32` (write pointer reset to its start per call), memo table of
+  0x800 × {pointer, bytes} at `this+0x2a` (zeroed by SControl/TControl), codes `> ntiles`
+  and `< 0x780` walk the run list from `this+0x42` (`p += *p + 1`), codes `>= 0x780` use memo
+  entries SControl fills from the back buffer (`this+0x15`) with the u16 lengths `<< 3`
+  stored before the tile table. TControl decodes into the back buffer (limit 1,200,000
+  bytes), SControl into the picture (limit 0x8cfff bytes); nothing else checks the size.
+  S header: u32 size, u32 runs size, u16 tile count, u16 tile words (4), u32 width, u32
+  height. Corpus (453 distinct HBR files, 895 in all): every chunk decodes without an
+  out-of-range tile, run or segment; 'S' frames: 19,644 exactly 640×448 pixels, 18,965 over
+  (mostly one tile from the final nibble), 17 short; 'T': 3,923 exactly the segment total,
+  3,865 over. Decoded frames shown as RGB555 bottom-up give a coherent picture (e.g. frame
+  30 of DVD `AS/PLA/1001.CNM`).
+- **Reference:** `reference/multimedia_cx/Game_Formats/CNM.md` "version 1" describes a
+  different scheme (3-bit delta tiles, motion vectors); the binary does not do that for
+  HBR. Templier's `graphics/movies/cinematic1.cpp` was not followed.
+- **Method:** decompiles in `engines/ring/notes/decomp/`; Python prototype then
+  `ring_hbr` in `parsers/ringdec.c`; `python engines/ring/tools/parsers/cnm.py`: 100%.
+- **Confidence:** proven

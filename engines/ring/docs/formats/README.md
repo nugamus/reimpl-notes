@@ -21,7 +21,7 @@ The corpus of a type is its loose files and the members of every archive of that
 | `.wav` | 744 (210) | `wav.py` | below | E-0022 | done |
 | `.dia` subtitles, `.dan` lip timing | 7,755 (4,498) | `dia.py` | below | E-0025 | done |
 | Configuration: `fl.ini`, `aPre.ini`, `cd.ini`, `aObj.ini`, `aMes.ini`; `.aba` save lists | 38 (19) | `ini.py` | below | E-0026 | done (`.aba` records not specced: corpus has none) |
-| `.cnm` / `.ci2` video, `CNM UNR` images in `.at3` | 3,462 (2,780) + 1 damaged | `cnm.py` | `cnm.ksy` | E-0024 | container done; codec not yet decoded (Q-0005 for the damaged file) |
+| `.cnm` / `.ci2` video, `CNM UNR` images in `.at3` | 3,462 (2,780) + 1 damaged | `cnm.py` | `cnm.ksy` | E-0024, E-0028 | HBR (Ring DVD/CD) decoded in full; UNR (Ring ISO, Prophet) container only, codec pending; Q-0005 for the damaged file |
 
 ## Packed bit stream
 
@@ -39,6 +39,24 @@ bit. Bits are read MSB first (a big-endian dword at byte `pos >> 3`). A cache of
 
 Decoding runs while the position is below the end bit, so a stream may yield one extra
 code from its padding bits.
+
+## HBR video codec
+
+(`RING_DVD.EXE` 0x42ce30, E-0028; C in `parsers/ringdec.c` `ring_hbr`.) A picture is a
+raster of 4×1-pixel tiles (four RGB555 words), rows bottom-up. Each 'T' and 'S' chunk
+carries a tile table (8 bytes per tile), a code stream and a run list (the chunk's last
+`runs_size` bytes: entries of a byte count `c` then `c/2` u16 tile indices). The stream is
+read in nibbles. At a byte boundary: a byte `< 0x80` starts a new 12-bit code (it and the
+next byte's high nibble); a byte `>= 0x80` repeats ring slot `b - 0x80`. Mid-byte: a low
+nibble `< 8` starts a new 11-bit code (it and the next byte); otherwise ring slot
+`nibble·16 + next high nibble - 0x80`. New codes go into a 128-slot ring (write position
+back to 0 every chunk, contents kept). A code `<= ntiles` emits one tile; `ntiles < code <
+0x780` emits run number `code - ntiles` of the run list; `code >= 0x780` emits back-buffer
+segment `code - 0x780`. Each emitted code's output is remembered for the rest of the chunk,
+and a ring hit repeats it. A 'T' chunk decodes into the back buffer, whose segment lengths
+(in tiles) precede its payload; an 'S' chunk decodes into the picture, which is kept
+between frames: a short frame leaves the rest unchanged, and a stream may emit more than
+the picture (up to the engine's 0x8cfff-byte check).
 
 ## Plain BMP / TGA
 

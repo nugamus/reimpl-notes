@@ -77,6 +77,13 @@ def _load():
         lib.ring_dpcm.argtypes = [ctypes.c_char_p, ctypes.c_size_t, ctypes.c_uint32, ctypes.c_int,
                                   ctypes.c_int, ctypes.POINTER(ctypes.c_int16),
                                   ctypes.POINTER(ctypes.c_int16), ctypes.POINTER(ctypes.c_uint32)]
+        lib.ring_hbr.restype = ctypes.c_int
+        lib.ring_hbr.argtypes = [ctypes.c_char_p, ctypes.c_size_t, ctypes.c_uint32, ctypes.c_uint32,
+                                 ctypes.c_char_p, ctypes.c_size_t,
+                                 ctypes.POINTER(ctypes.c_uint16), ctypes.c_int,
+                                 ctypes.POINTER(ctypes.c_uint32), ctypes.POINTER(ctypes.c_uint16),
+                                 ctypes.POINTER(ctypes.c_uint16), ctypes.c_int,
+                                 ctypes.POINTER(ctypes.c_uint16), ctypes.c_size_t]
         _lib = lib
     return _lib
 
@@ -121,6 +128,26 @@ def dpcm(buf: bytes, pos: int, vbits: int, nsamples: int, state: list[int]):
     lib.ring_dpcm(buf, len(buf), pos, vbits, nsamples, out, st, ctypes.byref(endpos))
     state[:] = [st[0], st[1]]
     return list(out), endpos.value
+
+
+HBR_ERRORS = {-1: "output overflow", -2: "tile index out of range", -3: "run list overrun",
+              -4: "ring reference to an unset code", -5: "back-buffer segment out of range"}
+
+
+def hbr(buf: bytes, pos: int, end: int, runs: bytes, tiles, ntiles: int, ring, back, segs,
+        cap: int):
+    """One HBR video stream (0x42ce30). ring: ctypes u32[128] carried between calls.
+    Returns (pixels as ctypes array, count) or raises ValueError with the error."""
+    lib = _load()
+    out = (ctypes.c_uint16 * cap)()
+    t = (ctypes.c_uint16 * max(1, len(tiles)))(*tiles)
+    s = (ctypes.c_uint16 * max(1, len(segs)))(*segs)
+    b = back if back is not None else (ctypes.c_uint16 * 1)()
+    n = lib.ring_hbr(buf, len(buf), pos, end, runs, len(runs), t, ntiles, ring, b, s,
+                     len(segs), out, cap)
+    if n < 0:
+        raise ValueError(HBR_ERRORS[n])
+    return out, n
 
 
 def selftest() -> None:

@@ -101,3 +101,112 @@ __declspec(dllexport) int ring_dpcm(const uint8_t *buf, size_t len, uint32_t pos
 	*endpos = pos;
 	return nsamples;
 }
+
+/* HBR video stream (RING_DVD.EXE 0x42ce30), one call per 'T' or 'S' chunk. Codes of 11 or
+ * 12 bits are packed in nibbles; a 128-slot ring remembers recent codes (write position
+ * restarts at 0 every call, contents persist: ring[] is in/out). A code <= ntiles is one
+ * tile (4 pixels) of the chunk's tile table; ntiles < code < 0x780 is the (code-ntiles)th
+ * run in the run list (u8 byte count, then u16 tile indices); code >= 0x780 is a segment
+ * of the back buffer (segment k = code - 0x780, lengths in tiles). Every emitted code's
+ * output is remembered (memo) so a ring reference repeats it.
+ * Returns pixels written, or a negative error: -1 output overflow, -2 tile index out of
+ * range, -3 run list overrun, -4 ring reference to an unset code, -5 segment out of range. */
+typedef struct { int32_t kind, start, len; } memo_t; /* kind 0 unset, 1 tiles, 2 out, 3 back */
+
+static int emit_copy(const memo_t *m, const uint16_t *tiles, const uint16_t *out_base,
+                     const uint16_t *back, uint16_t *out, size_t n, size_t cap)
+{
+	const uint16_t *src = m->kind == 1 ? tiles : m->kind == 2 ? out_base : back;
+	if (!m->kind)
+		return -4;
+	if (n + (size_t)m->len > cap)
+		return -1;
+	for (int i = 0; i < m->len; i++)
+		out[n + i] = src[m->start + i];
+	return m->len;
+}
+
+__declspec(dllexport) int ring_hbr(const uint8_t *buf, size_t buflen, uint32_t pos,
+                                   uint32_t end, const uint8_t *runs, size_t runslen,
+                                   const uint16_t *tiles, int ntiles, uint32_t *ring,
+                                   const uint16_t *back, const uint16_t *segs, int nsegs,
+                                   uint16_t *out, size_t cap)
+{
+	static memo_t memo[0x800];
+	size_t n = 0;
+	int half = 0, rp = 0;
+	for (int i = 0; i < 0x800; i++)
+		memo[i].kind = 0;
+	for (int k = 0, c = 0; k < nsegs && 0x780 + k < 0x800; c += segs[k] * 4, k++) {
+		memo[0x780 + k].kind = 3;
+		memo[0x780 + k].start = c;
+		memo[0x780 + k].len = segs[k] * 4;
+	}
+	while (pos < end) {
+		uint8_t b = buf[pos], nx = pos + 1 < buflen ? buf[pos + 1] : 0;
+		uint32_t code;
+		int is_new;
+		if (half) {
+			uint8_t lo = b & 15;
+			is_new = lo < 8;
+			code = is_new ? lo * 256u + nx : ring[lo * 16 + (nx >> 4) - 0x80];
+			pos += is_new ? 2 : 1;
+			half = !is_new;
+		} else {
+			is_new = b < 0x80;
+			code = is_new ? b * 16u + (nx >> 4) : ring[b - 0x80];
+			pos += 1;
+			half = is_new;
+		}
+		int r;
+		if (!is_new) {
+			if (code >= 0x800)
+				return -4;
+			r = emit_copy(&memo[code], tiles, out, back, out, n, cap);
+		} else {
+			ring[rp] = code;
+			rp = (rp + 1) & 127;
+			if ((int)code > ntiles && code < 0x780) {
+				size_t p = 0;
+				for (uint32_t k = 0; k + 1 < code - ntiles; k++) {
+					if (p >= runslen)
+						return -3;
+					p += runs[p] + 1u;
+				}
+				if (p >= runslen || p + 1 + runs[p] > runslen)
+					return -3;
+				int cnt = runs[p] >> 1;
+				if (n + cnt * 4u > cap)
+					return -1;
+				memo[code].kind = 2;
+				memo[code].start = (int32_t)n;
+				memo[code].len = cnt * 4;
+				for (int k = 0; k < cnt; k++) {
+					int t = runs[p + 1 + 2 * k] | runs[p + 2 + 2 * k] << 8;
+					if (t >= ntiles)
+						return -2;
+					for (int q = 0; q < 4; q++)
+						out[n + 4 * k + q] = tiles[t * 4 + q];
+				}
+				r = cnt * 4;
+			} else if (code >= 0x780) {
+				if ((int)code - 0x780 >= nsegs)
+					return -5;
+				r = emit_copy(&memo[code], tiles, out, back, out, n, cap);
+			} else if (memo[code].kind) {
+				r = emit_copy(&memo[code], tiles, out, back, out, n, cap);
+			} else {
+				if ((int)code >= ntiles)
+					return -2;
+				memo[code].kind = 1;
+				memo[code].start = (int32_t)code * 4;
+				memo[code].len = 4;
+				r = emit_copy(&memo[code], tiles, out, back, out, n, cap);
+			}
+		}
+		if (r < 0)
+			return r;
+		n += (size_t)r;
+	}
+	return (int)n;
+}

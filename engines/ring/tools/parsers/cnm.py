@@ -1,6 +1,6 @@
 """`.cnm` / `.ci2` video containers (and the `CNM UNR` images inside Prophet's `.at3`).
-Spec: engines/ring/docs/formats/cnm.ksy, E-0024. Container level only: frame payloads are
-walked by their size fields; the video codec is not decoded yet (README status).
+Spec: engines/ring/docs/formats/cnm.ksy, E-0024. HBR frames are decoded in full
+(decode_hbr); UNR frame payloads are walked by their size fields only (codec pending).
 
 Two variants, told apart by the magic:
 
@@ -78,6 +78,58 @@ def chunks(r: Reader, header_sizes: dict[str, int], frames: int, image_types: st
     return {"counts": counts, "starts": starts}
 
 
+def decode_hbr(data: bytes, starts: list[int], frames: int, width: int, height: int) -> dict:
+    """Decode every 'T' and 'S' chunk of an HBR file (0x42ccf0 / 0x42cbf0 / 0x42ce30):
+    'T' = u32 size, u32 runs_size, u16 ntiles, u16 tile_words (4), u8 n, then n+1 u16
+    back-buffer segment lengths (in tiles), then size bytes: tiles, code stream, run list
+    (the last runs_size bytes); its stream decodes into the back buffer. 'S' = u32 size,
+    u32 runs_size, u16 ntiles, u16 tile_words, u32 width, u32 height, then size bytes laid
+    out the same; its stream decodes into the frame. A stream may emit one tile more than
+    it covers (its last nibble); a short frame leaves the rest of the picture as it was."""
+    import ctypes
+
+    from bitstream import hbr
+
+    from collections import Counter
+
+    sizes = Counter()
+    ring = (ctypes.c_uint32 * 128)()
+    back, segs, images = None, [], 0
+    for at in starts:
+        t = chr(data[at])
+        if t not in "TS" or images == frames:
+            continue
+        if t == "T":
+            size, runs, ntiles, words, n = struct.unpack_from("<IIHHB", data, at + 1)
+            segs = list(struct.unpack_from(f"<{n + 1}H", data, at + 14))
+            body = data[at + 16 + 2 * n:at + 16 + 2 * n + size]
+            want = sum(segs) * 4
+        else:
+            size, runs, ntiles, words, w, h = struct.unpack_from("<IIHHII", data, at + 1)
+            if (w, h) != (width, height) or back is None:
+                raise ParseError(f"frame {w}x{h} or no tile chunk before it", at)
+            body = data[at + 21:at + 21 + size]
+            want = w * h
+        if words != 4:
+            raise ParseError(f"tile of {words} words", at)
+        tiles = struct.unpack_from(f"<{ntiles * 4}H", body, 0)
+        try:
+            out, got = hbr(body, ntiles * 8, size - runs, body[size - runs:], tiles, ntiles,
+                           ring, back if t == "S" else None, segs if t == "S" else [],
+                           (0x8d000 if t == "S" else 1200000) // 2)
+        except ValueError as exc:
+            raise ParseError(f"{t} chunk: {exc}", at) from None
+        # The engine's only size check: SControl > 0x8cfff bytes, TControl > 1,200,000.
+        if got * 2 > (0x8cfff if t == "S" else 1200000):
+            raise ParseError(f"{t} chunk decodes to {got} pixels", at)
+        sizes[(t, "short" if got < want else "exact" if got == want else "over")] += 1
+        if t == "T":
+            back = out
+        else:
+            images += 1
+    return {"decoded_frames": images, "decoded_sizes": dict(sizes)}
+
+
 def parse(data: bytes) -> dict:
     r = Reader(data)
     magic = r.bytes(8)
@@ -87,6 +139,7 @@ def parse(data: bytes) -> dict:
         unk16, width, height, unk1f = r.u8(), r.u32(), r.u32(), r.u16()
         r.check(r.bytes(0x40 - r.pos) == bytes(0x40 - 0x21), "header tail not zero")
         body = chunks(r, {"A": 4, "B": 4, "Z": 4, "S": 20, "T": 13}, frames, "S", trailing)
+        body.update(decode_hbr(data, body["starts"], frames, width, height))
         return {"variant": "HBR", "frames": frames, "width": width, "height": height,
                 "audio": (ch, bits, rate), "unk_timing": timing, "unk": (unk16, unk1f), **body}
     r.check(magic == UNR, f"bad magic {magic!r}", 0)
@@ -115,10 +168,15 @@ def parse(data: bytes) -> dict:
 
 
 def selftest() -> None:
-    hdr = HBR + struct.pack("<BBIIIBIIH", 1, 16, 22050, 1, 1250, 0, 2, 2, 16) + bytes(0x1f)
-    body = b"Z" + struct.pack("<I", 2) + b"ab" + b"S" + struct.pack("<I", 3) + bytes(16) + b"xyz"
+    # 4x1 picture: a tile chunk (1 tile, 1 segment), then a frame that emits tile code 0.
+    hdr = HBR + struct.pack("<BBIIIBIIH", 1, 16, 22050, 1, 1250, 0, 4, 1, 16) + bytes(0x1f)
+    tile = struct.pack("<4H", 1, 2, 3, 4)
+    tbody = tile + b"\0\0"                        # code 0 (12 bits) + pad nibble
+    body = b"T" + struct.pack("<IIHHB", len(tbody), 0, 1, 4, 0) + struct.pack("<H", 1) + tbody
+    body += b"Z" + struct.pack("<I", 2) + b"ab"
+    body += b"S" + struct.pack("<IIHHII", len(tbody), 0, 1, 4, 4, 1) + tbody
     out = parse(hdr + body)
-    assert out["frames"] == 1 and out["counts"] == {"Z": 1, "S": 1}
+    assert out["frames"] == 1 and out["counts"] == {"T": 1, "Z": 1, "S": 1}, out
     try:
         parse(hdr + body + b"S")
     except ParseError:
