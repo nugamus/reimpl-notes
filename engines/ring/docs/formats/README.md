@@ -21,6 +21,7 @@ The corpus of a type is its loose files and the members of every archive of that
 | `.wav` | 744 (210) | `wav.py` | below | E-0022 | done |
 | `.dia` subtitles, `.dan` lip timing | 7,755 (4,498) | `dia.py` | below | E-0025 | done |
 | Configuration: `fl.ini`, `aPre.ini`, `cd.ini`, `aObj.ini`, `aMes.ini`; `.aba` save lists | 38 (19) | `ini.py` | below | E-0026 | done (`.aba` records not specced: corpus has none) |
+| Windows raster fonts: `arxrin.fon`, DVD `ARXRIN.GRE`/`.HEB`/`.SLO` | 7 (4) | `fon.py` | below | E-0043 | done |
 | `.cnm` / `.ci2` video, `CNM UNR` images in `.at3` | 3,462 (2,780) + 1 damaged | `cnm.py` | `cnm.ksy` | E-0024, E-0028 | HBR (Ring DVD/CD) decoded in full; UNR (Ring ISO, Prophet) container only, codec pending; Q-0005 for the damaged file |
 
 ## Packed bit stream
@@ -90,9 +91,21 @@ has a `TA` line no language matches). Details in `parsers/ini.py`.
 ## Not read by the game
 
 `INSTALL/*.LAN`, `*.LIS`, `*.UNI` (installer), `aObj.BAK` (CD disc 6), `.pdf`/`.txt`/`.htm`
-documents, and `ARXRIN.GRE`/`.HEB`/`.SLO`: no game EXE names them. The EXEs load one font
-each (`arxrin.fon`, Prophet `Legend.FON`, via `AddFontResourceA`): a standard Windows
-`.FON`, validator not written yet.
+documents, and `ARXRIN.GRE`/`.HEB`/`.SLO`: no game EXE names them (they are fonts, below).
+
+## Fonts
+
+The EXEs add one font file each with `AddFontResourceA` (`arxrin.fon`, Prophet
+`Legend.FON`). A standard Windows `.FON`: an NE executable whose resources are one FONTDIR
+and FNT 2.0 raster fonts (118-byte header, a table of `width u16, offset u16` for
+characters first..last plus a sentinel, column-major glyph bitmaps of ceil(width/8) × pixel
+height bytes, the face name). `arxrin.fon` (identical in the three editions, MD5
+`1005a256…`) holds "ARX Pilgrim L" at 8, 10, 12, 14, 18, 24 points, cell heights 13, 16,
+20, 24, 29, 37, ascents 11, 13, 16, 19, 23, 29, characters 32..255, default character 128,
+weight 400, charset 0. `ARXRIN.SLO` is the same six fonts (0xFF padding after one font's
+dfSize); `ARXRIN.HEB` and `ARXRIN.GRE` are the same file: "ArxelHebrew" 9, 12, 16 points,
+charset 2. Prophet's `Legend.FON` holds one font, "Arxel1" 8 points, characters 31..255.
+`fon.py` accounts for every byte of every font resource.
 
 ## Not this type
 

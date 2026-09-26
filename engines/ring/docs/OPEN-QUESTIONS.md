@@ -107,3 +107,12 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** nothing; the engine follows the data. One run of the original (move the
   mouse to y = 70 over "new game" and see whether it lights) would confirm it.
 - **Status:** open
+
+### Q-0010 — Which "ARX Pilgrim L" size does GDI pick for `lfHeight` 12?
+- **Context:** `spec/text.md`: font 1 asks for a 12-pixel cell; `arxrin.fon` has cells of
+  13, 16, 20, 24, 29, 37 pixels and GDI does not scale raster fonts except by whole
+  multiples.
+- **What we checked:** the `LOGFONTA` the EXE fills (E-0044); the font file (E-0043).
+- **Blocks:** nothing; the engine uses the closest cell, 13 (8 points). One screenshot of
+  the original's new-game question would settle it (text height of 11-pixel capitals).
+- **Status:** open

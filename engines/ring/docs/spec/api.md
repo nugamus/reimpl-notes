@@ -65,6 +65,8 @@ Rotation angles, "ran" and the transition kind byte are specified with the rende
 | `ObjPreSetAniCooOnPuz` | 0x4039f0 | int object, int presentation, int x, int y | animation position |
 | `ObjPrePauAni` | 0x403a40 | int object, int presentation | pauses the animation |
 | `ObjPreAddTxtToPuz` | 0x403b10 | int object, int presentation, int puzzle, str text, then 9 arguments passed to `aText::Init` | a text on the puzzle (`aObjectPresentation::ObjPreAddTxtToPuz` 0x42f270) |
+| `ObjPreSetTxtToPuz` | 0x403ba0 | int object, int presentation, int index, str text | sets the presentation's `index`-th text (`spec/text.md`) |
+| `ObjPreSetTxtCooToPuz` | 0x403bf0 | int object, int presentation, int index, int x, int y | moves it |
 | `ObjPreSho` | 0x403c80 / 0x403e00 | int object, int presentation / int object | shows one presentation / all of them (`aObject::ShowPresentation`) |
 | `ObjPreHid` | 0x403d00 / 0x403e80 | the same | hides one / all (`aObject::HidePresentation`) |
 | `ObjPreHidDeaPuz` | 0x403d80 / 0x403f00 | the same | hides one / all and frees their pictures (`aObjectPresentation::HideWithDeallocPuzzle`) |

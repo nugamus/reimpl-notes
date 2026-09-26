@@ -702,3 +702,32 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   call's argument count against the purge.
 - **Method:** script over the call lists; decompiles of 0x403c80 / 0x403d00 / 0x403f00.
 - **Confidence:** proven
+
+### E-0043 — Fonts: `arxrin.fon` and the DVD's `ARXRIN.*` are NE raster font files
+- **Binary/file:** `games/ring/discs/*/arxrin.fon` (3 copies, MD5 `1005a256…`),
+  `dvd-edition/ARXRIN.GRE`, `.HEB`, `.SLO`; `prophet-and-assassin/discs/cd1/Legend.FON`;
+  `RING_DVD.EXE` 0x407b80 (`AddResource("arxrin.fon")`), 0x4265b0 (`AddFontResourceA`)
+- **Evidence:** `engines/ring/tools/parsers/fon.py`: 7 files, 4 distinct, 100% parsed; every
+  byte of every font resource accounted for (header, character table, glyph bitmaps, face
+  name; zero or, in `ARXRIN.SLO`'s first font, 0xFF padding after dfSize). Contents in
+  `docs/formats/README.md` "Fonts". `ARXRIN.HEB`'s charset (2) is the `lfCharSet` the EXE
+  sets for language 8 (E-0044).
+- **Method:** validator over the corpus, `--selftest`.
+- **Confidence:** proven
+
+### E-0044 — Texts: font 1, `aText`, text drawing, `GetMultiLanMes` (DVD)
+- **Binary/file:** `RING_DVD.EXE` `aApplication::Init` 0x407b80 (lines with `FonAdd`),
+  `FonAdd` 0x406900, `aFontHandler::Add` 0x426820, 0x4262d0 (`CreateFontIndirectA`),
+  `GetFontHandler` 0x426a90, `ObjPreAddTxtToPuz` 0x403b10 → 0x42f270, `aText::Init`
+  0x42c450, set string 0x42c550 (`GetTextExtentPoint32A`), 0x42f520, 0x42f5d0, text draw
+  0x414df0 (`SetBkMode`, `SetBkColor`, `SetTextColor`, `TextOutA`), `aPuzzle::Update`
+  0x41c320 (texts after images), `GetMultiLanMes` 0x40e150 (format strings `%sames.ini`
+  0x4861e4, `rt` 0x4823e4, `%s\n` 0x4861a8), question 0x40e090, warning 0x40dfd0;
+  `AMES.INI`
+- **Evidence:** as described in `engines/ring/docs/spec/text.md`, from the decompiles in
+  `engines/ring/notes/decomp/text/`. `FonAdd(1, face, height, 1, 2, 2, 2)` with face
+  `ArxelHebrew`/12 for language 8, `Arial`/16 for 9, `ARX Pilgrim L`/12 otherwise; weight
+  `(arg != 1 ? 300 : 0) + 400`. Question and warning lines at (0xe1, 0xc1) and (0xe1, 0xd5).
+- **Reference:** Templier's `base/text.cpp` and `base/font.cpp` cover the same classes; not used as proof.
+- **Method:** decompiles, string reads with `pefile`.
+- **Confidence:** proven (behaviour); GDI's size choice for height 12 is Q-0010.

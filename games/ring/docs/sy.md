@@ -61,7 +61,7 @@ spots answer the mouse (`spec/cursor.md`).
 
 Question (0x40e090, `kind`): `PuzSetMod(1, 2, 4)`; object 4's two text lines are set to
 the message buffers (0x49536c, 0x49546c; filled by `GetMultiLanMes` 0x40e150 from the
-language's messages, `spec/text.md` to come) at (225, 193) and (225, 213); presentation 0
+language's messages, `spec/text.md`) at (225, 193) and (225, 213); presentation 0
 shown; accessibilities `kind`..`kind`+1 enabled (0x403070). Closing it (0x40e120,
 `kind`): all of object 4's presentations hidden (`ObjPreHidDeaPuz`), accessibilities
 `kind`..`kind`+1 disabled, `PuzSetMod(1, 1, 0)`. The warning (0x40dfd0 / 0x40e060) is the
