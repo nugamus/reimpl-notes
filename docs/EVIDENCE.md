@@ -4873,3 +4873,19 @@ An entry at `tentative` confidence must also have a matching line in
 - **Method:** MCP decompile and disassembly; `pefile` IAT of the thunks; `o3d.py`;
   engine `dev_commands` runs.
 - **Confidence:** proven (walls: engine collision on the original data).
+
+### E-0620 — Unit input hooks: where each runs the generic input relative to its ground tests
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** vtable `+0x40` (camera input, frame loop step 4, E-0046) per unit:
+  U02, U03, U33, U05 = `Scene_HandleInput` (`0x0041b7f0`) itself. U00 `0x00409b40`: key
+  flags, Shift jump-off (returns), then `Scene_HandleInput`, then `_stricmp(camera +0x3c,
+  "*U04_32")` and the Monet distance. U01 `0x00401940`: train test on camera `+0x3c` as
+  it stands, ride or `Camera_HandleKeys`, ground probe, then `Scene_HandleInput` (E-0083).
+  U04 `0x0040afd0`: window/exit/boat branches, then `+0x6f8` (the `Box70` object) ==
+  camera `+0x3c`, then `Scene_HandleInput`. U06 `0x00410d30`: `Scene_HandleInput`
+  first, then the clown turn if Up/Down. U07 `0x00411850`: `Scene_HandleInput` first, then
+  the ladder (before M01) or the plank and water tests. Frame hooks (`+0x1c`: U02's fall
+  test, etc.) run after the render, so they read the ground left by the last step 4.
+- **Method:** vtable dump with pefile; MCP decompile of the four hooks.
+- **Confidence:** proven. Answers Q-0197: the engine ran U06's and U07's work before the
+  walk step; U00, U01, U04 and the frame hooks already matched.

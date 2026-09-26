@@ -992,4 +992,4 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** nothing visible; a one-step lag on triggers that fire on entering an object.
 - **Next to try:** per unit, the order of `Scene_HandleInput` and the ground read in the
   unit vtable `+0x40` hook; move the engine's call if it differs.
-- **Status:** open
+- **Status:** answered by E-0620 (U06 and U07 now run the generic input first)

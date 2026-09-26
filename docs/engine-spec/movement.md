@@ -35,6 +35,22 @@ per rendered frame is per display refresh (E-0541); the engine uses 0.06 rad per
 60 ticks per second (3.6 rad/s), the original on a 60 Hz display (and under dgVoodoo's
 60 fps cap, E-0059).
 
+### Unit input hooks (E-0620)
+
+Step 4 is the unit's input hook; where it runs the generic input (`Scene_HandleInput`: the
+walk, turn and jump keys, which refresh the ground object) decides which ground a test sees:
+
+| Unit | Order |
+|---|---|
+| U02, U03, U33, U05 | generic input only |
+| U00 | tutorial keys, Shift jump-off (ends the step), generic input, then the `*U04_32` test and the Monet distance |
+| U01 | train test on the current ground object, ride or keys, probe, then generic input (`u01.md`) |
+| U04 | window/exit/boat branches, the `Box70` test, then generic input |
+| U06 | generic input, then the clown turn |
+| U07 | generic input, then the ladder or the plank and water tests |
+
+Frame-hook tests (step 3, e.g. U02's stream) see the ground of the last step 4.
+
 ## Camera state (E-0047)
 
 Defaults (constructor), then `SCENE.BIN` `#CAMERA#`, then scene load (E-0039):
