@@ -73,7 +73,7 @@ header). See `dmf.ksy`. Palette entries are B, G, R, 0; 15-bit pixels are 555, 1
 565. Maps are referenced from `.O3D` materials by `.TGA` names, which the loader rewrites
 to `.dmf`. The EXE registers `Data/<unit>/Maps\` as the scene's map search path
 (`XScene_70` → `FUN_0041dd30`, a list at scene `+0x1b0`); that the host file callback
-searches that list is inferred, not traced.
+searches that list is inferred, not traced. Every map's width and height are powers of two (E-0611).
 
 ## `SCENE.BIN` payloads (E-0039)
 

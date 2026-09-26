@@ -4657,3 +4657,63 @@ An entry at `tentative` confidence must also have a matching line in
 - **Method:** MCP decompile; byte scan of `MissionD.exe` `.text`.
 - **Confidence:** proven. A report that Shift runs fast in the original does not match
   either binary.
+
+### E-0610 — Players screen: the edit starts with the current player's name, typing re-selects the row and swaps OK, a double click selects, lists are opaque boxes
+- **Binary/file:** `MissionMonet.exe`; `Data/2DFRA/OptionUser.fra`.
+- **Evidence:** `fra.py --file OptionUser.fra`: four views only: `TIB#` 1 (0, 0, 640, 480)
+  `UserFond`, `ucg@` 0; `TIB#` 2 (510, 443, 31, 23) `UserOKM`, `RCS@ SelectUser`,
+  `LIH@ UserOKH`, `ucg@` 2; `cSU#` 10 (149, 126, 406, 288) `UserASC`/`UserBoule`, `ucg@` 2;
+  `dEU#` 11 (306, 91, 236, 19), no properties. No delete control; the player module
+  (`0x00413910` load, `0x00413b40` add, `0x00413d70` update, `0x004140b0` select, which
+  writes the `CURRENT` index to `User\Info.bin` via `0x00413fd0`) has no remove.
+  **Edit base** (constructor `0x00428530`, vtable `0x0043a3a8`): text `+0x64`, default
+  `+0x168`, caret `+0x270`, selection end `+0x274`, max `+0x290`; caret shown `+0x27c`,
+  toggled (`0x004290c0`) by its timer (`0x00429080`) every `GetCaretBlinkTime()` ms
+  (`+0x278`); every caret move (`0x00429000`, `+0x11c(delta)`, clamped to 0..length,
+  collapses the selection) shows it and restarts the blink. Char (`0x00428c30`, `+0x9c`):
+  8 → `+0x120(1)` (`0x00428e80`: delete the selection, else the char before the caret);
+  13 → the option screen's `+0x40`; 27, 9 → not taken; any other: return if length >
+  max (so a 31st char still goes in), delete the selection, insert at the caret, caret + 1,
+  then `+0x134` (text changed). Key down (`0x00428f20`, `+0x98`): VK_LEFT caret − 1,
+  VK_RIGHT to selection end + 1; nothing else. Press (`0x00428d40`): caret to the char
+  boundary nearest the x (`0x00428db0`, `GetTextExtentPoint32`), with Shift extending the
+  selection; drag (`0x00428f70`/`0x00428fa0`) selects from the press point. Draw
+  (`0x004286b0`): fill, `DrawTextA(0x928)` at (0, 0, w, h) (left, vertically centred,
+  one line) white on 0x502020; the selection redrawn 0x502020 on white; caret
+  (`0x00428890`) a 1 px `R2_NOT` column at the caret's text extent, full height, when
+  shown and no selection. **`#UEd`** (`0x004292f0`, vtable `0x0043a640`): max 30; default
+  = `Message.txt` 301; text = the current player's name (`DAT_0046ec10 +4`, name at
+  `+0xce + 64·i`) when the player count (`+6`) ≠ 0, else the default; caret at the end;
+  then `0x00429460` → list `+0x144(text)`. Char 13 (`0x00429430`) → list `+0x134` =
+  `LUser_SelectUser`. **`#USc`** (vtable `0x0043a784`, `DAT_0046ec78`): selected `+0x11c`
+  = −1 at construction. `+0x144` (`0x0042a0e0`): empty text → view 2's bitmap name's
+  letter before `.bmp` := `N` (`UserOKN`), view 2 `+0x18(0, 0)` (every property disabled,
+  `0x0042e1c0` → `0x00423300`), selected = −1; else → `M` (`UserOKM`), `+0x18(1, 0)`,
+  selected = `+0x138(0)` (`0x004296f0`: the used player whose name equals the text,
+  `strcmp`, as a row index, else −1); if found and max > 0: position := min(selected,
+  max), rows redrawn. Press (`0x00429f10`): scroll press first; then, inside the rows
+  (`0x00432f20`), row = position + (y − top) div 32; ignored when max < 0 and row ≥ player
+  count; selected := row, then `+0x140` (`0x0042a050`): the edit's text := that player's
+  name (`0x00428bd0`, caret to the end) and `+0x144(name)` (so the row scrolls to the top
+  when the list scrolls). `WM_LBUTTONDBLCLK` (manager `0x0042bcc0` jump table `0x0042c030`
+  index 3 → `0x0042bea3`: press, then frame `+0x24` → view `+0x58`, event 6) → `#USc`
+  `+0x88` (`0x0042a000`): inside the rows and selected ≠ −1 → `LUser_SelectUser`; the
+  window class has `CS_DBLCLKS` (style 8, `0x00416acd`). List draw (`0x00429870`,
+  `0x004277e0` for `#LOA`/`#SAV`): the row surface (w − 38) × h (created by
+  `LUser::LUser_244` with flags 7, no colour key) is filled with 0x502020 before the rows
+  and copied with `BltFast` flags 0x10 (`DDBLTFAST_WAIT`, no `SRCCOLORKEY`,
+  `0x00429a5d`, `0x004279ce`): an opaque dark box. Runtime (`snap.ps1`, one player
+  `Player's nameTutor` in `Save\User_0`): the edit shows `Player's nameTutor`, row
+  `1 - Player's nameTutor` in the selected colour, a dark box over the rows area,
+  OK bright.
+- **Method:** `fra.py`; MCP decompile; capstone; live run (one snap).
+- **Confidence:** proven. Supersedes E-0184's "surface colour key 0x502020" (the value is
+  the fill) and, for the players OK button, E-0545 (the view's properties are disabled
+  through `+0x18`).
+
+### E-0611 — Every DMF map has power-of-two dimensions
+- **Binary/file:** corpus, all 518 `.dmf` files under `Data/`.
+- **Evidence:** `dmf.parse` on each (deduplicated case-insensitively): 518 of 518 have a
+  power-of-two width and height; none is non-power-of-two.
+- **Method:** one-off `python` loop over `tools/parsers/dmf.py`.
+- **Confidence:** proven (corpus statistic).
