@@ -1,5 +1,7 @@
 """Build engines/peintre/notes/function-map.csv from the Ghidra dump.
 
+Names come from the NAMES table below and from notes/names/*.csv.
+
 Every function of /MISSION.EXE gets its module (by address range, module-map.md says why)
 and, where a string proves it, a name with the evidence string. The names are applied
 back to Ghidra with tools/ghidra/scripts/apply_names.py.
@@ -151,13 +153,24 @@ def module_of(addr: int) -> str:
     return mod
 
 
+def extra_names() -> dict:
+    """More names from notes/names/*.csv (address,name,evidence), one file per work area,
+    so parallel work does not edit the same table. The NAMES table wins on conflicts."""
+    out = {}
+    for path in sorted((NOTES / "names").glob("*.csv")):
+        for row in csv.DictReader(path.open(encoding="utf-8")):
+            out[int(row["address"], 16)] = (row["name"], f"{row['evidence']} ({path.name})")
+    return out
+
+
 def build() -> None:
+    names = {**extra_names(), **NAMES}
     rows = list(csv.DictReader((NOTES / "function-dump.tsv").open(encoding="utf-8"),
                                delimiter="\t", quoting=csv.QUOTE_NONE))
     out = []
     for r in rows:
         addr = int(r["address"], 16)
-        name, why = NAMES.get(addr, ("", ""))
+        name, why = names.get(addr, ("", ""))
         mod = module_of(addr)
         m = CRT_FILE.search(r["strings"])
         if mod == "msvcrt" and m and not name:
