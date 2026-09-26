@@ -54,15 +54,11 @@ RIFF WAVE with even-padded chunks to the RIFF size; a PCM `fmt ` and a `data` ch
 ## Dialog text
 
 `.dia` (`aDialog::ReadLyrics` 0x427090, `ParseLyricLine` 0x427550): the first 0x1000 bytes,
-cut at each `
-`; the byte before each `
-` is blanked (the ``, or the last character
-of a line in files with bare `
-`); each complete line is spaces, a decimal time,
-optionally `,digits:digits.digits`, spaces, the text; `#` splits the text into two parts.
-Bytes after the last `
-` are never parsed. `.dan` (`aDialog::ReadDialogAnimation`
-0x4271b0): `%d`, then `%d %d %d` triples until the scan fails.
+cut at each LF; the byte before each LF is blanked (the CR, or the last character of a line
+in files with bare LFs); each complete line is spaces, a decimal time, optionally
+`,digits:digits.digits`, spaces, the text; `#` splits the text into two parts. Bytes after
+the last LF are never parsed. `.dan` (`aDialog::ReadDialogAnimation` 0x4271b0): `%d`, then
+`%d %d %d` triples until the scan fails.
 
 ## Configuration files
 
