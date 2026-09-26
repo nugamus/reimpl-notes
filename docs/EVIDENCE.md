@@ -4641,3 +4641,19 @@ An entry at `tentative` confidence must also have a matching line in
   leaves such a hotspot.
 - **Method:** MCP decompile.
 - **Confidence:** proven. With E-0603 answers Q-0060.
+
+### E-0609 — Shift never runs: it jumps (when allowed); Ctrl runs, in both EXEs
+- **Binary/file:** `MissionMonet.exe`, `MissionD.exe`.
+- **Evidence:** `MissionMonet.exe` `Camera_HandleKeys` (`0x00418970`) re-read: the only use
+  of `held[0x10]` (`0x0046e820`) calls `Camera_Jump` (`0x00419000`), which does nothing
+  unless camera `+0x4c` and `+0x40` are set, then clears `held[0x10]` and returns before
+  the arrow keys, so a Shift key-down message ends that frame's key handling (no walk, no
+  turn). Speed factor ×2 (mode 1) comes only from `held[0x11]` (Ctrl) with camera `+0x48`.
+  `MissionD.exe` has the same function at `0x0042f15f` (key table `0x004a6600`: Ctrl
+  `0x004a6644` → mode 1 with `+0x48`; Shift `0x004a6640` → jump `0x0042fa82`, found by its
+  `GetAsyncKeyState`-style reads of 0x26 then 0x28 at `0x0042fb04`; Numpad 0 `0x004a6780`
+  first). The only writes of `+0x48` / `+0x4c` are in U33 (`U33::TransitionVelo`
+  `0x00407d43`, and `0x00409575`..`0x00409788`, E-0047).
+- **Method:** MCP decompile; byte scan of `MissionD.exe` `.text`.
+- **Confidence:** proven. A report that Shift runs fast in the original does not match
+  either binary.

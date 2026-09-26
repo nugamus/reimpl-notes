@@ -70,6 +70,8 @@ the order is: Up, Down, Right, Left, PgUp, PgDn, so Down wins over Up.
 | Numpad 0 (press) | — | crouch (below) |
 | Enter, Escape, Space | — | `boot.md` "Skipping" (E-0043) |
 
+Shift is never a run key, and nothing runs outside U33 (E-0609). A Shift or Numpad 0
+key-down ends that frame's key handling, whether or not the jump is allowed.
 `v` stays at 1.0 after Down until the next Up. Pitch limits are checked before the step, so
 e can end up to 0.06 past them. Mouse look does not exist; the mouse only picks.
 
