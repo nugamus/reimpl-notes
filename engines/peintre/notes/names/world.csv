@@ -44,3 +44,9 @@ address,name,evidence
 0x004279a3,Maisonet_Init,scene maisonet code; E-0362
 0x00427b98,Maisonet_StepAnim,scene maisonet code; E-0362
 0x00427e04,Maisonet_Frame,scene maisonet code; E-0362
+0x004285e0,Maisonj_SetBoxSet,scene maisonj code; E-0363
+0x004287d1,Maisonj_LoadSounds,scene maisonj code; E-0363
+0x00428904,Maisonj_BoxSetForDoors,scene maisonj code; E-0363
+0x0042897f,Maisonj_Init,scene maisonj code; E-0363
+0x00428c8c,Maisonj_StepAnim,scene maisonj code; E-0363
+0x00428e63,Maisonj_Frame,scene maisonj code; E-0363

@@ -106,3 +106,10 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** nothing for playback (they stay at their loaded pose); mangeurs' track ends
   hide the log/faggot and scroll `fire`, which would matter if they ran.
 - **Status:** open
+
+### Q-0237 — What leaves maisonj for hopiext (7 → 2)?
+- **Context:** `0x41fda9` has an arrival for previous scene 7, target 2 (E-0308), but
+  maisonj's frame `0x428e63` never sets `DAT_004e3144` := 2 (E-0363).
+- **What we checked:** every write of `DAT_004e3144` in the decompiled 3D functions of batch B.
+- **Blocks:** nothing; a missing exit would only drop an unused arrival.
+- **Status:** open

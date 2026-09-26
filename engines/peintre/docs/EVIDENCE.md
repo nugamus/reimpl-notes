@@ -697,3 +697,22 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   tables read from .data through pefile's mapped image.
 - **Confidence:** proven
 - **Doc:** `games/mission-sunlight/docs/maisonet.md`
+
+### E-0363 — maisonj (scene 7): pots, rain movie, world map textures, DAT_004abd14 := 1, gate/door box sets, zone 12, three edge exits
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** init `0x42897f`, per frame `0x428e63`, anim step `0x428c8c`, sounds
+  `0x4287d1`, `LoadBoxMaisonj` `0x4286e2` (`BOX1..3.3DI`), box sets `0x4285e0`/`0x428904`,
+  `LoadAnimsmaisonj` `0x428832`. Objects `0x4ad8d0` (8 x 0x3c, `nuages` hidden), tracks
+  `0x4adab8` (`escargot`, `nuages`, `portail`, `porte-mj`, `train` on `TRAIN02` playing in
+  .data). `pot01` plays `pluie` (`Hnm_AllocDecBuffers` + `0x42f6a0`, mode 2) while
+  `DAT_0059905c` = 0; `pot02` swaps `WMAP0n` → `JMAP0n` on `world` (`0x435dc0`) and sets
+  `DAT_004abd94`, `DAT_004abd14`. `escargot` item 11; `pendule` zone 12. Exits: z < -0x30d4
+  → 7 → 9; x < -0x2134 → 7 → 10; -0x1859 < x < -6000 and z > 2000 → 7 → 6. Train step:
+  `pastrain` once when frame > 0x46, playing word cleared at the end. `nuages.3da`'s
+  playing word (`0x4adba4`) is written by no decompiled 3D function (Q-0236); no maisonj
+  code sets 7 → 2 although `0x41fda9` has that arrival (Q-0237).
+- **Method:** decompiled with PyGhidra `decompile_one.py` (read-only copy of Peintre.gpr);
+  call arguments the decompiler dropped read from the pushes before each call (capstone);
+  tables read from .data through pefile's mapped image.
+- **Confidence:** proven
+- **Doc:** `games/mission-sunlight/docs/maisonj.md`
