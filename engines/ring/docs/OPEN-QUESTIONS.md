@@ -131,6 +131,5 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   the saved-game restore writes it (0x40d34d / 0x40d359); the constructor (0x41da10)
   does not, and the object comes from `operator new` (not zeroed in a release build).
 - **What we checked:** every byte store to +0x67 in `.text` (E-0046).
-- **Blocks:** nothing; the engine takes 0 (the view turns), which is how the game is
-  known to play.
+- **Blocks:** nothing; the engine takes 0 (the view turns with the mouse).
 - **Status:** open
