@@ -294,3 +294,43 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
 - **Method:** decompiled 0x430700 (`notes/decomp/MISSION.EXE__FUN_00430700.c`), compared
   with the ScummVM source; corpus run of `tgp.py`.
 - **Confidence:** proven
+
+### E-0102 — SPR: u32 head (raw/band bits + palette end), RGB palette, bank of offset-indexed frames `{u16 a, u16 b, data}` padded to 4
+- **Binary/file:** `/MISSION.EXE`; `Data/SPRITES/*.SPR` (289 files)
+- **Evidence:** `Sprite_LoadFile` (0x40a766) opens `%sDATA\SPRITES\%s.SPR`, reads `u32
+  head`: bit 31 → bank flag +0x1C (raw), else bit 30 → bank flag +0x20 (band); `head &
+  0x3FFFFFFF` is the palette end: if it is not 4, `(end − 4) / 3` RGB triples are read and
+  stored as `u32` whose high half is RGB565 (`(r & 0xF8) << 8 | (g & 0xFC) << 3 | b >> 3`)
+  or, when DAT_006516bc is set, RGB555 (`(r & 0xF8) << 7 | (g & 0xF8) << 2 | b >> 3`).
+  The rest of the file (from `end` to EOF) is read as one block; its first u32 / 4 is the
+  frame count and that many u32 offsets are relocated by the block address. Raw banks
+  without palette get 0x40b266 (565 → 555) over `u16[0] * u16[1]` pixels after each
+  frame's 4-byte header when DAT_006516bc is set. 0x470951 returns a frame's `u32[0] &
+  0xFFFF` and `>> 16` as its width and height (used by `Sprite_Open` 0x40a24c to size
+  buffers). Corpus: `spr.py` validates 289/289, every byte consumed: every palette end is
+  4 (152 files) or 772 (137 files, 256 colours); offsets[0] = 4 × count and offsets rise;
+  every frame is a multiple of 4 long and its 0..3 bytes after the data are zero; 115
+  band banks (3,619 frames, 26 of them the empty `a = b = 0` frame, every `a + b <= 480`,
+  every row within 640 px), 12 RLE banks (124 frames, every row within `a`), 152 raw16
+  (1,938 frames), 10 raw8 (146 frames). Decoded frames (CURSEURS arrows, CAPSAC00 round
+  buttons, A01_032A portraits, A01_02A band silhouettes over the A01_02 painting) look
+  right.
+- **Method:** decompiled `Sprite_LoadFile`, `Sprite_Open`, 0x470951; `engines/peintre/tools/parsers/spr.py`.
+- **Confidence:** proven
+
+### E-0103 — SPR drawing: bank kind picks the blitter; RLE frames are centred and keyed by skips, band frames span the screen from row `a`, raw frames are opaque from the top-left
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** `Sprite_Draw` (0x409d76; unclipped) and `Sprite_DrawClipped` (0x409e44)
+  switch on the bank flags: not raw and not band → 0x4703be / 0x47049a; band →
+  0x4705da (unclipped only); raw without palette → 0x46fb4b / 0x46fbc6 (via 0x47037a,
+  0x47039c); raw with palette → 0x47067d / 0x470793. 0x4703be and 0x47049a start at
+  `(x − w/2, y − h/2)` (`w >> 1`, `u32 >> 17`) and read per row: `0x80` ends the row,
+  `c < 0x80` advances `c` pixels without writing, `c > 0x80` writes `c & 0x7F` pixels
+  looked up in the palette (high half of the u32 entry). 0x4705da ignores x/y: it starts
+  at screen row `u32[0] & 0xFFFF` column 0, draws `u32[0] >> 16` rows of the same RLE,
+  and returns at once for a zero header. 0x47067d / 0x470793 draw `w*h` palette indices
+  from (x, y) with no transparency; 0x46fb4b copies `w*h` u16 pixels from (x, y) with no
+  transparency. The background-save routine 0x409f09 uses the same rectangles: centred
+  for RLE, `(0, a, 640, b)` for band, `(x, y, w, h)` for raw, clipped to 640×480.
+- **Method:** decompiled the functions named (`notes/decomp/`).
+- **Confidence:** proven

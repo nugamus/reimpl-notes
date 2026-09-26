@@ -2,3 +2,15 @@ address,name,evidence
 0x00430700,Hlz_Unpack,Cryo HLZ LZ = ScummVM HLZDecoder; E-0101
 0x0040918c,Tgp_Unpack,thunk to Hlz_Unpack used by both TGP loaders; E-0100
 0x0040b266,Rgb565To555,(v>>1)&0x7FE0|v&0x1F over n pixels; E-0100
+0x0040a766,Sprite_LoadFile,%sDATA\SPRITES\%s.SPR; E-0102
+0x00409d76,Sprite_Draw,picks the blitter from the bank flags; E-0103
+0x00409e44,Sprite_DrawClipped,clipped variants of Sprite_Draw's blitters; E-0103
+0x00409ee1,Sprite_GetFrameSize,wraps SprLib_FrameSize; E-0102
+0x00409f09,Sprite_SaveBackground,rectangle per bank kind then 0x46f7a0; E-0103
+0x00470951,SprLib_FrameSize,u32[0] & 0xFFFF / >> 16; E-0102
+0x004703be,SprLib_DrawRle,centred RLE over palette; E-0103
+0x0047049a,SprLib_DrawRleClipped,centred RLE with clipping; E-0103
+0x004705da,SprLib_DrawBand,RLE rows across the screen from row u32[0] & 0xFFFF; E-0103
+0x0047067d,SprLib_DrawRaw8,opaque palette indices from (x y); E-0103
+0x00470793,SprLib_DrawRaw8Clipped,opaque palette indices with clipping; E-0103
+0x0046fb4b,SprLib_DrawRaw16,opaque u16 copy from (x y); E-0103

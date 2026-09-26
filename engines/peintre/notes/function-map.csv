@@ -108,10 +108,10 @@ address,module,name,ghidra,size,callers,evidence
 0x00409c79,game/shell,,FUN_00409c79,84,0,
 0x00409ccd,game/shell,,FUN_00409ccd,128,0,
 0x00409d4d,game/shell,,FUN_00409d4d,41,0,
-0x00409d76,game/shell,,FUN_00409d76,206,19,
-0x00409e44,game/shell,,FUN_00409e44,157,11,
-0x00409ee1,game/shell,,FUN_00409ee1,40,4,
-0x00409f09,game/shell,,FUN_00409f09,585,23,
+0x00409d76,game/shell,Sprite_Draw,FUN_00409d76,206,19,picks the blitter from the bank flags; E-0103 (2d.csv)
+0x00409e44,game/shell,Sprite_DrawClipped,FUN_00409e44,157,11,clipped variants of Sprite_Draw's blitters; E-0103 (2d.csv)
+0x00409ee1,game/shell,Sprite_GetFrameSize,FUN_00409ee1,40,4,wraps SprLib_FrameSize; E-0102 (2d.csv)
+0x00409f09,game/shell,Sprite_SaveBackground,FUN_00409f09,585,23,rectangle per bank kind then 0x46f7a0; E-0103 (2d.csv)
 0x0040a152,game/shell,,FUN_0040a152,70,12,
 0x0040a198,game/shell,,FUN_0040a198,130,9,
 0x0040a21a,game/shell,,FUN_0040a21a,50,1,
@@ -751,7 +751,7 @@ address,module,name,ghidra,size,callers,evidence
 0x0046f9ab,cryo/misc,,FUN_0046f9ab,120,1,
 0x0046fa23,cryo/misc,,FUN_0046fa23,165,1,
 0x0046fac8,cryo/misc,,FUN_0046fac8,131,1,
-0x0046fb4b,cryo/misc,,FUN_0046fb4b,123,2,
+0x0046fb4b,cryo/misc,SprLib_DrawRaw16,FUN_0046fb4b,123,2,opaque u16 copy from (x y); E-0103 (2d.csv)
 0x0046fbc6,cryo/misc,,FUN_0046fbc6,195,2,
 0x0046fc89,cryo/misc,,FUN_0046fc89,127,1,
 0x0046fd08,cryo/misc,,FUN_0046fd08,90,1,
@@ -766,12 +766,12 @@ address,module,name,ghidra,size,callers,evidence
 0x0047029e,cryo/misc,,FUN_0047029e,117,1,
 0x0047037a,cryo/misc,,FUN_0047037a,34,1,
 0x0047039c,cryo/misc,,FUN_0047039c,34,1,
-0x004703be,cryo/misc,,FUN_004703be,220,1,
-0x0047049a,cryo/misc,,FUN_0047049a,320,1,
-0x004705da,cryo/misc,,FUN_004705da,163,1,
-0x0047067d,cryo/misc,,FUN_0047067d,278,1,
-0x00470793,cryo/misc,,FUN_00470793,446,1,
-0x00470951,cryo/misc,,FUN_00470951,21,1,
+0x004703be,cryo/misc,SprLib_DrawRle,FUN_004703be,220,1,centred RLE over palette; E-0103 (2d.csv)
+0x0047049a,cryo/misc,SprLib_DrawRleClipped,FUN_0047049a,320,1,centred RLE with clipping; E-0103 (2d.csv)
+0x004705da,cryo/misc,SprLib_DrawBand,FUN_004705da,163,1,RLE rows across the screen from row u32[0] & 0xFFFF; E-0103 (2d.csv)
+0x0047067d,cryo/misc,SprLib_DrawRaw8,FUN_0047067d,278,1,opaque palette indices from (x y); E-0103 (2d.csv)
+0x00470793,cryo/misc,SprLib_DrawRaw8Clipped,FUN_00470793,446,1,opaque palette indices with clipping; E-0103 (2d.csv)
+0x00470951,cryo/misc,SprLib_FrameSize,FUN_00470951,21,1,u32[0] & 0xFFFF / >> 16; E-0102 (2d.csv)
 0x00470970,cryo/misc,,FUN_00470970,105,1,
 0x004709e0,cryo/memory,m__purge,FUN_004709e0,154,1,> m__purge ()
 0x00470a80,cryo/memory,m__malloc,FUN_00470a80,274,13,> m__malloc (%u)

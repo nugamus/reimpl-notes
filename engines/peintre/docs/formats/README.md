@@ -13,6 +13,7 @@ validator in `engines/peintre/tools/parsers/<fmt>.py` (with `--selftest`), the p
 | `.3DA` animation (in BFG) | 48 | `obj3d.py` | `obj3d.ksy` | E-0016 | layout done; key meaning tentative (Q-0004) |
 | `.3DI` boxes (in BFG) | 27 | `obj3d.py` | `obj3d.ksy` | E-0016 | layout done; face record fields open |
 | `.TGP` full-screen / panorama image | 134 (110 single 640x480, 24 chunked panoramas) | `tgp.py` | `tgp.ksy` | E-0100, E-0101 | done |
+| `.SPR` sprite bank | 289 (12 RLE, 115 band, 10 raw8, 152 raw16; 5,827 frames) | `spr.py` | `spr.ksy` | E-0102, E-0103 | done |
 
 ## `.BFG` — scene bundle (E-0013)
 
@@ -63,3 +64,23 @@ one HLZ stream to EOF; the engine uses only the packed size and unpacks straight
 engine shifts red/green down (0x40b266). HLZ is Cryo's LZ (0x430700), bit for bit the
 one ScummVM already has as `Image::HLZDecoder::decodeFrameInPlace` (`image/codecs/hlz.h`):
 reuse it. Every stream ends with its end marker exactly at the end of its chunk.
+
+## `.SPR` — sprite banks (E-0102, E-0103)
+
+`u32 head`: bit 31 = raw frames, bit 30 = band frames (only without bit 31), bits 0..29 =
+palette end (4 = no palette, 772 = 256 RGB triples, 8 bits per channel; the engine keeps
+the top 5/6/5 bits). From there to EOF is the bank: `u32 offsets[n]` (n = offsets[0] / 4,
+relative to the bank; the last frame ends at EOF), then frames `{u16 a; u16 b; data}`,
+each zero-padded to a multiple of 4. Four kinds:
+
+| Kind | Files / frames | a, b | Data | Drawn at |
+|---|---|---|---|---|
+| rle (bits 00) | 12 / 124 (cursors, CURSOPT, LCAPS, portraits) | width, height | `b` RLE rows over palette indices | centred: `(x − a/2, y − b/2)` |
+| band (bits 01) | 115 / 3,619 | first screen row, row count | `b` RLE rows, 640 px wide | `(0, a)`, x/y ignored; `a = b = 0` is empty |
+| raw8 (bit 1, palette) | 10 / 146 | width, height | `a*b` palette indices | `(x, y)`, opaque |
+| raw16 (bit 1, no palette) | 152 / 1,938 | width, height | `a*b` RGB565 | `(x, y)`, opaque |
+
+RLE row: `0x80` ends the row; `c < 0x80` skips `c` pixels (transparent: the only
+transparency in SPR); `c > 0x80` is followed by `c & 0x7F` palette indices. Band frames
+are full-width strips drawn over a 640×480 background.
+No ScummVM reader applies (cryomni3d's `SPRI` sprites are a different, big-endian format).
