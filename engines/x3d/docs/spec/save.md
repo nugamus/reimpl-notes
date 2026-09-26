@@ -131,8 +131,9 @@ Restore order inside the unit start (each step skipped when its chunk is absent)
    root), load the clip into that slot as a scripted clip (`animation.md`), then set its
    paused, loop, ping-pong, backward, frame, fps, first/last and the two unknown fields;
    then the node's active slot.
-6. `JAUGE`: name, visible, duration, elapsed; if elapsed > 0 the gauge's start time is
-   reset to now, so it resumes with the saved remainder (elapsed = 0: it stays stopped).
+6. `JAUGE`: name, visible, duration, elapsed; if elapsed > 0 the gauge's last-update time
+   is set to now, so it resumes with the saved remainder (the update adds the time since
+   the last update to elapsed; elapsed = 0: it stays stopped) (E-0623).
 7. A pending held item is given back to the cursor.
 8. Actions are built from `INFOACT.BIN` (`interaction.md`), then `ACTIONS` overwrites the
    exhausted and runs tables and every action's condition.
@@ -245,3 +246,6 @@ characters (the sample player created by typing `Name` is `Player's nameName`).
   restore `OBJECTS` before the animation slots.
 - Map the original's slots onto ScummVM save slots 1..98 if importing; the `GAME` name is
   the save description.
+- Bug fix (user, 2026-09-26): U05's and U33's private clocks are not saved by the
+  original, so a load restarts them (E-0623). The engine saves each as the time since it
+  started (save version 5), so a nag or wait saved half-way resumes where it was.

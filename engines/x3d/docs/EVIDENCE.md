@@ -4928,3 +4928,18 @@ An entry at `tentative` confidence must also have a matching line in
   `B` on the same screen, and the second save was named `Save without name AB`.
 - **Method:** MCP decompile; `pefile` vtable read; capstone.
 - **Confidence:** proven.
+
+### E-0623 — A loaded gauge resumes from its saved elapsed time; unit clocks without a save chunk restart
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `Gauge_Update` (`FUN_0041a5d0`): unless paused (`+0x38`), elapsed `+0xc`
+  += `timeGetTime()` − last `+4`; last := now; progress `+0x30` := elapsed / duration
+  `+8`. `Gauge_Start` (`FUN_0041a560`) sets last := now and elapsed := 0; `Gauge_Load`
+  (`0x0041a790`) reads the elapsed time back and, when it is > 0, sets last := now
+  (E-0606). So a restored gauge carries on from where it was saved; one saved before its
+  first update (elapsed 0) keeps last = 0 and stays stopped. `Gauge_Stop`
+  (`FUN_0041a680`) zeroes last, the label and the progress. U05 and U33 write no unit
+  chunk (E-0182, `save.md`): their private clocks (U05: the dog's 4-s wait, the station
+  master's 20-s chatter; U33: the projectionist's 25-s nag, the clown's 7-s search,
+  E-0422) start again after a load.
+- **Method:** MCP decompile.
+- **Confidence:** proven.
