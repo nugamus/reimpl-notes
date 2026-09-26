@@ -4452,3 +4452,18 @@ An entry at `tentative` confidence must also have a matching line in
 - **Confidence:** proven for the geometry. Bears on Q-0047: the car is reached by leaving
   the roofs and walking along the rails, if the collision and fall rules allow the drop
   from `toit01` (about 150 units).
+
+### E-0545 — Dimmed frame buttons still run their command: nothing disables an `RCS@` property
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `@SCR`'s handler (`0x004323a0`) runs the named command when property
+  `+0xc` ≠ 0. The property base constructor (`0x0042e210`) sets `+4` = 1, `+0xc` = 1,
+  `+8` = 0; the `@SCR` constructor (`0x004322f0`, vtable `0x0043b2b0`) calls it and does not
+  clear `+0xc`. The tag `RCS@` (`0x40534352`) occurs once in the EXE, as the factory
+  registration at `0x0042ab33`; no immediate store of 0 to a `+0xc` field in the frame code
+  (`0x00426000..0x00435fff`, instruction search) targets a property. The frame press
+  (`0x0042cba0`) gates only on view `+0x38` (`0x00426a00`, the `.fra` visible flag) and
+  `PtInRect`. `OptionSave`'s OK handler only renames the three bitmaps `…D` → `…N`
+  (E-0184). So Back, Main menu and Quit on `OptionSave` answer clicks before the first save.
+- **Method:** capstone; MCP decompile; byte and instruction search.
+- **Confidence:** proven for every path found; stores through computed pointers were not
+  enumerated. Answers Q-0100.

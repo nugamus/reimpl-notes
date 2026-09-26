@@ -652,7 +652,8 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** menu fidelity only.
 - **Next to try:** open the save screen and click Back before saving; look for code that
   disables `RCS@` on those views (`0x004323a0` "enabled").
-- **Status:** open
+- **Status:** RESOLVED (E-0545): yes; dimming only swaps the bitmap, and nothing disables
+  the `RCS@` command.
 
 ### Q-0101 — Which animation nodes does `ANIMATIONS` cover, and what are node `+0x1cc`/`+0x1d0`?
 - **Context:** E-0183. The writer recurses through node `+0x50` only (E-0056 calls it the

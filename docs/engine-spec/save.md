@@ -169,7 +169,7 @@ Opened by `SaveOui` on the "Do you want to save?" frame (`ui.md` "Escape").
   `…N` (runtime: dim before the first save, bright after).
 - `OptionSave3D` (Back to the game): close the frame, back to play. `OptionSaveSommaire`
   (Main menu): the Option menu. `SaveQuit` (Quit): the quit confirmation
-  `OptionQuitter`. Whether they react while dimmed: Q-0100.
+  `OptionQuitter`. They react while dimmed (E-0545).
 
 ## Load screen: frame `OptionLoad` (E-0184)
 
