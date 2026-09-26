@@ -4889,3 +4889,25 @@ An entry at `tentative` confidence must also have a matching line in
 - **Method:** vtable dump with pefile; MCP decompile of the four hooks.
 - **Confidence:** proven. Answers Q-0197: the engine ran U06's and U07's work before the
   walk step; U00, U01, U04 and the frame hooks already matched.
+
+### E-0621 — U01's cabin doorway is narrower than the collision sphere; the original gets through only at low frame rates
+- **Binary/file:** `MissionMonet.exe`; `U01/Anim/U01_07.O3D`, `U01_07.A3D`; U01 collision
+  meshes.
+- **Evidence:** `U01_OpenDoor` (`0x00402050`) only runs node `*U01_07` (`+0x78` = 2.5,
+  `FUN_00420100(12.0, 1)`) and plays `OpenDoor`; no `+0x118` write (the only ones in the EXE
+  are E-0048's). `Camera_SlideSphere` (`0x00419f70`) resolves with the camera radius
+  (`+0x60`, 0.5·s = 20 in U01). Door: rotation keys at frames 0, 1, 12, frame 12 turned 90°
+  about the hinge at (499.12, −130.44), so the open door lies along x with its face at
+  y −128.93. Doorway jambs (vertical edges) of `int05fen01`/`intporte01` at x 498.75,
+  y −94.56 and −130.59 (36.0 apart); inside, `colision`'s edge at (494.06, −93.23) and the
+  open door (35.7 apart). A sphere of diameter 40 cannot fit: at the doorway centre each jamb
+  edge pushes the centre back to 8.7 = √(20² − 18²) units in front of the jamb, and a step
+  gets through only when one frame moves the centre more than that (E-0047: step
+  = v·s / max(fps, 8), 80 units/s walking, ×2 running): walking below ≈ 9 fps, running below
+  ≈ 18 fps. At 60 fps (1.33 units/frame) the player stays at x 508.3 outside / 482 inside,
+  measured in the engine (`where` after `press up`, door at frame 12), matching the user's
+  report that the original also blocks at high frame rates.
+- **Method:** MCP decompile; `o3d.py`/`a3d.py` dumps; engine collision traced per face
+  (temporary logging, not committed).
+- **Confidence:** proven for the geometry and the algorithm; the frame rates the designers
+  played at are not known.

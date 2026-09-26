@@ -142,6 +142,18 @@ does not overlap the collision sphere. For each face in order:
   ceilings never push; the ground step handles them).
 - Else c = q + m · r and continue with the next face, using the moved c.
 
+### Narrow openings (E-0621)
+
+Openings narrower than 2r (U01's cabin door: 36 units against 40) stop the sphere at any
+frame rate where one step is shorter than the edges' push-back; the original gets through
+them only at low frame rates, where a frame's step is long. The engine keeps the original's
+step and adds one retry: when a walking slide makes less than a tenth of the step's progress
+along the velocity, slide again from the same eye with the step the original takes at its
+8 fps floor, v·s/8 with the mode factor and the face-ahead halving, capped at r/2 (a longer step could start past a flat
+face's plane and skip it). Take the retry when it gets at least one normal step further along
+the velocity; otherwise keep the normal slide. Scraping along walls and stops at flat walls
+are unchanged.
+
 **Segment casts** (ground, headroom, face ahead): a face is hit when the segment crosses its
 plane from the front side (start on or in front of it) and the crossing point lies inside
 the polygon. So the downward ray hits upward-facing faces, the upward ray downward-facing
