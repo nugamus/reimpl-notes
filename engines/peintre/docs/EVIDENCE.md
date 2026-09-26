@@ -334,3 +334,27 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   for RLE, `(0, a, 640, b)` for band, `(x, y, w, h)` for raw, clipped to 640×480.
 - **Method:** decompiled the functions named (`notes/decomp/`).
 - **Confidence:** proven
+
+### E-0104 — TGA: plain uncompressed 16-bit TGA (X1R5G5B5, bottom-up); the engine reads only width, height and pixels; pure green is the key colour
+- **Binary/file:** `/MISSION.EXE`; `Data/Graphs_2D/*.TGA` (104 files)
+- **Evidence:** `LoadTga` (0x41ad98) and `LoadTga2` (0x41af1c; into a caller's buffer)
+  build `<dir><name>.TGA`, seek to 12, read `u16 w`, `u16 h`, seek to 18 and read
+  `w*h*2` bytes, then 0x41acfa swaps rows `i` and `h−1−i` (the file is bottom row first)
+  and, when DAT_005b7fa4 == 16, 0x41aae0 maps each pixel `v` to `(v >> 10) << 11 |
+  ((v & 0x3E0) >> 5) << 6 | v & 0x1F` (RGB555 → RGB565). 0x41b1d5 (called from 0x424190)
+  copies a clipped rectangle skipping source pixels equal to 0x07C0 when DAT_005b7fa4 ==
+  16, else 0x03E0: pure green in the current format. 0x41b061 (from 0x426171) is the
+  opaque copy; its loops run `rows + 1` and `cols + 1` times (0x41b061 `local_c + 1`,
+  `local_8 + 1`). Callers: 0x426594 loads the cursor images (strings `op_`, `fleche`,
+  `main`, `curza`, `def_0`, `def_1`, `curdoi`), 0x4240f0 ("Curseur->Buf => NULL"),
+  0x42e97f ("Loading", "intro") uses `LoadTga2`. Corpus: `tga.py` validates 104/104, every
+  byte consumed: all have id length 0, no colour map, type 2, origin 0, depth 16,
+  descriptor 0 (93) or 1 (11), bit 15 clear in every pixel; 11 end with the 26-byte TGA
+  2.0 footer (both offsets 0, `TRUEVISION-XFILE.\0`), the rest end with the pixels; 49 use
+  0x03E0. Decoding cle.TGA with the rows flipped shows an upright key on the green key.
+  ScummVM's `Image::TGADecoder` reads this variant, but maps it to ARGB1555 with
+  `attributeBits` alpha bits (`image/tga.cpp`), which makes the 11 descriptor-1 files
+  fully transparent (bit 15 is 0): an engine must take the pixels as RGB555 and ignore
+  alpha, then key on 0x03E0.
+- **Method:** decompiled the functions named (`notes/decomp/`); `engines/peintre/tools/parsers/tga.py`.
+- **Confidence:** proven

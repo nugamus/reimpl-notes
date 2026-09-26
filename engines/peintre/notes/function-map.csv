@@ -130,26 +130,26 @@ address,module,name,ghidra,size,callers,evidence
 0x0040b266,game/shell,Rgb565To555,FUN_0040b266,95,3,(v>>1)&0x7FE0|v&0x1F over n pixels; E-0100 (2d.csv)
 0x0040b980,game/shell,,FUN_0040b980,18,0,
 0x0040b992,game/shell,Hnm_AllocDecBuffers,FUN_0040b992,121,7,'%s': could not allocate HNM dec buffers ...
-0x0040ba0b,game/shell,,FUN_0040ba0b,74,1,
+0x0040ba0b,game/shell,Hnm_CloseAndFree,FUN_0040ba0b,74,1,Hnm_Close then frees both 0x96000-byte decode buffers; E-0201 (media.csv)
 0x0040ba55,game/shell,,FUN_0040ba55,15,0,
 0x0040ba64,game/shell,Hnm_Open,FUN_0040ba64,1338,2,%sDATA\MOVIES\%s.CVY / .HNM
-0x0040bf9e,game/shell,,FUN_0040bf9e,212,5,
+0x0040bf9e,game/shell,Hnm_Close,FUN_0040bf9e,212,5,frees the CVY table/buffers and the 0x80000 ring; stops the read thread; E-0201 (media.csv)
 0x0040c072,game/shell,Hnm_Stream,FUN_0040c072,200,2,Cannot stream closed movie !
-0x0040c13a,game/shell,,FUN_0040c13a,121,2,
-0x0040c1b3,game/shell,,FUN_0040c1b3,471,1,
-0x0040c38a,game/shell,,FUN_0040c38a,78,0,
+0x0040c13a,game/shell,Hnm_ReadBlock,FUN_0040c13a,121,2,reads n bytes of the HNM in 1 KB pieces; E-0201 (media.csv)
+0x0040c1b3,game/shell,Hnm_FillRing,FUN_0040c1b3,471,1,read thread body: refills the 0x80000 ring with 0x5000/0x8000-byte reads; E-0201 (media.csv)
+0x0040c38a,game/shell,Hnm_ReadThreadProc,FUN_0040c38a,78,0,WaitForMultipleObjects on the two read-thread events then Hnm_FillRing; E-0201 (media.csv)
 0x0040c3d8,game/shell,Hnm_StartReadThread,FUN_0040c3d8,192,1,Could not create HNM read thread ...
-0x0040c498,game/shell,,FUN_0040c498,114,1,
-0x0040c50a,game/shell,,FUN_0040c50a,184,2,
-0x0040c5c2,game/shell,,FUN_0040c5c2,355,2,
-0x0040c725,game/shell,,FUN_0040c725,52,2,
-0x0040c759,game/shell,,FUN_0040c759,42,4,
-0x0040c783,game/shell,,FUN_0040c783,306,2,
-0x0040c8b5,game/shell,,FUN_0040c8b5,245,1,
-0x0040c9aa,game/shell,,FUN_0040c9aa,541,1,
+0x0040c498,game/shell,Hnm_StopReadThread,FUN_0040c498,114,1,SetEvent + WaitForSingleObject on the thread + CloseHandle; E-0201 (media.csv)
+0x0040c50a,game/shell,Hnm_NextSuperchunkSize,FUN_0040c50a,184,2,u32 & 0xFFFFFF at the ring read position; 0 when not yet loaded; E-0201 (media.csv)
+0x0040c5c2,game/shell,Hnm_ParseChunks,FUN_0040c5c2,355,2,chunk walk: AA/BB audio and IV/IX video; E-0201 (media.csv)
+0x0040c725,game/shell,Hnm_DecodeVideo,FUN_0040c725,52,2,passes the IX chunk and the two frame buffers to 0x4674c9; E-0201 (media.csv)
+0x0040c759,game/shell,Cvy_UnpackFrame,FUN_0040c759,42,4,Hlz unpacks CVY frame n into the CVY buffer; E-0204 (media.csv)
+0x0040c783,game/shell,Hnm_DecodeAudio,FUN_0040c783,306,2,APC-decodes the AA (after its 32-byte header) or BB chunk of the frame; E-0202 (media.csv)
+0x0040c8b5,game/shell,Hnm_QueueAudio,FUN_0040c8b5,245,1,copies one decoded slice into slot (n & 31) of the movie sound buffer; E-0202 (media.csv)
+0x0040c9aa,game/shell,Hnm_InitSound,FUN_0040c9aa,541,1,audio_flags -> channels/rate; 32-slot movie buffer from the AA chunk; fps; E-0202 (media.csv)
 0x0040cbc7,game/shell,,FUN_0040cbc7,24,0,
-0x0040cbdf,game/shell,,FUN_0040cbdf,61,2,
-0x0040cc1c,game/shell,,FUN_0040cc1c,27,1,
+0x0040cbdf,game/shell,Hnm_ConsumeSuperchunk,FUN_0040cbdf,61,2,advances the ring read position and wakes the read thread; E-0201 (media.csv)
+0x0040cc1c,game/shell,Hnm_SignalEnd,FUN_0040cc1c,27,1,sets the end flag and wakes the read thread; E-0201 (media.csv)
 0x0040d0f0,game/shell,,FUN_0040d0f0,34,0,
 0x0040d112,game/shell,,FUN_0040d112,221,0,
 0x0040d1ef,game/shell,,FUN_0040d1ef,24,0,
@@ -199,7 +199,7 @@ address,module,name,ghidra,size,callers,evidence
 0x0040ff77,game/shell,Save_WriteGame,FUN_0040ff77,476,1,"%sSAVE\GAME%02u%02u.BIN, Game save: create file failed..."
 0x00410153,game/shell,Save_WriteGGame,FUN_00410153,530,3,"%sSAVE\GGAME%u.BIN, Game save: create file failed..."
 0x00410365,game/shell,,FUN_00410365,565,1,
-0x0041059a,game/shell,,FUN_0041059a,89,3,
+0x0041059a,game/shell,Timer_StartPeriodic,FUN_0041059a,89,3,timeBeginPeriod + timeSetEvent(period); E-0203 (media.csv)
 0x004105f3,game/shell,Timer_End,FUN_004105f3,49,6,timeKillEvent + timeEndPeriod
 0x00410624,game/shell,,FUN_00410624,1372,1,
 0x00410b80,game/shell,,FUN_00410b80,78,2,
@@ -246,11 +246,11 @@ address,module,name,ghidra,size,callers,evidence
 0x004148a5,game/shell,,FUN_004148a5,300,1,
 0x004149d1,game/shell,,FUN_004149d1,196,1,
 0x00414a95,game/shell,,FUN_00414a95,57,1,
-0x00414ace,game/shell,,FUN_00414ace,263,33,
+0x00414ace,game/shell,Movie_Open,FUN_00414ace,263,33,opens movie n of the table at 0x4a7a08 with its rectangle and CVY; E-0204 (media.csv)
 0x00414bd5,game/shell,,FUN_00414bd5,35,0,
-0x00414bf8,game/shell,,FUN_00414bf8,225,1,
-0x00414cd9,game/shell,,FUN_00414cd9,135,0,
-0x00414d60,game/shell,,FUN_00414d60,108,1,
+0x00414bf8,game/shell,Movie_Step,FUN_00414bf8,225,1,Hnm_Stream + blit into the rectangle + CVY mask; skip on input; E-0204 (media.csv)
+0x00414cd9,game/shell,Movie_Redraw,FUN_00414cd9,135,0,Display_Flip or blit frame + CVY mask; E-0204 (media.csv)
+0x00414d60,game/shell,Movie_Blit,FUN_00414d60,108,1,blit frame + CVY mask of frame n; E-0204 (media.csv)
 0x00414dcc,game/shell,,FUN_00414dcc,32,14,
 0x00414dec,game/shell,,FUN_00414dec,78,14,
 0x00414e3a,game/shell,,FUN_00414e3a,110,1,
@@ -261,14 +261,14 @@ address,module,name,ghidra,size,callers,evidence
 0x004150b0,game/shell,,FUN_004150b0,61,1,
 0x00416650,game/sound,Snd_Init,FUN_00416650,161,1,DirectSound initialisation failed...
 0x004166f1,game/sound,Snd_InitMovieBuffer,FUN_004166f1,150,1,Movie sound-buffer initialization failed...
-0x00416787,game/sound,,FUN_00416787,237,3,
-0x00416874,game/sound,,FUN_00416874,237,18,
+0x00416787,game/sound,Snd_PlayStreamWav,FUN_00416787,237,3,marks the name with '_' and starts the 64 KB stream buffer; E-0209 (media.csv)
+0x00416874,game/sound,Snd_PlayStreamApc,FUN_00416874,237,18,marks the name with '!' and starts the 64 KB stream buffer; E-0209 (media.csv)
 0x00416961,game/sound,,FUN_00416961,38,1,
 0x00416987,game/sound,,FUN_00416987,38,1,
-0x004169ad,game/sound,,FUN_004169ad,130,22,
+0x004169ad,game/sound,Snd_StopStream,FUN_004169ad,130,22,stops the stream buffer and closes its file; E-0209 (media.csv)
 0x00416a2f,game/sound,,FUN_00416a2f,10,1,
-0x00416a39,game/sound,,FUN_00416a39,384,0,
-0x00416bb9,game/sound,,FUN_00416bb9,486,0,
+0x00416a39,game/sound,Snd_RefillStreamWav,FUN_00416a39,384,0,refills 0x2000 bytes of raw WAV data; E-0209 (media.csv)
+0x00416bb9,game/sound,Snd_RefillStreamApc,FUN_00416bb9,486,0,refills 0x2000 bytes from 0x800 APC bytes; E-0209 (media.csv)
 0x00416d9f,game/sound,Snd_CreateStatic,FUN_00416d9f,55,34,Static Sound: could not create '%s'...
 0x00416dd6,game/sound,,FUN_00416dd6,23,15,
 0x00416ded,game/sound,,FUN_00416ded,34,1,
@@ -309,14 +309,14 @@ address,module,name,ghidra,size,callers,evidence
 0x0041a0b0,game3d/scenes,,FUN_0041a0b0,507,0,
 0x0041a2ab,game3d/scenes,,FUN_0041a2ab,384,1,
 0x0041a42b,game3d/scenes,,FUN_0041a42b,980,0,
-0x0041aae0,game3d/scenes,,FUN_0041aae0,160,2,
+0x0041aae0,game3d/scenes,Rgb555To565,FUN_0041aae0,160,2,after LoadTga when DAT_005b7fa4 == 16; E-0104 (2d.csv)
 0x0041ab80,game3d/tga,SaveScreenTga,FUN_0041ab80,262,1,D:/VANGOGH/TGA/%04d.TGA
 0x0041ac86,game3d/tga,SaveScreenBtm,FUN_0041ac86,116,0,D:/VANGOGH/TGA/%04d.BTM
-0x0041acfa,game3d/tga,,FUN_0041acfa,158,2,
+0x0041acfa,game3d/tga,Tga_FlipRows,FUN_0041acfa,158,2,swaps rows i and h-1-i after LoadTga; E-0104 (2d.csv)
 0x0041ad98,game3d/tga,LoadTga,FUN_0041ad98,388,2,LoadTga::Erreur ouverture %s
 0x0041af1c,game3d/tga,LoadTga2,FUN_0041af1c,325,1,LoadTga::Erreur ouverture %s
-0x0041b061,game3d/tga,,FUN_0041b061,372,1,
-0x0041b1d5,game3d/tga,,FUN_0041b1d5,417,1,
+0x0041b061,game3d/tga,Blit16,FUN_0041b061,372,1,opaque clipped copy; E-0104 (2d.csv)
+0x0041b1d5,game3d/tga,Blit16Keyed,FUN_0041b1d5,417,1,skips 0x03E0/0x07C0 (pure green); E-0104 (2d.csv)
 0x0041b5a0,game3d/scenes,,FUN_0041b5a0,115,1,
 0x0041b613,game3d/scenes,,FUN_0041b613,136,0,
 0x0041b6ab,game3d/scenes,LoadAnimscafe,FUN_0041b6ab,210,1,LoadAnimscafe::%s manque
@@ -654,12 +654,12 @@ address,module,name,ghidra,size,callers,evidence
 0x00454af0,engine3d,,FUN_00454af0,158,1,
 0x00455470,engine3d/asm,,FUN_00455470,119,1,
 0x00465bd0,cryo/codec,,FUN_00465bd0,446,0,
-0x00465d8e,cryo/codec,,FUN_00465d8e,615,3,
+0x00465d8e,cryo/codec,Apc_Decode,FUN_00465d8e,615,3,IMA ADPCM decoder (shift-add (media.csv)
 0x00465ff5,cryo/codec,,FUN_00465ff5,615,0,
 0x00466260,cryo/codec,,FUN_00466260,93,0,
-0x004662bd,cryo/codec,,FUN_004662bd,1055,0,
-0x004666dc,cryo/codec,,FUN_004666dc,209,0,
-0x004667ad,cryo/codec,,FUN_004667ad,284,2,
+0x004662bd,cryo/codec,Apc_Encode,FUN_004662bd,1055,0,PCM -> CRYO_APC 1.20 encoder (no callers); E-0207 (media.csv)
+0x004666dc,cryo/codec,Apc_GetInfo,FUN_004666dc,209,0,CRYO_APC header -> PCM size (media.csv)
+0x004667ad,cryo/codec,Apc_InitState,FUN_004667ad,284,2,CRYO_APC header -> decoder state; E-0207 (media.csv)
 0x004668c9,cryo/codec,Adpcm_ErrorString,FUN_004668c9,392,0,ADPCMERR_*
 0x00466a81,cryo/codec,,FUN_00466a81,117,1,
 0x00466af6,cryo/codec,,FUN_00466af6,144,1,
@@ -735,9 +735,9 @@ address,module,name,ghidra,size,callers,evidence
 0x0046f6be,cryo/misc,,FUN_0046f6be,27,1,
 0x0046f6d9,cryo/misc,,FUN_0046f6d9,30,0,
 0x0046f6f7,cryo/misc,,FUN_0046f6f7,31,1,
-0x0046f716,cryo/misc,,FUN_0046f716,99,1,
-0x0046f779,cryo/misc,,FUN_0046f779,18,4,
-0x0046f78b,cryo/misc,,FUN_0046f78b,21,4,
+0x0046f716,cryo/misc,Blit_SetMovieRect,FUN_0046f716,99,1,stores source/destination strides and the x/y/w/h of the movie rectangle; E-0204 (media.csv)
+0x0046f779,cryo/misc,Blit_MovieFrame,FUN_0046f779,18,4,copies the top-left w x h of the 640-wide frame to (x (media.csv)
+0x0046f78b,cryo/misc,Blit_CvyMask,FUN_0046f78b,21,4,paints a CVY run mask in one colour at (x (media.csv)
 0x0046f7a0,cryo/misc,,FUN_0046f7a0,30,1,
 0x0046f7be,cryo/misc,,FUN_0046f7be,30,4,
 0x0046f7dc,cryo/misc,,FUN_0046f7dc,30,2,

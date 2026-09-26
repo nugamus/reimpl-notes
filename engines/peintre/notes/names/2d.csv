@@ -14,3 +14,7 @@ address,name,evidence
 0x0047067d,SprLib_DrawRaw8,opaque palette indices from (x y); E-0103
 0x00470793,SprLib_DrawRaw8Clipped,opaque palette indices with clipping; E-0103
 0x0046fb4b,SprLib_DrawRaw16,opaque u16 copy from (x y); E-0103
+0x0041acfa,Tga_FlipRows,swaps rows i and h-1-i after LoadTga; E-0104
+0x0041aae0,Rgb555To565,after LoadTga when DAT_005b7fa4 == 16; E-0104
+0x0041b061,Blit16,opaque clipped copy; E-0104
+0x0041b1d5,Blit16Keyed,skips 0x03E0/0x07C0 (pure green); E-0104

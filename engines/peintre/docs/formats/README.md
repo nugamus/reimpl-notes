@@ -14,6 +14,7 @@ validator in `engines/peintre/tools/parsers/<fmt>.py` (with `--selftest`), the p
 | `.3DI` boxes (in BFG) | 27 | `obj3d.py` | `obj3d.ksy` | E-0016 | layout done; face record fields open |
 | `.TGP` full-screen / panorama image | 134 (110 single 640x480, 24 chunked panoramas) | `tgp.py` | `tgp.ksy` | E-0100, E-0101 | done |
 | `.SPR` sprite bank | 289 (12 RLE, 115 band, 10 raw8, 152 raw16; 5,827 frames) | `spr.py` | `spr.ksy` | E-0102, E-0103 | done |
+| `.TGA` 2D overlay / cursor | 104 (11 with TGA 2.0 footer) | `tga.py` | `tga.ksy` | E-0104 | done |
 
 ## `.BFG` — scene bundle (E-0013)
 
@@ -84,3 +85,13 @@ RLE row: `0x80` ends the row; `c < 0x80` skips `c` pixels (transparent: the only
 transparency in SPR); `c > 0x80` is followed by `c & 0x7F` palette indices. Band frames
 are full-width strips drawn over a 640×480 background.
 No ScummVM reader applies (cryomni3d's `SPRI` sprites are a different, big-endian format).
+
+## `.TGA` — 2D overlays and cursors of the 3D part (E-0104)
+
+Plain Truevision TGA, one variant: type 2, 16 bits, no id, no colour map, origin 0,
+descriptor 0 or 1, pixels **X1R5G5B5 bottom row first**, then optionally (11 files) the
+26-byte TGA 2.0 footer. The engine reads only width/height (offset 12) and the pixels
+(offset 18), flips the rows and converts to RGB565 on 565 screens. The keyed blitter skips
+**pure green** (0x03E0 in 555, 0x07C0 in 565). ScummVM's `Image::TGADecoder` parses it,
+but treats the descriptor-1 files as ARGB1555 with bit 15 = 0, i.e. fully transparent:
+convert its surface as RGB555 ignoring alpha (or read the 18-byte header directly).
