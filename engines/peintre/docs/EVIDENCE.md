@@ -547,3 +547,17 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   0x42b776 (musee) and 0x42ddbf (terrasse). `Wav_Open` (0x416e7f) has no callers.
 - **Method:** decompiled the functions named; callers via Ghidra references.
 - **Confidence:** proven
+
+### E-0208 — WAV: plain RIFF PCM, 16-bit 22050 Hz (118 mono, 4 stereo); the game reads fmt and data only; 122/122 validate
+- **Binary/file:** `/MISSION.EXE`; `Data/SOUND/*.WAV` (122)
+- **Evidence:** Snd_Load (0x417084) requires `RIFF` and `WAVE` ("not a wav file"),
+  then walks chunk headers: `fmt ` must be >= 14 bytes ("corrupted header"); it keeps
+  channels (+2), rate (+4) and bits (+0xE), never the format tag; `data` gives the
+  file position and size; it returns once both are seen, so later chunks are not read.
+  Corpus (`wav.py`): 122/122 files, RIFF size = file size - 8, chunks walked to EOF with
+  even padding; format tag 1 (PCM), 16 bits, 22050 Hz in all; 118 mono, 4 stereo
+  (`A03_06I`, `J`, `K`, `L`); `fmt ` of 16 bytes (106) or 18 with cbSize 0 (16); chunk
+  orders `fmt data` (82), `fmt data LIST` (22), `fmt data LIST cue LIST` (10),
+  `fmt data smpl LIST` (7), `fmt data cue LIST plst` (1).
+- **Method:** decompiled 0x417084; `engines/peintre/tools/parsers/wav.py`.
+- **Confidence:** proven

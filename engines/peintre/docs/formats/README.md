@@ -18,6 +18,7 @@ validator in `engines/peintre/tools/parsers/<fmt>.py` (with `--selftest`), the p
 | `.HNM` movie (Cryo HNM6) | 95 (94 `.HNM` + extensionless `A13_052B`; 21,363 IX, 80 AA, 18,208 BB chunks) | `hnm.py` | `hnm.ksy` | E-0200..E-0203, E-0206 | done |
 | `.CVY` movie mask | 37 (2,900 frames; 24 opened by the game, 13 never) | `cvy.py` | `cvy.ksy` | E-0204, E-0205 | done (colour meaning Q-0150) |
 | `.APC` sound | 68 (all 22050 Hz mono, 17.4 min) | `apc.py` | `apc.ksy` | E-0207, E-0209 | done |
+| `.WAV` sound | 122 (PCM 16-bit 22050 Hz: 118 mono, 4 stereo) | `wav.py` | `wav.ksy` | E-0208, E-0209 | done |
 | `.AWF` bitmap font | 2 (1 fixed, 1 proportional) | `awf.py` | `awf.ksy` | E-0105 | done |
 
 ## `.BFG` — scene bundle (E-0013)
@@ -173,3 +174,12 @@ streams them (the `!` path of Snd_Load, E-0209), always as 22050 Hz mono 16-bit.
 `step, step >> 1, step >> 2` by bits and always `step >> 3` (the IMA reference
 shift-add): the two differ by a few LSB on small steps, so decoded samples are not
 bit-identical (E-0207).
+
+## `.WAV` — RIFF sounds (E-0208, E-0209)
+
+Plain RIFF WAVE: `fmt ` first, `data` second in all 122 files; 40 add `LIST`, `cue `,
+`smpl` or `plst` after the data, which the game never reads. All are PCM 16-bit 22050 Hz,
+118 mono and 4 stereo (`A03_06I`..`L`, static sounds). Snd_Load takes channels, rate and
+bits from `fmt ` without checking the format tag, so anything but PCM would play as
+noise; none occurs. Streamed WAVs (`_` path) are forced to mono 22050 Hz, which all of
+them are. ScummVM's `Audio::makeWAVStream` reads every file.
