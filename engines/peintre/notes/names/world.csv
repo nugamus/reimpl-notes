@@ -64,3 +64,7 @@ address,name,evidence
 0x0042cfe2,Pont_Init,scene pont code; E-0365
 0x0042d26a,Pont_StepAnim,scene pont code; E-0365
 0x0042d489,Pont_Frame,scene pont code; E-0365
+0x0042dcb0,Terrasse_LoadSounds,scene terrasse code; E-0366
+0x0042ddbf,Terrasse_Init,scene terrasse code; E-0366
+0x0042df65,Terrasse_StepAnim,scene terrasse code; E-0366
+0x0042e023,Terrasse_Frame,scene terrasse code; E-0366

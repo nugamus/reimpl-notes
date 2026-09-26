@@ -749,3 +749,17 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   tables read from .data through pefile's mapped image.
 - **Confidence:** proven
 - **Doc:** `games/mission-sunlight/docs/pont.md`
+
+### E-0366 — terrasse (scene 10): awning crank, die/letter/spectacles, zones 16 and 17, doors to the café
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** init `0x42ddbf`, per frame `0x42e023`, anim step `0x42df65`, sounds
+  `0x42dcb0`, `LoadAnimsterrasse` `0x42dced`. Objects `0x4afc08` (9 x 0x3c), track
+  `terrasse.3da` on `storeho` (`0x4afe28`). First visit streams `apierre`
+  (`Snd_PlayStreamWav`, `DAT_004abd78`). Items: `lettre` 27, `lunette` 17, `de` (via
+  `platode`) 26. Zones: `KASKET` 17, `drapo` 16 (needs `DAT_004abd74`). `porte01`/`porte02`
+  → 10 → 5; z < -0x9c4 → 10 → 7.
+- **Method:** decompiled with PyGhidra `decompile_one.py` (read-only copy of Peintre.gpr);
+  call arguments the decompiler dropped read from the pushes before each call (capstone);
+  tables read from .data through pefile's mapped image.
+- **Confidence:** proven
+- **Doc:** `games/mission-sunlight/docs/terrasse.md`
