@@ -716,3 +716,21 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   tables read from .data through pefile's mapped image.
 - **Confidence:** proven
 - **Doc:** `games/mission-sunlight/docs/maisonj.md`
+
+### E-0364 — mangeurs (scene 4): stove, faggot and log carried to the fire, baby/window, kettle, zones 2 and 3
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** init `0x4298e5`, per frame `0x429dd6`, anim step `0x429b94`, sounds
+  `0x429758` (9), `LoadAnimsmangeurs` `0x429813`; UV callbacks `0x4296d0`, `0x4296e7`,
+  `0x4296fe`, `0x42972b` (thunks `0x40110e`, `0x401663`, `0x40100f`, `0x40109b`). Objects
+  `0x4ae060` (12 x 0x3c, `vapeur` hidden), tracks `0x4ae338`. Carry: `fagot` on `fire` →
+  `finfeu`, `DAT_004abc3c`; `buche` on `fire` → `feu` looped, `DAT_004abc2c`, `DAT_004abc18`;
+  else `0x4359a0(DAT_00502a80)`. Items: `theieres` 3, `patat01` 4. Zones: `bersso` 2, `POT` 3.
+  `porte` → 4 → 3. Timers: baby after `DAT_00599024` > 0x32, window auto-shut after
+  `DAT_00599034` > 500, steam after `DAT_00599040` > 0x96. `DAT_004abc08` is only read at
+  entry and cleared by the cuckoo in 3D code (Q-0235); tracks `buche`, `chaise`, `fagot`
+  have no writer of their playing word (Q-0236).
+- **Method:** decompiled with PyGhidra `decompile_one.py` (read-only copy of Peintre.gpr);
+  call arguments the decompiler dropped read from the pushes before each call (capstone);
+  tables read from .data through pefile's mapped image.
+- **Confidence:** proven
+- **Doc:** `games/mission-sunlight/docs/mangeurs.md`

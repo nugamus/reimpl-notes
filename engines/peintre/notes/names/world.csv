@@ -50,3 +50,11 @@ address,name,evidence
 0x0042897f,Maisonj_Init,scene maisonj code; E-0363
 0x00428c8c,Maisonj_StepAnim,scene maisonj code; E-0363
 0x00428e63,Maisonj_Frame,scene maisonj code; E-0363
+0x004296d0,Uv_SubV550000,scene mangeurs code; E-0364
+0x004296e7,Uv_AddV550000,scene mangeurs code; E-0364
+0x004296fe,Uv_AddU550000Wrap,scene mangeurs code; E-0364
+0x0042972b,Uv_AddU400000Wrap,scene mangeurs code; E-0364
+0x00429758,Mangeurs_LoadSounds,scene mangeurs code; E-0364
+0x004298e5,Mangeurs_Init,scene mangeurs code; E-0364
+0x00429b94,Mangeurs_StepAnim,scene mangeurs code; E-0364
+0x00429dd6,Mangeurs_Frame,scene mangeurs code; E-0364
