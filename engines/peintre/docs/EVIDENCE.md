@@ -507,3 +507,43 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   and paints only lines < h.
 - **Method:** disassembly of 0x46ff0d; `cvy.py`.
 - **Confidence:** proven (what the colour is for: Q-0150)
+
+### E-0207 — APC: CRYO_APC 1.20 header + IMA ADPCM of samples / 2 + 1 bytes; 68/68 validate; the EXE decodes with the IMA shift-add
+- **Binary/file:** `/MISSION.EXE`; `Data/SOUND/*.APC` (68)
+- **Evidence:** Apc_InitState (0x4667ad) and Apc_GetInfo (0x4666dc) check `CRYO_APC`
+  and `1.20` (`strncmp` 8 and 4 bytes), take stereo from bit 0 of +0x1C, samples per
+  channel from +0xC (PCM size = `samples * (stereo ? 4 : 2)`), rate +0x10, start
+  predictors +0x14 / +0x18, data at +0x20. The encoder Apc_Encode (0x4662bd, no callers)
+  requires an output size of `pcm_bytes / 4 + 0x21` and writes the header the same way.
+  Apc_Decode (0x465d8e): high nibble first (stereo: low nibble = right), diff =
+  `(c & 4 ? step : 0) + (c & 2 ? step >> 1 : 0) + (c & 1 ? step >> 2 : 0) + (step >> 3)`,
+  negated if `c & 8`, index += table 0x4b2900 (-1 -1 -1 -1 2 4 6 8), clamped 0..88,
+  steps at 0x4b2790 = the 89-entry IMA table; the predictor is an int, stored to the
+  output as a short without clamping. ScummVM `audio/decoders/apc.cpp` uses
+  `(2 * (c & 7) + 1) * step / 8` (e.g. step 7, c = 7: 13 against the EXE's 11) and
+  truncates its predictor to 16 bits at every sample. Corpus (`apc.py`): 68/68 files,
+  `CRYO_APC 1.20`, 22050 Hz, flags 0 (mono), start predictors 0, ADPCM size =
+  `samples * 2 * channels / 4 + 1` in every file; the extra byte is 0 when `samples` is
+  even (36) and holds the last nibble with a zero low nibble when odd (32).
+- **Method:** decompiled 0x4667ad, 0x4666dc, 0x4662bd, 0x465d8e; tables read with
+  pefile; `engines/peintre/tools/parsers/apc.py`.
+- **Confidence:** proven
+
+### E-0209 — Sound paths: static WAV, streamed WAV ('_'), streamed APC ('!'), all through Snd_Load; streams are 22050 Hz mono 16-bit
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** Snd_Init (0x416650) registers Snd_Load (0x417084) and Adpcm_StreamInit
+  (0x4176c6) as the Cryo DirectSound library's load callbacks (0x472bc0) and sets the
+  primary format to 1 channel, 22050 Hz, 16 bits. Snd_PlayStreamApc (0x416874) and
+  Snd_PlayStreamWav (0x416787) save the name's first letter (0x4e292c), replace it by `!`
+  / `_`, and create a 0x10000-byte stream buffer; Snd_Load sees the marker, puts the
+  letter back and forces the format to 1 channel, 22050 Hz, 16 bits: `!` opens
+  `DATA\SOUND\%s.APC` (kind 2), `_` the WAV (kind 1, data chunk played raw). Without a
+  marker it is a static WAV with the format of its `fmt ` chunk (Snd_CreateStatic
+  0x416d9f). Streams refill 0x2000 PCM bytes at a time: raw WAV reads (0x416a39) or 0x800
+  APC bytes decoded to 0x1000 samples (0x416bb9); past the length (`samples * 2` for
+  APC, the data size for WAV) the rest is filled with silence and refills stop (no loop). One
+  stream plays at a time (Snd_StopStream 0x4169ad first). A `++` name gives the movie
+  buffer's format. Streamed WAVs are started only from the 3D scene code at 0x41d167,
+  0x42b776 (musee) and 0x42ddbf (terrasse). `Wav_Open` (0x416e7f) has no callers.
+- **Method:** decompiled the functions named; callers via Ghidra references.
+- **Confidence:** proven

@@ -17,6 +17,7 @@ validator in `engines/peintre/tools/parsers/<fmt>.py` (with `--selftest`), the p
 | `.TGA` 2D overlay / cursor | 104 (11 with TGA 2.0 footer) | `tga.py` | `tga.ksy` | E-0104 | done |
 | `.HNM` movie (Cryo HNM6) | 95 (94 `.HNM` + extensionless `A13_052B`; 21,363 IX, 80 AA, 18,208 BB chunks) | `hnm.py` | `hnm.ksy` | E-0200..E-0203, E-0206 | done |
 | `.CVY` movie mask | 37 (2,900 frames; 24 opened by the game, 13 never) | `cvy.py` | `cvy.ksy` | E-0204, E-0205 | done (colour meaning Q-0150) |
+| `.APC` sound | 68 (all 22050 Hz mono, 17.4 min) | `apc.py` | `apc.ksy` | E-0207, E-0209 | done |
 | `.AWF` bitmap font | 2 (1 fixed, 1 proportional) | `awf.py` | `awf.ksy` | E-0105 | done |
 
 ## `.BFG` — scene bundle (E-0013)
@@ -159,3 +160,16 @@ for the 94-frame `A13_052B.HNM` (the extensionless `A13_052B` has 101 frames, Q-
 and three of the unused ones. For the 24 opened files every mask covers at least the
 rectangle's height and paints nothing below it.
 
+## `.APC` — Cryo ADPCM sound (E-0207, E-0209)
+
+32-byte header (`CRYO_APC`, `1.20`, samples per channel, rate, two start predictors,
+flags bit 0 stereo), then IMA ADPCM, high nibble first, `samples * channels / 2` bytes
+(rounded down) plus one: the size the Cryo encoder (0x4662bd, unused by the game)
+allocates. All 68 files are 22050 Hz mono with zero start predictors. The game only
+streams them (the `!` path of Snd_Load, E-0209), always as 22050 Hz mono 16-bit.
+
+**ScummVM:** `Audio::makeAPCStream` reads the header unchanged. Its IMA step is
+`(2 * (code & 7) + 1) * step / 8`, where the EXE (Apc_Decode 0x465d8e) adds
+`step, step >> 1, step >> 2` by bits and always `step >> 3` (the IMA reference
+shift-add): the two differ by a few LSB on small steps, so decoded samples are not
+bit-identical (E-0207).
