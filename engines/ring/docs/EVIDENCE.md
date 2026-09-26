@@ -161,3 +161,54 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   inventory.
 - **Method:** `survey.py`.
 - **Confidence:** proven
+
+### E-0012 — Ghidra project Ring.gpr holds the four game EXEs, analysed
+- **Binary/file:** `ghidra_projects/Ring.gpr`: `/RING_DVD.EXE`, `/RING_ISO.EXE`, `/RING_CD.EXE`,
+  `/LEGEND.EXE` (renamed copies in `build/ring-import/` of DVD `RING.EXE`, ISO disc 1
+  `ring.exe`, CD disc 6 `ring.exe`, Prophet cd1 `Legend.ex_`; MD5s as E-0002..E-0004)
+- **Evidence:** auto-analysis succeeded for all four (`logs/ring-import.log`); function
+  counts 1,940 / 1,954 / 3,111 / 2,079.
+- **Method:** PyGhidra headless `-import … -overwrite` (the command is in CLAUDE.md, Ring).
+- **Confidence:** proven
+
+### E-0013 — ~370 functions per EXE are named from the method names in their error strings
+- **Binary/file:** the four programs of E-0012; results in `engines/ring/notes/names/*.csv`
+- **Evidence:** functions referencing strings that name exactly one method
+  (`aClass::Method -> …`, `Method(args) -> …`, `Method -> …`): DVD 367 named of 377,
+  ISO 368/379, CD 499/512, Prophet 367/379; the rest reference two methods and are only
+  commented (`RING-STR:`). 60 class names occur (`aApplication`, `aPuzzle`, `aRotation`,
+  `aObject`, `aObjectPresentation`, `aSecComAqi`, `aCin`, `aImageFileBMP`…); Prophet adds
+  `aZone`, `aEpizode`, `aFileIoArt`, `aCinemaCompression`, `aImageFileCinema`. A name means
+  the function raises that method's messages; where the compiler inlined a callee, the
+  name is its caller's messages' owner. Confidence strong, not proven, for that reason.
+- **Method:** `tools/ghidra/scripts/ring_string_namer.py` (PyGhidra postScript, raw scan of
+  the data blocks for NUL-terminated strings, xrefs to functions).
+- **Confidence:** strong
+
+### E-0014 — Few virtual methods: 34 vtables in the DVD EXE, most with one entry
+- **Binary/file:** the four programs; `engines/ring/notes/vtables/*.md`
+- **Evidence:** tables installed by `MOV dword ptr [reg], imm32` whose target is a run of
+  function entries: DVD 34 (0x47e380..0x47f100), ISO 35, CD 39, Prophet 34; 28 of the DVD's
+  34 have a single entry, most written by exactly two functions (constructor and destructor shape). Only
+  `aSecComSou` (0x47f0a8) and `aSecComSouMono` (0x47f0d4) get a class name from their
+  entries in the MSVC builds; the CD build names 10. Class names therefore come from the
+  error strings (E-0013), not from vtables.
+- **Method:** `tools/ghidra/scripts/ring_vtables.py`.
+- **Confidence:** proven (the table census); a table's class is only as strong as E-0013.
+
+### E-0015 — DVD Init ends with 0x402280(this, 7, 999); TRAILER.EXE passes 998
+- **Binary/file:** `RING_DVD.EXE` 0x431140 (named `Init` by its strings; the call at
+  0x431171 is the E-0005 difference); 0x402280
+- **Evidence:** 0x402280 takes (zone byte, int): with the int 1000 it tests globals
+  0x49534d (== 7) and 0x49534f/0x495354 against 0x13882..0x1388a/0x138e5; otherwise it reads
+  a file through `GameZoneOnCD` (0x4312c0) and, when the zone is available, calls 0x402210
+  and 0x40d220 (the function carrying `aApplication::GameSetZone` and
+  `aApplication::LoadSave` strings); if not, it stores the int in 0x495238 and shows the
+  `InsertCD` message (0x40e5b0, 0x40df20).
+- **Reference:** `reference/templier-scummvm-ring/engines/ring/shared.h:238` names
+  998 `kSetupType998`, 999 `kSetupTypeStartZone`, 1000 `kSetupTypeLoading`, and
+  `Application::setZone(ZoneId, SetupType)` in `base/application.h:74`.
+- **Method:** decompiled with `tools/ghidra/scripts/decompile_one.py` (output in
+  `engines/ring/notes/decomp/`).
+- **Confidence:** strong (the control flow is proven; the parameter meanings are the
+  reference's until the zone setup functions are read)

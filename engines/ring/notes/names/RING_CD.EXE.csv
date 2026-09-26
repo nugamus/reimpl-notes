@@ -1,0 +1,513 @@
+address,name,verdict,size,strings
+00405dfc,aVisualObjectList::Alloc,named,2076,aVisualObjectList::Alloc -> Can not Load -> 
+004068e0,,ambiguous,2233,aList::openImage -> Can not ALLOC text oaoTxt1 = NULL | aList::openImage -> Can not ALLOC text oaoTxt2 = NULL | aList::openImage -> Can not Init text1 | aList::openImage -> Can not Init text2 | aVisualObjectList::Init -> bDnGua == NULL | aVisualObjectList::Init -> bDnGun == NULL | aVisualObjectList::Init -> bDnGur == NULL | aVisualObjectList::Init -> bDnGus == NULL | aVisualObjectList::Init -> bUpGua == NULL | aVisualObjectList::Init -> bUpGun == NULL | aVisualObjectList::Init -> bUpGur == NULL | aVisualObjectList::Init -> bUpGus == NULL | aVisualObjectList::Init -> bgrImg == NULL | aVisualObjectList::Init -> cliImgA == NULL | aVisualObjectList::Init -> cliImgP == NULL | aVisualObjectList::Init -> icoDir == NULL
+00407940,aVisualObjectList::SetObjectClicked,named,175,aVisualObjectList::SetObjectClicked -> Object ID does not exist ->
+004079f0,aList::Add,named,513,aList::Add -> ObjPtr == NULL | aList::Add -> aDisObjPtr == NULL
+00408334,aApplication::ScrollImage,named,542,aApplication::ScrollImage -> Load failed ->  | aApplication::ScrollImage -> ip == NULL -> 
+0040885c,aApplication::PlyCinMul,named,451,aApplication::PlyCinMul -> Wromg channel number -> 
+00408b08,aApplication::FadOut,named,1277,aApplication::FadOut -> Can not copy buffer to Image | aApplication::FadOut -> Can not create image | aApplication::FadOut -> Free failed | aApplication::FadOut -> Init FAILED | aApplication::FadOut -> hglb == NULL | aApplication::FadOut -> pa == NULL | aApplication::FadOut -> pi == NULL | aApplication::FadOut Global Free failed -> during allocation | aApplication::FadOut Mem Lock falied
+00409008,,ambiguous,2391,aApplication::DisFad -> Free failed | aApplication::DisFad -> Height is not the same ->  | aApplication::DisFad -> Init FAILED | aApplication::DisFad -> Load failed ->  | aApplication::DisFad -> Only true color image s are supported ->  | aApplication::DisFad -> hglb == NULL | aApplication::DisFad -> ip == NULL ->  | aApplication::DisFad Global Free failed -> during allocation | aApplication::DisFad Mem Lock falied | aApplication::DisFadOut -> Free failed | aApplication::DisFadOut -> pa == NULL
+00409960,aApplication::GetZoneStr,named,111,aApplication::GetZoneStr(Zone) -> Wrong Zone ->
+004099f4,aApplication::GetZoneStr,named,111,aApplication::GetZoneStr(Zone) -> Wrong Zone ->
+00409a88,aApplication::GetZoneStr,named,111,aApplication::GetZoneStr(Zone) -> Wrong Zone ->
+00409b1c,GetreadFrom,named,274,GetreadFrom(CHAR gz) -> Wrong Zone ->
+0040a064,aApplication::RotSetAct,named,440,aApplication::RotSetAct -> Rotation Ptr is NULL -> 
+0040a28c,aApplication::CurAdd,named,117,aApplication::CurAdd -> ASV_cur == NULL | aApplication::CurAdd -> This is NOT function for ADD ANIMATED CURSOR
+0040a304,aApplication::CurAdd,named,122,aApplication::CurAdd -> ASV_cur == NULL | aApplication::CurAdd -> This is function for ADD ANIMATED CURSOR
+0040a4ec,,ambiguous,285,aApplication::AddObj -> ID already exists -> | aApplication::RemObj -> ID does not exist ->
+0040a60c,aApplication::RemObj,named,105,aApplication::RemObj -> ID does not exist ->
+0040a678,aApplication::ObjGetID,named,136,aApplication::ObjGetID -> Name does not exist ->
+0040a700,aApplication::ObjGetIcoNam,named,111,aApplication::ObjGetIcoNam -> ID does not exist ->
+0040a770,aApplication::ObjGetNam,named,111,aApplication::ObjGetNam -> ID does not exist ->
+0040a830,aApplication::ObjAddPuzAcc,named,333,aApplication::ObjAddPuzAcc -> Object ID does not exist -> | aApplication::ObjAddPuzAcc -> Puzzle ID does not exist -> | aApplication::ObjAddPuzAcc -> x2 is smaller than x1 | aApplication::ObjAddPuzAcc -> y2 is smaller than y1
+0040a980,aApplication::ObjSetPuzAccKey,named,73,aApplication::ObjSetPuzAccKey -> Object ID does not exist ->
+0040a9cc,aApplication::ObjAddRotAcc,named,351,aApplication::ObjAddRotAcc -> Object ID does not exist -> | aApplication::ObjAddRotAcc -> Rotation ID does not exist -> | aApplication::ObjAddRotAcc -> x2 is smaller than x1 | aApplication::ObjAddRotAcc -> y2 is smaller than y1
+0040ab2c,aApplication::ObjAddBagAni,named,325,aApplication::ObjAddBagAni -> Object ID does not exist -> | aApplication::ObjAddBagAni can not Init Animation | aApplication::ObjAddBagAni can not Set Animation to Object | aApplication::ObjAddBagAni pa == NULL
+0040acf4,ObjSetAccOnOrOff,named,253,"ObjSetAccOnOrOff(INT id, CHAR v) -> Object ID does not exist -> | ObjSetAccOnOrOff(INT id, CHAR v) -> pa == NULL"
+0040adf4,aApplication::ObjSetAccOnOrOff,named,421,aApplication::ObjSetAccOnOrOff -> FromAcc is greater than toAcc ->  | aApplication::ObjSetAccOnOrOff -> FromAcc is not in range ->  | aApplication::ObjSetAccOnOrOff -> Object ID does not exist -> | aApplication::ObjSetAccOnOrOff -> ToAcc is not in range ->  | aApplication::ObjSetAccOnOrOff -> pa == NULL
+0040af9c,aApplication::ObjAddPre,named,121,aApplication::ObjAddPre -> Object ID does not exist ->
+0040b018,aApplication::ObjPreAddImgToPuz,named,273,aApplication::ObjPreAddImgToPuz -> Object ID does not exist -> | aApplication::ObjPreAddImgToPuz -> Puzzle ID does not exist ->
+0040b12c,aApplication::ObjPreAddAniToPuz,named,286,aApplication::ObjPreAddAniToPuz -> Object ID does not exist -> | aApplication::ObjPreAddAniToPuz -> Puzzle ID does not exist ->
+0040b24c,aApplication::ObjPreAddImgToRot,named,302,aApplication::ObjPreAddImgToRot -> Object ID does not exist -> | aApplication::ObjPreAddImgToRot -> Puzzle ID does not exist -> | aApplication::ObjPreAddImgToRot -> Rotation Layer number is too big ->
+0040b37c,aApplication::ObjPreAddAniToRot,named,313,aApplication::ObjPreAddAniToRot -> Object ID does not exist -> | aApplication::ObjPreAddAniToRot -> Puzzle ID does not exist -> | aApplication::ObjPreAddAniToRot -> Rotation Layer number is too big ->
+0040b4b8,aApplication::ObjPreSetImgCooOnPuz,named,81,aApplication::ObjPreSetImgCooOnPuz(idImg) -> Object ID is wrong ->
+0040b50c,aApplication::ObjPreSetImgCooOnPuz,named,77,aApplication::ObjPreSetImgCooOnPuz -> Object ID is wrong ->
+0040b55c,aApplication::ObjPreSetImgOriCooOnPuz,named,73,aApplication::ObjPreSetImgOriCooOnPuz(idImg) -> Object ID is wrong ->
+0040b5a8,aApplication::ObjPreSetImgOriCooOnPuz,named,69,aApplication::ObjPreSetImgOriCooOnPuz(idImg) -> Object ID is wrong ->
+0040b5f0,aApplication::ObjPreGetImgCooOnPuzX,named,73,aApplication::ObjPreGetImgCooOnPuzX -> Object ID is wrong ->
+0040b63c,aApplication::ObjPreGetImgCooOnPuzY,named,73,aApplication::ObjPreGetImgCooOnPuzY -> Object ID is wrong ->
+0040b688,aApplication::ObjPreSetAniIdeOnPuz,named,77,aApplication::ObjPreSetAniIdeOnPuz -> Object ID is wrong ->
+0040b6d8,aApplication::ObjPreSetAniIdeOnRot,named,77,aApplication::ObjPreSetAniIdeOnRot -> Object ID is wrong ->
+0040b728,aApplication::ObjPreGetAniIdeOnPuz,named,73,aApplication::ObjPreGetAniIdeOnPuz -> Object ID is wrong ->
+0040b774,aApplication::ObjPreGetAniIdeOnRot,named,73,aApplication::ObjPreGetAniIdeOnRot -> Object ID is wrong ->
+0040b7c0,aApplication::ObjPreSetAniRanOnPuz,named,77,aApplication::ObjPreSetAniRanOnPuz -> Object ID is wrong ->
+0040b810,aApplication::ObjPreSetAniRanOnRot,named,77,aApplication::ObjPreSetAniRanOnRot -> Object ID is wrong ->
+0040b860,aApplication::ObjPreAniSetStaFra,named,73,aApplication::ObjPreAniSetStaFra -> Object ID is wrong ->
+0040b8ac,aApplication::ObjPreAniSetActFra,named,73,aApplication::ObjPreAniSetActFra -> Object ID is wrong ->
+0040b8f8,aApplication::ObjPreSetAniCooOnPuz,named,81,aApplication::ObjPreSetAniCooOnPuz -> Object ID is wrong ->
+0040b94c,aApplication::ObjPreSetAniCooOnPuz,named,77,aApplication::ObjPreSetAniCooOnPuz I -> Object ID is wrong ->
+0040b99c,aApplication::ObjPrePauAni,named,69,aApplication::ObjPrePauAni -> Object ID is wrong ->
+0040b9e4,aApplication::ObjPreUnPauAni,named,69,aApplication::ObjPreUnPauAni -> Object ID is wrong ->
+0040ba2c,aApplication::ObjPrePauTimAni,named,73,aApplication::ObjPrePauTimAni -> Object ID is wrong ->
+0040ba78,aApplication::ObjPreUnPauTimAni,named,69,aApplication::ObjPreUnPauTimAni -> Object ID is wrong ->
+0040bac0,aApplication::ObjPrePauAutAni,named,81,aApplication::ObjPrePauAutAni -> Object ID is wrong ->
+0040bb14,aApplication::ObjPreUnPauAutAni,named,69,aApplication::ObjPreUnPauAutAni -> Object ID is wrong ->
+0040bb5c,aApplication::ObjPreUnPauAutAni,named,69,aApplication::ObjPreUnPauAutAni -> Object ID is wrong ->
+0040bba4,aApplication::ObjPrePauFraAni,named,81,aApplication::ObjPrePauFraAni -> Object ID is wrong ->
+0040bbf8,aApplication::ObjPreUnPauFraAni,named,69,aApplication::ObjPreUnPauFraAni -> Object ID is wrong ->
+0040bc40,aApplication::ObjPreSetPauAniRefOn,named,69,aApplication::ObjPreSetPauAniRefOn -> Object ID is wrong ->
+0040bc88,aApplication::ObjPreSetPauAniRefOff,named,69,aApplication::ObjPreSetPauAniRefOff -> Object ID is wrong ->
+0040bcd0,aApplication::ObjPreUnPauAllAni,named,69,aApplication::ObjPreUnPauAllAni -> Object ID is wrong ->
+0040bd18,aApplication::ObjPreAddTxtToPuz,named,163,aApplication::ObjPreAddTxtToPuz -> Object ID is wrong -> | aApplication::ObjPreAddTxtToPuz -> Puzzle ID is wrong ->
+0040bdc0,aApplication::ObjPreAddTxtToRot,named,160,aApplication::ObjPreAddTxtToRot -> Object ID is wrong -> | aApplication::ObjPreAddTxtToRot -> Rotation ID is wrong ->
+0040be64,aApplication::ObjPreSetTxtToPuz,named,77,aApplication::ObjPreSetTxtToPuz -> Object ID is wrong ->
+0040beb4,aApplication::ObjPreSetTxtToRot,named,77,aApplication::ObjPreSetTxtToRot -> Object ID is wrong ->
+0040bf04,aApplication::ObjPreSetTxtFonToPuz,named,77,aApplication::ObjPreSetTxtFonToPuz -> Object ID is wrong ->
+0040bf54,aApplication::ObjPreSetTxtFonToRot,named,77,aApplication::ObjPreSetTxtFonToRot -> Object ID is wrong ->
+0040bfa4,aApplication::ObjPreSetTxtCooToPuz,named,81,aApplication::ObjPreSetTxtCooToPuz -> Object ID is wrong ->
+0040bff8,aApplication::ObjPreSetTxtCooToRot,named,81,aApplication::ObjPreSetTxtCooToRot -> Object ID is wrong ->
+0040c04c,aApplication::ObjPreSetTxtColToPuz,named,85,aApplication::ObjPreSetTxtColToPuz -> Object ID is wrong ->
+0040c0a4,aApplication::ObjPreSetTxtColToRot,named,85,aApplication::ObjPreSetTxtColToRot -> Object ID is wrong ->
+0040c0fc,aApplication::ObjPreSetTxtBgrColToPuz,named,85,aApplication::ObjPreSetTxtBgrColToPuz -> Object ID is wrong ->
+0040c154,aApplication::ObjPreSetTxtBgrColToRot,named,85,aApplication::ObjPreSetTxtBgrColToRot -> Object ID is wrong ->
+0040c1ac,aApplication::ObjPreGetTxtWid,named,73,aApplication::ObjPreGetTxtWid -> Object ID is wrong ->
+0040c1f8,aApplication::ObjPreGetTxtHei,named,73,aApplication::ObjPreGetTxtHei -> Object ID is wrong ->
+0040c244,ObjPreSho,named,127,ObjPreSho -> Object ID does not exist ->
+0040c2c4,ObjPreHid,named,127,ObjPreHid -> Object ID does not exist ->
+0040c344,ObjPreHidDeaPuz,named,127,ObjPreHidDeaPuz -> Object ID does not exist ->
+0040c3c4,ObjPreSho,named,121,ObjPreSho(INT id) -> Object ID does not exist ->
+0040c440,ObjPreHid,named,121,ObjPreHid(INT id) -> Object ID does not exist ->
+0040c4bc,ObjPreHidDeaPuz,named,121,ObjPreHidDeaPuz(INT id) -> Object ID does not exist ->
+0040c538,ObjSetPasCur,named,164,ObjSetPasCur -> Object ID does not exist ->
+0040c5dc,ObjSetActCur,named,164,ObjSetActCur -> Object ID does not exist ->
+0040c680,ObjSetPasDraCur,named,164,ObjSetPasDraCur -> Object ID does not exist ->
+0040c724,ObjSetActDraCur,named,164,ObjSetActDraCur -> Object ID does not exist ->
+0040c7c8,aApplication::AddPuz,named,127,aApplication::AddPuz -> ID already exists ->
+0040c848,aApplication::PuzAddBgrImg,named,159,aApplication::PuzAddBgrImg -> Can not Add Bgr Img -> | aApplication::PuzAddBgrImg -> Wrong Puzzle ID ->
+0040c8e8,aApplication::PuzAddMovToRot,named,400,PuzAddMovToRot -> Wrong FROM Rotation ID -> | PuzAddMovToRot -> Wrong TO Rotation ID -> | PuzAddMovToRot -> aMovability *pm == NULL | aApplication::PuzAddMovToRot -> x2 is smaller than x1 | aApplication::PuzAddMovToRot -> y2 is smaller than y1
+0040ca78,PuzSetMovToRot,named,382,PuzSetMovToRot -> Wrong ID for Movability -> | PuzSetMovToRot -> Wrong ID for Movability; pm == NULL -> | PuzSetMovToRot -> Wrong Puzzle ID -> | PuzSetMovToRot -> Wrong Puzzle ID; pp == NULL -> | PuzSetMovToRot -> Wrong Type for Movability ->
+0040cbf8,aApplication::PuzAddMovToPuz,named,394,PuzAddMovToPuz -> Wrong FROM Puzzle ID -> | PuzAddMovToPuz -> Wrong TO Puzzle ID -> | PuzAddMovToPuz -> aMovability *pm == NULL | aApplication::PuzAddMovToPuz -> x2 is smaller than x1 | aApplication::PuzAddMovToPuz -> y2 is smaller than y1
+0040cd84,PuzSetMovOnOrOff,named,266,PuzSetMovOnOrOff -> Wrong ID for Movability; pm == NULL -> | PuzSetMovOnOrOff -> Wrong Puzzle ID -> | PuzSetMovOnOrOff -> Wrong Puzzle ID; pr == NULL ->
+0040ce90,PuzSetMovOnOrOff,named,449,PuzSetMovOnOrOff -> Wrong Puzzle ID -> | PuzSetMovOnOrOff(INT CHAR INT INT ) -> FromMov is greater than toMove ->  | PuzSetMovOnOrOff(INT CHAR INT INT ) -> FromMov is not in range ->  | PuzSetMovOnOrOff(INT CHAR INT INT ) -> ToMov is not in range ->  | PuzSetMovOnOrOff(INT CHAR INT INT ) -> Wrong ID for Movability; pm == NULL ->  | PuzSetMovOnOrOff(INT CHAR INT INT ) -> Wrong Puzzle ID; pr == NULL ->
+0040d0c4,PuzSetMovRidNam,named,269,PuzSetMovRidNam -> Wrong ID for Movability -> | PuzSetMovRidNam -> Wrong ID for Movability; pm == NULL -> | PuzSetMovRidNam -> Wrong Puzzle ID -> | PuzSetMovRidNam -> Wrong Puzzle ID; pr == NULL ->
+0040d1d4,PuzSetMod,named,101,PuzSetMod -> Wrong ID for Puzzle; pp == NULL ->
+0040d23c,PuzGetMod,named,63,PuzGetMod -> Wrong ID for Puzzle; pp == NULL ->
+0040d27c,aApplication::PuzAddAmbSou,named,212,PuzAddAmbSou -> Can not Add Ambient Sound  ->  | PuzAddAmbSou -> Wrong ID for Puzzle; pp == NULL -> | aApplication::PuzAddAmbSou -> Only ASOUNDTYPE_AMBIENTMUSIC is legal ->  | aApplication::PuzAddAmbSou -> Sound ID does not exist -> 
+0040d354,PuzSetAmbSouOn,named,107,PuzSetAmbSouOn -> Can not Set Ambient Sound To On ->  | PuzSetAmbSouOn -> Wrong ID for Puzzle; pp == NULL ->
+0040d3c0,PuzSetAmbSouOff,named,107,PuzSetAmbSouOff -> Can not Set Ambient Sound To Off ->  | PuzSetAmbSouOff -> Wrong ID for Puzzle; pp == NULL ->
+0040d42c,PuzSetAmbSouVol,named,111,PuzSetAmbSouVol -> Can not Set Ambient Sound Volume ->  | PuzSetAmbSouVol -> Wrong ID for Puzzle; pp == NULL ->
+0040d49c,PuzSetAmbSouPan,named,111,PuzSetAmbSouPan -> Can not Set Ambient Sound Pan ->  | PuzSetAmbSouPan -> Wrong ID for Puzzle; pp == NULL ->
+0040d50c,PuzIsAmbSouOn,named,69,PuzIsAmbSouOn -> Wrong ID for Puzzle; pp == NULL ->
+0040d554,aApplication::PuzAdd3DSou,named,215,PuzAdd3DSou -> Can not Add 3D Sound Effect ->  | PuzAdd3DSou -> Wrong ID for Puzzle; pp == NULL -> | aApplication::PuzAdd3DSou -> Only ASOUNDTYPE_AMBIENTEFFECT is legal ->  | aApplication::PuzAdd3DSou -> Sound ID does not exist -> 
+0040d630,PuzSet3DSouOn,named,107,PuzSet3DSouOn -> Can not Set 3D Sound Effect To On ->  | PuzSet3DSouOn -> Wrong ID for Puzzle; pp == NULL ->
+0040d69c,PuzSet3DSouOff,named,107,PuzSet3DSouOff -> Can not Set 3D Sound Effect To Off ->  | PuzSet3DSouOff -> Wrong ID for Puzzle; pp == NULL ->
+0040d708,PuzSet3DSouVol,named,111,PuzSet3DSouVol -> Can not Set 3D Sound Effect Volume ->  | PuzSet3DSouVol -> Wrong ID for Puzzle; pp == NULL ->
+0040d778,PuzIs3DSouOn,named,69,PuzIs3DSouOn -> Wrong ID for Puzzle; pp == NULL ->
+0040d7c0,aApplication::AddRot,named,674,aApplication::AddRot -> ID already exists-> | aApplication::AddRot -> Node Chanell File does not exist ->  | aApplication::AddRot -> Node File does not exist -> 
+0040da64,RotAddMovToRot,named,339,RotAddMovToRot -> Wrong FROM Rotation ID -> | RotAddMovToRot -> Wrong TO Rotation ID -> | RotAddMovToRot -> aMovability *pm == NULL
+0040dbb8,RotSetMovToRot,named,406,RotSetMovToRot -> Wrong ID for Movability -> | RotSetMovToRot -> Wrong ID for Movability; pm == NULL -> | RotSetMovToRot -> Wrong Rotation ID -> | RotSetMovToRot -> Wrong Rotation ID; pr == NULL -> | RotSetMovToRot -> Wrong Type for Movability ->
+0040dd50,RotAddMovToPuz,named,333,RotAddMovToPuz -> Wrong FROM Rotation ID -> | RotAddMovToPuz -> Wrong TO Puzzle ID -> | RotAddMovToPuz -> aMovability *pm == NULL
+0040dea0,RotSetMovToPuz,named,405,RotSetMovToPuz -> Wrong ID for Movability -> | RotSetMovToPuz -> Wrong ID for Movability; pm == NULL -> | RotSetMovToPuz -> Wrong Rotation ID -> | RotSetMovToPuz -> Wrong Rotation ID; pr == NULL -> | RotSetMovToPuz -> Wrong type for Movability ->
+0040e038,RotSetMovOnOrOff,named,287,RotSetMovOnOrOff -> Wrong ID for Movability; pm == NULL ->  | RotSetMovOnOrOff -> Wrong Rotation ID ->  | RotSetMovOnOrOff -> Wrong Rotation ID; pr == NULL -> 
+0040e15c,RotSetMovOnOrOff,named,537,RotSetMovOnOrOff -> Wrong Rotation ID ->  | RotSetMovOnOrOff(INT CHAR INT INT ) -> FromMov is greater than toMove ->  | RotSetMovOnOrOff(INT CHAR INT INT ) -> FromMov is not in range ->  | RotSetMovOnOrOff(INT CHAR INT INT ) -> ToMov is not in range ->  | RotSetMovOnOrOff(INT CHAR INT INT ) -> Wrong ID for Movability; pm == NULL ->  | RotSetMovOnOrOff(INT CHAR INT INT ) -> Wrong Rotation ID; pr == NULL ->
+0040e3e8,RotSetMovRidNam,named,275,RotSetMovRidNam -> Wrong ID for Movability -> | RotSetMovRidNam -> Wrong ID for Movability; pm == NULL -> | RotSetMovRidNam -> Wrong Puzzle ID -> | RotSetMovRidNam -> Wrong Puzzle ID; pr == NULL ->
+0040e4fc,RotSetAlp,named,140,"RotSetAlp -> Wrong Rotation ID -> Zone, ID: "
+0040e588,RotSetBet,named,140,"RotSetBet -> Wrong Rotation ID -> Zone, ID: "
+0040e614,RotSetRan,named,140,"RotSetRan -> Wrong Rotation ID -> Zone, ID: "
+0040e6a0,RotGetAlp,named,129,RotGetAlp -> Wrong Rotation ID ->
+0040e728,RotGetBet,named,129,RotGetBet -> Wrong Rotation ID ->
+0040e7b0,RotGetRan,named,129,RotGetRan -> Wrong Rotation ID ->
+0040e838,aApplication::RotSetRolTo,named,76,aApplication::RotSetRolTo -> Wrong Rotation ID ->
+0040e884,aApplication::RotSetCutTo,named,76,aApplication::RotSetCutTo -> Wrong Rotation ID ->
+0040e8d0,RotSetObjImg,named,147,RotSetObjImg -> Wrong Rotation ID ->
+0040e964,RotSetJugOn,named,281,RotSetJugOn -> Wrong Amplitude parameter for Rotation ->  | RotSetJugOn -> Wrong Rotation ID -> | RotSetJugOn -> Wrong Speed parameter for Rotation -> 
+0040eb14,RotSetWigOn,named,281,RotSetWigOn -> Wrong Amplitude parameter for Rotation ->  | RotSetWigOn -> Wrong Rotation ID -> | RotSetWigOn -> Wrong Speed parameter for Rotation -> 
+0040ecc4,aApplication::RotAddAmbSou,named,212,RotAddAmbSou -> Can not Add Ambient Sound  ->  | aApplication::RotAddAmbSou -> Only ASOUNDTYPE_AMBIENTMUSIC is legal ->  | aApplication::RotAddAmbSou -> Sound ID does not exist ->  | aApplication::RotAddAmbSou -> Wrong Rotation ID ->
+0040ed9c,aApplication::RotSetAmbSouOn,named,107,aApplication::RotSetAmbSouOn -> Can not Set Ambient Sound To On ->  | aApplication::RotSetAmbSouOn -> Wrong Rotation ID ->
+0040ee08,aApplication::RotSetAmbSouOff,named,107,aApplication::RotSetAmbSouOff -> Can not Set Ambient Sound To On ->  | aApplication::RotSetAmbSouOff -> Wrong Rotation ID ->
+0040ee74,aApplication::RotSetAmbSouVol,named,111,aApplication::RotSetAmbSouVol -> Can not Set Ambient Sound Volume ->  | aApplication::RotSetAmbSouVol -> Wrong Rotation ID ->
+0040eee4,aApplication::RotSetAmbSouPan,named,111,aApplication::RotSetAmbSouPan -> Can not Set Ambient Sound Pan ->  | aApplication::RotSetAmbSouPan -> Wrong Rotation ID ->
+0040ef54,aApplication::RotIsAmbSouOn,named,69,aApplication::RotIsAmbSouOn -> Wrong Rotation ID ->
+0040ef9c,,ambiguous,215,RotAdd3DSou -> Can not Add 3D Sound Sound  ->  | aApplication::RotAdd3DSou -> Only ASOUNDTYPE_AMBIENTEFFECT is legal ->  | aApplication::RotAdd3DSou -> Sound ID does not exist ->  | aApplication::RotAddAmbSou -> Wrong Rotation ID ->
+0040f078,aApplication::RotSet3DSouOn,named,107,aApplication::RotSet3DSouOn -> Can not Set 3D Ambient Effect To On ->  | aApplication::RotSet3DSouOn -> Wrong Rotation ID ->
+0040f0e4,aApplication::RotSet3DSouOff,named,107,aApplication::RotSet3DSouOff -> Can not Set 3D Ambient Effect To On ->  | aApplication::RotSet3DSouOff -> Wrong Rotation ID ->
+0040f150,aApplication::RotIs3DSouOn,named,69,aApplication::RotIs3DSouOn -> Wrong Rotation ID ->
+0040f198,aApplication::RotSet3DSouVol,named,111,aApplication::RotSet3DSouVol -> Can not Set 3D Ambient Effect Volume ->  | aApplication::RotSet3DSouVol -> Wrong Rotation ID ->
+0040f208,aApplication::SetComBufLen,named,71,aApplication::SetComBufLen -> Wrong Rotation ID ->
+0040f250,aApplication::RotSetFreOn,named,69,aApplication::RotSetFreOn -> Wrong Rotation ID ->
+0040f298,aApplication::RotSetFreOff,named,69,aApplication::RotSetFreOff -> Wrong Rotation ID ->
+0040f5e4,aApplication::VarRemAll,named,54,aApplication::VarRemAll -> ASV_var == NULL
+0040f61c,aApplication::BagAdd,named,190,aApplication::BagAdd -> AGV_bag == NULL | aApplication::BagAdd -> Object ID des not  exist -> | aApplication::BagAdd -> Wring ID -> Can not be zero
+0040f6dc,aApplication::BagRem,named,156,aApplication::BagRem -> AGV_bag == NULL | aApplication::BagRem -> Object ID des not  exist ->
+0040f778,aApplication::BagRemAll,named,54,aApplication::BagRemAll -> AGV_bag == NULL
+0040f7b0,aApplication::BagIsIn,named,154,aApplication::BagIsIn -> AGV_bag == NULL | aApplication::BagIsIn -> Object ID des not  exist ->
+0040f95c,aApplication::TimSta,named,62,aApplication::TimSta -> ASV_timer == NULL
+0040f99c,aApplication::TimSta,named,58,aApplication::TimSta -> ASV_timer == NULL
+0040f9d8,aApplication::TimSta,named,58,aApplication::TimSta -> ASV_timer == NULL
+0040fa14,aApplication::TimSta,named,58,aApplication::TimSta -> ASV_timer == NULL
+0040fa50,aApplication::TimGetTim,named,58,aApplication::TimGetTim -> ASV_timer == NULL
+0040fa8c,aApplication::TimStoAll,named,52,aApplication::TimStoAll -> ASV_timer == NULL
+0040fe24,aApplication::FonAdd,named,121,aApplication::FonAdd -> AGV_fonHan == NULL | aApplication::FonAdd -> Adding FAILED -> 
+0040fea0,aApplication::FonRem,named,97,aApplication::FonRem -> AGV_fonHan == NULL | aApplication::FonRem -> Remove FAILED -> 
+0040ff04,aApplication::FonRemAll,named,88,aApplication::FonRemAll -> AGV_fonHan == NULL | aApplication::FonRemAll -> RemoveAll FAILED
+0040ff5c,aApplication::FonIsIn,named,55,aApplication::FonIsIn -> AGV_fonHan == NULL
+0040ff94,aApplication::SouAdd,named,565,aApplication::SouAdd -> File does not exist ->  | aApplication::SouAdd -> Sound with that ID already exists ->  | aApplication::SouAdd -> Wrong file format  | aApplication::SouAdd -> Wrong name 1 -> 
+004101cc,aApplication::SouAdd,named,581,aApplication::SouAdd -> Wrong file format  | aApplication::SouAdd -> Wrong name 2 ->  | aApplication::SouAdd(1) -> File does not exist ->  | aApplication::SouAdd(1) -> Sound with that ID already exists -> 
+00410634,aApplication::SubTitSetCol,named,63,aApplication::SubTitSetCol ->  AGV_diaHan == NULL
+00410674,aApplication::SubTitSetBgrCol,named,63,aApplication::SubTitSetBgrCol ->  AGV_diaHan == NULL
+004106b4,aApplication::SubTitFon,named,55,aApplication::SubTitFon ->  AGV_diaHan == NULL
+004106ec,aApplication::SubTitSetGeo,named,59,aApplication::SubTitSetGeo ->  AGV_diaHan == NULL
+00410728,aApplication::ZoomImage,named,299,aApplication::ZoomImage -> Load | aApplication::ZoomImage -> Zoom | aApplication::ZoomImage -> Zoom Save | aApplication::ZoomImage -> pi == NULL
+00410854,aApplication::VisAddLisToPuz,named,741,aApplication::VisAddLisToPuz -> Can  not Add Visual To Puzzle ->  | aApplication::VisAddLisToPuz -> Puzzle ID is wrong -> | aApplication::VisAddLisToPuz -> Visual with that ID is alredy on Puzzle ->  | aApplication::VisAddLisToPuz -> can not Init Visual ->  | aApplication::VisAddLisToPuz -> vo == NULL ->
+00410b3c,aApplication::VisLisAdd,named,111,aApplication::VisLisAdd -> Puzzle ID is wrong -> | aApplication::VisLisAdd -> Visual with that ID is not on Puzzle -> 
+00410bb0,aApplication::VisLisRem,named,115,aApplication::VisLisRem -> Puzzle ID is wrong -> | aApplication::VisLisRem -> Visual with that ID is not on Puzzle -> 
+00410c28,aApplication::VisLisRemAll,named,111,aApplication::VisLisRemAll -> Puzzle ID is wrong -> | aApplication::VisLisRemAll -> Visual with that ID is not on Puzzle -> 
+00410c9c,aApplication::VisLisIsIn,named,111,aApplication::VisLisIsIn -> Puzzle ID is wrong -> | aApplication::VisLisIsIn -> Visual with that ID is not on Puzzle -> 
+00410d10,aApplication::VisLisGetIndCli,named,105,aApplication::VisLisGetIndCli -> Puzzle ID is wrong -> | aApplication::VisLisGetIndCli -> Visual with that ID is not on Puzzle -> 
+00410d7c,aApplication::VisLisGetObjCli,named,105,aApplication::VisLisGetObjCli -> Puzzle ID is wrong -> | aApplication::VisLisGetObjCli -> Visual with that ID is not on Puzzle -> 
+00410de8,aApplication::VisLisGetNumIte,named,105,aApplication::VisLisGetNumIte -> Puzzle ID is wrong -> | aApplication::VisLisGetNumIte -> Visual with that ID is not on Puzzle -> 
+00410e54,aApplication::VisAddShoToPuz,named,338,aApplication::VisAddShoToPuz -> Can  not Add Visual To Puzzle ->  | aApplication::VisAddShoToPuz -> Puzzle ID is wrong -> | aApplication::VisAddShoToPuz -> Visual with that ID is alredy on Puzzle ->  | aApplication::VisAddShoToPuz -> can not Init Visual ->  | aApplication::VisAddShoToPuz -> vo == NULL ->
+004118dc,aApplication::Init,named,3892,aApplication::Init -> AGV_art == NULL | aApplication::Init -> AGV_bag == NULL | aApplication::Init -> AGV_dragControl == NULL | aApplication::Init -> AGV_preferences == NULL | aApplication::Init -> AGV_preferences->Load failed | aApplication::Init -> ASV_timer == NULL | aApplication::Init -> Can not Allocate aDialogHandler | aApplication::Init -> Can not Inir aArtHandler  | aApplication::Init -> Can not Init aDialogHandler | aApplication::Init -> Can not init Bag | aApplication::Init -> Can not open Art for ->  | aApplication::Init -> Font is not Added -> arxrin.fon | aApplication::Init AGV_objIntLis -> AddObjectsFromFile failed | aApplication::Init AGV_objIntLis -> Init failed | aApplication::Init AGV_objIntLis == NULL | aApplication::Init Cn not Init ASV_sou | aApplication::Init(HWINDOW hw) ASV_cur == NULL | aApplication::Init(HWINDOW hw) ASV_objLis == NULL | aApplication::Init(HWINDOW hw) ASV_puzLis == NULL | aApplication::Init(HWINDOW hw) ASV_rotLis == NULL | aApplication::Init(HWINDOW hw) ASV_sou == NULL | aApplication::Init(HWINDOW hw) ASV_var == NULL | aApplication::Init(HWINDOW hw) Cannot find file fl.ini | aApplication::Init(HWINDOW hw) Cannot init video buffer | aApplication::Init(HWINDOW hw) vbf == NULL
+00413b7c,aApplication::MouseLeftEvent,named,5752,aApplication::MouseLeftEvent -> Changing Rotation pm == NULL
+00417390,,ambiguous,646,aApplication::GameSetZone -> AGV_art == NULL | aApplication::GameSetZone -> Can not open Art for ->  | aApplication::LoadSave -> AGV_preferences == NULL | aApplication::LoadSave -> AGV_preferences->Load failed
+0041767c,aApplication::LoadSaveTimer,named,532,aApplication::LoadSaveTimer -> Bag | aApplication::LoadSaveTimer -> Can not open file ->  | aApplication::LoadSaveTimer -> Timer | aApplication::LoadSaveTimer -> fp == NULL 
+00417890,aApplication::LoadSave,named,2014,aApplication::LoadSave -> Bag | aApplication::LoadSave -> CODE is not the same ->  | aApplication::LoadSave -> Can not open file ->  | aApplication::LoadSave -> MTIME is not the same ->  | aApplication::LoadSave -> Object ->  | aApplication::LoadSave -> Pre Reading error ->  | aApplication::LoadSave -> Pre Writing error ->  | aApplication::LoadSave -> Puzzle ->  | aApplication::LoadSave -> Reading error ->  | aApplication::LoadSave -> Rotation ->  | aApplication::LoadSave -> SIZE is not the same ->  | aApplication::LoadSave -> Timer | aApplication::LoadSave -> Var | aApplication::LoadSave -> Writing error ->  | aApplication::LoadSave -> fp == NULL 
+00418070,aApplication::StartMenu,named,626,aApplication::StartMenu -> Can not Copy from Video Buffer | aApplication::StartMenu -> Can not Save in  SaveGame.ars | aApplication::StartMenu -> Can not create image | aApplication::StartMenu -> pi == NULL
+0041896c,aApplication::GetMultiLanMes,named,911,aApplication::GetMultiLanMes -> Can not find Message ->  | aApplication::GetMultiLanMes -> Can not find Message -> Language ->  | aApplication::GetMultiLanMes -> Can not find Message -> Line too long ->  | aApplication::GetMultiLanMes -> Can not find Message -> Wrong Line ->  | aApplication::GetMultiLanMes -> Can not find Message -> Wrong Line format->  | aApplication::GetMultiLanMes -> Can not find Message -> in == NULL 2 ->  | aApplication::GetMultiLanMes -> Can not open file -> 
+00418fb4,aApplication::FindTempFileName,named,207,aApplication::FindTempFileName -> Directory does not exist ->  | aApplication::FindTempFileName -> Limit over ->  | aApplication::FindTempFileName -> dir && fx && ex == NULL
+0041a428,aCin::DeInit,named,303,aCin::DeInit -> Free failed -> aCinTControlKosi | aCin::DeInit -> Free failed -> backBuf | aCin::DeInit -> Free failed -> bufGlobal | aCin::DeInit -> Free failed -> cacheBuf
+0041a558,aCin::Init,named,756,aCin::Init - Can not Init plaFil | aCin::Init - Can not Open file | aCin::Init - plaFil == NULL | aCin::Init -> Mem Lock falied -> aCinTControlKosiGlobal | aCin::Init -> Mem Lock falied -> backBufGlobal | aCin::Init -> Mem Lock falied -> buf | aCin::Init -> Mem Lock falied -> cacheBufGlobal | aCin::Init -> aCinTControlKosiGlobal == NULL | aCin::Init -> backBufGlobal == NULL | aCin::Init -> bufGlobal == NULL | aCin::Init -> cacheBufGlobal == NULL | aCin::Init Global Free failed -> during allocation -> aCinTControlKosiGlobal | aCin::Init Global Free failed -> during allocation -> backBufGlobal | aCin::Init Global Free failed -> during allocation -> buf | aCin::Init Global Free failed -> during allocation -> cacheBufGlobal
+0041a894,aCin::Decompress,named,99,aCin::Decompress -> Error reading Frame Header
+0041a8f8,,ambiguous,236,aCin::T Control -> Error reading data | aCin::TControl -> Error reading T Control Header
+0041a9e4,aCin::SControl,named,316,aCin::SControl -> Error reading Frame Header | aCin::SControl -> Error reading data
+0041b008,aFileIoBuf::Init,named,223,aFileIoBuf::Init -> GlobalAlloc failed ->  | aFileIoBuf::Init Global Free failed -> during allocation ->  | aFileIoBuf::Init Mem Lock falied -> 
+0041b0e8,aFileIoBuf::DeInit,named,130,aFileIoBuf::DeInit() -> Free failed -> 
+0041b458,aImage::Destroy,named,184,aImage::Destroy -> Free failed -> 
+0041b510,aImage::Create,named,843,aImage::Create - NOT SUPPORTED | aImage::Create - Switch Default | aImage::Create Global Free failed -> during allocation ->  | aImage::Create Mem Lock falied ->  | aImage::Create NO ERROR Undefind Format
+0041b89c,aImage::SetOffset,named,175,aImage::SetOffset -> Buffer OVER run | aImage::SetOffset -> Buffer under run
+0041b94c,aImage::GetNextRow,named,147,aImage::GetNextRow -> Buffer OVER run | aImage::GetNextRow -> Buffer under run
+0041bbe8,aImage::Load,named,926,aImage::Load - ifp == NULL | aImage::Load -> Invalid readFrom -> 
+0041bf88,aImage::Save,named,599,aImage::Save - SaveImage | aImage::Save - new 
+0041c1e0,aImage::NewPallette,named,106,aImage::NewPallette
+0041c344,aImage::Display1,named,431,aImage::Display1 -> Free failed | aImage::Display1 -> GlobalAlloc failed | aImage::Display1 Global Free failed -> during allocation | aImage::Display1 Mem Lock falied
+0041c4f4,aImage::Zoom,named,451,aImage::Zoom -> Can not create image | aImage::Zoom -> Image not created | aImage::Zoom -> zi == NULL
+0041c6c0,aImage::Display,named,471,aImage::Display -> Free failed | aImage::Display -> GlobalAlloc failed | aImage::Display Global Free failed -> during allocation | aImage::Display Mem Lock falied
+0041cbe0,aDialog::Init,named,449,aDialog::Init -> Error reading Lyrics ->  | aDialog::Init -> File does not exist -> 
+0041cda4,aDialog::ReadLyrics,named,233,aDialog::ReadLyrics -> Error Parsing line ->  | aDialog::ReadLyrics -> Error opening file ->  | aDialog::ReadLyrics -> buf == NULL
+0041ce90,aDialog::ReadDialogAnimation,named,532,aDialog::ReadDialogAnimation -> Eror reading hmLevels ->  | aDialog::ReadDialogAnimation -> Eror reading levels ->  | aDialog::ReadDialogAnimation -> File not found ->  | aDialog::ReadDialogAnimation -> dalp == NULL ->  | aDialog::ReadDialogAnimation -> datc == NULL -> 
+0041d0a4,aDialog::ParseLyricLine,named,443,aDialog::ParseLyricLine -> Error Parsing line ->  | aDialog::ParseLyricLine -> Error Parsing line TC min ->  | aDialog::ParseLyricLine -> Error Parsing line TC sec ->  | aDialog::ParseLyricLine -> sl == NULL -> 
+0041d628,aDialog::AddDialog,named,716,aDialog::AddDialog -> dia or dp == NULL 
+0041d8f4,aDialog::AddDialog,named,74,aDialog::AddDialog -> dia or dp == NULL 
+0041d940,aDialog::RemoveDialog,named,135,aDialog::RemoveDialog -> dia == NULL 
+0041da2c,aDialog::IsPlaying,named,100,aDialog::IsPlaying -> dia == NULL 
+0041da94,aDialog::IsPlaying,named,59,aDialog::IsPlaying(VOID) -> dia == NULL 
+0041dbec,aCinMov::Init,named,1068,aCinMov::Init -> Can not read Cin Frame Size | aCinMov::Init -> Video buffer is NULL | aCinMov::Init -> cinFil == NULL -> 
+0041e058,aCinMov::ReadSound,named,343,aCinMov::ReadSound -> Can not read Cin isImage -> Haw Many Sound | aCinMov::ReadSound -> Can not read Cin isImage -> Sound | aCinMov::ReadSound -> cp == NULL | aCinMov::ReadSound -> data == NULL
+0041e1b0,aCinMov::SkipSound,named,256,aCinMov::SkipSound -> Can not read Cin isImage -> Haw Many Sound | aCinMov::SkipSound -> Can not read Cin isImage -> Sound | aCinMov::SkipSound -> cp == NULL
+0041e2b0,aCinMov::Play,named,2102,aCinMov::Play -> Can not Skip Sound ->   | aCinMov::Play -> Can not read Cin typeCinData ->  | aCinMov::Play -> Can not read Sound ->   | aCinMov::Play -> Error in typeCinData ->  | aCinMov::Play -> Error rading T Control ->  | aCinMov::Play -> ReadImage | aCinMov::Play -> cp == NULL
+0041eae8,,ambiguous,425,GetNumFrames -> cinFil == NULL ->  | aCinMov::Init -> Can not read Cin Frame Size
+0041edb4,aSecComSouMono::Init,named,259,aSecComSouMono::Init -> Can not Decompress Header ->  | aSecComSouMono::Init -> Can not Init aSecComAqi ->  | aSecComSouMono::Init -> res == NULL ->  | aSecComSouMono::Init -> scp == NULL -> 
+0041ef10,aSecComSouMono::DecompressHeader,named,468,aSecComSouMono::DecompressHeader -> Can not read Header | aSecComSouMono::DecompressHeader -> scp == NULL | aSecComSouMono::DecompressHeader -> tmpOutBuf == NULL
+0041f0ec,aSecComSouMono::Decompress,named,1122,aSecComSouMono::Decompress -> MEM ERROR 1:  | aSecComSouMono::Decompress -> MEM ERROR 2:  | aSecComSouMono::Decompress -> MEM ERROR 3:  | aSecComSouMono::Decompress -> raed Error | aSecComSouMono::Decompress -> scp == NULL
+0041f624,aObject::aObject,named,466,aObject::aObject -> acc == NULL | aObject::aObject -> ico == NULL | aObject::aObject -> nam == NULL | aObject::aObject -> pre == NULL
+0041f94c,aObject::LoadSave,named,827,aObject::LoadSave -> Accesibility ->  | aObject::LoadSave -> Bag Animation  | aObject::LoadSave -> Object Presentation ->  | aObject::LoadSave -> Reading error | aObject::LoadSave -> Writing error | aObject::LoadSave -> fp == NULL
+0041fcd8,aObject::addAccesibility,named,134,aObject::addAccesibility(aPuzzle) -> ac == NULL
+0041fd60,aObject::addAccesibility,named,134,aObject::addAccesibility(aRotation) -> ac == NULL
+0041fde8,aObject::SetAccesibilityKey,named,146,aObject::SetAccesibilityKey -> Not exist ->  | aObject::SetAccesibilityKey -> acc == NULL -> 
+0041fe7c,aObject::GetAccesibilityKey,named,136,aObject::GetAccesibilityKey -> Not exist ->  | aObject::GetAccesibilityKey -> acc == NULL -> 
+0041ff04,aObject::accesibilityDisable,named,90,aObject::accesibilityDisable(VOID) -> acc == NULL
+0041ff60,aObject::accesibilityDisable,named,119,aObject::accesibilityDisable(INT) -> Not exist | aObject::accesibilityDisable(INT) -> acc == NULL
+0041ffd8,aObject::accesibilityEnable,named,90,aObject::accesibilityEnable(VOID) -> acc == NULL
+00420034,,ambiguous,119,aObject::accesibilityDisable(INT) -> Not exist | aObject::accesibilityEnable(INT) -> acc == NULL
+004200ac,aObject::addPresentation,named,86,aObject::addPresentation po == NULL
+00420104,aObject::addObjectImageToPuz,named,125,aObject::addObjectImageToPuz -> Wrong Presentation ID -> 
+00420184,aObject::addAnimationToPuz,named,140,aObject::addAnimationToPuz -> Wrong Presentation ID -> 
+00420210,aObject::addImageToRot,named,95,aObject::addImageToRot -> Wrong Presentation ID -> 
+00420270,aObject::addAnimationToRot,named,106,aObject::addAnimationToRot -> Wrong Presentation ID -> 
+004202dc,aObject::ObjPreSetImgCooOnPuz,named,99,aObject::ObjPreSetImgCooOnPuz(idImg) -> Wrong Presentation ID -> 
+00420340,aObject::ObjPreSetImgCooOnPuz,named,95,aObject::ObjPreSetImgCooOnPuz -> Wrong Presentation ID -> 
+004203a0,aObject::ObjPreSetImgOriCooOnPuz,named,91,aObject::ObjPreSetImgOriCooOnPuz(idImg) -> Wrong Presentation ID -> 
+004203fc,aObject::ObjPreSetImgOriCooOnPuz,named,85,aObject::ObjPreSetImgOriCooOnPuz -> Wrong Presentation ID -> 
+00420454,aObject::ObjPreGetImgCooOnPuzX,named,91,aObject::ObjPreGetImgCooOnPuzX -> Wrong Presentation ID -> 
+004204b0,aObject::ObjPreGetImgCooOnPuzY,named,91,aObject::ObjPreGetImgCooOnPuzY -> Wrong Presentation ID -> 
+0042050c,aObject::ShowPresentation,named,87,aObject::ShowPresentation -> Wrong Presentation ID -> 
+00420564,aObject::HidePresentation,named,87,aObject::HidePresentation -> Wrong Presentation ID -> 
+004205bc,aObject::HideWithDeallocPuzzle,named,87,aObject::HideWithDeallocPuzzle -> Wrong Presentation ID -> 
+004207b4,aObject::ObjPreAniSetStaFra,named,91,aObject::ObjPreAniSetStaFra -> Wrong Presentation ID -> 
+00420810,aObject::ObjPreAniSetActFra,named,91,aObject::ObjPreAniSetActFra -> Wrong Presentation ID -> 
+0042086c,aObject::ObjPreSetAniCooOnPuz,named,99,aObject::ObjPreSetAniCooOnPuz -> Wrong Presentation ID -> 
+004208d0,aObject::ObjPreSetAniCooOnPuz,named,95,aObject::ObjPreSetAniCooOnPuz I -> Wrong Presentation ID -> 
+00420930,aObject::ObjPrePauAni,named,85,aObject::ObjPrePauAni -> Wrong Presentation ID -> 
+00420988,aObject::ObjPreUnPauAni,named,85,aObject::ObjPreUnPauAni -> Wrong Presentation ID -> 
+004209e0,aObject::ObjPrePauTimAni,named,91,aObject::ObjPrePauTimAni -> Wrong Presentation ID -> 
+00420a3c,aObject::ObjPreUnPauTimAni,named,85,aObject::ObjPreUnPauTimAni -> Wrong Presentation ID -> 
+00420a94,aObject::ObjPrePauAutAni,named,99,aObject::ObjPrePauAutAni -> Wrong Presentation ID -> 
+00420af8,aObject::ObjPreUnPauAutAni,named,85,aObject::ObjPreUnPauAutAni -> Wrong Presentation ID -> 
+00420b50,aObject::ObjPreUnPauAutAni,named,85,aObject::ObjPreUnPauAutAni -> Wrong Presentation ID -> 
+00420ba8,aObject::ObjPrePauFraAni,named,99,aObject::ObjPrePauFraAni -> Wrong Presentation ID -> 
+00420c0c,aObject::ObjPreUnPauFraAni,named,85,aObject::ObjPreUnPauFraAni -> Wrong Presentation ID -> 
+00420c64,aObject::ObjPreSetPauAniRefOn,named,85,aObject::ObjPreSetPauAniRefOn -> Wrong Presentation ID -> 
+00420cbc,aObject::ObjPreSetPauAniRefOff,named,85,aObject::ObjPreSetPauAniRefOff -> Wrong Presentation ID -> 
+00420d14,aObject::ObjPreUnPauAllAni,named,85,aObject::ObjPreUnPauAllAni -> Wrong Presentation ID -> 
+00420d6c,aObject::ObjPreSetAniIdeOnPuz,named,95,aObject::ObjPreSetAniIdeOnPuz -> Wrong Presentation ID -> 
+00420dcc,aObject::ObjPreSetAniIdeOnRot,named,95,aObject::ObjPreSetAniIdeOnRot -> Wrong Presentation ID -> 
+00420e2c,aObject::ObjPreGetAniIdeOnPuz,named,91,aObject::ObjPreGetAniIdeOnPuz -> Wrong Presentation ID -> 
+00420e88,aObject::ObjPreGetAniIdeOnRot,named,91,aObject::ObjPreGetAniIdeOnRot -> Wrong Presentation ID -> 
+00420ee4,aObject::ObjPreSetAniRanOnPuz,named,95,aObject::ObjPreSetAniRanOnPuz -> Wrong Presentation ID -> 
+00420f44,aObject::ObjPreSetAniRanOnRot,named,95,aObject::ObjPreSetAniRanOnRot -> Wrong Presentation ID -> 
+00420fa4,aObject::ObjPreAddTxtToPuz,named,131,aObject::ObjPreAddTxtToPuz -> Wrong Presentation ID -> 
+00421028,aObject::ObjPreAddTxtToRot,named,131,aObject::ObjPreAddTxtToRot -> Wrong Presentation ID -> 
+004210ac,aObject::ObjPreSetTxtToPuz,named,95,aObject::ObjPreSetTxtToPuz -> Wrong Presentation ID -> 
+0042110c,aObject::ObjPreSetTxtToRot,named,95,aObject::ObjPreSetTxtToRot -> Wrong Presentation ID -> 
+0042116c,aObject::ObjPreSetTxtFonToPuz,named,95,aObject::ObjPreSetTxtFonToPuz -> Wrong Presentation ID -> 
+004211cc,aObject::ObjPreSetTxtFonToRot,named,95,aObject::ObjPreSetTxtFonToRot -> Wrong Presentation ID -> 
+0042122c,aObject::ObjPreSetTxtCooToPuz,named,99,aObject::ObjPreSetTxtCooToPuz -> Wrong Presentation ID -> 
+00421290,aObject::ObjPreSetTxtCooToRot,named,99,aObject::ObjPreSetTxtCooToRot -> Wrong Presentation ID -> 
+004212f4,aObject::ObjPreSetTxtColToPuz,named,103,aObject::ObjPreSetTxtColToPuz -> Wrong Presentation ID -> 
+0042135c,aObject::ObjPreSetTxtColToRot,named,103,aObject::ObjPreSetTxtColToRot -> Wrong Presentation ID -> 
+004213c4,aObject::ObjPreSetTxtBgrColToPuz,named,103,aObject::ObjPreSetTxtBgrColToPuz -> Wrong Presentation ID -> 
+0042142c,aObject::ObjPreSetTxtBgrColToRot,named,103,aObject::ObjPreSetTxtBgrColToRot -> Wrong Presentation ID -> 
+004214b8,aObject::ObjPreGetTxtWid,named,91,aObject::ObjPreGetTxtWid -> Wrong Presentation ID -> 
+00421514,aObject::ObjPreGetTxtHei,named,91,aObject::ObjPreGetTxtHei -> Wrong Presentation ID -> 
+004215e4,aSecComSou::Init,named,259,aSecComSou::Init -> Can not Decompress Header ->  | aSecComSou::Init -> Can not Init aSecComAqi ->  | aSecComSou::Init -> res == NULL ->  | aSecComSou::Init -> scp == NULL -> 
+00421740,aSecComSouStereo::DecompressHeader,named,522,aSecComSouStereo::DecompressHeader -> Can not read Header | aSecComSouStereo::DecompressHeader -> scp == NULL | aSecComSouStereo::DecompressHeader -> tmpOutBuf == NULL
+00421954,aSecComSou::Decompress,named,1022,aSecComSou::Decompress -> raed Error | aSecComSou::Decompress -> scp == NULL
+00422110,aImageFileCin::Init,named,172,aImageFileCin::Init - pCi == NULL | aImageFileCin::Init -> Init | aImageFileCin::Init -> ReadHeader
+0042220c,aImageFileCin::ReadImage,named,232,aImageFileCin::ReadImage | aImageFileCin::ReadImage - Create | aImageFileCin::ReadImage -> pim == NULL
+00422304,aImageFileCin::WriteImage,named,91,aImageFileCin::WriteImage
+00422360,aImageFileCin::LoadImage,named,258,aImageFileCin::LoadImage -> Can not read Cin isImage | aImageFileCin::LoadImage -> Init  | aImageFileCin::LoadImage -> ReadImage | aImageFileCin::LoadImage -> This is not compressed image file
+00422834,aVideoDeviceRaw::Update,named,1325,aVideoDeviceRaw::Update -> ip == NULL
+00422d64,aVideoDeviceRaw::Display,named,148,aVideoDeviceRaw::Display 1 -> ip == NULL
+00422e58,aVideoDeviceRaw::Clear,named,190,aVideoDeviceRaw::Clear Unsupported format | aVideoDeviceRaw::Clear imgBts == NULL
+00423184,aVideoDeviceRaw::CopyBufferToImage,named,652,aVideoDeviceRaw::CopyBufferToImage -> Can not lock buffer | aVideoDeviceRaw::CopyBufferToImage -> Free failed | aVideoDeviceRaw::CopyBufferToImage -> Free failed ->  | aVideoDeviceRaw::CopyBufferToImage -> bufVal == NULL | aVideoDeviceRaw::CopyBufferToImage -> bufValPtr == NULL | aVideoDeviceRaw::CopyBufferToImage -> hglb == NULL
+00423558,aPreFer::Load,named,178,aPreFer::Load Cannot find file aPre.ini | aPreFer::Load Error reading file aPre.ini
+0042360c,aPreFer::Save,named,170,aPreFer::Save Cannot find file aPre.ini | aPreFer::Save Error writing file aPre.ini
+00423b84,aList::LoadSave,named,475,aList::LoadSave -> Reading error | aList::LoadSave -> Reading error Haw many ->  | aList::LoadSave -> Reading error ObjCli ->  | aList::LoadSave -> Writing error | aList::LoadSave -> Writing error Haw Many  | aList::LoadSave -> Writing error ObjCli  | aList::LoadSave -> fp == NULL
+00423d68,aList::openImage,named,1095,aList::openImage -> Can not ALLOC text oaoTxt = NULL | aList::openImage -> Can not Init text
+00424538,aList::add,named,526,aList::add -> ObjPtr == NULL | aList::add -> aDisObjPtr == NULL
+00424904,aList::checkClickOnListHotSpots,named,1403,aList::checkClickOnListHotSpots -> Erda must not be active on that zone ->  | aList::checkClickOnListHotSpots -> LoadSaveTimer Failed -> alb.ars | aList::checkClickOnListHotSpots -> LoadSaveTimer Failed -> bru.ars | aList::checkClickOnListHotSpots -> LoadSaveTimer Failed -> log.ars | aList::checkClickOnListHotSpots -> LoadSaveTimer Failed -> sie.ars
+004255e4,aList2::SetObjectClicked,named,147,aList2::SetObjectClicked -> Object ID does not exist ->
+004258c4,aSoundItem::Init,named,156,aSoundItem::Init -> icoNam == NULL | aSoundItem::Init -> nam == NULL
+004259dc,aObjectHandler::Init,named,77,aObjectHandler::Init -> ob == NULL
+00425a7c,,ambiguous,686,aApplication::AddObjectsFromFile ->  Init failed ->  | aApplication::AddObjectsFromFile ->  oi == NULL ->  | aApplication::AddObjectsFromFile -> Missing two # #  -> Wrong Line format->  | aApplication::GetMultiLanMes -> Can not find Language -> Wrong Line ->  | aObjectHandler::AddObjectsFromFile -> Can not open file ->  | aObjectHandler::AddObjectsFromFile -> Line too long -> 
+0042602c,aSecComRes::Add,named,203,aSecComRes::Add -> tmpVal == NULL | aSecComRes::Add -> val == NULL
+00426268,aSecComAqi::InitBuf,named,181,aSecComAqi::InitBuf - Can not Open file | aSecComAqi::InitBuf - inFil == NULL
+00426320,aSecComAqi::AllocBuf,named,72,aSecComAqi::AllocBuf -> Can not Init inFil
+0042644c,aSecComAqi::Write,named,235,aSecComAqi::Write - Can not Open file | aSecComAqi::Write - Can not Write File | aSecComAqi::Write - outBuf == NULL | aSecComAqi::Write - outFil == NULL
+0042653c,aSecComAqi::Write,named,229,aSecComAqi::Write - Can not Open file | aSecComAqi::Write - Can not Write File | aSecComAqi::Write - outBuf == NULL | aSecComAqi::Write - outFil == NULL
+0042674c,aImageFileTGA::ReadInfo,named,184,aImageFileTGA::ReadInfo | aImageFileTGA::ReadInfo -> Only 24 and 32 TGA images are supported | aImageFileTGA::ReadInfo -> Wrong Type -> Should be 2 
+0042681c,aImageFileTGA::ReadImage,named,747,aImageFileTGA::ReadImage - Create | aImageFileTGA::ReadImage - Switch Default | aImageFileTGA::ReadImage -> 32 BIT | aImageFileTGA::ReadImage -> Buffer OVER run ->  | aImageFileTGA::ReadImage -> Create | aImageFileTGA::ReadImage-> Buffer under run -> 
+00426b4c,aImageFileTGA::LoadImage,named,274,aImageFileTGA::LoadImage - Open | aImageFileTGA::LoadImage - ReadHeader | aImageFileTGA::LoadImage - ReadImage | aImageFileTGA::LoadImage - ReadInfo | aImageFileTGA::LoadImage - ReadPallette
+00426d34,aArt::Init,named,491,aArt::Init - Can not Alloc Art record | aArt::Init - Can not Init Art Array rec == NULL ->  | aArt::Init - Can not Open file ->  | aArt::Init - Can not Read Art Header ->  | aArt::Init - Can not Read Art record ->  | aArt::Init - inFil == NULL
+00426fc8,aArt::GetRec,named,245,aArt::GetRec -> Can not Read  | aArt::GetRec -> WRONG index  | aArt::GetRec -> retPtr == NULL
+0042711c,aArtHandler::Init,named,80,aArtHandler::Init - Can not Init Art Array art == NULL -> 
+00427260,aArtHandler::Open,named,384,aArtHandler::Open - Can not Alloc Art -> pa == NULL ->  | aArtHandler::Open - Can not Init Art ->  | aArtHandler::Open - Load From not supported ->  | aArtHandler::Open - art == NULL 
+004273e0,aArtHandler::Close,named,94,aArtHandler::Close -> ind is wrong -> 
+0042746c,aArtHandler::GetData,named,279,aArtHandler::GetData -> File for that GameZone and LoadFrom is not opened  ->  | aArtHandler::GetData -> ind is wrong   ->  | aArtHandler::GetData -> ind is wrong  -> 
+004276c0,aImageFileBma::Init,named,336,aImageFileBma::Init - Can not read file ->  | aImageFileBma::Init - psc == NULL | aImageFileBma::Init -> Init | aImageFileBma::Init -> ReadHeader
+00427860,aImageFileBma::ReadImage,named,801,aImageFileBma::ReadImage - Create | aImageFileBma::ReadImage -> corBuf == NULL | aImageFileBma::ReadImage -> seqBuf == NULL
+00427b94,aImageFileBma::WriteImage,named,91,aImageFileBma::WriteImage
+00427bf0,aImageFileBma::LoadImage,named,147,aImageFileBma::LoadImage -> Init  | aImageFileBma::LoadImage -> ReadImage
+00427cfc,aImageFileTgc::DeInit,named,117,aImageFileTgc::DeInit() -> Free failed
+00427d74,,ambiguous,828,aFileIoBuf::Init -> GlobalAlloc failed | aImageFileTgc::Init - Can not read file ->  | aImageFileTgc::Init - Outut Buffer Size is wrong ->  | aImageFileTgc::Init - inBufPtr == NULL ->  | aImageFileTgc::Init - psc == NULL | aImageFileTgc::Init -> Init | aImageFileTgc::Init -> outBuf == NULL | aImageFileTgc::Init Global Free failed -> during allocation | aImageFileTgc::Init::Init Mem Lock falied
+004280b0,aImageFileTgc::ReadInfo,named,165,aImageFileTgc::ReadInfo -> 32 TGA images are supported | aImageFileTgc::ReadInfo -> Wrong Type -> Should be 2 
+00428180,aImageFileTgc::ReadImage,named,709,aImageFileTgc::ReadImage - Create | aImageFileTgc::ReadImage - Switch Default | aImageFileTgc::ReadImage -> Create | aImageFileTgc::ReadImage -> Free failed
+00428460,aImageFileTgc::LoadImage,named,322,aImageFileTgc::LoadImage - ReadHeader | aImageFileTgc::LoadImage - ReadInfo | aImageFileTgc::LoadImage - ReadPallette | aImageFileTgc::LoadImage -> Init  | aImageFileTgc::LoadImage -> ReadImage | aImageFileTgc::LoadImage -> pim == NULL
+00428be4,aSecComAqi::Write,named,235,aSecComAqi::Write - Can not Open file | aSecComAqi::Write - Can not Write File | aSecComAqi::Write - outBuf == NULL | aSecComAqi::Write - outFil == NULL
+004290f0,aImageHandle::LoadSave,named,396,aImageHandle::LoadSave -> Reading error | aImageHandle::LoadSave -> Writing error | aImageHandle::LoadSave -> dir | aImageHandle::LoadSave -> fp == NULL
+00429280,aImageHandle::SetNameID,named,100,aImageHandle::SetNameID -> namID == NULL
+00429304,aImageHandle::SetDirectory,named,100,aImageHandle::SetDirectory -> dir == NULL
+00429388,aImageHandle::SetActive,named,52,aImageHandle::SetActive -> isActive wrong value
+00429448,aImageHandle::SetObjectPre,named,47,aImageHandle::SetObjectPre -> op == NULL
+00429484,aImageHandle::SetAnimation,named,47,aImageHandle::SetAnimation -> pa == NULL
+00429510,aSecComAqi::Init,named,167,aSecComAqi::Init -> AllocBuf failed ->  | aSecComAqi::Init -> InitBuf failed -> 
+004295b8,aSecComAqi::InitBuf,named,145,aSecComAqi::InitBuf - Can not Open file | aSecComAqi::InitBuf - inFil == NULL
+00429680,aSecComAqi::AllocBuf,named,72,aSecComAqi::AllocBuf -> Can not Init inFil
+004296c8,aSecComAqi::InitArt,named,144,aSecComAqi::InitArt -> Can not Init ArtFil ->  | aSecComAqi::InitArt -> artFil == NULL
+00429a84,aSecComAqi::DecompressNode,named,448,aSecComAqi::DecompressNode - Can not read file ->  | aSecComAqi::DecompressNode - outBuf == NULL
+00429c48,aSecComAqi::DecompressChannel,named,506,aSecComAqi::DecompressChannel - Can not read file ->  | aSecComAqi::DecompressChannel - outBuf == NULL
+0042a218,aFileList::Init,named,156,aFileList::Init - name == NULL | aFileList::Init - rec == NULL
+0042a2d4,aFileList::Load,named,363,aFileList::Load - Can not Open file | aFileList::Load - Can not Read NOR | aFileList::Load - Can not Read Record | aFileList::Load - inFil == NULL
+0042a460,aFileList::Save,named,344,aFileList::Save - Can not Open file | aFileList::Save - Can not Write NOR | aFileList::Save - Can not Write Record | aFileList::Save - inFil == NULL
+0042a5b8,aFileList::Reset,named,258,aFileList::Reset - Can not Open file | aFileList::Reset - inFil == NULL
+0042a6bc,aFileList::Add,named,137,aFileList::Add - Can not Add Record | aFileList::Add - Can not Add Record -> nr == NULL
+0042aea8,aRotation::LoadSave,named,880,aRotation::LoadSave -> Reading error | aRotation::LoadSave -> Reading error Channel ->  | aRotation::LoadSave -> Writing error | aRotation::LoadSave -> Writing error Channel ->  | aRotation::LoadSave -> ani ->  | aRotation::LoadSave -> fp == NULL | aRotation::LoadSave -> mov ->  | aRotation::LoadSave -> objImg
+0042b280,aRotation::SetObjectiveImage,named,142,aRotation::SetObjectiveImage objmg == NULL
+0042b310,aRotation::Alloc,named,457,aRotation::Alloc -> Can not load image -> 
+0042b53c,aRotation::AddPreAni,named,299,aRotation::AddPreAni -> Can not Init Animation | aRotation::AddPreAni -> Wrong layer number  | aRotation::AddPreAni -> aniPre == NULL | aRotation::AddPreAni -> op == NULL
+0042b66c,aRotation::AddPreTxt,named,61,aRotation::AddPreTxt -> txt == NULL or tp == NULL
+0042b6d0,aRotation::AddAmbientSound,named,174,aRotation::AddAmbientSound -> Init failed ->  | aRotation::AddAmbientSound -> sp == NULL
+0042b780,aRotation::Add3DSound,named,228,aRotation::Add3DSound -> Init failed ->  | aRotation::Add3DSound -> sp == NULL
+0042b8c8,aRotation::SetAmbientSoundOff,named,65,aRotation::SetAmbientSoundOff -> Sound Id does nor exist -> 
+0042b90c,aRotation::SetAmbientSoundOn,named,65,aRotation::SetAmbientSoundOn -> Sound Id does nor exist -> 
+0042b950,aRotation::SetAmbientSoundVolume,named,71,aRotation::SetAmbientSoundVolume -> Sound Id does nor exist -> 
+0042b998,aRotation::SetAmbientSoundPan,named,71,aRotation::SetAmbientSoundPan -> Sound Id does nor exist -> 
+0042b9e0,aRotation::IsAmbientSoundOn,named,63,aRotation::IsAmbientSoundOn -> Sound Id does nor exist -> 
+0042bc14,aPuzzle::aPuzzle,named,354,aPuzzle::aPuzzle(INT id) -> acc == NULL | aPuzzle::aPuzzle(INT id) -> imgPre == NULL | aPuzzle::aPuzzle(INT id) -> mov == NULL
+0042beec,aPuzzle::LoadSave,named,455,aPuzzle::LoadSave -> Reading error | aPuzzle::LoadSave -> Writing error
+0042c0b8,aPuzzle::SetBgrImg,named,166,aPuzzle::SetBgrImg -> bgrImg == NULL
+0042c160,aPuzzle::Alloc,named,1291,aPuzzle::Alloc -> Can not load image ->  | aPuzzle::Alloc -> can not Alloc aVisualObject -> 
+0042c66c,aPuzzle::DeAlloc,named,209,aPuzzle::DeAlloc(VOID) -> Something wrong with ani in aImageHandle
+0042c740,aPuzzle::Update,named,1720,aPuzzle::Update -> Something wrong with ANI in aImageHandle 1 ->  | aPuzzle::Update(aVideoDevice *vd) -> Something wrong with ani in aImageHandle -> 
+0042cdf8,aPuzzle::addAccesibility,named,53,aPuzzle::addAccesibility -> pa == NULL
+0042ce30,aPuzzle::GetAccesibility,named,42,aPuzzle::GetAccesibility -> acc == NULL
+0042ce5c,aPuzzle::addMovability,named,53,aPuzzle::addMovability -> pm == NULL
+0042ce94,aPuzzle::GetMovability,named,44,aPuzzle::GetMovability -> mov == NULL
+0042cec0,aPuzzle::AddPreImg,named,225,aPuzzle::AddPreImg -> imgPre == NULL | aPuzzle::AddPreImg -> ip == NULL
+0042cfa4,aPuzzle::AddPreAni,named,152,aPuzzle::AddPreAni -> aniPre == NULL | aPuzzle::AddPreAni -> prPo == NULL
+0042d100,aPuzzle::AddAmbientSound,named,174,aPuzzle::AddAmbientSound -> Init failed ->  | aPuzzle::AddAmbientSound -> sp == NULL
+0042d1b0,aPuzzle::Add3DSound,named,217,aPuzzle::Add3DSound -> Init failed ->  | aPuzzle::Add3DSound -> sp == NULL
+0042d2ec,aPuzzle::SetAmbientSoundOff,named,65,aPuzzle::SetAmbientSoundOff -> Sound Id does nor exist -> 
+0042d330,aPuzzle::SetAmbientSoundOn,named,65,aPuzzle::SetAmbientSoundOn -> Sound Id does nor exist -> 
+0042d374,aPuzzle::SetAmbientSoundVolume,named,71,aPuzzle::SetAmbientSoundVolume -> Sound Id does nor exist -> 
+0042d3bc,aPuzzle::SetAmbientSoundPan,named,71,aPuzzle::SetAmbientSoundPan -> Sound Id does nor exist -> 
+0042d404,aPuzzle::IsAmbientSoundOn,named,63,aPuzzle::IsAmbientSoundOn -> Sound Id does nor exist -> 
+0042d7d8,aSoundItem::LoadSave,named,196,aSoundItem::LoadSave -> Reading error | aSoundItem::LoadSave -> Writing error | aSoundItem::LoadSave -> fp == NULL
+0042d8d4,aSoundItem::Init,named,238,aSoundItem::Init -> Fade number of frames have to be greater than 1 ->  | aSoundItem::Init -> Sound ID does not exist -> 
+0042ebd0,aSoundHandler::SetLR,named,69,aSoundHandler::SetLR -> Argument not valid -> 
+004302dc,aText::LoadSave,named,318,aText::LoadSave -> Reading error | aText::LoadSave -> Writing error | aText::LoadSave -> fp == NULL | aText::LoadSave -> txt
+0043041c,aText::Init,named,190,aText::Init -> SetText FAILED -> 
+00430748,aFont::LoadSave,named,206,aFont::LoadSave -> Reading error - Unpossible OPERATION | aFont::LoadSave -> Writing error | aFont::LoadSave -> fp == NULL
+004309d4,aFontHandler::LoadSave,named,475,aFontHandler::LoadSave -> Reading error  | aFontHandler::LoadSave -> Reading error -> Add FAILED ->  | aFontHandler::LoadSave -> Reading error -> Can not read How Many | aFontHandler::LoadSave -> Writing error -> Can not write How Many
+00430bb4,aFontHandler::AddResource,named,114,aFontHandler::AddResource -> Font is not Added -> 
+00430c28,aFontHandler::RemoveAllResources,named,145,aFontHandler::RemoveAllResources -> res == NULL
+00430cbc,aFontHandler::Add,named,269,aFontHandler::Add -> ID already exist ->  | aFontHandler::Add -> Init failed | aFontHandler::Add -> fon == NULL | aFontHandler::Add -> new failed
+00430dcc,aFontHandler::Remove,named,139,aFontHandler::Remove -> ID does not exist ->  | aFontHandler::Remove -> fon == NULL
+00430e5c,aFontHandler::RemoveAll,named,78,aFontHandler::RemoveAll -> fon == NULL
+00430eac,aFontHandler::GetFontPtr,named,135,aFontHandler::GetFontPtr -> ID does not exist ->  | aFontHandler::GetFontPtr -> fon == NULL
+00430f38,aFontHandler::GetFontHandler,named,142,aFontHandler::GetFontHandler -> ID does not exist ->  | aFontHandler::GetFontHandler -> fon == NULL
+00430fc8,aFontHandler::IsInit,named,118,aFontHandler::IsInit -> fon == NULL
+004310a0,aString::aString,named,115,aString::aString -> Can not copy string -> 
+00431114,aString::aString,named,140,aString::aString Global Free failed -> during allocation | aString::aString GlobalAlloc failed | aString::aString Mem Lock falied
+004311c4,aString::aString,named,70,aString::~aString() -> Free failed
+0043120c,,ambiguous,348,aObjectPresentation::LoadSave -> Writing error | aObjectPresentation::LoadSave -> fp == NULL | aString::LoadSave -> Reading error | aString::LoadSave -> Reading error - HawMany | aString::LoadSave -> Writing error - HawMany | aString::LoadSave -> str == NULL
+00431368,aString::SetString,named,124,aString::SetString -> Can not copy string -> 
+00431c10,aImageFileBMP::ReadHeader,named,119,aImageFileBMP::ReadHeader-1 | aImageFileBMP::ReadHeader-2
+00431c88,aImageFileBMP::ReadInfo,named,99,aImageFileBMP::ReadInfo
+00431cec,aImageFileBMP::ReadRowBW,named,161,aImageFileBMP::ReadRowBW
+00431d90,aImageFileBMP::ReadRow16,named,145,aImageFileBMP::ReadRow16
+00431e24,aImageFileBMP::ReadRow256,named,79,aImageFileBMP::ReadRow256
+00431e74,aImageFileBMP::ReadImage,named,566,aImageFileBMP::ReadImage - Create | aImageFileBMP::ReadImage - NOT SUPPORTED 1 Bit | aImageFileBMP::ReadImage - NOT SUPPORTED 4 Bit | aImageFileBMP::ReadImage - Switch Default
+00432174,aImageFileBMP::WriteHeader,named,102,aImageFileBMP::WriteHeader
+004321dc,aImageFileBMP::WriteInfo,named,225,aImageFileBMP::WriteInfo
+00432328,aImageFileBMP::WriteImageRow,named,87,aImageFileBMP::WriteImageRow
+00432380,aImageFileBMP::WriteImage,named,91,aImageFileBMP::WriteImage
+004323dc,aImageFileBMP::LoadImage,named,274,aImageFileBMP::LoadImage - Open | aImageFileBMP::LoadImage - ReadHeader | aImageFileBMP::LoadImage - ReadImage | aImageFileBMP::LoadImage - ReadInfo | aImageFileBMP::LoadImage - ReadPallette
+004324f0,aImageFileBMP::SaveImage,named,478,aImageFileBMP::SaveImage - Open | aImageFileBMP::SaveImage - WriteHeader | aImageFileBMP::SaveImage - WriteHeader - 2 | aImageFileBMP::SaveImage - WriteImage | aImageFileBMP::SaveImage - WriteInfo | aImageFileBMP::SaveImage - WritePallette | aImageFileBMP::SaveImage - pim == NULL
+004331ac,aByte::LoadSave,named,182,aByte::LoadSave -> Reading error | aByte::LoadSave -> Writing error | aByte::LoadSave -> fp == NULL
+004332c0,aWord::LoadSave,named,186,aWord::LoadSave -> Reading error | aWord::LoadSave -> Writing error | aWord::LoadSave -> fp == NULL
+004333d4,aDoubleWord::LoadSave,named,182,aDoubleWord::LoadSave -> Reading error | aDoubleWord::LoadSave -> Writing error | aDoubleWord::LoadSave -> fp == NULL
+004334e4,aFloat::LoadSave,named,182,aFloat::LoadSave -> Reading error | aFloat::LoadSave -> Writing error | aFloat::LoadSave -> fp == NULL
+00433630,aVarString::LoadSave,named,459,aVarString::LoadSave -> Reading error | aVarString::LoadSave -> Reading error Length ->  | aVarString::LoadSave -> Reading error String ->  | aVarString::LoadSave -> Writing error | aVarString::LoadSave -> Writing error Length | aVarString::LoadSave -> Writing error String | aVarString::LoadSave -> fp == NULL
+0043388c,aVar::aVar,named,322,aVar::aVar() -> byt == NULL | aVar::aVar() -> dwd == NULL | aVar::aVar() -> flo == NULL | aVar::aVar() -> str == NULL | aVar::aVar() -> wor == NULL
+00433a62,aVar::LoadSave,named,1862,aVar::LoadSave -> Reading error Byte | aVar::LoadSave -> Reading error Byte Definition | aVar::LoadSave -> Reading error Double Word | aVar::LoadSave -> Reading error Double Word Definition | aVar::LoadSave -> Reading error Float | aVar::LoadSave -> Reading error Float Definition | aVar::LoadSave -> Reading error Haw many Byte | aVar::LoadSave -> Reading error Haw many Double Word | aVar::LoadSave -> Reading error Haw many Float | aVar::LoadSave -> Reading error Haw many String | aVar::LoadSave -> Reading error Haw many Word | aVar::LoadSave -> Reading error Length ->  | aVar::LoadSave -> Reading error String | aVar::LoadSave -> Reading error String ->  | aVar::LoadSave -> Reading error String Definition | aVar::LoadSave -> Reading error Word | aVar::LoadSave -> Reading error Word Definition | aVar::LoadSave -> Writing error Byte | aVar::LoadSave -> Writing error Double Word | aVar::LoadSave -> Writing error Float | aVar::LoadSave -> Writing error Haw many Byte ->  | aVar::LoadSave -> Writing error Haw many Double Word ->  | aVar::LoadSave -> Writing error Haw many Float ->  | aVar::LoadSave -> Writing error Haw many String ->  | aVar::LoadSave -> Writing error Haw many Word ->  | aVar::LoadSave -> Writing error String | aVar::LoadSave -> Writing error Word | aVar::LoadSave -> fp == NULL
+00434278,aVar::VarDefByte,named,132,aVar::VarDefByte -> ID already exist -> 
+004342fc,aVar::VarSetByte,named,113,aVar::VarSetByte -> ID does not exist -> 
+00434370,aVar::VarGetByte,named,105,aVar::VarGetByte -> ID does not exist -> 
+004343dc,aVar::VarDelByte,named,102,aVar::VarDelByte -> ID does not exist -> 
+00434444,aVar::VarDefWord,named,136,aVar::VarDefWord -> ID already exist-> 
+004344cc,aVar::VarSetWord,named,117,aVar::VarSetWord -> ID does not exist -> 
+00434544,aVar::VarGetWord,named,108,aVar::VarGetWord -> ID does not exist -> 
+004345b0,aVar::VarDelWord,named,105,aVar::VarDelWord -> ID does not exist -> 
+0043461c,aVar::VarDefDwrd,named,135,aVar::VarDefDwrd -> ID already exist -> 
+004346a4,aVar::VarSetDwrd,named,116,aVar::VarSetDwrd -> ID does not exist -> 
+00434718,aVar::VarGetDwrd,named,108,aVar::VarGetDwrd -> ID does not exist -> 
+00434784,aVar::VarDelDwrd,named,105,aVar::VarDelDwrd -> ID does not exist -> 
+004347f0,aVar::VarDefFloa,named,134,aVar::VarDefFloa -> ID already exist -> 
+00434878,aVar::VarSetFloa,named,115,aVar::VarSetFloa -> ID does not exist -> 
+004348ec,aVar::VarGetFloa,named,112,aVar::VarGetFloa -> ID does not exist -> 
+004349cc,aVar::VarDefStrg,named,135,aVar::VarDefStrg -> ID already exist -> 
+00434a54,aVar::VarSetStrg,named,116,aVar::VarSetStrg -> ID does not exist -> 
+00434ac8,aVar::VarGetStrg,named,108,aVar::VarGetStrg -> ID does not exist -> 
+00434b34,aVar::VarDelStrg,named,105,aVar::VarDelStrg -> ID does not exist -> 
+00434bdc,aObjectPresentation::aObjectPresentation,named,829,aObjectPresentation::aObjectPresentation aniPuz == NULL | aObjectPresentation::aObjectPresentation aniPuzPtr == NULL | aObjectPresentation::aObjectPresentation imgPuz == NULL | aObjectPresentation::aObjectPresentation imgPuzPtr == NULL | aObjectPresentation::aObjectPresentation layAniRot == NULL | aObjectPresentation::aObjectPresentation layAniRotAni == NULL | aObjectPresentation::aObjectPresentation layAniRotPtr == NULL | aObjectPresentation::aObjectPresentation layImgRot == NULL | aObjectPresentation::aObjectPresentation layImgRotPtr == NULL | aObjectPresentation::aObjectPresentation txtPuz    == NULL | aObjectPresentation::aObjectPresentation txtPuzPtr == NULL | aObjectPresentation::aObjectPresentation txtRot    == NULL | aObjectPresentation::aObjectPresentation txtRotPtr == NULL
+00435164,aObjectPresentation::LoadSave,named,595,aObjectPresentation::LoadSave -> Reading error | aObjectPresentation::LoadSave -> Writing error | aObjectPresentation::LoadSave -> aniPuz ->  | aObjectPresentation::LoadSave -> fp == NULL | aObjectPresentation::LoadSave -> imgPuz ->  | aObjectPresentation::LoadSave -> txtPuz ->  | aObjectPresentation::LoadSave -> txtRot -> 
+004353bc,aObjectPresentation::addImageToPuzzle,named,186,aObjectPresentation::addImageToPuzzle ih == NULL
+00435478,aObjectPresentation::addAnimationToPuzzle,named,331,aObjectPresentation::addAnimationToPuzzle can not Init Animation | aObjectPresentation::addAnimationToPuzzle pa == NULL
+004355c4,aObjectPresentation::addImageToRotation,named,105,aObjectPresentation::addImageToRotation lp == NULL
+00435630,aObjectPresentation::addAnimationToRotation,named,165,aObjectPresentation::addAnimationToRotation ap == NULL
+004356d8,aObjectPresentation::setImageCoordinateToPuzzle,named,89,aObjectPresentation::setImageCoordinateToPuzzle -> Image number is to big -> 
+00435778,aObjectPresentation::setImageOriginCoordinateToPuzzle,named,79,aObjectPresentation::setImageOriginCoordinateToPuzzle -> Image number is to big -> 
+00435800,aObjectPresentation::GetImgCooOnPuzX,named,78,aObjectPresentation::GetImgCooOnPuzX -> Image number is to big -> 
+00435850,aObjectPresentation::GetImgCooOnPuzY,named,78,aObjectPresentation::GetImgCooOnPuzY -> Image number is to big -> 
+00435990,aObjectPresentation::HideWithDeallocPuzzle,named,196,aObjectPresentation::HideWithDeallocPuzzle() -> Something wrong with ani in aImageHandle
+00435c24,aObjectPresentation::ObjPreSetAniCooOnPuz,named,89,aObjectPresentation::ObjPreSetAniCooOnPuz -> Animation number is to big -> 
+00436218,aObjectPresentation::ObjPreSetAniIdeOnPuz,named,85,aObjectPresentation::ObjPreSetAniIdeOnPuz -> Animation number is to big -> 
+00436270,aObjectPresentation::ObjPreSetAniIdeOnRot,named,85,aObjectPresentation::ObjPreSetAniIdeOnRot -> Animation number is to big -> 
+004362c8,aObjectPresentation::ObjPreGetAniIdeOnPuz,named,77,aObjectPresentation::ObjPreGetAniIdeOnPuz -> Animation number is to big -> 
+00436318,aObjectPresentation::ObjPreSetGetIdeOnRot,named,77,aObjectPresentation::ObjPreSetGetIdeOnRot -> Animation number is to big -> 
+00436368,aObjectPresentation::ObjPreSetAniRanOnPuz,named,85,aObjectPresentation::ObjPreSetAniRanOnPuz -> Animation number is to big -> 
+004363c0,aObjectPresentation::ObjPreSetAniRanOnRot,named,85,aObjectPresentation::ObjPreSetAniRanOnRot -> Animation number is to big -> 
+00436418,aObjectPresentation::ObjPreAddTxtToPuz,named,211,aObjectPresentation::ObjPreAddTxtToPuz -> Init text FAILED ->  | aObjectPresentation::ObjPreAddTxtToPuz tp == NULL -> 
+004364ec,aObjectPresentation::ObjPreAddTxtToRot,named,211,aObjectPresentation::ObjPreAddTxtToRot -> Init text FAILED ->  | aObjectPresentation::ObjPreAddTxtToRot tp == NULL
+004365c0,aObjectPresentation::ObjPreSetTxtToPuz,named,83,aObjectPresentation::ObjPreSetTxtToPuz -> Text ID is too big -> 
+00436614,aObjectPresentation::ObjPreSetTxtToRot,named,83,aObjectPresentation::ObjPreSetTxtToRot -> Text ID is too big -> 
+00436668,aObjectPresentation::ObjPreSetFonToPuz,named,83,aObjectPresentation::ObjPreSetFonToPuz -> Text ID is too big -> 
+004366bc,aObjectPresentation::ObjPreSetTxtFonToRot,named,83,aObjectPresentation::ObjPreSetTxtFonToRot -> Text ID is too big -> 
+00436710,aObjectPresentation::ObjPreSetCooToPuz,named,87,aObjectPresentation::ObjPreSetCooToPuz -> Text ID is too big -> 
+00436768,aObjectPresentation::ObjPreSetTxtCooToRot,named,87,aObjectPresentation::ObjPreSetTxtCooToRot -> Text ID is too big -> 
+004367c0,aObjectPresentation::ObjPreSetColToPuz,named,91,aObjectPresentation::ObjPreSetColToPuz -> Text ID is too big -> 
+0043681c,aObjectPresentation::ObjPreSetTxtColToRot,named,91,aObjectPresentation::ObjPreSetTxtColToRot -> Text ID is too big -> 
+00436878,aObjectPresentation::ObjPreSetBgrColToPuz,named,91,aObjectPresentation::ObjPreSetBgrColToPuz -> Text ID is too big -> 
+004368d4,aObjectPresentation::ObjPreSetTxtBgrColToRot,named,91,aObjectPresentation::ObjPreSetTxtBgrColToRot -> Text ID is too big -> 
+00436930,aObjectPresentation::ObjPreGetTxtWid,named,77,aObjectPresentation::ObjPreGetTxtWid -> Text ID is too big -> 
+00436980,aObjectPresentation::ObjPreGetTxtHei,named,77,aObjectPresentation::ObjPreGetTxtHei -> Text ID is too big -> 
+00436ab8,aMovability::aMovability,named,176,aMovability::aMovability -> rna = new aString | aMovability::aMovability -> rot == NULL
+00436b68,aMovability::aMovability,named,176,aMovability::aMovability -> puz == NULL | aMovability::aMovability -> rna = new aString
+00436dc0,aMovability::SetHotSpot,named,103,aMovability::SetHotSpot -> hsp = new aHotSpot
+00436e28,aMovability::GetHotSpot,named,44,aMovability::GetHotSpot -> hsp == NULL
+00436e54,aMovability::GetRotation,named,43,aMovability::GetRotation -> rot == NULL
+00436e80,aMovability::GetPuzzle,named,44,aMovability::GetPuzzle -> puz == NULL
+00436eb8,aMovability::SetRideName,named,95,aMovability::SetRideName -> rna == NULL
+004370d8,aTimer::LoadSave,named,561,aTimer::LoadSave -> Reading error  | aTimer::LoadSave -> Reading error -> Can not read HawMany | aTimer::LoadSave -> Reading error -> aTimerhandler is NULL ->  | aTimer::LoadSave -> Writing error -> Can not write HawMany
+00437310,aTimer::StopAll,named,112,aTimer::StopAll -> tim == NULL
+00437380,aTimer::StartTimer,named,185,aTimer::StartTimer -> Timer with that ID already started | aTimer::StartTimer -> th == NULL
+0043749c,aTimer::GetElapsedTime,named,98,aTimer::GetElapsedTime -> Timer with that ID does not exist
+0043754c,aTimer::GetNumOfExe,named,98,aTimer::GetNumOfExe -> Timer with that ID does not exist
+004375b0,aTimer::GetEveryNumOfMs,named,98,aTimer::GetEveryNumOfMs -> Timer with that ID does not exist
+00437614,aTimer::GetTimerHandler,named,93,aTimer::GetTimerHandler -> Timer with that ID does not exist
+004376c4,aAccesibility::aAccesibility,named,51,aAccesibility::aAccesibility -> obj == NULL
+00437730,aAccesibility::LoadSave,named,108,aAccesibility::LoadSave -> Hot Spot | aAccesibility::LoadSave -> fp == NULL
+0043779c,aAccesibility::SetHotSpot,named,103,aAccesibility::SetHotSpot -> hsp = new aHotSpot
+00437804,aAccesibility::GetHotSpot,named,44,aAccesibility::GetHotSpot -> hsp == NULL
+00437830,aAccesibility::GetObject,named,42,aAccesibility::GetObject -> obj == NULL
+004378e8,aHotSpot::LoadSave,named,272,aHotSpot::LoadSave -> Reading error 
+004384d0,aCursorImage::Init,named,126,aCursorImage::Init -> hcu == NULL
+0043857c,aCursorImage::Alloc,named,146,aCursorImage::Alloc -> Can not Load Image | aCursorImage::Alloc -> Must be 32 bit Tga
+00438740,aCursorHandler::Add,named,1114,aCursorHandler::Add -> Can not Load cursor ANIMATION ->  | aCursorHandler::Add -> Can not Load cursor IMAGE ->  | aCursorHandler::Add -> Can not Load cursor W 32->  | aCursorHandler::Add -> Cursor Type does not exist ->  | aCursorHandler::Add -> Cursor Type does not exist pc == NULL ->  | aCursorHandler::Add -> Dummy requested ->  | aCursorHandler::Add -> cur == NULL  | aCursorHandler::Add -> id already exist -> 
+00438ba0,aCursorHandler::Delete,named,170,aCursorHandler::Delete -> ID does not exist ->  | aCursorHandler::Delete -> cur == NULL 
+00438c4c,aCursorHandler::DeleteTypeDelete,named,125,aCursorHandler::DeleteTypeDelete -> cur == NULL 
+00438ccc,aCursorHandler::Set,named,167,aCursorHandler::Set -> ID does not exist ->  | aCursorHandler::Set -> cur == NULL 
+00438d78,aCursorHandler::Set,named,185,aCursorHandler::Set -> ID does not exist ->  | aCursorHandler::Set -> cur == NULL 
+00438e34,aCursorHandler::Set,named,158,"aCursorHandler::Set(HDC hc, INT x, INT y) -> cur == NULL "
+00438ed4,aCursorHandler::Set,named,148,aCursorHandler::Set -> ID does not exist ->  | aCursorHandler::Set -> cur == NULL 
+00438f78,aCursorHandler::SetOffset,named,178,aCursorHandler::SetOffset -> ID does not exist ->  | aCursorHandler::SetOffset -> cur == NULL 
+0043902c,aCursorHandler::DeAlloc,named,164,aCursorHandler::DeAlloc -> ID does not exist ->  | aCursorHandler::DeAlloc -> cur == NULL 
+004390d4,aCursorHandler::GetTypeOfLoad,named,164,aCursorHandler::GetTypeOfLoad -> ID does not exist ->  | aCursorHandler::GetTypeOfLoad -> cur == NULL 
+0043917c,aCursorHandler::GetType,named,140,aCursorHandler::GetType() -> cur == NULL 
+0043927c,aCursorAnimation::Init,named,70,aCursorAnimation::Init -> Can not init aCursor1
+004392c4,aCursorAnimation::Init,named,173,aCursorAnimation::Init -> Can not init Animation | aCursorAnimation::Init(for animation) -> Can not init aCursor
+0043950c,aCursor::SetName,named,97,aCursor::SetName -> nam == NULL
+004395dc,aAnimationImage::aAnimationImage,named,137,aAnimationImage::aAnimationImage() -> img == NULL
+00439698,aAnimationImage::LoadSave,named,257,aAnimationImage::LoadSave -> Animation | aAnimationImage::LoadSave -> Reading error | aAnimationImage::LoadSave -> Writing error | aAnimationImage::LoadSave -> fp == NULL
+0043979c,aAnimationImage::Init,named,374,aAnimationImage::Init -> Can not Alloc | aAnimationImage::Init -> io == NULL
+00439984,aAnimation::Alloc,named,1404,aAnimation::Alloc -> Can not alloc
+00439f4c,aAnimation::Alloc,named,1207,aAnimation::Alloc -> Can not alloc
+0043a420,,ambiguous,1454,aAnimation::PlayFrame -> Can not Load Image | aAnimationImage::DisplayActiveFrame activeImage == NULL
+0043ab54,aAnimation::LoadSave,named,933,aAnimation::LoadSave -> Reading error | aAnimation::LoadSave -> Writing error | aAnimation::LoadSave -> fp == NULL
+0043af00,aAnimation::Init,named,440,aAnimation::Init -> Number of frames can not be zero | aAnimation::Init -> Wrong Start Frame number
+0043b610,aAnimation::SetActiveFrame,named,78,aAnimation::SetActiveFrame(INT f) -> frame number is too big | aAnimation::SetActiveFrame(INT f) -> frame number is too small
+0043b678,aAnimation::PauseFra,named,133,"aAnimation::PauseFra -> Pause frame number is wrong | aAnimation::PauseFra(INT f, INT l, LONG ms) -> Loop is out of range, must be >= 1 "
+0043b700,aAnimation::PauseExactOnFrame,named,271,aAnimation::PauseExactOnFrame -> Pause frame number is wrong
+0043b810,aAnimation::SetStartFrame,named,89,aAnimation::SetStartFrame -> Start frame number is wrong
+0043b960,aAnimation::SetName,named,95,aAnimation::SetName -> nam == NULL
+00441a08,aApplication::GameSetZoneN2,named,519,aApplication::GameSetZoneN2 -> case 10 -> Erda LoadSaaveTimer Failed 
+00449f34,aApplication::GameSetZoneWA,named,661,aApplication::GameSetZoneWA -> case 10 -> Erda LoadSaaveTimer Failed 
+0045034c,aApplication::GameSetZoneRO,named,484,aApplication::GameSetZoneRO -> case 10 -> Erda LoadSaaveTimer Failed 
+00455418,aApplication::Init,named,95,aApplication::Init -> AGV_preferences == NULL | aApplication::Init -> AGV_preferences->Load failed
+004555d0,aApplication::GameZoneOnCD,named,120,aApplication::GameZoneOnCD -> Wrong Zone ->
+004639a4,aApplication::GameSetZoneFO,named,623,aApplication::GameSetZoneFO -> case 10 -> Erda LoadSaaveTimer Failed 
+00469024,aApplication::GameSetZoneRH,named,543,aApplication::GameSetZoneRH -> case 10 -> Erda LoadSaaveTimer Failed 
+00473810,aApplication::GameSetZoneNI,named,775,aApplication::GameSetZoneNI -> case 10 -> Erda LoadSaaveTimer Failed 
+004759ac,,ambiguous,7680,AGV_preferences->Save -> failed | AOBJ_SY_Preferences -> AGC_preferences == NULL
+00479220,NoiceIdPlay,named,414,NoiceIdPlay -> Can not Init DIALOG ->  | NoiceIdPlay -> dp == NULL -> 
