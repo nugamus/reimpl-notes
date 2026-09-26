@@ -763,3 +763,677 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   tables read from .data through pefile's mapped image.
 - **Confidence:** proven
 - **Doc:** `games/mission-sunlight/docs/terrasse.md`
+
+### E-0400 — Boot order: registry, players, player screen, DirectInput, paths/DirectDraw, resume file, loading screen, intro
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** WinMain 0x42e97f (called from the CRT entry 0x476510): `App_Init` 0x4180c0
+  (Registry_Read 0x418416, USERS.BIN read 0x41889c, `Users_CheckSessions` 0x41861d, window
+  class `WC_MS_ACCUEIL` with WndProc 0x418c21 via thunk 0x401654, message loop until
+  message 0x502 whose wParam/lParam are kept at 0x4e298c / `*param_2`; lParam 0 → 0x4187ba
+  deletes the player's saves; 0x418966 writes USERS.BIN; `DI_Create`, mouse 0x472590(0, 0xD)
+  and 0x4726a0, keyboard 0x472a20(5) and 0x472b10); then 0x470970(0x1000000),
+  `SetWindowLongA(GWL_WNDPROC, 0x40139d → 0x42fbd6)`, `App3D_InitPaths` 0x42eb21 (0x4712e0
+  with 640, 480, 16; 0x472240 returning 1 → 0x6516bc = 1; 0x40fb60; `Snd_Init`; two page
+  clears), `Load3DGGame` when lParam = 1, else 0x28 zero ints at 0x651220; if 0x50273c = 0:
+  `LoadTga2("Loading")`, blit, mode 0, 0x41fda9; then mode 2 and
+  `Hnm_AllocDecBuffers(hwnd, "intro")`, then the `GetMessage` loop.
+- **Method:** decompiled 0x42e97f, 0x4180c0, 0x42eb21 (PyGhidra, `notes/decomp/`).
+- **Confidence:** proven
+
+### E-0401 — Registry: HKLM\SOFTWARE\Cryo\Mission Sunlight\{Path: Target, CD; Language: LOC; Install Level: IL}
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** Registry_Read 0x418416 opens key 0x4a9688, subkey "Path" (0x4a96a8): value
+  "Target" (0x104 bytes → 0x6514c0, then `lstrcatA "\"`), value "CD" (0x4a96bc, 0x80 bytes
+  → 0x6515e0); subkey "Language", value "LOC" (DWORD → 0x6515c4); subkey "Install Level",
+  value "IL" (DWORD → 0x651464). Any failure returns 0 and App_Init calls FatalError.
+- **Method:** decompiled 0x418416; strings read with pefile.
+- **Confidence:** proven
+
+### E-0402 — USERS.BIN = u32 count + 40-byte records {name[32], volume, view size}; player screen controls and outcomes
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x41889c reads `%sSAVE\USERS.BIN` ("rb"): u32 into 0x4e2994, then count ×
+  0x28 bytes into 0x4e29c8; a missing file leaves 0 players. 0x418966 writes the same
+  ("wb"). Record fields: name at +0 (0x4183a7, `lstrcpyA`); +0x20 read by `Snd_Init` into
+  the volume 0x4e2908 (0x4183d7) and written by 0x416ded as `(v - 100) * 50` (0x418400);
+  +0x24 view size (0x4183c4 / 0x4183ea; 0x42f515 maps 0..3 to `FUN_00435170` 640×480,
+  512×384, 400×300, 320×240). Accueil_WndProc 0x418c21: WM_CREATE loads ACCUEIL_BMP,
+  BOUTONS_BMP, font "Trobo" 16, creates buttons 0x66 (0x197, 0x18c, 0x24×0x17), 0x67 (0x1d4,
+  0x18c, 0x48×0x1b), one per player 0x68+i (0x5a, 0xd9 + 0x22 i, 0xa2×0x1b), edit 0x65
+  (0x158, 0xce, 0xa3×0x1a, EM_LIMITTEXT 20), all relative to the centred 640×480;
+  WM_DRAWITEM blits BOUTONS_BMP (x 0 / 0x28, y 0 / 0x1c when selected) or the name
+  (colours 0xd6c6b5 / 0xffffff on brush 0x785400); WM_COMMAND 0x66: `__strcmpi` against
+  the list; known → post 0x502 (index, 1); new with count < 5 → append with +0x20 = +0x24
+  = 0, post (index, 0); count = 5 → ACCUEIL2_BMP, edit destroyed, selection 0; in that mode
+  OK copies the name into the selected slot, zeroes +0x20/+0x24, posts (slot, 0); 0x67 →
+  WM_CLOSE; key-up Enter/Escape → 0x66/0x67 (edit subclass 0x418b31); background brush
+  0x502810.
+- **Method:** decompiled 0x41889c, 0x418966, 0x4183a7..0x418400, 0x418c21, 0x418a2d,
+  0x418b31, 0x419684, 0x416ded, 0x416e0f, `Snd_Init`.
+- **Confidence:** proven
+
+### E-0403 — The player screen's bitmaps are 8-bit 640×480 / 160×100 resources in the EXE
+- **Binary/file:** `Data/mission.___` `.rsrc`
+- **Evidence:** RT_BITMAP `ACCUEIL_BMP` (RVA 0x2b8600, 308,138 B, 640×480 8 bpp),
+  `ACCUEIL2_BMP` (0x3039b0, 308,002 B, 640×480 8 bpp), `BOUTONS_BMP` (0x34ecd8, 17,064 B,
+  160×100 8 bpp), RT_GROUP_ICON `GAME_ICON`; all language 1036. No WAVE resource.
+- **Method:** `pefile` resource walk.
+- **Confidence:** proven
+
+### E-0404 — Data paths come from the registry; PEINTRE.INI is never read
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** App3D_InitPaths 0x42eb21: 0x599460 = Target + `DATA\GRAPHS_2D\`, 0x5bae40 =
+  CD + `DATA\SCENES_3D\`, 0x502880 += `\DATA\`, 0x598ee0 = 0x502880 + `\SCENES\`, 0x598aa0 =
+  Target + `SAVE\`; the 2D loaders format `%sDATA\...` with 0x6514c0 (Target).
+  ReadPeintreIni 0x41ed13 (which would fill 0x502880) is reached only by the thunk
+  0x40128a, and no `call`/`jmp` rel32 in `.text` and no absolute pointer in any section
+  targets that thunk or the function.
+- **Method:** decompiled 0x42eb21, 0x41ed13; scan of every E8/E9 rel32 target and every
+  4-byte value in the image.
+- **Confidence:** proven
+
+### E-0405 — Window procedure 0x42fbd6 dispatches on the mode byte 0x598cb0; end of intro and end movies
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x42fbd6: modes 0/4 → 0x42f988; 1/3 → `MainWndProc` 0x4122bb unless
+  0x4b0058 ≠ 0 (then 0x42f755 → Entry2D); 2 → on 0x500 `FUN_00472710` (DirectInput mouse,
+  button 0 → 0x5b7fac) or `Hnm_Stream` = 0 closes the movie (0x40ba0b); then: 0x4aba5c = 1
+  → play `cinefin2` once (0x4e3148 1 → 2), afterwards mode 1 + `Timer_Begin`; else
+  0x502864 = 0, 0x4e4580 = 0, 0x50273c = 0 → mode 0, 0x41fda9, `Timer3D_Begin`; 0x4e4580 =
+  0 and 0x50273c = 1 → mode 1, `Entry2D(hwnd, 0x502860, 0x651220, 0x4aba40, 0x36c)`.
+  0x42f2c2 plays `cinefin` when the zone left is 0x15 (0x4aba5c = 1, 0x4e3148 = 1).
+- **Method:** decompiled 0x42fbd6, 0x42f2c2, 0x42f755.
+- **Confidence:** proven
+
+### E-0406 — The 2D timer: 40 ms multimedia timer posting 0x500 / 0x503 / 0x504 unless 0x4e22fc is set
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x410365 → 0x41059a(0x28): `timeSetEvent(40, 5, 0x401181 → 0x41224c)`;
+  0x40fccb: `timeSetEvent(0x28, 5, 0x4012f3 → 0x412271)`; Timer_Begin 0x40fbe9: callback
+  0x40183e → 0x412296. Each callback posts 0x500 / 0x503 / 0x504 to 0x651694 when 0x4e22fc
+  = 0; 0x41222e / 0x41223d set / clear it around loads.
+- **Method:** decompiled the functions; thunks resolved with capstone.
+- **Confidence:** proven
+
+### E-0407 — 2D input: relative DirectInput mouse ×2 into a software cursor; keys fire on release; Esc, Space, Backspace, arrows
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x40e3e1 adds `2 * dx, 2 * dy` from 0x472910 (GetDeviceState, 16 bytes)
+  and clamps to 0..0x27f / 0..0x1df; 0x40e4ef returns `rgbButtons[0] >> 7` via 0x4727d0.
+  MainWndProc toggles buffer 0x4e27c4 and reads 256 bytes into 0x4e2350 + 0x100·buffer
+  (0x472b80); 0x410c21(k) is true when the key was down in the other buffer and is up now.
+  Calls in MainWndProc (disassembly): 0x410c21(1) → 0x4e25e4, (0x39) → 0x4e2634, (0x0e) →
+  0x4e2678. 0x40dcf3 tests 0xc8, 0xd0, 0xcb, 0xcd with 0x410c8e / 0x410cb9.
+- **Method:** decompiled 0x40e3e1, 0x40e4ef, 0x410c21, 0x4727d0, 0x472910, 0x472b80,
+  0x40dcf3; capstone on 0x4122bb.
+- **Confidence:** proven
+
+### E-0408 — Entry2D contract; zone table 0x4a6b18 (25 × 0x6C) and object table 0x4a75a8 (35 × 0x20); handlers only through the table
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** Entry2D 0x40fdc6 (Ghidra shows a thiscall; the real arguments are hwnd,
+  zone, flags, state, size): zone > 0x19 → FatalError "Entrée 2D: n° de ZA (%u) pas
+  valide"; builds 0x4e2688 from the 35 flags; 0x410365; zone 0x15 →
+  `Save_WriteGGame(state, size, 0)`. 0x410365: `0x4e266c = 0x4a6b18 + zone * 0x6c`,
+  `Tgp_Load2(entry + 0x14)`, view rects from +0x38/+0x3c, per object `+8 + 4i` → 0x414a95.
+  MainWndProc calls `entry[0x12]` (+0x48, args object, slot), `entry[0x13]` (+0x4c, on
+  Backspace), `entry[0x14 + slot]` (+0x50, args tick, &result); +0x40 indexes TOURN and
+  its rects, +0x44 indexes 0x4e2318, +0x5c is patched at byte 99 to 'a'/'b'/'c' (0x414e3a,
+  0x414ea8), +0x68 is set when the zone is done and saved (0x40ff77). Rows read from
+  `mission.___` `.data` (file offset = VA − 0x401000); row 25 would start at 0x4a75a4,
+  inside the object table. Object k at 0x4a75a8 + 0x20 k: id, name pointer (0x4a8398 + 8k,
+  `OP_GENE`/`OPnn`), sprites +8 CapsE (0x414a95), +0xc CapsOP, +0x10 CapsAO, +0x14 CapsAC
+  (0x4149d1), +0x18 placed, +0x1c sound (0x4148a5). No handler has a direct caller
+  (function-dump.tsv); 0x403ddb (zone 9's onPlace, target of thunk 0x40122b) is not a
+  Ghidra function: 34 bytes, `push 0; push 0x3b; call Movie_Open`, then stores its args.
+- **Method:** decompiled 0x40fdc6, 0x410365, 0x410624; table dumps with pefile; thunk
+  targets with capstone; `define_and_decompile.py` on 0x403ddb.
+- **Confidence:** proven
+
+### E-0409 — MainWndProc 0x4122bb: a per-tick state machine on 0x4e27e4
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** message 0x500 reads input, then `switch (0x4e27e4)` over states 0..0x24
+  as tabled in `docs/spec/ui.md`, then the magnifier step, 0x410e30 (bar), 0x410d68
+  (dragged sprite), 0x41474a (cursor + `Display_Flip`). E.g. state 8: 0x4116a8 hit test,
+  0x4112f7 removes from the list, `CapsOP` start, `placed` = 1, 0x4e2658 = 1; state 0xF:
+  result 0x4e2640 = 0 and 0x4e2658 ≠ 0 → back to the bar; state 0x21: 0x410b80, 0x42eede,
+  `Save_WriteGame(0x4e267c)`.
+- **Method:** decompiled 0x4122bb; argument pushes checked in its disassembly.
+- **Confidence:** proven
+
+### E-0410 — Inventory bar: geometry tables 0x4a68e8..0x4a6aa8 and the 30-step slide
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x40fb86 fills 0x4e2550[30] with `__ftol(cos(π/2 − 3° i) · 60)` (0x4a2058
+  = 0.0523598775, 0x4a2060 = 60.0; 0x475794 uses `fcos`); 0x410e30 sets the bar y
+  0x4e2714 = 0x1df − T[i] while opening (i up to 0x1e → 0x1a4) and closing (down to −1 →
+  0x1e0). Tables (i32): arrow frames at (13, 0), (504, 0); arrow rects (13, 435, 23, 30),
+  (509, 435, 22, 30); slot rects (88 + 70i, 436, 28, 27); icons (67 + 70i, 0); drag origins
+  (101 + 70i, 30); zone slot drop rects (12, 53/143/233, 59, 58) at 0x4a69d8; slot draw
+  (0, 29/116/222); placed-slot rects 0x4a6a20; fly-back origins (40, 83/172/263); Retour
+  (605, 437, 24, 29), RetourM (11, 437, 24, 29), their sprites at (600, 435), (8, 432);
+  counter (558, 21), pot (558, 2), pot area (590, 400, 45, 80); sunflower rects 0x4a6ab8,
+  grab offsets 0x4a6ae8. 0x411514 scrolls when `(0x4e27e8 & 7) == 0`. Sprites and sounds
+  from 0x414fbf, 0x4148a5.
+- **Method:** decompiled 0x40fb86, 0x410e30, 0x411153, 0x411454, 0x411514, 0x411649,
+  0x4113e0, 0x414fbf, 0x4148a5; tables dumped with pefile.
+- **Confidence:** proven
+
+### E-0411 — Magnifier states and the two views (panorama `<zone>b`, animation `<zone>a`)
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x4e2348: 0x411807(0,…) draws the last `LoupeOut` frame → 2; 0x4119c2 plays
+  `LoupeOut` → 1; 0x41195b plays `LoupeIn` (+ `bar_outi`) → 0; the end of MainWndProc's
+  0x500 turns 1 → 2 and 0 → 3 on even ticks. 0x411454 returns 2 for (x + 0x4e, y, 0x41,
+  0x24) and 1 for (x + 2, …) when 0x4e2348 = 2. State 2: `Tgp_Load(entry + 0x2c)`,
+  0x40dc22; state 1: 0x40dcf3 until a click. State 4: 0x409310(entry + 0x20)
+  (`Tgp_Load2`, `Sprite_Open`, `pas_VG2`); state 3: 0x4093cb until it returns 1.
+- **Method:** decompiled the functions; call arguments from the disassembly of 0x4122bb.
+- **Confidence:** proven
+
+### E-0412 — Object placement, slot run protocol and result
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** states 8, 10, 0xE, 0xD, 0xF, 0x10–0x12, 0xC, 0xB of 0x4122bb; 0x41170e draws
+  CapsE (not placed) / CapsAC (slot = argument) / CapsAO (placed); fly-back in state
+  0x11: `t = (sin(3π/2 − n·π/32) + 1) / 2` (0x4a2068..0x4a2088; 0x475b84 uses `fsin`),
+  `x = bar·t + slot·(1 − t)`; state 0xF sets entry[0x1a] = 1 and goes to 0x1A when all
+  zone objects have `placed` ≠ 0 and the zone is not 0.
+- **Method:** decompiled 0x4122bb, 0x41170e, 0x4116a8, 0x4112f7, 0x41138b; disassembly
+  0x413818..0x413940.
+- **Confidence:** proven
+
+### E-0413 — Sunflower sequence: PA<zone>a/b/c, TOURN<n>, POT, sounds pas_VG, tourneso, vase
+- **Binary/file:** `/MISSION.EXE`; `Data/SPRITES`, `Data/SOUND`
+- **Evidence:** 0x414e3a (PA..a, PA..b, `pas_VG`), 0x414ea8 (PA..c), 0x414f64 (`TOURN%u`
+  with entry +0x40, `tourneso`), 0x4150b0 (`POT`, `vase`); states 0x1A, 0x16, 0x17, 0x18,
+  0x1C, 0x1D, 0x19, 0x1B of 0x4122bb; the frame-12 test at 0x413ce9 stops 0x4e2664
+  (`pas_VG`), state 0x19 starts it at frame 12; state 0x1C increments 0x4e2318[entry +
+  0x44]. Corpus: `PA*A/B/C.SPR` for every zone with a Van Gogh name, `TOURN0..2.SPR`,
+  `POT.SPR`, `PAS_VG.WAV`, `TOURNESO.WAV`, `VASE.WAV`.
+- **Method:** decompiled; disassembly for thunk arguments; corpus listing.
+- **Confidence:** proven
+
+### E-0414 — Leaving a zone: 0x42f2c2(flags, counter, code) with -1, -2, -3 or a save number
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** state 0x20: 0x410624 (free), 0x410b80(0x4e2720), 0x42f2c2(0x4e2720,
+  0x4e2318[entry + 0x44], 0x4e25dc). 0x4e25dc = −1 from Retour / Backspace / zone 0 /
+  zone 21, −3 from RetourM, −2 / n from OptionMenu. 0x42f2c2 copies the flags to 0x651220,
+  0x4abbd4 = counter; counter > 0x598fe0 → `0x4abb0c[zone] = 1` (u32, disassembly
+  0x42f32e); −3 → 0x50273c = 0, later 0x4e3144 = 0 and 0x41fda9; −2 → PostQuitMessage;
+  n ≥ 0 → Load3DGame(n); zone 0 → 0x4aba48 = 0x4aba4c = 1; zone 0x15 → `cinefin`.
+- **Method:** decompiled 0x42f2c2, 0x410b80; disassembly.
+- **Confidence:** proven
+
+### E-0415 — Option menu 0x40ecd4: pages, rects, volume, view size, load list, quit
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x40e620 (`option`, `options`, `cursopt`, `lcaps`, `trobo12`, volume
+  `0x416e0f() * 0xd3 / 100`, view size from the player, Save_ListGames), 0x40e976 (six rects
+  0x4a65c0; volume bar 0x4a6660 → 10, knob 0x4a6670 moved by 0x4a6658 + v → 11; buttons
+  1..3 ignored while the volume row is open), 0x40ea4f (0x4a66a0), 0x40ea9a (0x4a6730,
+  arrows 0x4a6770/0x4a6780), 0x40eb34 (0x4a66f0), 0x40ebd9 (`lcaps` frame = slot at
+  0x4a6710, "Game %u" at x 0x130 colour 0xce59), OptionMenu states 0..0x12 (load →
+  `player * 100 + slot`; quit yes → 0x410b80/0x42eede when opened from 2D,
+  `Save_WriteGGame(state, size, from2D)`, 0x418966, −2; credits `Credit%02u` 250 ticks),
+  0x40e6fb (restore, volume `v * 100 / 0xd3`, view size). Backgrounds `load`, `scrsize`,
+  `keyboard`, `quit`. Opened from 3D: 0x42edef → 0x40fccb (mode 3); on close 0x42f515(result).
+- **Method:** decompiled; tables dumped with pefile; disassembly 0x4124b8.
+- **Confidence:** proven
+
+### E-0416 — Cursor table 0x4a64e8: 14 entries {frame, dx, dy} of Curseurs.SPR
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x40e25a(_, n) loads `0x4a64e8 + 12n` into 0x4e1fcc / 0x4e1fdc / 0x4e1fe0;
+  0x40e2fc draws frame 0x4e1fcc at cursor − (dx, dy); 0x40e200 opens `Curseurs`. Uses:
+  0x40dcf3 (1..8), 0x408118 (10), hit tests (11, 12), drags (13), waits (9).
+- **Method:** decompiled 0x40e200, 0x40e25a, 0x40e2fc; table dump.
+- **Confidence:** proven
+
+### E-0417 — 2D movies are opened by index into the 0x4a7a08 table; the second argument forbids skipping
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** Movie_Open 0x414ace(n, p): record 0x4a7a08 + 0x24 n; 0x4e2300 = (p == 0);
+  Movie_Step 0x414bf8 ends on a click only when 0x4e2300 ≠ 0. Generic slot functions:
+  0x414dcc sets result 1 and returns Movie_Step's end; 0x414dec sets result 1, waits while
+  0x651678 = 0 and no click, then stops the stream (0x4169ad). Each zone's movie index and
+  flag: E-0426..E-0431.
+- **Method:** decompiled 0x414ace, 0x414bf8, 0x414dcc, 0x414dec.
+- **Confidence:** proven
+
+### E-0418 — End credits: sound `Credits`, 16 pictures `Credit00..15`, 250 ticks each, then quit
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** MainWndProc 0x504: first 0x409600 (`Credits` static, looping), then
+  0x409645(0x4e2634 = Space fired, disassembly 0x4125ec): `Credit%02u` via Tgp_Load2,
+  > 0xfa ticks → next, 16 → end; a click or Space → end; the end waits for the button up
+  and stops the sound; then 0x40fca8 and 0x42f508 (`PostQuitMessage(0)`). Corpus:
+  `GFX/CREDIT00..15.TGP`, `SOUND/Credits.wav`.
+- **Method:** decompiled 0x409600, 0x409645, 0x42f508; disassembly.
+- **Confidence:** proven
+
+### E-0419 — GAME save = 0x36C-byte 3D block + 0x100-byte 2D block; slot = object id; list = slots 1..34 by file time
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** Save_WriteGame 0x40ff77(slot): `%sSAVE\GAME%02u%02u.BIN` (player 0x41839d,
+  slot); writes 0x4e2624 (0x4aba40) × 0x4e2610 (0x36c) bytes, then 0x100; its only call
+  passes 0x4e267c, the current object (disassembly 0x4139e0). Save_ListGames 0x40e78a:
+  slots 1..0x22 through 0x466f10 (file time), bubble sort on CompareFileTime > 0.
+  Load3DGame 0x42ef0f(n): `%sSAVE\GAME%04d.BIN`, size < 0x801, 0x36c bytes to 0x4aba40,
+  the rest to 0x40fed7, then Entry2D with +0x3e.
+- **Method:** decompiled 0x40ff77, 0x40e78a, 0x42ef0f; disassembly.
+- **Confidence:** proven
+
+### E-0420 — GGAME resume file = u32 in_2d + the same two blocks; writers and reader
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** Save_WriteGGame 0x410153(state, size, flag): `%sSAVE\GGAME%u.BIN`, writes
+  the flag (4 bytes), `size` bytes of state, 0x100 bytes. Callers: OptionMenu quit (flag
+  = 0x4e2000, 1 when opened from 2D), Entry2D zone 0x15 (0), 0x42f873 (0; called from
+  0x41bbcf, 0x426171, 0x429dd6, 0x42d489). Load3DGGame 0x42f111: size < 0x801; u32 →
+  0x50273c, 0x36c → 0x4aba40, rest → 0x40fed7; returns 0, −1 (no file) or the size.
+- **Method:** decompiled 0x410153, 0x42f111, 0x42f873; callers from function-dump.tsv.
+- **Confidence:** proven
+
+### E-0421 — The 2D block: 25 zone-done flags, 35 object-placed flags, 4 counters
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x40ff77 / 0x410153 build `u32[25]` from 0x4a6b80 + 0x6c i (zone +0x68),
+  `u32[35]` from 0x4a75c0 + 0x20 i (object +0x18), `u32[4]` from 0x4e2318; 0x40fed7
+  restores from offsets 0, 0x64, 0xf0.
+- **Method:** decompiled.
+- **Confidence:** proven
+
+### E-0422 — 3D block fields touched by the save glue
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x42f755, 0x42f873, 0x42edef write +0x24..+0x2c and +0x30..+0x38 from the
+  s16 at 0x651346 and 0x651352 (movsx), +0x3c/+0x3d/+0x3e from bytes 0x4e3144/0x4e3140/
+  0x502860, +0x40 (0x8c bytes) from 0x651220; Load3DGame/Load3DGGame restore them into
+  0x5b7fb0.., 0x5b7f80.., 0x4e3144, 0x4e3140, 0x502860, 0x651220, reset byte +0x194
+  (0x4abbd4) when 3 with +0x1a0 = 0 or 15 with +0x1a4 = 0, and copy byte +0 to the player's
+  view size. 0x42f2c2 writes +0x08, +0x0c, +0x1c, +0xcc + 4·zone, +0x194. App3D_InitPaths
+  zeroes 100 bytes at +0xcc.
+- **Method:** decompiled; field widths from the disassembly.
+- **Confidence:** proven
+
+### E-0423 — Loading a game always resumes inside the saved 2D zone
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** Load3DGame 0x42ef0f ends with mode 1, `Timer3D_End`, `Entry2D(hwnd, +0x3e,
+  0x651220, 0x4aba40, 0x36c)`; GAME files are written only in state 0x21 of the 2D shell
+  (Save_WriteGame's single caller).
+- **Method:** decompiled 0x42ef0f; callers of 0x40ff77.
+- **Confidence:** proven
+
+### E-0424 — Users_CheckSessions discards players without GGAME and does not rename the later players' files
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x41861d: for i < count, `GGAME%u` missing → delete `GAME%02u%02u` for
+  0..0x22, MessageBox 0x4a9710 / 0x4a9770, count − 1, `memmove` of the later 0x28-byte
+  records, i − 1. No file is renamed. 0x4187ba (new player) deletes `GGAME%u` and
+  `GAME%02u%02u` 0..0x22 of the chosen index.
+- **Method:** decompiled 0x41861d, 0x4187ba.
+- **Confidence:** proven
+
+### E-0425 — Voice and movie waits used by the puzzles
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x416874(name) starts the streamed voice (`!` prefix, E-0209) and clears
+  0x651678; 0x4169ad stops it; 0x414dec waits while 0x651678 = 0 and 0x40e4ef = 0. The
+  puzzles' hint timers are tick counters compared with 0xfa, 0x271 or 500 (per zone, E-0426..
+  E-0431).
+- **Method:** decompiled 0x416874, 0x4169ad, 0x414dec and the puzzle functions.
+- **Confidence:** proven
+
+### E-0426 — A01 zones 1–2 (`games/mission-sunlight/docs/a01.md`)
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x40d0f0 (Movie_Open(0x1d, 0)); 0x40d112 (object 2 → voice `A01_031`;
+  object 3 → background `a01_032a`, Movie_Open(0, 1), sprite `a01_032a`, `pt_clic1..3`,
+  `reussit`), 0x40d1ef, 0x40d207, 0x40d293 (states 0..7 as written; piece table 0x4a62c0
+  stride 0x28: x, y, pick rect, drop rect). Movies 0..6 = `A01_032a..f`, `A01_032l`.
+- **Method:** decompiled; tables dumped with pefile.
+- **Confidence:** proven
+
+### E-0427 — A03 zones 4, 7, 12, 13, 16, 18 (`a03.md`)
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** zone 4: 0x4022c0, 0x402376, 0x40238e (0x4a4f88), 0x4023d9 (0x4a4fb8 +
+  0x10·(f − 4)), 0x4023fa (0x4a5078 + 0x10·(f − 16)), 0x40241b; zone 7: 0x4029f5, 0x402ac2,
+  0x402ada, 0x402b51, 0x402bc8 (0x4a5168), 0x402c20 (letters 0x4a5198 + 4h + 0x18·mask,
+  movies 0x4a51a4 + 4h + 0x18·mask); zone 12: 0x404130; zone 13: 0x404152, 0x404217,
+  0x40422f, 0x40429c (0x4a4f18), 0x404306 (0x4a4f48), 0x404351 (0x4a4f78), 0x404378 (hint
+  start 0x177, limit 0x271); zone 16: 0x4055bb, 0x405659, 0x4056ac, 0x4056bb/0x405725
+  (0x4a4b88 stride 0x38), 0x405766/0x4057be (0x4a4cd8/0x4a4ce8 stride 0x20), 0x405816
+  (board rect 0x9e, 0xd2, 0x142, 0x96; `a03_05f/g/h` by attempts < 2, < 4, else); zone 18:
+  0x405e8c, 0x405f26, 0x405f5b, 0x405f6a (windows 0x4a5138, rect 0x4a5158), 0x405fa6.
+- **Method:** decompiled; tables dumped with pefile.
+- **Confidence:** proven
+
+### E-0428 — A04 zones 19, 22, 23 (`a04.md`)
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x4074c0 (object 0x1d → voice `A04_01`; 0x1e → Movie_Open(0x43, 0));
+  0x407b83 (0x23, 0); 0x407ba5 (0x24, 0); slot functions 0x414dec / 0x414dcc (zone table).
+- **Method:** decompiled.
+- **Confidence:** proven
+
+### E-0429 — A11 zone 3 (`a11.md`)
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x40d271: Movie_Open(0x3c, 0); slot function 0x414dcc.
+- **Method:** decompiled.
+- **Confidence:** proven
+
+### E-0430 — A13 zones 5, 6, 8, 9, 10, 11, 14, 15, 17 (`a13.md`)
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** movie-only onPlace functions 0x4029b1 (0x15), 0x4029d3 (0x3d), 0x403ddb
+  (0x3b), 0x40410e (0x3a), 0x40474b (0x25, 0x26), 0x405e6a (0x3f), all with 0; zone 8:
+  0x403346, 0x4034f2, 0x403501, 0x4035fb (rects 0x4a4b50, answers 0x4a4b70, frame test
+  0xf), 0x403a1a (hint counter +2 per tick, limit 0x271), 0x403215 (0x4a4a90, 0x4a4b30),
+  0x402e76 (0x4a4a30, 0x4a4a80; frame formulas as written, including `(s ^ 1) + 10`
+  without × 14), rect save/restore 0x46f7be/0x46f818 (0x6e, 0x1d, 0x1e2, 0x182); zone 10:
+  0x403dfd, 0x403e7e, 0x403ea1, 0x403eb9 (0x4a4ed8), 0x403f04; zone 15: 0x404a47, 0x404b5f,
+  0x404b77, 0x404793/0x404834/0x4048d0/0x40497d (0x4a4d98 stride 0x10, order 0x4a4e98,
+  board limits 0x9c..0x1e3 × 0x1d..0x1ac, snap ±4), 0x404bde.
+- **Method:** decompiled; tables dumped with pefile.
+- **Confidence:** proven
+
+### E-0431 — A14 zones 0, 20, 21, 24 (`a14.md`)
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** zone 0: 0x4119fc (Movie_Open(0x20, 1), 0x4e27c0 = 0), 0x411a28 (states
+  0..0xC: views through 0x411454, 250-tick timeout, Movie_Open(0x21, 1), `a14_031c`,
+  `A14_031a` frames at (0x1f, 0xc6), 0x4e2318[entry + 0x44] = 1, Movie_Open(0x22, 0),
+  `a14_031d`, 40 ticks); zone 20: 0x407509 (start states 0x4e0538..0x4e0540 = 2, 2, 1),
+  0x407617, 0x4076b2, 0x4076c1 (0x4a57d8), 0x40770c (goal array 0x4e0558: in `.bss`, past
+  the 0x3c400 raw bytes of `.data`, and its only reference in `.text` is the read at
+  0x407979; names 0x4a5808 + 8·state + 0x18·wheel; s5 ends at count > 0x32, s7 at count
+  = 0x3c on the same counter); zone 21: 0x412065 (rect 0x4a6b08, movies 0x40, 0x41);
+  zone 24: 0x407bc7 (calloc 0x2d420, last 3 bytes 0xff, brush = `Curseurs` frame 10 size
+  via 0x40e2b8), 0x407d43, 0x407dd1, 0x407de0/0x407e38 (0x4a5850/0x4a5860 stride 0x20),
+  0x407e83 (area 0x70..0x24f × 0x1d..0x1a0, stride 0x1df, done when < 0x2423 of 0xb508
+  words ≠ −1), 0x40804c, 0x4080b6 (0x4a58f0), 0x408118 (drop point + 0x20, hint 0x7d /
+  500).
+- **Method:** decompiled; tables dumped with pefile; section sizes from pefile; `.text`
+  scan for 0x4e0558.
+- **Confidence:** proven
+
+### E-0432 — The corpus holds no save file
+- **Binary/file:** `engines/peintre/notes/corpus-md5.tsv`
+- **Evidence:** no path containing `SAVE` and no `.BIN` file among the 877 files.
+- **Method:** `grep -i "save\|\.bin" corpus-md5.tsv` (no match).
+- **Confidence:** proven
+
+### E-0300 — The 3D tick: a 66 ms multimedia timer posting 0x505, dropped while busy; elapsed ticks clamped to 1..10; one frame per handled tick
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** `Timer3D_Begin` 0x42fb5e: `timeBeginPeriod(0x42)`, `timeSetEvent(0x42, 5,
+  0x40104b → 0x42f955, 0, 1)`; 0x42f955 increments 0x598ca4 and posts 0x505 unless 0x502a84.
+  The window procedure 0x42fbd6 sends modes 0/4 to 0x42f988, which on 0x505 sets 0x502a84,
+  reads the keyboard into buffer `0x5b7fc0 + 0x100 · (0x5bae2c ^= 1)` (0x472b80 =
+  `GetDeviceState(256)`), sets 0x598ec0 = tick delta clamped to 1..10, then in mode 0 runs
+  0x422aa6 + 0x41fda9 when 0x4e313c, 0x41fda9 when 0x502740 ≠ 0x598cb0, 0x4223e8 when
+  0x4e4580 = 1; in mode 4 0x41f9f8 then 0x41faf9 when it returns 0; clears 0x502a84.
+  WM_DESTROY → 0x42ed9c; WM_SYSCOMMAND 0xF140 swallowed. Frame 0x4223e8: 0x422b98, 0x4216b6,
+  0x420e07, border fill (0x114a / 0x8aa by 0x5b7fa4), `0x4378f0(0x5baf80)`, 0x426171,
+  cursor (0x424190), 480 rows of 0x500 bytes to the surface (0x472030/0x471fd0/0x471d40),
+  keys 0x0E / 0x39 / 0x01 by 0x41ec7b, then `(*0x651358)()`. Debug flags 0x4e3104,
+  0x4e3108, 0x4e310c lie in `.bss` (`.data` raw data ends at 0x4e0400) and a byte scan of
+  `.text` finds one reference each (0x42260b, 0x422481, 0x42248f), all reads. 0x4221f6 = the
+  same without 0x422b98 (camera from 0x651346.. through 0x422f30) and with `sablier` centred;
+  sets 0x4b0058 in mode 1.
+- **Method:** decompiled (listings in `engines/peintre/notes/decomp/`); thunk targets
+  resolved from the `jmp rel32` stubs; byte scan of `.text` for the flag addresses.
+- **Confidence:** proven
+- **Doc:** `engines/peintre/docs/spec/movement.md` "The tick"
+
+### E-0301 — Keyboard: two 256-byte DirectInput buffers; held = bit 7 now, released = up now and down before
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x41ece8(k) = `buf[cur][k] & 0x80`; 0x41ec7b(k) returns 1 only when
+  `buf[cur][k] & 0x80` = 0 and `buf[prev][k] & 0x80` ≠ 0. Buffers cleared in
+  `Alloc3DMemory` 0x422869, 0x42f2c2, 0x42f515.
+- **Method:** decompiled.
+- **Confidence:** proven
+- **Doc:** `movement.md` "Keyboard"
+
+### E-0302 — Walking: per-tick velocities with halving damping, +60 forward / ±40 yaw rate / ±30 pitch, direction (M[2], M[8]) of the angle matrix
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x422b98: damping of 0x651342 (|v| > 10 → `v -= v/2`, else 0), 0x651344
+  (`vy -= vy/2`, then +5 when < 6), 0x65134e; keys 0xC8 (+0x3c while < 0x9c4), 0xD0 (-0x3c
+  while > -0x9c4), 0xD1 (0x651340 and 0x651346 -0x1e while > -500), 0xC9 (+0x1e while < 500),
+  0xCB (-0x28 while > -300), 0xCD (+0x28 while < 300); `0x651348 = (0x651348 + 0x65134e) &
+  0xfff`; `0x43a780(pitch, yaw, roll, m)`; x += (m[2]·v) >> 15, y += vy, z += (v·m[8]) >> 15
+  (signed shift with the +0x7fff bias = division toward zero); 0x422f30 sets the camera
+  (0x436160 position, 0x4360f0 matrix) and copies the six values back. 0x43a780's nine terms
+  as in the spec; 0x43a660 fills 0x6a7580 with `fcos(θ)·32768` and 0x6ab5a0 with
+  `fsin(θ)·32768`, θ from 0 in steps of 2π/4096 for 4096 entries. `Alloc3DMemory` clears
+  0x651340..0x651357 before the start camera is set.
+- **Method:** decompiled; FPU constants read from `.rdata` (0x4a25e8 = 0.0f, 0x4a25f8 =
+  -0.0015339808f subtracted per step, 0x4a25f0 = 32768.0).
+- **Confidence:** proven (rules); the derived speeds in the spec are arithmetic on them
+- **Doc:** `movement.md` "Walking and turning"
+
+### E-0304 — Collision: sphere of radius 250 against .3DI triangles, front side only; push out from the average face point along the average normal, else from the average edge point
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** body created by `0x432e70(0xf)` (flags byte +0x10 = 0xF, 0x431630) in
+  `C_Monde::LoadScene`; radius `0x432f30(body, 0xfa)` (+0xc) in `Alloc3DMemory`. Broad phase
+  0x4310b0 per axis; 0x430db0 adds a face to list +0x30 when its axis bits are 7 (body flag
+  4) and to list +0x34 when bits 0 and 2 are set and the axis is not 1 (flag 8); face box
+  ends at +0x48 / +0x54 (0x430c30). 0x432220: `d = (n·c) >> 15 - face[4]` with n =
+  `*face[3]`; bounds `-r < d < r` for flags 1|2; edge distances 0x431700 (normals +0x14 +
+  12i, constants +0x38 + 4i), any below -r → 0; mask of negatives → 0x431920 (projection),
+  0x431d30 (edge), vertex copy; returns ±2 for mask 0, else ±1 when |closest - c|² < r²;
+  sign `(d >= 0) ? 1 : -1`. 0x4216b6 (disassembly 0x4217a7..0x421b72): counts result 1
+  only while no result 2 was seen, sums its points (0x5b7f90..) into [ebp-0x84..]; result 2
+  sums points into [ebp-0xc..] and normals (0x433050's fifth argument = `face[3]`) into
+  [ebp-0x90..]; with faces: `fdivr 1.0` by the count, `__ftol` of the normal average, times
+  `250 / 32768.0` (0x4a2528), `__ftol`, plus the point average, `__ftol`, `0x436160(0, p)`;
+  else with edges: average, `__ftol(c - E)`, `sqrt` of the integer square sum (0x476464),
+  times `250 / len`, `__ftol`, plus E, `__ftol`, set.
+- **Method:** decompiled; FPU sequences read from the disassembly (capstone), the
+  decompiler dropped their operands.
+- **Confidence:** proven
+- **Doc:** `movement.md` "Collision"
+
+### E-0305 — Floor: the eye is set 700 above the nearest front-facing face below; y points down
+- **Binary/file:** `/MISSION.EXE`; `Data/Scenes_3D/MUSEE.BFG`, `AUBERGE.BFG`, `MAISONET.BFG`
+- **Evidence:** 0x4216b6 second half: for each list-+0x34 face, 0x431f90 (point inside the
+  (x, z) triangle by three cross-product signs, `n.y ≠ 0`, y on the plane, returns 1 on the
+  front side); keeps the smallest `y > camera y` (start 9999999); then `y = yf - 0xfa -
+  0x1c2` (disassembly 0x421c10..0x421c3c) and 0x436160. In the corpus (extracted with
+  `bfg.py --extract`, faces read with the E-0016 layout): MUSEE `BOX.3DI` and `BOX1.3DI`
+  have one face under the default museum start (-39, -209, 361), normal (0, -32767, 0), D =
+  -491, plane y = 491, signed distance 699, and -209 = 491 - 700; AUBERGE `BOX.3DI` under
+  (0, 0, 0): y = 838; MAISONET under its start (1149, 141, -1491): y ≈ 930. 0x4211a6 and
+  0x4212f7 have no callers (function-dump.tsv).
+- **Method:** decompiled + disassembly; a script over the extracted `.3DI` faces.
+- **Confidence:** proven
+- **Doc:** `movement.md` "Floor"
+
+### E-0306 — Scene table: 14 scenes, their bundles, init/frame callbacks, completion zones, entry/return movies
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x41fda9 switch on 0x4e3144 → bundle strings (0 "musee", 1 "auberge",
+  2 "hopiext", 3 "maisonet", 4 "mangeurs", 5 "cafe", 6 "chambrev"/"chambreb" by 0x4abd14,
+  7 "maisonj", 8 "hopiint", 9 "pont", 10 "terrasse", 11 "jardin", 12 "champ", 13 "eglise").
+  0x41ee1d sets the callback pair 0x651460/0x651358 per scene; thunks resolved: 0x40141a →
+  0x42ad92, 0x401645 → 0x42b776, 0x4012fd → 0x41a0b0, 0x4014c4 → 0x41a42b, 0x401271 →
+  0x424af7, 0x401771 → 0x424d93, 0x401078 → 0x4279a3, 0x401802 → 0x427e04, 0x4017f8 →
+  0x4298e5, 0x401140 → 0x429dd6, 0x401555 → 0x41b77d, 0x40191a → 0x41bbcf, 0x40168b →
+  0x41c979, 0x401028 → 0x41d167, 0x40188e → 0x41dd7f, 0x40111d → 0x41ded8, 0x401776 →
+  0x42897f, 0x40182a → 0x428e63, 0x401726 → 0x425541, 0x401848 → 0x42579a, 0x401839 →
+  0x42cfe2, 0x401023 → 0x42d489, 0x4012e4 → 0x42ddbf, 0x4018c0 → 0x42e023, 0x401424 →
+  0x426d9b, 0x401172 → 0x427069, 0x4012cb → 0x41e383, 0x4017da → 0x41e5de, 0x4011f4 →
+  0x4242ed, 0x401005 → 0x424467. Completion 0x41efc5 (u32 flags 0x4abb10 … 0x4abb6c =
+  0x4abb0c + 4·zone; 1, 2, 11 return 0). Entry movies 0x41faf9 ("maisa", "mangeurs",
+  "cafe", "chamba", "maisonj", "hopi", "pont", "terrasse", "jardin", "champ", "eglise"),
+  return movies 0x41f14b ("maisr", "mangeurr", "cafer", "chambr", "maisonjr", "hopir",
+  "pontr", "terr", "jardinr" unreachable (case 11 returns first), "champr", "eglr"); all
+  present in `Data/MOVIES` as `.hnm` (`terr` as `Terr.hnm`).
+- **Method:** decompiled; strings and thunks read from the image (pefile).
+- **Confidence:** proven (numbers, bundles, callbacks); the place names in the spec are ours
+- **Doc:** `engines/peintre/docs/spec/scene.md` "The scene table"
+
+### E-0307 — Scene load: 7 MB 3D heap, BFG image, .3DC under the camera, BOX.3DI in the collision world, a name table of ≤ 200 nodes, init callback, BFG freed
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** `Alloc3DMemory` 0x422869: clears 0x5badc0[20], 0x6511e0[10];
+  `m__malloc(0x700000)` + memset; 0x421d73 (heap 0x434e70 creates the object "Camera" with
+  flag 0x400; viewport 0x435170 per 0x4aba3c; then 0x4353c0(0x40), 0x4353d0(80000)); cursor
+  0x25; callbacks; `C_Monde::LoadScene`; keyboard buffers cleared; 0x43c220(0); 0x426594;
+  0x421c98; 0x432f10 + 0x432f30(0xfa); 0x4e4580 = 1; init callback; `m__free(0x598cac)`
+  (the BFG image, E-0013); 0x439a10 when 0x5b7fa4 = 15. `C_Monde::LoadScene` 0x421e56:
+  `<name>.BFG` (0x42e85c), `<name>.3DC` (`Obj_Load`), 0x435880(root, 0), 0x435930(root,
+  0xf), `BOX.3DI`, 0x432df0, 0x432e70(0xf), 0x432e10(box), `CheckObjectCount` 0x4210b9 +
+  0x420e99/0x420fa9 (records 0x38 bytes at 0x5b81e0, handle at +0x34 = 0x5b8214, first
+  child 0x435fb0, next sibling 0x436020; > 200 → MessageBox). 0x41edc9 = strcmp search.
+  0x422aa6 = unload. 0x435970 / 0x4359a0 set / clear bit 0 of node +0xc; 0x435dc0 renames
+  face-group textures (+0xa4 list, `puVar2[2]` texture id); 0x4395d0 loads `<file>.3DM` as
+  a named texture (texel pointer = entry + 0x8014); 0x436200 copies node +0x4c.
+  0x435170(w, h, x, y, 480): centre, 0x6af5fc = `480·w/640`, 0x6af654 = `h·4.0 / (w·3.0)`
+  (0x4a2570 = 4.0, 0x4a2578 = 3.0), 0x4353c0(0x80), 0x4353d0(65000); 0x432c30 draws only
+  when z > 0x6af5bc (the near clip). 0x42f515 calls 0x435170 alone.
+- **Method:** decompiled.
+- **Confidence:** proven
+- **Doc:** `scene.md` "What a scene is made of", "Camera and view"
+
+### E-0308 — Start positions: per scene from the museum, per painting in the museum, per doorway between scenes, saved spot with pitch 0 after 2D
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x41fda9: `Alloc3DMemory(name, 0xf, init, frame, x, y, z, pitch, yaw, roll)`
+  immediates (case A, both switches), the `local_1c..local_8` assignments per
+  (0x4e3140, 0x4e3144) pair (case B), and the 0x5b7f80.. branch passing 0 for pitch
+  (case C, taken when 0x502740 ≠ 0x598cb0). 0x4aba5c = 1 → "musee" at (0x4d0, -0xd0,
+  0x106f, 0, 0xd52, 0). The else-branch's locals are only assigned for the listed pairs.
+- **Method:** decompiled; every hex immediate converted and checked twice (the museum rows
+  equal the flight targets of 0x41f506).
+- **Confidence:** proven
+- **Doc:** `scene.md` "Start positions"
+
+### E-0309 — Museum → scene: 20-step camera flight (mode 4), then the entry movie unless the scene is complete
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x41f506: target per 0x4e3144 (same values as the museum rows of 0x41fda9),
+  differences 0 → 1, angle wrap ±0x800, divided by 0x4aba30 (= 20 in `.data`), mode 4.
+  0x41f9f8: add the step, 0x4221f6, counter 0x5b7fa0 += 1 (elapsed < 3) or elapsed >> 1,
+  returns 0 when the counter ≥ 21. 0x41faf9: mode 2, stop stream, stop statics, 0x41efc5 = 0
+  → `Hnm_AllocDecBuffers(movie)` + 0x42f6a0; else mode 0 and 0x4e313c = 1. Mode-2 end in
+  0x42fbd6: 0x41fda9 + `Timer3D_Begin` when 0x502864 = 0x4e4580 = 0x50273c = 0.
+- **Method:** decompiled.
+- **Confidence:** proven
+- **Doc:** `scene.md` "Moving between the museum and the scenes"
+
+### E-0310 — Scene → museum: Backspace or the return icon; return movie when the scene is complete
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x4223e8: `0x41ec7b(0xe)` and 0x4e3144 ≠ 0, or `click` with 0x4acfa0 = 0 and
+  the cursor in (x < w65 + 10, y > 0x1da - h65), → 0x4221f6, 0x4e3140 = 0x4e3144, 0x4e3144 =
+  0, 0x4e313c = 1, 0x41f14b. 0x41f14b: per scene the same flags as 0x41efc5 (cases 0, 1, 2,
+  11 return); else mode 2, stream stop, statics freed, return movie, 0x4e3138 = 1, 0x4e3144
+  = 0, `*(0x4abb70 + 4·0x502860) = 1`. 0x42f988 handles 0x4e313c (0x422aa6 + 0x41fda9).
+- **Method:** decompiled.
+- **Confidence:** proven
+- **Doc:** `scene.md`, `interaction.md` "The return icon"
+
+### E-0311 — Back from 2D: zone solved when the sunflower count rose; actions -1/-2/-3/slot; special zones 0, 7, 8, 11, 21
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x42f2c2(flags, count, action) (called from `MainWndProc` at 0x412e76):
+  clears keyboard buffers, copies 0x8c bytes to 0x651220, 0x4abbd4 = count, count > 0x598fe0
+  → `0x4abb0c[0x502860] = 1`; -3 → 0x50273c = 0, 0x4e3140 = 0x4e3144; -2 → `PostQuitMessage`;
+  ≥ 0 → `Load3DGame`; zone 0 → 0x4aba4c = 0x4aba48 = 1; 0x15 → 0x4aba5c = 1, movie
+  "cinefin", 0x4e3148 = 1; 0xb → 0x4abd4c = 1 when 0, 0x4e30f4 = 1 when 0x4abd5c = 0; 7 →
+  0x4abd54 = 0x4abd58 = 1; 8 → 0x4abd50 = 1 when 0; -1 → 0x41fda9 with 0x502740 = 1 (case
+  C), else 0x41f14b; -3 → 0x4e3144 = 0 and 0x41fda9; `Timer3D_Begin` unless mode 2.
+  0x598fe0 is set to 0x4abbd4 before every `Entry2D` (0x42fbd6, 0x42f755).
+- **Method:** decompiled; caller found by scanning `MainWndProc` calls through the thunk
+  0x4015c3.
+- **Confidence:** proven
+- **Doc:** `scene.md` "3D ↔ 2D"
+
+### E-0312 — Into 2D: scene code sets the zone and mode 1; the redraw sets 0x4b0058; 0x42f755 saves the camera and calls Entry2D; Escape → option menu
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** scene frames set `0x502740 = 0, 0x598cb0 = 1, 0x502860 = zone` (e.g. 0x41a42b
+  `casquette` → 0x14) and end with 0x4221f6 when 0x598cb0 = 1, which sets 0x4b0058.
+  0x42fbd6 modes 1/3 with 0x4b0058 ≠ 0 → 0x42f755: 0x4aba70/74/78 = position,
+  0x4aba64/68/6c = angles, 0x4aba7e = zone, 0x4aba7c = 0x4e3144, 0x4aba7d = 0x4e3140, the
+  same into 0x5b7f80.. / 0x5b7fb0.., 0x422aa6, 0x598fe0 = 0x4abbd4, 0x8c bytes 0x651220 →
+  0x4aba80, `Timer3D_End`, `Entry2D(hwnd, zone, 0x651220, 0x4aba40, 0x36c)`. Escape
+  (0x41ec7b(1)) → 0x42edef: same copies, mode 3, 0x4221f6, 0x416961, `Timer3D_End`,
+  0x40fccb (option menu, 40 ms timer). 0x42f515(action) (called from `MainWndProc`
+  0x4124bc): -2 quit, slot → `Load3DGame`, 0x435170 by 0x4aba3c, static volumes
+  (0x416e68), 0x416987, `Timer3D_Begin`. 0x42f873 (bar closed): the same copies and
+  `Save_WriteGGame(0x4aba40, 0x36c, 0)`.
+- **Method:** decompiled; callers found through the thunks 0x4010b9, 0x4013cf, 0x401244.
+- **Confidence:** proven
+- **Doc:** `scene.md` "3D ↔ 2D"
+
+### E-0313 — Mouse and picking: relative DirectInput mouse clamped to 640×480, left-button level; pick = renderer pass at the cursor (or the cursor centre while carrying), -1 outside the viewport
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x472710 (`GetDeviceState(0x10)`: lX, lY, `rgbButtons[0] >> 7`,
+  `rgbButtons[1] >> 7`, disassembly 0x47276e..0x47279c); 0x420e07 adds and clamps 0..0x27f,
+  0..0x1df; 0x4aba34/38 = 320/240 in `.data`. `Pick` 0x41eb20: bounds per 0x4aba3c
+  (0/0x280/0/0x1e0, 0x40/0x240/0x30/0x1b0, 0x78/0x208/0x5a/0x186, 0xa0/0x1e0/0x78/0x168),
+  offset by half the cursor's size when 0x502734 = 1, 0x439b90(0, x, y): 0x6af5a0/0x6af5b4
+  = x/y, depth 0x6af5b0 = 0x4f000000, drawer pointers swapped to 0x43a150 around 0x450160,
+  result 0x433740(0x6af5b8). Frames clear 0x5b7fac at their end (0x41a42b, 0x42b776).
+- **Method:** decompiled + disassembly.
+- **Confidence:** proven (the pick routine's internals are the renderer's)
+- **Doc:** `interaction.md` "Mouse", "Picking"
+
+### E-0314 — Cursors: 66 TGA slots, their files and indices
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x426594: `op_` + itoa(0..34) → slots 0..34, `fleche` 0x25, `main` 0x26,
+  `curza` 0x27, `def_0` 0x23, `def_1` 0x24, `curdoigt` 0x3a, `curferme` 0x28, `sablier`
+  0x29, `acces` 0x3b, `deja_vu` 0x3c, `fagot` 0x3e, `buche` 0x3d, `manivel` 0x40, `cle` 0x3f,
+  `retour` 0x41, `Ct` + itoa(0..15) → 0x2a..0x39; `Invent` → 0x599078; sounds `bar_obj`,
+  `cf_clic3` (0x425f00). `Cursor_Check` 0x4240f0: on failure 32×32, `m__malloc(0x800)`
+  memset 0xff. Cursor drawn at (0x4aba34, 0x4aba38) with 0x424190 → `Blit16Keyed`.
+  Writers of 0x28: 0x41bbcf, 0x429dd6, 0x42d489 (while 0x502734 = 1 and a pick).
+- **Method:** decompiled; strings read with pefile.
+- **Confidence:** proven
+- **Doc:** `interaction.md` "Cursors"
+
+### E-0315 — Scene object tables and the hover/click skeleton of the frame callbacks
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** init callbacks resolve names with 0x41edc9 and hide `startHidden` = 1
+  (0x42ad92: stride 0x40, name at +0, cursor type +0x32, handle +0x38, hidden +0x3c, count
+  0x4ae7e0; 0x41a0b0: stride 0x3c, handle +0x34, hidden +0x38, count 0x4a9948). Frames
+  0x41a42b and 0x42b776: reset of 0x26/0x27/0x3a/0x3b/0x3c to 0x25; with `click` and cursor
+  0x25 the per-object action; else hover mapping 2 → 0x26, 3 → 0x27, 4 → 0x3a, 6 → 0x3b,
+  0x3c → 0x3c, default 0x25 (the museum: 2/3/4 only and `sqrt(x² + z²) < 1200.0f`
+  (0x4a2550) of 0x436200's result).
+- **Method:** decompiled; tables dumped from `.data`.
+- **Confidence:** proven
+- **Doc:** `interaction.md` "Hover and click"
+
+### E-0316 — Inventory bar: slides 8 px per frame, arrows scroll, a click with an object stores it, 6 visible, sunflower counter, autosave on close
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x426171 (states of 0x4acfa0, 0x4acfa4 ± 8, `bar_obj` via 0x599138,
+  `Blit16` of 0x599078 at (0, y) 640 × 0x599128, arrows 0x425f71(x, y, 12 / 500, y + 15,
+  32, 32) → `def_0` at (10, y + 13) / `def_1` at (0x1f7, y + 13), 0x4e311c scroll rules,
+  store box (0, y - 0x1e, 0x280, 100), `cf_clic3`, `0x651220[cursor] = 1`, cursor 0x25,
+  `first = count - 7` when count > 6, state 3; 0x4abbd8 = 1 when the cursor is 0);
+  0x426071 (slots at 0x4acfa8 = 100, 170, 250, 310, 380, 450; y + 0x1e centred), 0x425ff2
+  (`Ct` slot 0x2a + 0x4abbd4 at 0x22c, y + 0x1f centred), 0x425fb1 (held count), closing →
+  0x42f873. Space in 0x4223e8: 0 → 2, 1 → 3. Return icon drawn in 0x426171 when 0x4e3144 ≠
+  0, bar hidden, cursor in the corner.
+- **Method:** decompiled; `.data` values read with pefile.
+- **Confidence:** proven
+- **Doc:** `interaction.md` "Inventory bar"
+
+### E-0317 — Carrying a 3D node: 0x502734 / 0x502a80, cursor by the node's name
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x4223e8: when 0x502734 = 1, `strcmp(BadHandle(0x502a80), "fagot" /
+  "buche" / "poignee04" / "clef")` → cursor '>' 0x3e / '=' 0x3d / '@' 0x40 / '?' 0x3f.
+  Writers of 0x502734 = 1: the cafe, mangeurs and pont frames (0x41bbcf, 0x429dd6,
+  0x42d489); `App3D_InitPaths` clears it.
+- **Method:** decompiled; strings read with pefile.
+- **Confidence:** proven
+- **Doc:** `interaction.md` "Carrying a 3D object"
+
+### E-0318 — Animation records: 3DA handle + node handle, length = first word, frame advanced by elapsed ticks, posed with 0x438290
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** `LoadAnimsmusee` 0x42ac4a: records of 0x78 bytes from 0x4aed70 (count
+  0x4aed68), `Obj_Load(name)` → +0x64, 0x437d90 (`*0x4338a0(h)`, the first word of the
+  object's data) → +0x6c, +0x70 = 1, 0x41edc9(name at +0x32) → +0x68; 0x42b5fe adds 0x598ec0
+  to +0x70, per-record end rules, then `0x438290(+0x68, +0x64 + frame, +0x64 + frame, 0,
+  0)`. 0x438290: key handles carry the frame in their low 16 bits; equal high halves →
+  one-object interpolation `((256 - t)·f1 + t·f2) / 256` (0x4a25ac = 1/256).
+- **Method:** decompiled.
+- **Confidence:** proven (the pose computation itself is the renderer's / Q-0004's)
+- **Doc:** `scene.md` "What a scene is made of"
+
+### E-0319 — Box-set swap helper and the texture/visibility helpers scene code uses
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x42a980(n) (museum): unregister the set in 0x4e312c (0 = `BOX.3DI` 0x5bada4,
+  1..4 = 0x6511e0..0x6511ec) with 0x432e40, register set n with 0x432e10, 0x4e312c = n.
+  `LoadBoxMusee` 0x42aab8 loads `BOX1.3DI`..`BOX4.3DI`; `LoadBoxAuberge` 0x419f0e
+  `BOXBAS.3DI`, `BOXHAUT.3DI`. Helpers as in E-0307; 0x4399d0(node, fn) calls fn on each of
+  the node's 8-byte UV records (+0x84 count, +0x88 array), e.g. 0x42ad1c adds ±0x7f0000 to
+  word 1 for six steps each way.
+- **Method:** decompiled.
+- **Confidence:** proven
+- **Doc:** `scene.md` "What a scene is made of"
+
+### E-0320 — Static sounds per scene: slots at 0x5badc0, count 0x650f80, ambience 0x50286c looped
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x42abf1 (museum: `robot2`, `etoile`, `musee` = ambience, count 4, slot 0
+  empty), 0x419fb3 (auberge: `auberge`, count 1); 0x416e24(s, loop) = volume 0x4e2908 then
+  play (0x473300); 0x416e51 stop; 0x416dd6 free. Init callbacks start the ambience with
+  0x416e24(s, 1) (0x42ad92, 0x41a0b0); 0x42fbd6 restarts 0x50286c after the entry movie;
+  0x41faf9 / 0x41f14b stop / free all slots.
+- **Method:** decompiled.
+- **Confidence:** proven
+- **Doc:** `scene.md` "What a scene is made of"
