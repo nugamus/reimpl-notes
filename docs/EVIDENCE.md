@@ -4732,3 +4732,20 @@ An entry at `tentative` confidence must also have a matching line in
   `lip.py` shape counts; engine runs with forced slots.
 - **Confidence:** proven for the visible result; the order itself is E-0125/E-0606.
 
+
+### E-0613 — Run and jump are allowed in every unit: the camera constructor never writes them (debug heap 0xCD); Ctrl doubles the walk in U01
+- **Binary/file:** `MissionMonet.exe`; live run of the original.
+- **Evidence:** the camera constructor `FUN_004184b0` writes dwords 0..0x11, 0x14..0x1a and
+  0x1c but not 0x12 / 0x13 (`+0x48` run allowed, `+0x4c` jump allowed); its only caller,
+  `XScene_70` (`0x0041ab2e`), allocates the 0x74-byte camera with `operator new`
+  (`0x0043651c` → MSVCRTD `??2@YAPAXI@Z`, 0xCD fill, as E-0534). Each scene load builds a
+  new camera, so both flags are 0xCDCDCDCD (true) until U33's writes (E-0047, E-0609).
+  Live, `MissionMonet.exe` via `to_u01.sh`: camera `+0x48` = `+0x4c` = 0xCDCDCDCD in U00's
+  garden and at U01's hand-over (read through `[0x00442640]+0x14c`). After `TakeCard`,
+  yaw 5.24, 700 ms posted Up: 57.5 units; Ctrl held + 700 ms Up: 114.8; Up again: 57.6
+  (ratio 2.0). One posted Shift tap at the same spot: no z change in camera reads at
+  ~1.5 s and ~4.5 s after it (not explained; not explored further).
+- **Method:** MCP decompile; capstone read of `0x0041ab02`..`0x0041ab40`; live memory reads
+  (`camera.ps1`, a one-off `ReadProcessMemory` of camera `+0x40..+0x54`), `send.ps1`.
+- **Confidence:** proven. Supersedes E-0047's "`+0x48` = `+0x4c` = 0" and E-0609's "only
+  U33" (E-0609's key bindings stand).

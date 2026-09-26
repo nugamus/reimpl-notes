@@ -47,7 +47,7 @@ Defaults (constructor), then `SCENE.BIN` `#CAMERA#`, then scene load (E-0039):
 | sphere radius `r` | 0.5 · s (U01: 20) |
 | sphere Z offset `o` | h − 2r (U01 then sets 37.0 in `U01_Start`) |
 | can move / can turn | 1 / 1 |
-| run allowed / jump allowed | 0 / 0 (U01 never enables them) |
+| run allowed / jump allowed | never written: true (debug-heap fill, E-0613); only U33 changes them |
 | collision | on |
 | landing sound | on |
 
@@ -70,7 +70,7 @@ the order is: Up, Down, Right, Left, PgUp, PgDn, so Down wins over Up.
 | Numpad 0 (press) | — | crouch (below) |
 | Enter, Escape, Space | — | `boot.md` "Skipping" (E-0043) |
 
-Shift is never a run key, and nothing runs outside U33 (E-0609). A Shift or Numpad 0
+Shift is never a run key (E-0609); Ctrl runs in every unit (E-0613). A Shift or Numpad 0
 key-down ends that frame's key handling, whether or not the jump is allowed.
 `v` stays at 1.0 after Down until the next Up. Pitch limits are checked before the step, so
 e can end up to 0.06 past them. Mouse look does not exist; the mouse only picks.
@@ -133,7 +133,7 @@ ones.
 
 ## Jump and crouch (E-0049)
 
-Not reachable in U01 (jump needs "jump allowed"); crouch is. Both block the main loop.
+Both are available in every unit ("jump allowed" starts true, E-0613). Both block the main loop.
 
 - **Jump** (Shift): mode ×0.5 if running, else ×0.25; Up/Down are sampled once at the
   start. Each frame: t += elapsed seconds; z = z₀ + s·t − s·t²/2 (peak s/2 at t = 1, lands
