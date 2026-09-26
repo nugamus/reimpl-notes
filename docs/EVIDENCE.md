@@ -4783,3 +4783,43 @@ An entry at `tentative` confidence must also have a matching line in
   only drains `DonnerLunettes` / `TakeLunettes`.
 - **Method:** MCP decompile and disassembly; `o3d.py` duplicate scan; `U00.x3d` object list.
 - **Confidence:** proven.
+
+### E-0616 — U04's window test compares the `Box70` object, its boat test the name; mid-pond Shift falls through; the boat's frame := 1 comes after the jump
+- **Binary/file:** `MissionMonet.exe`; `Data/U04/U04.x3d` and the 127 files it loads.
+- **Evidence:** `U04_HandleInput` (`0x0040afd0`) ends with `if (this[0x1be] == *(camera+0x3c))
+  U04_ClimbOutOfWindow` — `+0x6f8` (`window`, E-0331) against the ground object: a pointer
+  compare. `U04_UpdateFrameLogic` (`0x0040aac0`) steps onto the boat on `+0x6ec` = 0 and
+  `_stricmp(camera+0x3c name, "*U04_32")` = 0: a name compare (as U00's, E-0615). On the
+  boat, Shift: `this` := slot 1 of node `+0x6f4`, else the node; frame < 60 or > last − 60
+  → `U04_JumpOffBoat`, then `FUN_004200c0(this, 1.0)` (frame := 1), return; else with no
+  slot 1 → `U04_JumpOffBoat`, return; else no return: the window test and
+  `Scene_HandleInput` run (can move is 0 on the boat, so no walk or jump). The frame hook
+  tests each gauge label as `<unit condition> && _stricmp(label) = 0 && fired(gauge)`, the
+  unit condition first: "Door" needs M03 (`+0x41c`) = 0, "Paint" M17 (`+0x454`) = 0 and
+  x > 180, y > 275, "ecroule" `onBoat`; a label whose condition fails is not consumed.
+  Action-table offsets: exhausted flag of Mnn at `+0x414 + 4(n−1)`, run count at
+  `+0x810 + 4n` (M41 `+0x8b4`, M42 `+0x8b8`). `o3d.py` over the files `U04.x3d` names
+  (Object, Lod, Animation lines, `;` lines skipped): `Box70` once (`static\u04.o3d` #570,
+  parent `$$$DUMMY.Dummy01`), `*U04_32` once (`Anim\BARKE_PLACEMENT.O3D` #0); no rename of
+  `U04_FixObjectNames` produces either. Engine: `goto 190.5 236.4 40` over `Box70` climbs
+  out to (186, 220.26); Shift at `Traj` frame 125.5 stays aboard, at 31 jumps off and the
+  frame reads 1.
+- **Method:** MCP decompile; `o3d.py` scan; engine `dev_commands` runs.
+- **Confidence:** proven.
+
+### E-0617 — U33's frame hook and click dispatcher test exactly the conditions of u33.md; no ground-object test
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `U33::UpdateFrameLogic` (`0x00407770`), flags at `+0x414 + 4(n−1)`:
+  `+0x580` (M92) ≠ 0 and `+0x4f8` (M58) = 0 before the gauge's fired test (so the 20-s gauge
+  is consumed only then); nag on `+0x424` (M05) ≠ 0, `+0x428` (M06) = 0; M06 exhausted on
+  `+0x430` (M08); search on `+0x508` (M62), `+0x510` (M64) = 0, `+0x50c` (M63) = 0 and voice
+  group 2 silent; M64 on M62, M63, !M64, silent; game over on `+0x564` (M85) and the gauge
+  fired. `U33::DispatchClickActions` (`0x00407940`): M62 ≠ 0 and M64 = 0 →
+  `CaughtBehindCurtain` before any pick. `OuvrePorte` (`0x00409260`): M02's live count
+  (`[+0x18]+0x364`) ≠ 0 → `EnterCaravan`, else M58 → `LeaveCaravan`. `OuvrePorteClown`:
+  `+0x4a0` (M36) = 0 → M03. `DoParleProjectionniste`: `+0x52c` (M71), then `+0x540/544`
+  (M76/M77) or `+0x548/54c` (M78/M79). No U33 function reads camera `+0x3c`. Engine:
+  M05 exhausted alone plays `U03_01_11` after 25 s, M05 with M08 does not; with M62
+  exhausted a click plays `U03_01_20` (caught), with M62 and M64 it does not.
+- **Method:** MCP decompile; engine `dev_commands` runs.
+- **Confidence:** proven.
