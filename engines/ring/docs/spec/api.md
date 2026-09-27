@@ -39,7 +39,7 @@ sound, variable) has its own list and a second declaration with the same id is r
   `0, 0, 85.0, 0, 2, 0, 0, 85.0`.
 
 Rotation angles, "ran" and the transition kind byte are specified with the renderer
-(`spec/rotation.md`).
+(`spec/rotation.md`); sounds, ambient and 3D sounds in `spec/sound.md`.
 
 ## Declarations
 
@@ -82,10 +82,10 @@ Rotation angles, "ran" and the transition kind byte are specified with the rende
 | `RotSetMovOff` | 0x405850 | int rotation, int from, int to | `RotSetMovOnOrOff(rotation, 0, from, to)` |
 | `RotSetJugOn` | 0x405c70 | int rotation, f32 unk_2, f32 unk_3 | `RotSetJugOn` (the renderer's spec) |
 | `SouAdd` | 0x406970 (4 arguments), 0x406ba0 (6) | int id, int type, str file, … | a sound in the global sound list (0x4683c0; when the 5th argument ≠ 1 the sound object is the larger class with an event, vtable 0x47e86c, else vtable 0x47e844) |
-| `PuzAddAmbSou` / `RotAddAmbSou` | 0x404b00 / 0x405d50 | int owner, int sound, int unk_3, int unk_4, int unk_5, int unk_6, int fade | an ambient sound of the puzzle/rotation (`aSoundItem::Init` 0x41a150: fade > 1 required, stored as fade − 1; the sound must be of the ambient-music type) |
-| `PuzAdd3DSou` / `RotAdd3DSou` | 0x404c30 / 0x405e80 | int owner, int sound, int unk_3, int unk_4, int unk_5, int unk_6, f32 unk_7, int unk_8 | a 3D sound (`aRotation::Add3DSound` / `aPuzzle::Add3DSound`; the sound must be of the ambient-effect type) |
+| `PuzAddAmbSou` / `RotAddAmbSou` | 0x404b00 / 0x405d50 | int owner, int sound, int volume, int pan, int same_mode, int leave_mode, int fade | an ambient sound of the puzzle/rotation (`aSoundItem::Init` 0x41a150: fade > 1 required, stored as fade − 1; the sound must be of the ambient-music type) |
+| `PuzAdd3DSou` / `RotAdd3DSou` | 0x404c30 / 0x405e80 | int owner, int sound, int same_mode, int leave_mode, int fade, int volume, f32 angle, int amplitude | a 3D sound (`aRotation::Add3DSound` / `aPuzzle::Add3DSound`; the sound must be of the ambient-effect type) |
 | `PuzSetAmbSouOff`, `PuzSet3DSouOff`, `RotSetAmbSouOff`, `RotSet3DSouOff` | 0x404be0, 0x404d20, 0x405e30, 0x405f70 | int owner, int sound | switches a sound off |
-| `SouSet_406e20` | 0x406e20 | int sound, int unk_2 | calls 0x4690f0(sound, unk_2); observed unk_2 90..100 |
+| `SouSet_406e20` | 0x406e20 | int sound, int volume | the sound's own volume (`spec/sound.md`) |
 | `VarDefByte`, `VarDefWord`, `VarDefDwrd`, `VarDefFloa`, `VarDefStrg` | 0x406080, 0x406100, 0x406180, 0x406200, 0x406280 | int id, value | a game variable (`aVar`, app+0x95) with its initial value |
 | `VarSetByte` | 0x4060b0 | int id, u8 value | sets a byte variable |
 | `VisAddLisToPuz` | 0x406f90 | int id, int puzzle, … (57 arguments) | the inventory list widget of a puzzle (SY zone) |

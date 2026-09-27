@@ -826,3 +826,59 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
 - **Method:** decompiles (`engines/ring/notes/decomp/drag/`), disassembly, byte scan for
   the stores to +0x76.
 - **Confidence:** proven
+
+### E-0050 — The sound list, volume and pan, playing, stopping, sound events (DVD)
+- **Binary/file:** `RING_DVD.EXE` `SouAdd` 0x406ba0 (extensions `wav`/`wac`/`was` at
+  0x484c1c/18/14, paths `%s%s\%s\%s\%s` 0x482060 and `%s%s\%s\%s\%s\%s` 0x484bf8 with `DATA`
+  0x482070 and `SOUND` 0x484c0c), 0x4683c0 (list 0x4a1cf0.., kind ≠ 1 → vtable 0x47e86c,
+  +0x111/+0x115 = 100, +0x119 = 0, +0x121 format), 0x468170, 0x468100 (disassembly: fild
+  +0x115 × 0.01 (0x47e478) × fild +0x111 × 0.01 × [0x4932a8] 1.0 × −10000 (0x47e840),
+  ftol, −10000 − x → vtable +4; (fild +0x119 + 100 (0x47e83c)) × −100 (0x47e838), ftol,
+  −10000 − x → vtable +8), clamps 0x468060 / 0x468090 / 0x4680c0; wrappers 0x406de0..0x406f00
+  (0x406de0 passes `n != 1`: disassembly `cmp edx, 1; setne al`); `NoiceIdPlay` 0x468e20;
+  0x469010, 0x469150, 0x4693b0, 0x469540, 0x4695b0; stream play 0x468ae0 (+0x11d = flag,
+  0x46ab00 stores it at stream +0x28), stream thread 0x46b300 (`cmp [esi+0x28], 0` at
+  0x46b3ec: zero → silence and stop, else rewind), stop 0x468c90 (+0x10c = 0); frame check
+  0x40f6c0 → 0x468da0 → 0x4681d0, 0x40f690 (`push 0x1001`, skips type 5); event dispatcher
+  0x40ced0 (splits bit 0x1000; disassembly `and esi, 0x1000; and bh, 0xef`); 0x40b650
+  (0x406e40(4, 0x10), 0x406e40(5, 0x10)); type names: Templier `shared.h`
+  `kSoundType*` (Reference), confirmed for 2, 3 by the `ASOUNDTYPE_AMBIENTMUSIC/EFFECT`
+  checks in the four Add wrappers and for 5 by the dialogue branches.
+- **Evidence:** as written in `spec/sound.md` "The sound list" .. "Playing, stopping,
+  events"; decompiles in `engines/ring/notes/decomp/sound/`. Corpus: every `SouAdd` in the
+  set-ups passes kind 2 (491 calls in `ring/setup.cpp`).
+- **Method:** decompiles, disassembly (`/tmp`-style capstone reads of the listed
+  addresses), call-site scan for 0x40ced0.
+- **Confidence:** proven (the DirectSound unit mapping is DirectSound's documented one)
+
+### E-0051 — Dialogues: `.dia` timing and subtitles, `.dan` lip sync (DVD)
+- **Binary/file:** `RING_DVD.EXE` `aDialog::Init` 0x426ef0 (`%s%s\%s\%s\%s\%sdia` 0x486afc,
+  `DIA` 0x486b10, install prefix 0x402480; `…dan` 0x48a0d4), `ReadLyrics` 0x427090,
+  `ParseLyricLine` 0x427550, `ReadDialogAnimation` 0x4271b0 (disassembly 0x427222..0x427288:
+  `%d %d %d` read into (a, b, c) and stored as (b, c, a); 0x42738f..0x4273f5 stored as
+  read), `AddDialog` 0x427f20, `RemoveDialog` 0x428050 → 0x4279b0, 0x427880, 0x427900,
+  0x427940, 0x427980, 0x427a10, the per-frame 0x427c70 (`push 0x1001` at 0x427cd4),
+  0x427b30 / 0x427c20 (called from 0x407b80 with 1, 200, 200, 0x1e, 0, 0, 0, 0x1cd, 3);
+  corpus `DATA/AS/DIA/ENG/1060.DIA` (`5000   END`), `1072.DIA`, `DATA/FO/DIA/ENG/1322.DAN`
+  (`1`, `1 30101 0`, then `0 28 0`, `29 1286 1`, …).
+- **Evidence:** as written in `spec/sound.md` "Dialogues".
+- **Method:** decompiles (`notes/decomp/dialog/`), disassembly.
+- **Confidence:** proven
+
+### E-0052 — Ambient and 3D sounds, the place-change transition (DVD)
+- **Binary/file:** `RING_DVD.EXE` `PuzAddAmbSou` 0x404b00, `RotAddAmbSou` 0x405d50,
+  `PuzAdd3DSou` 0x404c30, `RotAdd3DSou` 0x405e80, `aPuzzle::AddAmbientSound` 0x41d080 →
+  0x41a120 (Init with 0.0, 0x14), `aPuzzle::Add3DSound` 0x41d250, `aRotation::Add3DSound`
+  0x41e9f0 (amplitude pushed as an int, 0x41ea43), `aSoundItem::Init` 0x41a150, 0x41a220 /
+  0x41a280 (on/off), 0x41a2e0, 0x41a310, 0x41a350, 0x41a3b0, 0x41a3e0..0x41a500, 0x41a4a0
+  (disassembly: angle × π/180 (0x47e410) + [+0x21], fsin, × [+0x1d], ftol, × 0x41b5f0),
+  0x41b5f0 (LR == 1.0 → 1 else −1), 0x41ee10, 0x41ecc0, 0x41d530, the handler functions
+  0x41a820, 0x41a990, 0x41a9a0, 0x41a9b0, 0x41aa00, 0x41aee0, 0x41b130, 0x41b180, 0x41b350,
+  0x41b520; `PuzSetAct` 0x402490, `RotSetAct` 0x4025b0, `MouseLeftEvent` (0x40a254..
+  0x40a360), `aCinMov::Init` (0x41aee0 with the frame count), `aCinMov::Play` (0x41b180 /
+  0x41b350 per frame, and with the total on Escape).
+- **Evidence:** as written in `spec/sound.md` "Ambient and 3D sounds"; decompiles in
+  `engines/ring/notes/decomp/ambient/`. Set-up example: `RotAdd3DSou(80001, 80206, 1, 1, 10,
+  90, 270.0, 20)`.
+- **Method:** decompiles, disassembly, call-site scans for 0x41aa00..0x41b350.
+- **Confidence:** proven
