@@ -95,3 +95,22 @@ The wrappers look the owner up by id in the app's lists (objects app+0x79, puzzl
 app+0x7d, rotations app+0x85) and report an error when it is missing. The remaining `u8`
 and `unk_*` arguments are stored but not yet traced to their use; they stay opaque until
 the code that reads them is specified.
+
+## Variables (`aVar`, app+0x95; E-0055)
+
+Five typed lists (byte, word, dword, float, string), each keyed by id: `VarDef<Type>(id,
+value)` (0x406080 … 0x406280 → `aVar::VarDef*` 0x424a50 …) adds one (an id already in that
+list is refused), `VarSet<Type>(id, value)` (0x4060b0, float 0x406230 → 0x425300)
+replaces the value, `VarGet<Type>(id)` (byte 0x4060e0 → 0x424c40, float 0x406260 →
+0x425390) returns it; an unknown id is reported and gives 0 (0.0 for a float). The lists
+are saved with the game.
+
+## Timers (`aTimer`, app+0x91; E-0055)
+
+`TimSta(id, ms)` (0x4065e0 → `aTimer::StartTimer` 0x425c00) refuses an id already running,
+else records (id, start tick, count 0, ms) and calls `SetTimer(window, id, ms)`: a
+repeating Windows timer. `TimSto(id)` (0x4065a0 → 0x425d80, also named `TimSta` by its
+error string) kills it and drops the record; `TimStoAll` (0x406610 → `aTimer::StopAll`
+0x425b30) all of them. 0x406640(id) tells whether a timer with that id runs (0x425f00).
+On `WM_TIMER` (0x40b4a0), unless app+0x6a is set, the current zone's timer handler gets the
+id (0x40c590, `spec/events.md`), then the timer's count grows by one (0x425730).

@@ -915,3 +915,14 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
 - **Method:** decompiles.
 - **Confidence:** proven for the paths described; the pause-at-frame and loop controls
   (+0x28..+0x4a, 0x416720's other branches, events 0x40c7a0 / 0x40c910) are not traced.
+
+### E-0055 — Variables and timers (DVD)
+- **Binary/file:** `RING_DVD.EXE` `aVar::VarDef*` / `VarSet*` / `VarGet*` 0x424a50..0x425640
+  (error strings "ID already exists", "ID does not exist"), wrappers 0x4060e0, 0x406230,
+  0x406260 (0.0 from 0x47e278 without the list); `aTimer::StartTimer` 0x425c00 (`SetTimer`
+  with the window 0x4956d8), 0x425700 (record), 0x425d80 (`KillTimer`), `StopAll` 0x425b30,
+  0x425f00, 0x425730, `WM_TIMER` 0x40b4a0 → 0x40c590 (AS 0x436df0).
+- **Evidence:** as written in `spec/api.md` "Variables" and "Timers"; decompiles in
+  `engines/ring/notes/decomp/vartim/`.
+- **Method:** decompiles.
+- **Confidence:** proven
