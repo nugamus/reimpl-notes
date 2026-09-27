@@ -137,9 +137,10 @@ current angle (a puzzle's with angle 0, `aPuzzle::Add3DSound` 0x41d250; it never
 
 **3D pan** (0x41a4a0): pan = trunc(sin(alpha × π/180 + offset) × amplitude) × s, with
 alpha the rotation's view angle (its stored alpha + 135, less 360 when above 360) and s
-= 1 when LR is 1.0, else −1. It is recomputed for every type-3 item of a rotation when
-the rotation is entered (0x41ee10: `RotSetAct` through 0x41ecc0, and at a movability
-click with the arrival alpha), not while the player looks around.
+= 1 when LR is 1.0, else −1. Every frame the current rotation's update (0x410610 → 0x41ed80 → 0x41a460) recomputes
+it for every type-3 item and applies it to the sound, so 3D sounds follow the view; it is
+also computed without applying when the rotation is entered (0x41ee10: `RotSetAct` through
+0x41ecc0, and at a movability click with the arrival alpha).
 
 `PuzSetAmbSouOff` / `RotSetAmbSouOff`, `…3DSouOff` (item inactive, 0x41a280) and
 `PuzSet3DSouOn` / `RotSet3DSouOn` (active, 0x41a220) also stop / start the item at once

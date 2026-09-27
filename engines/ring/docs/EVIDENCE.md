@@ -882,3 +882,13 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   90, 270.0, 20)`.
 - **Method:** decompiles, disassembly, call-site scans for 0x41aa00..0x41b350.
 - **Confidence:** proven
+
+### E-0053 — 3D sound pans follow the view every frame (supersedes part of E-0052) (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x410610 (the rotation's per-frame update, called from
+  the frame at 0x40ec4a) calls 0x41ed80 at 0x41076b; 0x41ed80 runs 0x41a460(item, alpha +
+  135) for every item whose sound has type 3; 0x41a460 = 0x41a4a0 (the pan) then 0x41a310
+  (item +0xc and the sound's pan).
+- **Evidence:** disassembly of 0x41a460; call-site scan. E-0052 said the pan was not
+  updated while looking around: wrong.
+- **Method:** disassembly.
+- **Confidence:** proven
