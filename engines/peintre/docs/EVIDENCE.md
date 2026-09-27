@@ -1846,3 +1846,15 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
 - **Method:** `notes/decomp/MISSION.EXE__FUN_*.c` for the functions named; grep of the flag
   addresses over all listings.
 - **Confidence:** proven
+
+### E-0019 — The autosave and Escape store the view in the 3D block; the autosave skips the pitch
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x42f873 (autosave) writes camera x, y, z (0x651352/54/56) to block +0x30/+0x34/
+  +0x38, yaw and roll (0x651348/4a) to +0x28/+0x2c, zone 0x502860 to +0x3e, scene 0x4e3144 to
+  +0x3c, previous scene 0x4e3140 to +0x3d, copies 0x8c bytes from 0x651220 to +0x40, sets
+  +0x00 from 0x4aba3c and calls `Save_WriteGGame(0x4aba40, 0x36c, 0)`. The pitch
+  (0x651346) goes to 0x5b7fb0 only, not to +0x24. 0x42edef (Escape, when 0x598cb0 = 0)
+  writes the same fields and the pitch to +0x24, like 0x42f755.
+- **Method:** decompiler listings `notes/decomp/MISSION.EXE__FUN_0042f873.c`, `…0042edef.c`,
+  `…0042f755.c`.
+- **Confidence:** proven

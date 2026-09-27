@@ -270,4 +270,5 @@ the stored y only has to be above the right floor.
   a save slot: re-apply the view size (viewport table), restore the static sounds' volume,
   restart the 3D timer.
 - **Autosave**: closing the inventory bar writes the resume file (0x42f873: the 3D block
-  with the camera and inventory, `Save_WriteGGame`, `save.md`).
+  with the camera, scene, previous scene and inventory, `Save_WriteGGame`, `save.md`). Unlike
+  0x42f755 and Escape it does not store the pitch: +0x24 keeps its last value (E-0019).
