@@ -133,7 +133,7 @@ add a sound item to the puzzle's (+0x1c) or rotation's (+0x24) list (`aSoundItem
 mode (+0x14), fade − 1 (+0x19; `fade` must be at least 2), amplitude (+0x1d, kept when
 0..100) and angle offset (+0x21 = LR × angle × π/180, kept when −360 ≤ angle ≤ 360; LR is
 the stereo preference, −1 or 1). A 3D item's pan is computed at once from the rotation's
-current angle.
+current angle (a puzzle's with angle 0, `aPuzzle::Add3DSound` 0x41d250; it never changes).
 
 **3D pan** (0x41a4a0): pan = trunc(sin(alpha × π/180 + offset) × amplitude) × s, with
 alpha the rotation's view angle (its stored alpha + 135, less 360 when above 360) and s
