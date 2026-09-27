@@ -892,3 +892,26 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   updated while looking around: wrong.
 - **Method:** disassembly.
 - **Confidence:** proven
+
+### E-0054 — Rotation layers and animations (DVD)
+- **Binary/file:** `RING_DVD.EXE` `CAquatorStream::InitFull` 0x4111d0, 0x411150, 0x410d70
+  (reads count, +4, +0x4c, then 0x412640 per entry; +0x4c = −1 for one entry), 0x410e50
+  (0x412600 backup rectangle, 0x412720 copy from the panorama), 0x410610 (per-frame
+  rotation update: 0x416870 over rotation +0x18's presentations' +0xd / +0x25 lists; per
+  layer 0x410f50 (animated) → +0x26 clear: 0x4103d0(i, 0), else 0x411530(i, +0x22);
+  0x41ed80; 0x4114c0), 0x4114c0 (dirty → 0x4126b0 with the backup when +0x5c is 0, else
+  frames[+8]), 0x4126b0 (copies (x1 − x0) >> 2 u16 per row, rows y0..y1, destination
+  row stride width >> 2), 0x411530, 0x411580, 0x4103d0; `aRotation::AddPreAni` 0x41e640,
+  `aObjectPresentation::addImageToRotation` 0x42e720, `addAnimationToRotation` 0x42e910
+  (flag bit 1 clear → animation +0x20 = 0), show 0x42ecd0, hide 0x42ee80,
+  `aObject::ObjPrePauAni` 0x420db0 → 0x42f090, `ObjPreUnPauAni` 0x420e00 → 0x42f0f0,
+  `ObjPreAniSetStaFra` 0x420c80 → 0x42ef60, `ObjPreSetAniIdeOnRot` 0x42f220;
+  `aAnimation::Init` 0x416450, start 0x416670, stop 0x416710, advance 0x416870, pause
+  check 0x416720, event dispatcher 0x40cff0 (AS: 0x437110).
+- **Evidence:** as written in `spec/rotation.md` "Layers" and `spec/animation.md`;
+  decompiles in `engines/ring/notes/decomp/layers/`. AS example: object 80018 presentation
+  1 = `ObjPreAddAniToRot(80018, 1, 80101, 1, 49, 12.5, 4)`, id 80001, shown and paused at
+  set-up; the AS animation handler compares the frame argument with byte variable 80004.
+- **Method:** decompiles.
+- **Confidence:** proven for the paths described; the pause-at-frame and loop controls
+  (+0x28..+0x4a, 0x416720's other branches, events 0x40c7a0 / 0x40c910) are not traced.

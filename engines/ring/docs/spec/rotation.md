@@ -132,8 +132,43 @@ For step i of n, with `t = i / (n − 1)` (t = 0 when n = 1): alpha, beta and ra
 frame is drawn (0x410610, 0x40f9e0, 0x4100a0 draws and flips). Held Escape only waits for
 its release. One step per frame (Q-0011).
 
+## Layers (E-0054)
+
+A rotation has `layers` layers (`AddRot`'s last argument); the node file's first `layers`
+sections (formats README, `aqc.ksy`) are read into them when the node loads (0x4111d0 →
+0x411150 → 0x410d70): the entry count, a frame rate (`unk_a` as a float, 12.0 or 0.0), the
+last frame (`unk_b`; −1 when there is one entry) and the entries, each a header (x0, x1,
+y0, y1) and an index stream decoded like the node's (13-bit indices, one per 4 pixels,
+`data_size / 8` of them). Then (0x410e50) a backup of the panorama's indices under the
+first entry's rectangle is taken (0x412720), before any patch.
+
+Each layer (0x60 bytes in the stream, rotation +0x2d) keeps: animated (the rate is not
+0), dirty, current frame, shown, the entries and the backup. It starts dirty with its
+shown flag as it was (0 for a new rotation), so the node shows its backup until a
+presentation shows the layer.
+
+**Patching** (0x4114c0, every frame after the layer updates): each dirty layer with
+entries writes into the panorama's index array, for rows y0 ≤ y < y1, the `(x1 − x0) / 4`
+indices from column `x0 / 4`: the current frame's entry when shown, the backup otherwise
+(0x4126b0); then it is no longer dirty. The panorama keeps the patch until another one.
+
+**Showing and hiding** (0x4103d0 → 0x411580(layer, v)): when the shown flag changes it is
+set and the layer becomes dirty. `ObjPreSho` on a presentation shows every rotation layer
+it holds (`ObjPreAddImgToRot`, `ObjPreAddAniToRot`), `ObjPreHid` hides them
+(`spec/animation.md`).
+
+**Animated layers**: `ObjPreAddAniToRot(object, presentation, rotation, layer, frames, fps,
+flags)` initialises the layer's animation (`aRotation::AddPreAni` 0x41e640:
+`aAnimation::Init(frames, fps, start 1, flags)`; flag bit 1 clear: the animation is not
+restarted from its start frame when started, +0x20 = 0) and adds the presentation to the
+rotation's list of animated presentations (+0x18). Every frame of the current rotation
+(0x410610): the animations of those presentations advance (`spec/animation.md`, raising
+their events); then each animated layer takes its animation's state: stopped → hidden
+(0x4103d0(layer, 0)); running (paused or not) → its current frame (0x411530: a new frame
+makes the layer dirty when shown). The 3D sounds follow the view (`spec/sound.md`), then
+the patches are applied.
+
 ## Not yet specified
 
-Layers (sections of the `.aqc`, drawn into the panorama by 0x410610 / 0x411530 / 0x4114c0),
-the juggle effect (+0x65, `RotSetJugOn`) and the wave (+0x66), Space (+0x28), the
+The juggle effect (+0x65, `RotSetJugOn`) and the wave (+0x66), Space (+0x28), the
 movability events' handlers per zone.
