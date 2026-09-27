@@ -47,6 +47,8 @@ one only names their entry points.
      (`ui.md`);
    - otherwise: mode 0, start the 3D world again (0x41fda9), start the 3D timer
      (`Timer3D_Begin` 0x42fb5e): the player is in 3D.
+     The load is case A/B of `scene.md` (the saved scene from its own start position or
+     doorway), not case C: the saved camera is not used (E-0020).
 
 After that the program only reacts to window messages (`GetMessage` loop in WinMain); every
 frame is a timer message.

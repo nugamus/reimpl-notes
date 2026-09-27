@@ -1858,3 +1858,13 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
 - **Method:** decompiler listings `notes/decomp/MISSION.EXE__FUN_0042f873.c`, `…0042edef.c`,
   `…0042f755.c`.
 - **Confidence:** proven
+
+### E-0020 — After the intro, a 3D resume starts at the scene's own start position (case A/B)
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x42fbd6, mode 2, end of a movie with 0x4aba5c = 0, 0x502864 = 0, 0x4e4580 = 0 and
+  0x50273c (the GGAME in_2d word, set by `Load3DGGame`) = 0: writes 0x502740 = 0x598cb0 = 0,
+  then calls 0x41fda9, which picks case C only when 0x502740 ≠ 0x598cb0 (line 80). The
+  camera `Load3DGGame` copied to 0x5b7f80.. is therefore not used.
+- **Method:** decompiler listings `notes/decomp/MISSION.EXE__FUN_0042fbd6.c` (lines 50–90),
+  `…__FUN_0041fda9.c`, `…__Load3DGGame.c`.
+- **Confidence:** proven
