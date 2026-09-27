@@ -101,8 +101,12 @@ a hot spot, not once on entering. `unk_19` is the last argument of `ObjAddPuzAcc
 
 ## Left click (`aApplication::MouseLeftEvent` 0x409d90)
 
-Called with the button-down position. The same search order as tracking; on the first
-hit in puzzle 1, then the current puzzle (rotations: `spec/rotation.md`):
+Called when the left button is released (`WM_LBUTTONUP` with y < 465, 0x40af80) with the
+mouse position of the last frame: the screen position for puzzle 1 and the current
+position in the view (the panorama position for a rotation, 0x4107f0) for the rest
+(E-0049). An active drag is ended first ("Dragging" below). The same search order as
+tracking; on the first hit in puzzle 1, then the current puzzle (rotations:
+`spec/rotation.md`):
 
 - when the object's flag byte (`AddObj`'s last argument, object +0xc) has bit 0 set, the
   object-click event (0x40bbb0) gets (object, `unk_19`, puzzle id, 1); if the mode is now
@@ -113,3 +117,38 @@ hit in puzzle 1, then the current puzzle (rotations: `spec/rotation.md`):
 A click in puzzle 1 in mode 2 that hits nothing ends there. A hit on a movability takes
 the player through it (`spec/rotation.md`).
 
+
+## Dragging (drag control, app+0x99)
+
+Evidence: E-0049. One drag at a time. Its state (0x426040 fills it, 0x4260d0 clears it):
+the press position, the previous and current mouse positions, active (+0x20), the object
+(+0x21), the accessibility index (+0x25), the hot spot (+0x2d), the hot spot's `unk_19`
+(+0x31), the puzzle or rotation id (+0x35), 1 for a puzzle / 0 for a rotation (+0x39),
+the press tick, a move count, the drag mode (+0x45, 1 after a start) and a limit
+rectangle (+0x49; 0x4260d0 sets it to (0, 16)–(640, 464)).
+
+- **Start** (left button down, 0x409630, not while the inventory is shown): the search
+  order of tracking (puzzle 1 with its mode-2 rule, then the current puzzle, then the
+  current rotation), first enabled hot spot under the mouse. When its object's flag byte
+  has bit 1 (2) set, the "button down" event (0x40bd40) gets (object, `unk_19`, puzzle
+  id, 1 for a puzzle); when it has bit 2 (4) set, the drag starts at the mouse position
+  and the drag event (0x40c060) gets phase 1. Then tracking runs.
+- **Starting** also replaces cursors 3 and 4 with the object's drag cursors (0x40b9b0,
+  from `ObjSetPasDraCur` / `ObjSetActDraCur`): cursor 3 (passive) of the given kind; for
+  kind 3 its picture is `<icon>_dp` (`dummy_dp` when the object has no icon, the third
+  argument of `AddObj`), for kind 4 the animation is named `<icon>`; cursor 4 (active)
+  likewise with `_da`. Each gets the offset given with it.
+- **Move** (every frame while the button is down, 0x409520, not while the inventory is
+  shown): when the drag is active and the mouse is inside the hot spot of the drag (drag
+  mode 1) or inside the limit rectangle (drag mode 2), the current position becomes the
+  mouse position and the drag event gets phase 3. Outside, nothing happens.
+- **Release** (`MouseLeftEvent`, before anything else): when the drag is active, the drag
+  event gets phase 2, the drag is cleared (with `aCursorHandler::DeleteTypeDelete(3)`) and, in drag mode 2,
+  the click ends there; in drag mode 1 the click goes on as usual.
+
+The drag event (0x40c060) passes (object, `unk_19`, puzzle or rotation id, 1 for a puzzle,
+the drag state, phase) to the zone's handler; with puzzle 1 it goes to SY's handler
+(0x4331b0) whatever the zone (`spec/events.md`). A handler may switch the drag to mode 2
+and set the limit rectangle (0x406660, 0x406680, as SY's sliders do), and read the
+horizontal distance from the press position (0x4068c0, |current x − press x|) and its
+direction (0x4067d0, current x < press x).

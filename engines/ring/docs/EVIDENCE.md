@@ -785,3 +785,44 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   `notes/decomp/rot/range/RING_DVD.EXE__004101c0.c` and the disassembly of 0x4101c0.
 - **Method:** decompiles, disassembly.
 - **Confidence:** proven
+
+### E-0048 — The preferences screen and `aPre.ini` (DVD)
+- **Binary/file:** `RING_DVD.EXE` SY object click 0x431660 (cases 0x15f91, 0x15ff5..0x15ffb),
+  on-accessibility 0x4335a0, on-nothing 0x433bc0, drag event 0x4331b0, `aPreFer::Load`
+  0x428870, `aPreFer::Save` 0x428920, 0x4289c0 (store), 0x4289e0 (apply: 0x406e80(5, v0)
+  → 0x469350 = every sound whose channel (+8) is not 5; 0x406e60(5, v1) → 0x4692f0 =
+  channel 5; `aSoundHandler::SetLR` 0x41b5b0 (1 → 1.0, −1 → −1.0 at 0x487748); app+0xc
+  +0x28 = v3), 0x406ee0 → 0x468310 (0x4a1d04 != 0), credits 0x431350; the dialogue
+  handler is app+0xc (0x407b80 allocates it, "Can not Allocate aDialogHandler"), its
+  constructor sets +0x28 = 1 (0x427b4d) and 0x427e9d skips the two text draws (0x414df0)
+  when +0x28 is 0; the SY set-up (`notes/zones/sy.md`); `aPre.ini` of all three editions.
+- **Evidence:** as written in `games/ring/docs/sy.md` "Preferences"; decompiles in
+  `engines/ring/notes/decomp/sy/` and `notes/decomp/drag/`. Slider arithmetic: 0x13a
+  (314), divisor 5, clamp 0x36 (54), offset 0x2e (46); opening places the picture at
+  value × 5 + 0x54. Save's third argument is `(-(swapped != 0) & 2) - 1`. The corpus
+  `aPre.ini` files are all `100 100 -1 1`.
+- **Reference:** Templier's `ring_zonesystem.cpp` calls 90103 "subtitles" and 90104
+  "reverse stereo"; both confirmed above (the +0x28 test, `SetLR`).
+- **Method:** decompiles, disassembly of 0x40c060 and 0x427e80..0x427ecb.
+- **Confidence:** proven
+
+### E-0049 — Dragging; the left click comes on release (DVD)
+- **Binary/file:** `RING_DVD.EXE` window procedure 0x40eec0 (`WM_LBUTTONDOWN` 0x201 →
+  0x409630, `WM_LBUTTONUP` 0x202 → 0x40af80 / 0x40afb0, both only for y < 0x1d1), frame
+  0x40e9f0 (0x409520 while the button is down, 0x495704), 0x40f6c0 (GetCursorPos into
+  0x495584/0x495594 and 0x4956a4/0x4956a8; the rotation's 0x4107f0 then rewrites the
+  latter), 0x409630, 0x409520, `MouseLeftEvent` 0x409d90 (drag release at its top),
+  0x40c060 (6 arguments, `ret 0x18`; SY with puzzle 1 and flag 1), drag control 0x426040
+  (start), 0x426140 (move), 0x4260d0 (clear, limit (0, 16, 640, 464), cursor kind 3
+  entries dropped), 0x426240, 0x426290, 0x406660, 0x406680, 0x4067d0, 0x4068c0,
+  0x40b9b0 (drag cursors 3/4: `%s_dp` / `%s_da` with the icon or `dummy`, 0x485b14..
+  0x485b24).
+- **Evidence:** as written in `spec/cursor.md` "Dragging" and "Left click". Pushes before
+  each 0x40c060 call: phase 1 at 0x4098aa / 0x409b07 / 0x409cf4, 3 at 0x409589 /
+  0x4095e5, 2 at 0x409e5c; the fifth argument is the drag control. app+0x76 is only ever
+  set to 1 (0x407830 and five other stores), so the "clear when 0" branches after a start
+  or a move never run. SY.AT2 holds `ni_handsel_dp.tga`, `ni_handsel_da.tga`,
+  `dummy_dp.tga`, `dummy_da.tga`.
+- **Method:** decompiles (`engines/ring/notes/decomp/drag/`), disassembly, byte scan for
+  the stores to +0x76.
+- **Confidence:** proven

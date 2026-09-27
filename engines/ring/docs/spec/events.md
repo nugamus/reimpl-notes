@@ -11,7 +11,7 @@ puzzle 1 is SY's (the quit dialog, `WM_CLOSE` in `spec/boot.md`). Evidence: E-00
 | 0x40bbb0 object click | `MouseLeftEvent` 0x409d90 | 0x431660 | 0x431660 | 0x445c80 | 0x443990 | 0x43dac0 | 0x43afa0 | 0x437d60 | 0x4364a0 | 0x4341e0 |
 | 0x40bd40 button down on an object | 0x409630 (`WM_LBUTTONDOWN`) | — | — | 0x4472b0 | — | 0x441860 | 0x43b9a0 | — | — | 0x434740 |
 | 0x40bed0 click on an object with flag bit 3 | `MouseLeftEvent` | — | — | — | — | 0x441860 | — | 0x4392a0 | — | — |
-| 0x40c060 drag released | 0x409520, 0x409630, `MouseLeftEvent` | 0x4331b0 | 0x4331b0 | 0x4477d0 | — | 0x441890 | 0x43bbf0 | — | — | 0x4349b0 |
+| 0x40c060 drag: start 1, release 2, move 3 (`spec/cursor.md`, "Dragging") | 0x409630, `MouseLeftEvent`, 0x409520 | 0x4331b0 | 0x4331b0 | 0x4477d0 | — | 0x441890 | 0x43bbf0 | — | — | 0x4349b0 |
 | 0x40c1f0 inventory list click | `MouseLeftEvent` (list shown) | — | — | — | — | 0x441d50 | — | — | — | — |
 | 0x40c2b0 before a movability | `MouseLeftEvent` | — | 0x433530 | 0x449080 | 0x444b40 | 0x4420b0 | 0x43c290 | 0x439f40 | 0x436c10 | 0x435390 |
 | 0x40c420 after a movability | `MouseLeftEvent` | — | 0x433570 | 0x449320 | 0x444ba0 | 0x442580 | 0x43c450 | 0x43a050 | 0x436d60 | 0x435410 |

@@ -76,10 +76,11 @@ same with object 3 and one accessibility.
 - 2: `unk_19` 0 → hide presentation 1, show 2 (no lit); 1 → hide 2, show 1 (yes lit).
 - 3: show presentation 1.
 - 4: odd `unk_19` → hide 1, show 2 (cancel lit); even → hide 2, show 1 (OK lit).
-- the preferences, load, save and status objects: `sy` notes, to come.
+- the preferences objects: "Preferences" below; load, save and status: to come.
 
 **On nothing (0x433bc0):** hide presentation 0 of every menu entry and of the other SY
-screens' lit pictures, presentations 1 and 2 of objects 2 and 4, presentation 1 of 3;
+screens' lit pictures (90101, 90102, 90207, 90208, 90309, 90310, 90401, 90912), presentation
+2 of 90104, presentations 1 and 2 of objects 2 and 4, presentation 1 of 3;
 then `CurSet(0x38)` (`CUR_MenuIdle`). So in SY the cursor is `CUR_MenuIdle` off a hot
 spot and the hot spot's cursor (57, `CUR_MenuActive`) on one.
 
@@ -90,7 +91,7 @@ spot and the hot spot's cursor (57, `CUR_MenuActive`) on one.
 | Object | Action |
 |---:|---|
 | 90000 new game | `GetMultiLanMes("DoYouWantToStartNewGame")`, question with kind 2 |
-| 90001 preferences | `PuzSetAct(90001, 1, 1)`, then the preferences read from app+0xa1 (`sy` notes, to come) |
+| 90001 preferences | opens the preferences screen ("Preferences" below) |
 | 90002 load | builds the saved-game list, `PuzSetAct(90002, 1, 1)` |
 | 90003 save | busy cursor (0x33), saves the menu's snapshot as a picture, `PuzSetAct(90003, 1, 1)` |
 | 90004 continue | busy cursor, reloads the zone set-ups (0x408bc0, 0x431040) and loads the `SaveGame` snapshot (`spec/save.md`, to come); when that fails: set-ups reloaded, `aApplication::Init` 0x431140, and the warning `CanNotCountineGame` |
@@ -103,6 +104,77 @@ spot and the hot spot's cursor (57, `CUR_MenuActive`) on one.
 | 4, `unk_19` 2 (new game, OK) | busy cursor, set-ups reloaded (0x408bc0, 0x431040), `aApplication::Init` 0x431140 (loads the preferences, then `SetZone(7, 999)`: zone AS, `spec/boot.md`), then closes the question (kind 2) |
 | 4, `unk_19` 3 | closes the question (kind 2) |
 | 4, `unk_19` 4, 5 | delete a saved game / cancel (load screen) |
+
+## Preferences (puzzle 90001)
+
+Evidence: E-0048. Background `Preferences.bmp`; objects (all flag 1, cursor 57):
+
+| Object | Hot spots (x1, y1)–(x2, y2), `unk_19` | Presentations |
+|---:|---|---|
+| 90101 cancel | (410, 420)–(490, 445), 0; key 27 | 0: `g_cancel.tga` (407, 421), lit |
+| 90102 OK | (320, 420)–(370, 445), 0; key 13 | 0: `g_ok.tga` (328, 421), lit |
+| 90103 subtitles | on (310, 315)–(370, 350), 0; off (400, 315)–(460, 350), 1 | 0: `pr_on.bmp` (317, 326); 1: `pr_off.bmp` (402, 326) |
+| 90104 stereo | (355, 260)–(420, 295), 1 | 0: `pr_left.tga` (336, 288) + `pr_right.tga` (428, 288); 1: the two swapped; 2: `pr_3ds.tga` (356, 281), lit |
+| 90105 volume (flag 4, icon `ni_handsel`) | (300, 140)–(600, 180), 1 | 0: `pr_slider.tga` at (x, 155), shown |
+| 90106 dialogue volume (flag 4, icon `ni_handsel`) | (300, 197)–(600, 237), 1 | 0: `pr_slider.tga` at (x, 212), shown |
+| 90107 (no picture) | (0, 448)–(20, 640), 1 | — |
+
+90105 and 90106 have drag cursors (15, 15, 0, 3, 0, 0, 3): kind 3 pictures `ni_handsel_dp`
+and `ni_handsel_da` at offset (15, 15) (`spec/cursor.md`, "Dragging").
+
+**The preferences** (`aPreFer`, app+0xa1): four integers, `aPre.ini` in the game's
+directory, text `"%d %d %d %d"` (read at start-up, 0x407b80, and when a game starts,
+0x431140; a missing or short file is reported through 0x413f10 and the values stay;
+every edition ships `100 100 -1 1`):
+
+1. volume, 46..100 (the slider): all sound channels except 5 (0x469350);
+2. dialogue volume, 46..100: channel 5 (0x4692f0);
+3. stereo: −1 normal, 1 swapped (`aSoundHandler::SetLR`: the pan factor −1.0 or 1.0);
+4. subtitles: 1 on, 0 off (the dialogue handler, app+0xc, draws dialogue texts only when
+   its +0x28 is set).
+
+Loading and saving both apply them at once (0x4289e0; the stereo only with a sound
+handler).
+
+**Opening** (object click 90001): `PuzSetAct(90001, 1, 1)`, then the four values are
+copied to the screen's working values (volume, dialogue volume, swapped = stereo is 1,
+subtitles); without a preferences object 100, 100, 0, 1. When no sound device is up
+(0x406ee0: the sound system's object at 0x4a1d04 is null), subtitles become 1 and
+90103's hot spots are disabled. Then: subtitles 1 → 90103 presentation 0 shown, 1
+hidden; 0 → the reverse. Slider pictures at x = volume × 5 + 84 (90105, y 155) and
+dialogue volume × 5 + 84 (90106, y 212). 90104: all presentations hidden, then
+presentation "swapped" (0 or 1) shown.
+
+**On an accessibility:** 90101 → its presentation 0 shown, 90102's hidden; 90102 → the
+reverse; 90104 → presentation 2 shown.
+
+**Object clicks:**
+
+- 90101 cancel: `PuzSetAct(90000, 1, 1)`; the preferences are unchanged.
+- 90102 OK: `PuzSetAct(90000, 1, 1)`, then the preferences are saved (`aPreFer::Save`
+  0x428920: stored, applied, written to `aPre.ini`) with (volume, dialogue volume,
+  swapped ? 1 : −1, subtitles).
+- 90103: `unk_19` 0 → presentation 0 shown, 1 hidden, subtitles 1; `unk_19` 1 → the
+  reverse, subtitles 0.
+- 90104: swapped toggles; all presentations hidden, presentation "swapped" shown.
+- 90107: the credits (0x431350): 0x406ea0(0x400), `SetZone(6)`, 0x406de0(51002, 2),
+  `SetZone(1)`, then `ScrollImage("cre_01.bma", 0, 2, 101)` … `cre_10.bma` and
+  `ScrollImage("cre_11.bma", 5000, 2, 101)`, stopping at the first that returns 2;
+  finally 0x406e00(51002, 0x400) (`spec/sound.md`, ScrollImage: to come). Clicks only
+  reach it at y 448..464 (button events need y < 465).
+
+**The sliders** (drag event 0x4331b0, for 90105 and 90106 alike; `pos` is the slider's
+x, kept between drags, `delta` the signed horizontal distance of the last move):
+
+- phase 1 (press): drag mode 2, limit rectangle (310, 140)–(600, 180) for 90105,
+  (310, 197)–(600, 237) for 90106; step = (press x − 314) / 5 (C division, towards 0),
+  clamped to 0..54; `pos` = step × 5 + 314; the picture moves to `pos`.
+- phase 3 (move): `delta` = current x − press x; the picture moves to `pos` + `delta`
+  (not clamped; the limit rectangle keeps it near the track).
+- phase 2 (release): step = (`pos` + `delta` − 314) / 5, clamped to 0..54; the value
+  (volume or dialogue volume) = step + 46; `pos` = step × 5 + 314; the picture moves to
+  `pos`. `delta` is not reset at a press, so a press and release without a move reuses
+  the last drag's `delta`.
 
 ## Flow
 
