@@ -94,7 +94,9 @@ flag. The item is only in the inventory once it is dropped into the bar.
 State `bar` (0x4acfa0): 0 hidden, 1 shown, 2 opening, 3 closing; `barY` (0x4acfa4, 480 at
 start); the bar image `Invent.tga` (height `barH`). Every frame (0x426171):
 
-- **opening**: the first frame plays `bar_obj` once; `barY -= 8`; at `480 - barH` → shown.
+- **opening**: plays `bar_obj` when the flag 0x599138 is set and clears it; `barY -= 8`;
+  below `480 - barH` → clamped, shown, flag cleared. The flag is set by the scene load
+  (0x426594) and when the bar has closed, so a bar reopened while still closing is silent.
 - **closing**: `barY += 8`; at 480 → hidden, and the resume file is written (autosave,
   0x42f873, `save.md`).
 - opening, shown, closing: draw `Invent` opaque at (0, `barY`), 640 wide.

@@ -1937,3 +1937,18 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
 - **Confidence:** proven
 - **Doc:** `scene.md` "What a scene is made of"
 
+### E-0371 — The painting flight: zero before the division, 22 steps
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** Flight_Start 0x41f506: the six differences (target − viewer) are made 1
+  when 0, then angles folded (`< -0x800` → `+0x1000`, `> 0x800` → `-(0x1000 - d)`), then
+  divided by the step count 0x4aba30 (20) with C division into 0x5baf50.. (position) and
+  `& 0xfff` into 0x5bae20.. (angles); the targets (0x5baf60.., 0x5bae30..) per scene equal
+  the museum return spots of `scene.md`. Flight_Step 0x41f9f8 adds the step to the viewer,
+  redraws (0x4221f6), then `if (counter < count + 1)` grows the counter (1, or `elapsed >>
+  1` when `elapsed >= 3`) and returns 1, else returns 0 (the caller then runs Flight_End
+  0x41faf9): from 0, the calls that return 1 see 0..20 and the 22nd returns 0, each having
+  moved the camera.
+- **Method:** decompiled.
+- **Confidence:** proven
+- **Doc:** `scene.md` "Moving between the museum and the scenes"
+

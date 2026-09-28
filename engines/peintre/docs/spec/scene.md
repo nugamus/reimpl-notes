@@ -236,10 +236,13 @@ the stored y only has to be above the right floor.
 
 - **Museum → scene**: clicking a painting (`musee.md`) sets `prevScene` = 0, `scene` = the
   target, and 0x41f506 starts **mode 4**: the camera flies in 20 steps to the painting's
-  spot (table above): per step `(target - current) / 20` for position and angles, a zero
-  difference counts as 1, angle differences taken the short way round (±0x800). Each tick
-  (0x41f9f8) adds one step and redraws without input; the step counter grows by 1 per tick,
-  or by `elapsed / 2` when 3 or more ticks elapsed; when it passes 20, 0x41faf9 stops the
+  spot (table above): per step `(target - current) / 20` (C division) for position and
+  angles, where a zero difference is first replaced by 1 (so it divides to 0), and an angle
+  difference below -0x800 gets +0x1000, above 0x800 -0x1000 (E-0371). Each tick (0x41f9f8)
+  adds one step and redraws without input, then, while the step counter is below 21, grows
+  it by 1 (by `elapsed / 2` when 3 or more ticks elapsed) and goes on; the call that finds
+  it at 21 or more has still added its step (22 steps at one per tick, so the flight
+  overshoots the spot by two steps), and ends the flight: 0x41faf9 stops the
   stream and the static sounds and, if the target scene is not complete, plays
   `MOVIES\<entry movie>.hnm` (mode 2); when the movie ends the scene is loaded (the mode-2
   branch of 0x42fbd6 calls 0x41fda9 and restarts the timer). A complete scene (or 1, 2) is
@@ -254,7 +257,8 @@ the stored y only has to be above the right floor.
   and 0x4e313c = 1 (flow docs). The next tick (0x42f988) unloads and loads.
 - Every load goes through 0x41fda9 and `Alloc3DMemory`; nothing survives in the 3D heap.
   What persists is the 3D block (0x4aba40, 0x36C bytes, `save.md`): `zoneSolved`, the
-  inventory flags, the sunflower count (byte 0x4abbd4), and each scene's own flags.
+  inventory flags, the sunflower count (byte 0x4abbd4), and each scene's own flags. The
+  scenes' static tables and variables persist too, for the run (E-0370).
 
 ## 3D ↔ 2D (E-0311, E-0312)
 
