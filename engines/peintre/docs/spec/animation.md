@@ -16,6 +16,20 @@ E-0318 (records), E-0300 (ticks).
 - **Rotation keys** are `(time, x, y, z, w)`, unit quaternions in Q15 (32767 ≈ 1).
 - **Position keys** are `(time, x, y, z)` in world units, the node's local position.
 
+## Speed (E-0378)
+
+The scene step functions advance a playing record in one of three ways per handled tick:
+by `elapsed` (almost all: real time, one frame per 66 ms whatever the frame rate); by 1
+(chambreb's six tracks, chambrev's, the café bar door, mangeurs' stove door: one frame per
+drawn frame, slower in real time when frames take longer than a tick); or by `elapsed >> 1`
+(maisonet's bird out and back, with a floor of 1; mangeurs' rocking chair and eglise's
+kite, without). At the full 15 frames per second the last kind runs at double its design
+speed (the bird) or not at all (chair, kite: `1 >> 1 = 0`); it runs as designed only where
+frames take two ticks, as on the recommended machines of the ReadMe (Pentium 133 to
+Pentium II, software rendering, view sizes offered for speed). The engine steps these
+three tracks one frame per two ticks (a bug fix); the others as the original at 15 frames
+per second.
+
 ## Which node a track drives
 
 Track i drives node i of the scene's node table (the `.3DC`'s table, root first), for i

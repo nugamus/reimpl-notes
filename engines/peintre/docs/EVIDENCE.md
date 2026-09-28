@@ -2044,3 +2044,21 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   read with `pefile`.
 - **Confidence:** proven (the edit's caret, selection and I-beam are the Windows EDIT
   control's own behaviour; the selection colour is the system highlight colour)
+
+### E-0378 — Three tracks step by elapsed / 2: frozen or doubled at full frame rate
+- **Binary/file:** `/MISSION.EXE`; `ReadMe.txt`
+- **Evidence:** the step functions' increments (decompiled): `+ elapsed` in Auberge
+  0x41a2ab, Cafe 0x41ba80 record 0, Champ 0x41e4cc, HopiExt 0x424c4c, Hopiint 0x4256af,
+  Jardin 0x426f34, Maisonj 0x428c8c, Mangeurs 0x429b94 records 0/2/3, Musee 0x42b5fe,
+  Pont 0x42d26a, Terrasse 0x42df65; `+ 1` in Chambreb 0x41cee9 (all, the shoes by a toggle),
+  Chambrev 0x41de65, Cafe record 1, Mangeurs record 4; `elapsed >> 1` in Maisonet 0x427b98
+  records 2/3 (`local_8 = elapsed >> 1; if 0 then 1`), Mangeurs 0x429b94's default branch
+  (record 1, the chair; no floor), Eglise 0x4243cb (no floor; ends only on `frame ==
+  length`); Pont's default branch has the same halving but no record reaches it. The tick
+  counter runs on the 66 ms timer whatever the frame rate (E-0300), so `elapsed` is 1 at
+  15 frames per second. `ReadMe.txt`: minimum Pentium 133, recommended Pentium II, "a
+  Direct 3D mode whose performance without a 3D acceleration board is limited".
+- **Method:** decompiled; the ReadMe.
+- **Confidence:** proven (the increments); the design frame rate is inferred
+- **Doc:** `animation.md` "Speed"
+
