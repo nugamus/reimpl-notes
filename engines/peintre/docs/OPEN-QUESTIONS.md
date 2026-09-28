@@ -134,7 +134,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** 0x42f755, 0x42f873, 0x42edef, 0x42f2c2, Load3DGame, Load3DGGame.
 - **Blocks:** nothing for loading and writing (the block is copied whole); naming the
   fields belongs to the world spec.
-- **Status:** open
+- **Status:** RESOLVED as far as code can: `notes/block3d-access.md` lists every word the program touches and which functions write and read it (128 words; the rest is never accessed)
 
 ### Q-0200 — Does anything start the museum robot's third track (`robot03`)?
 - **Context:** `musee.md` / E-0321: record 3 (`robot03.3da` on `robot`, playing flag
