@@ -221,7 +221,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** nothing more; the engine lists the saves in slot order (roughly the
   order objects are placed).
 - **Blocks:** matching the original's order when objects are replayed out of order.
-- **Status:** open (engine side only: the original order is file time, E-0419; ScummVM saves carry none)
+- **Status:** RESOLVED (engine side): `<target>.order` keeps a write counter per save file; the Load page sorts by it, oldest first, as the original by file time
 
 ### Q-0356 — Does zone 0's state 0 draw the slots?
 - **Context:** `ui.md` state 0: "zone 0: magnifier open, load the bar, `LoupeIn`, open the
