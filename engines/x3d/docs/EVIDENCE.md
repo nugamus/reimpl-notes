@@ -4955,3 +4955,16 @@ An entry at `tentative` confidence must also have a matching line in
   clip without its face name (scan of the 14 talkers' eight clips each).
 - **Method:** `a3d.py` / `o3d.py` tree dump; MCP decompile of `0x004217b0`, `0x0041c380`.
 - **Confidence:** proven
+
+### E-0625 — A slot clip stays the active one after it stops; only a unit's call makes slot 0 active again
+- **Binary/file:** `MissionMonet.exe`.
+- **Evidence:** `U04_MonetOpenDoor` (`0x0040b400`) adds `ouvre01` only when M02's run
+  count is 1; on every knock it sets fps 15, loop 0, frame 1.0, forward and running on
+  Monet's node `+0x18c` (the active slot's playback) without re-adding the clip, so the
+  clip is still active after the door-close hook ran it backward to its start. The
+  switches back to slot 0 are explicit calls, e.g. `TakeCard` `FUN_004201c0(parent, 0, 1)`
+  (E-0057). Engine trace: with an automatic hand-back to slot 0 on a clip stopping
+  backward, the second knock ran Monet's `ATTENTE` instead (Monet stayed at (170.2,
+  340.0), frame 65); without it he walks to the door (162.0, 267.7), `ouvre01` frame 30.
+- **Method:** MCP decompile of `0x0040b400`; `dev_commands` `node`/`pos` runs.
+- **Confidence:** proven

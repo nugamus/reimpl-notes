@@ -126,7 +126,8 @@ A node can hold clips in slots 1..15 (slot 0 is the node itself). Adding a clip 
 whole `.A3D` (root to root, no `*` splitting) onto the node's object, copying the node's
 fps, loop and running flags, starts it, and optionally makes it the active slot. While a
 slot ≠ 0 is active only that clip advances and poses the object; the base node's frame
-is frozen.
+is frozen. A clip that stops (at either end, either direction) stays the active slot:
+only a unit's call makes slot 0 active again (`TakeCard` below; E-0625).
 
 ### U01's scripted calls (E-0050, E-0057)
 
