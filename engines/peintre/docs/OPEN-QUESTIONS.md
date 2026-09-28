@@ -127,7 +127,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   runs 0x41fda9 (E-0414); the 2D side calls the button "RetourM".
 - **What we checked:** 0x42f2c2 only.
 - **Blocks:** `ui.md` describes the effect by variables, not in game terms; world spec.
-- **Status:** open
+- **Status:** RESOLVED (E-0372): the museum, after the return movie of a complete scene
 
 ### Q-0252 — The rest of the 0x36C-byte 3D state block in the saves
 - **Context:** `game.ksy` `state_3d`; E-0422 names only the fields the save glue touches.

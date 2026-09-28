@@ -279,7 +279,7 @@ the 3D side (0x42f2c2) with the flags, the zone's counter and a code:
 | Code | From | 3D side |
 |---|---|---|
 | -1 | Retour, Backspace, end of zone 0 / 21 | back to 3D where the player was |
-| -3 | RetourM | back to 3D with state byte +0x3C set to 0 and the 3D start (0x41fda9) run again (Q-0251) |
+| -3 | RetourM | back to the **museum**: as Backspace in the scene the zone was entered from, the scene's return movie first when that scene is complete (0x41f14b), then the museum loads (E-0372) |
 | -2 | option menu Quit | `PostQuitMessage` |
 | n ≥ 0 | option menu Load | `Load3DGame(n)`, which re-enters the saved 2D zone |
 

@@ -1952,3 +1952,17 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
 - **Confidence:** proven
 - **Doc:** `scene.md` "Moving between the museum and the scenes"
 
+### E-0372 — Leaving a zone with -3 (RetourM) goes to the museum, with the return movie of a complete scene
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** Zone_ReturnTo3D 0x42f2c2 with -3: `0x50273c = 0`, modes 0, `0x4e3140 =
+  0x4e3144` (previous := the scene); later again `0x4e3140 = 0x4e3144`; since the code is
+  not -1 it sets `0x4e314c = 1` and calls 0x41f14b (Scene_LeaveToMuseum): for a complete
+  scene (per-scene zone tests, none for 0, 1, 2, 11) it stops the stream, frees the static
+  sounds, plays the return movie (mode 2), sets `0x4e3138 = 1`, `0x4e3144 = 0` and
+  `0x4abb70[0x502860] = 1` (0x502860: the zone just left); then, unless mode 2 was entered,
+  `0x4e3144 = 0` and 0x41fda9 loads the museum. Scene_LeaveToMuseum's flag index is the
+  last zone entered, not a zone of the scene.
+- **Method:** decompiled.
+- **Confidence:** proven
+- **Doc:** `ui.md` exit codes; resolves Q-0251
+
