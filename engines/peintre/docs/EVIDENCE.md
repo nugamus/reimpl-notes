@@ -1978,3 +1978,12 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
 - **Confidence:** proven
 - **Doc:** `scene.md` "What a scene is made of"
 
+### E-0374 — The café mirror's current texture name starts as MIRROIRG
+- **Binary/file:** `/MISSION.EXE`; `Data/Scenes_3D/CAFE.BFG`
+- **Evidence:** Cafe_Init 0x41b77d: `strcpy(0x650fe0, "MIRROIRG")` after loading MIRROIR1..3
+  and `Node_SetBrightness(mirroir, 0xF)`. The engine's load of `cafe.3DC` gives the
+  `mirroir` node's first face group the texture `mirroirg` (names compare without case).
+- **Method:** decompiled; engine debug output of the loaded node.
+- **Confidence:** proven
+- **Doc:** `cafe.md` "The mirror"; resolves Q-0403
+

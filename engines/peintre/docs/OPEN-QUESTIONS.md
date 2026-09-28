@@ -283,7 +283,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** `cafe.md`, E-0331.
 - **Blocks:** the engine starts from the texture name of `mirroir`'s first face group as
   loaded from the `.3DC`; a different initial name would leave the first swap without effect.
-- **Status:** open
+- **Status:** RESOLVED (E-0374): "MIRROIRG", the node's own texture
 
 ### Q-0404 — The museum star after it has been taken: hidden on the next visit?
 - **Context:** `musee.md` Init lists no step that hides `etoile` when 0x4aba44 (the star
