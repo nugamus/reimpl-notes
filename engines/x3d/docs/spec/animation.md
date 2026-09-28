@@ -113,6 +113,9 @@ disjoint objects):
      backward: ≤ first) stop running unless ping-pong;
    - looping: if frame > last, frame = fmod(frame, last) + first; if frame < first,
      frame = last − (first − frame);
+     **Engine:** wraps with first + fmod(frame − first, last − first) (and the mirror
+     below first), the same for any step shorter than one loop, and holds first when
+     last ≤ first, where the original's fmod(frame, 0) gives NaN;
    - stop target set and |frame − target| ≤ 2 · dt · fps: frame = target, stop running,
      clear the target.
 3. Animate(object, animation, frame) — also when not running, so a stopped node holds
