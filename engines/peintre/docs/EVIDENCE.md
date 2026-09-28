@@ -1966,3 +1966,15 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
 - **Confidence:** proven
 - **Doc:** `ui.md` exit codes; resolves Q-0251
 
+### E-0373 — "The last frame" of a finished track is length - 1
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** every 0x438290 call in the scene inits (Cafe, Chambreb, Chambrev, Champ,
+  HopiExt, Hopiint, Jardin, Maisonet, Maisonj, Mangeurs, Pont, Terrasse) that shows a
+  finished track passes `base + -1 + length` (e.g. Cafe_Init `DAT_004aa43c + -1 +
+  DAT_004aa444`); the others pass `base + 1` or `base + length / 2`. Maisonet_Init poses
+  record 1 at `base1 - 1 + length0` (record 0's length). Cafe_StepAnim record 1 ends by
+  setting `frame = length - 1` and posing there.
+- **Method:** decompiled (a scan of the inits' calls).
+- **Confidence:** proven
+- **Doc:** `scene.md` "What a scene is made of"
+

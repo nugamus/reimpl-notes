@@ -100,7 +100,9 @@ What the init callbacks add (every scene the same way, per-scene lists in the fl
   step functions share one shape (E-0368): `frame += step`; the end is `frame >= length`
   (some records use `length / 2`); a record with its own end rule applies it and returns
   **without posing**, so the node keeps the previous tick's frame; any other record
-  wraps to frame 1 and is posed there in the same tick (a loop never shows `length`).
+  wraps to frame 1 and is posed there in the same tick (a loop never shows `length`). A
+  scene init that shows a finished track poses "its last frame", which is always frame
+  `length - 1` (E-0373).
 - **Static tables** (E-0370): the object table, the animation records and the scene code's
   own variables are initialised data of the EXE, set once per run. A load resolves the
   handles and resets the frames to 1 (`LoadAnims<scene>`), and the init sets what it sets;
