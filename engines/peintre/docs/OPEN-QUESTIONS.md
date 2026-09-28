@@ -87,7 +87,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   write these words by offset.
 - **Blocks:** nothing in the 3D flow; possibly a mirror-breaking animation seen after
   zone 11.
-- **Status:** open
+- **Status:** open (0x4abd60 settled by E-0369: initial 1, written only; the mirror and shoe tracks remain)
 
 ### Q-0235 — Who sets DAT_004abc08 (mangeurs' cuckoo on entry)?
 - **Context:** mangeurs' init `0x4298e5` sets `DAT_00599044` := (`DAT_004abc08` = 0); the
@@ -95,7 +95,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** all decompiled game3d functions; no other write. It lies in the saved
   block `0x4aba40` passed to the 2D side (E-0312), so a 2D zone may set it.
 - **Blocks:** when the cuckoo sounds.
-- **Status:** open
+- **Status:** RESOLVED (E-0369): its initial value is 1; only mangeurs clears it
 
 ### Q-0236 — Are the never-started 3D tracks started elsewhere?
 - **Context:** loaded tracks whose playing word no decompiled 3D function sets to 1:

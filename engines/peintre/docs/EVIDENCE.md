@@ -1906,3 +1906,21 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
 - **Confidence:** proven
 - **Doc:** `scene.md` "What a scene is made of"; resolves Q-0400, Q-0402, Q-0404
 
+### E-0369 — A new player's 3D block is the EXE's initial data (non-zero words listed)
+- **Binary/file:** `/MISSION.EXE` (`mission.___`)
+- **Evidence:** the 0x36C bytes at 0x4aba40 in the image (`pefile` memory-mapped image):
+  40 non-zero bytes, words listed in `save.md`. No `memset`/copy over the block on the
+  new-player path: 0x4187ba only deletes the player's files; `Load3DGGame` 0x42f111 runs
+  only for a known player (`boot.md` steps 3, 6); the player-name screen runs once per
+  process. Every instruction whose operand falls in those words (capstone over all
+  functions of `function-dump.tsv`): 0x4abc08 `cmp` in Mangeurs_Init 0x429989, `mov 0` in
+  Mangeurs_Frame 0x42a35d; 0x4abcd8 `cmp 1` in Eglise_Init 0x42435f, `mov 0` in
+  Jardin_Frame 0x42723a; 0x4abd60 `cmp 0` / `mov 1` in Chambreb_Init 0x41caec / 0x41cb07;
+  byte 0x4abbfa `mov 2` in Musee_Frame 0x42c0ea; nothing else. No access by block offset
+  (`[reg + 0x1c8]`, `+ 0x320`, `+ 0x330`) outside stack frames.
+- **Method:** static read of the image and an operand scan.
+- **Confidence:** proven
+- **Doc:** `save.md` "A new player's block"; resolves Q-0235 (nothing writes 0x4abc08 but
+  mangeurs' clear: its initial 1 makes the cuckoo sound on a new player's first visit) and
+  the 0x4abd60 half of Q-0220 (initial 1, so chambreb's test never passes; written only)
+

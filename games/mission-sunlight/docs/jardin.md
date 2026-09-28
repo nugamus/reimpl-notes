@@ -75,7 +75,7 @@ checking the table first, so `aild`/`ailg` work:
 | `rato` | — | hide it, cursor := item 30, open the bar (E-0316), `DAT_004abcc0` := 1 |
 | `fuzz`, `aild` or `ailg` | — | hide `fuzz`, item 29, bar, `DAT_004abcbc` := 1 |
 | `porte01` or `porte02` | — | leave for `auberge` (11 → 1) |
-| `cerf` | — | start track 1, play `clochjar` once, `DAT_004abccc` := 1 (kite flown), `DAT_004abcd8` := 0 (role unknown here) |
+| `cerf` | — | start track 1, play `clochjar` once, `DAT_004abccc` := 1 (kite flown), `DAT_004abcd8` := 0 (the kite lands in the church: `eglise.md` shows `cerf` once it is 0; a new player starts with 1, E-0369) |
 | `partoche` | — | enter zone 19 (E-0312) |
 | `barriere` | — | start track 0, play `barriere` once |
 

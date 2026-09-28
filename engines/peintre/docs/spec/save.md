@@ -84,3 +84,22 @@ Owned by the 3D side (world spec); the fields the save and 2D glue touch (0x42f7
 | 0x1A0, 0x1A4 | u32 | tested by that reset |
 
 Everything else is opaque here (Q-0252).
+
+**A new player's block** (E-0369): the program shows the player-name screen once per run
+and never clears the block, so a new player starts from the EXE's initial data at
+0x4aba40 (only the 35 object flags are zeroed, `boot.md` step 6). Its non-zero words:
+
+| Offset | Address | Value | Read by |
+|---|---|---|---|
+| 0x1AC | 0x4abbec | 0xFF | — |
+| 0x1B8 | 0x4abbf8 | 0x00010001 | — (byte 0x4abbfa written by the museum) |
+| 0x1C4 | 0x4abc04 | 0xFF | — |
+| 0x1C8 | 0x4abc08 | 1 | mangeurs: the cuckoo on entry (`mangeurs.md`) |
+| 0x1D0, 0x1E0, 0x1F0, 0x200, 0x210, 0x220 | 0x4abc10 … 0x4abc60 | 0x00FFFFFF | — |
+| 0x1D4, 0x1E4, 0x1F4, 0x204, 0x214, 0x230, 0x240, 0x250, 0x288 | 0x4abc14 … 0x4abcc8 | 0xFF | — |
+| 0x1E8, 0x23C, 0x24C, 0x25C | 0x4abc28, 0x4abc7c, 0x4abc8c, 0x4abc9c | 1 | — |
+| 0x294 | 0x4abcd4 | 0x00010001 | — |
+| 0x298 | 0x4abcd8 | 1 | eglise: `cerf` (the kite) hidden until the garden clears it (`eglise.md`) |
+| 0x320 | 0x4abd60 | 1 | chambreb's entry test (`chambreb.md`) |
+
+("—": no instruction in the program reads it.)

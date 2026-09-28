@@ -107,7 +107,7 @@ and `fenclaq`, start track 3, `DAT_004abc58` := 1, `bersso` cursor 3, `fenetre` 
 | Kettle steams | `DAT_00599040` > 150, `DAT_004abc18` = 1, kettle not taken | show `vapeur`, loop `bouilloi`, `theieres` cursor 2 (repeated every frame while true) |
 
 `DAT_00599024` and `DAT_00599040` grow by the elapsed ticks each frame. What sets
-`DAT_004abc08` is not in the 3D code (Q-0235).
+Nothing writes `DAT_004abc08` but this clear: a new player starts with 1 (E-0369), so the cuckoo sounds on the first visit only.
 
 **State written:** `DAT_004abbfc`, `DAT_004abc00`, `DAT_004abc08`, `DAT_004abc18`,
 `DAT_004abc1c`, `DAT_004abc2c`, `DAT_004abc3c`, `DAT_004abc58`. **Read:** those,

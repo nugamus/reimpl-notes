@@ -24,7 +24,7 @@ the frame to 1 when it **equals** the length (E-0318). Static sound (E-0320, `0x
 
 ## Entry (`0x4242ed`)
 
-`cerf` hidden if `DAT_004abcd8` = 1 (written by the garden, `jardin.md`) or
+`cerf` hidden if `DAT_004abcd8` = 1 (a new player starts with 1, E-0369; the garden clears it when the kite flies, `jardin.md`) or
 `DAT_004abcdc` = 1 (kite taken); `gerbe` hidden if `DAT_004abce0` = 1. Zone 23 done →
 `eglise10` cursor 0x3c.
 
