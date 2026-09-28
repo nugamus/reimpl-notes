@@ -87,7 +87,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   write these words by offset.
 - **Blocks:** nothing in the 3D flow; possibly a mirror-breaking animation seen after
   zone 11.
-- **Status:** open (0x4abd60 settled by E-0369: initial 1, written only; the mirror and shoe tracks remain)
+- **Status:** RESOLVED (E-0376, E-0369): nothing starts the mirror track; the shoe track runs from its initial 1; 0x4abd60 is written only
 
 ### Q-0235 — Who sets DAT_004abc08 (mangeurs' cuckoo on entry)?
 - **Context:** mangeurs' init `0x4298e5` sets `DAT_00599044` := (`DAT_004abc08` = 0); the
@@ -105,14 +105,14 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** the decompiled game3d functions (0x419f0e-0x42fbd5).
 - **Blocks:** nothing for playback (they stay at their loaded pose); mangeurs' track ends
   hide the log/faggot and scroll `fire`, which would matter if they ran.
-- **Status:** open
+- **Status:** RESOLVED (E-0376): no, none of them ever runs
 
 ### Q-0237 — What leaves maisonj for hopiext (7 → 2)?
 - **Context:** `0x41fda9` has an arrival for previous scene 7, target 2 (E-0308), but
   maisonj's frame `0x428e63` never sets `DAT_004e3144` := 2 (E-0363).
 - **What we checked:** every write of `DAT_004e3144` in the decompiled 3D functions of batch B.
 - **Blocks:** nothing; a missing exit would only drop an unused arrival.
-- **Status:** open
+- **Status:** RESOLVED (E-0376): nothing; the arrival is dead
 
 ### Q-0250 — Can the 3D side call Entry2D with zone 25?
 - **Context:** Entry2D 0x40fdc6 rejects only zones > 0x19, but the zone table 0x4a6b18 has 25
@@ -143,7 +143,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   read); the museum's init and frame callbacks.
 - **Blocks:** nothing: the engine can load the track and never play it, like the original.
   It matters only if a cut robot exit is to be restored.
-- **Status:** open
+- **Status:** RESOLVED (E-0376): nothing; robot03 never runs
 
 ### Q-0300 — Node +0xac, +0xc0, +0xd4, +0xd8: what are they?
 - **Context:** `.3DC` node, `obj3d.ksy` (E-0504).

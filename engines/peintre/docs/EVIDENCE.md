@@ -2001,3 +2001,21 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
 - **Confidence:** proven
 - **Doc:** `musee.md` "Speaking", `cafe.md` "The clock"; resolves Q-0401
 
+### E-0376 — Dead paths: tracks nothing starts, an arrival nothing reaches
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** an operand scan of every instruction in the functions of
+  `function-dump.tsv` (capstone) for the playing words: musee `robot03` 0x4aef4c (writes
+  `0` in Musee_Init 0x42b20b and Musee_StepAnim 0x42b6f1, one `cmp`); chambreb `mirroir`
+  0x4ab03c (writes in Chambreb_Init 0x41cca9 and Chambreb_StepAnim 0x41cfa7, both 0) and
+  `chaussur` 0x4aafc4 (Chambreb_Init 0x41ca41, 0x41ca82, both 0; its `.data` value is 1);
+  jardin `papiyon3` 0x4ad228, maisonj `nuages` 0x4adba4, mangeurs `buche`/`chaise`/`fagot`
+  0x4ae3ac/0x4ae424/0x4ae49c (no direct write; the indexed `[reg + 0x4ae3ac]` writes are all
+  0; their `.data` values are 0). No instruction writes 1 to any of them, so none of these
+  tracks ever runs (the shoe track runs from its initial 1 until an entry clears it; the
+  broken mirror is only ever posed at its end by the entry). Every write of the target
+  scene byte 0x4e3144 (the same scan): Maisonj_Frame writes 9, 0xa and 6, never 2, so
+  0x41fda9's arrival from 7 at 2 is unreachable.
+- **Method:** static scan.
+- **Confidence:** proven
+- **Doc:** resolves Q-0200, Q-0220 (with E-0369), Q-0236, Q-0237
+
