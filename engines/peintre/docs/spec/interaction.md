@@ -132,7 +132,9 @@ These draws happen in every state; while hidden `barY` = 480 puts them off scree
 
 Some scenes let the player pick up a scene node and carry it to another (cafe, mangeurs,
 pont; flow docs): the scene hides the node, sets 0x502734 = 1 and keeps the node's handle
-in 0x502a80. While it is set, the frame (0x4223e8) picks the cursor by the carried node's
+in 0x502a80. The scene's carry branch runs only while `Pick` finds a node: a click over
+nothing (sky, outside the view) does not drop the object (0x41bbcf, 0x429dd6, 0x42d489).
+While it is set, the frame (0x4223e8) picks the cursor by the carried node's
 name: `fagot` → 62, `buche` → 61, `poignee04` → 64, `clef` → 63; and `Pick` uses the cursor
 image's centre. The scene clears 0x502734 when the object is used or put back. The cafe,
 mangeurs and pont frame callbacks set cursor 40 (`curferme`) while carrying over a node;
