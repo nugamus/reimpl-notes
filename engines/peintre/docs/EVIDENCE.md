@@ -1987,3 +1987,17 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
 - **Confidence:** proven
 - **Doc:** `cafe.md` "The mirror"; resolves Q-0403
 
+### E-0375 — UV callbacks run once per UV: the robot screen's counter turns mid-node; the café clock moves by half a texture
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** 0x4399d0 (node, callback): for each of the node's `+0x84` UVs (8 bytes
+  each at `+0x88`) calls the callback with the UV's address. Musee_Frame 0x42b776:
+  `0x599018 += elapsed` every frame; when 0x599010 (scrolling) and `0x599018 > 10`:
+  0x4399d0(`ecran`, 0x40170d → 0x42ad1c), `0x599018 = 0`. 0x42ad1c: if 0x599000: `v +=
+  0x7f0000`, `++0x4e3128`, at 6 `0x599000 = 0`; else `v -= 0x7f0000`, `--0x4e3128`, at 0
+  `0x599000 = 1`; Musee_Init sets `0x4e3128 = 0`, `0x599000 = 1`. Cafe_ClockUv 0x41b613 by
+  clock state (0x650fdc): 1: `u += 0x800000`; 2: `u -= 0x800000`, `v += 0x800000`; 3: `u +=
+  0x800000`, running (0x4aa4c8) := 0, sound slot 0x5badc8, `orloge` cursor := 2.
+- **Method:** disassembly (capstone).
+- **Confidence:** proven
+- **Doc:** `musee.md` "Speaking", `cafe.md` "The clock"; resolves Q-0401
+

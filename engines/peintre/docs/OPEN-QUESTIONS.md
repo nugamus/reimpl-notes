@@ -265,7 +265,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** the engine scrolls `ecran` (the node it retextures `ROBI3` ↔ `ROBI3N`), six
   steps of +0x7f0000 then six of −0x7f0000, counting 10 elapsed ticks per step. The node,
   the first direction and the step counter's start are to be confirmed.
-- **Status:** open
+- **Status:** RESOLVED (E-0375): `ecran`, up first, the counter counts UVs (not steps), every 11 ticks
 
 ### Q-0402 — Alternating tracks: does the second track restart from frame 1?
 - **Context:** maisonet's bird (`oisaller` → `oisrturn` → `oisaller` …) and jardin's

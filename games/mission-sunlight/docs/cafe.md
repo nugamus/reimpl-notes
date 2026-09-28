@@ -102,8 +102,8 @@ So zone 6 can be entered only from z 0x321..0x7d0.
 **The clock**: `DAT_00650fd8` += elapsed; when it is more than 199 ticks past
 `DAT_00650fd4` while `DAT_004aa4c8` = 1 and the clock is not taken, the state
 `DAT_00650fdc` goes up by one, `DAT_00650fd4` := `DAT_00650fd8`, and `0x41b613` is applied
-to every UV of `orloge`: state 1 u += 0x80 (16.16), state 2 u −= 0x80 and v += 0x80,
-state 3 u += 0x80, running := 0, `pendule` plays once, `orloge` cursor := 2. The clock
+to every UV of `orloge`: state 1 u += 0x800000 (16.16: half the texture), state 2 u −= 0x800000 and v += 0x800000,
+state 3 u += 0x800000, running := 0, `pendule` plays once, `orloge` cursor := 2. The clock
 becomes takeable after 3 × 200 ticks.
 
 ## Flow

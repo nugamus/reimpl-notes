@@ -143,6 +143,9 @@ loaded but never applied.
   when the `robot` node is within 1,500 ((x, z) of its camera-relative position): the
   robot speaks, `robot01` starts (then `robot02` loops), the `robot2` sound plays looped,
   0x4abbf0 = 1, the six parts get cursor type 0xFF.
+- **The screen scroll** (E-0375): a tick counter 0x599018 grows every frame; while the
+  screen scrolls and it is past 10, `ecran`'s UVs go through 0x42ad1c one by one (v up by
+  0x7f0000, counting; after 6 UVs down, counting back to 0, then up again) and it restarts.
 - **Speaking** uses the streamed voice lines of the table at 0x4aef50: `a50_01`,
   `a50_01c`, `a50_01d`, `a50_01e`, `a50_01h` (index 0x599020). Starting plays line 0
   (`a50_01`), the screen unchanged. Each time the stream ends (the stream-ended flag
