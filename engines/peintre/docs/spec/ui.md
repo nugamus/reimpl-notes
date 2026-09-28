@@ -17,7 +17,7 @@ Words used below:
 - **movie n** = entry n of the 2D movie table (E-0204, "2D movies"); **voice X** = the
   streamed sound `SOUND\X.APC` (E-0209); **sound X** = the static sound `SOUND\X.WAV`.
 
-## Player-name screen (E-0402, E-0403)
+## Player-name screen (E-0402, E-0403, E-0445)
 
 A popup window as large as the desktop, background brush RGB(16, 40, 80). The 640×480
 bitmap resource `ACCUEIL_BMP` (8-bit, in `mission.___`'s `.rsrc`, language 1036) is drawn
@@ -30,7 +30,16 @@ centred; `(ox, oy)` = its top-left corner. Controls, at `(ox, oy) +`:
 | Quit | 0x67 | (468, 396), 72×27 | `BOUTONS_BMP` at (40, 0); pressed (40, 28) |
 | Player i (i < count) | 0x68 + i | (90, 217 + 34 i), 162×27 | the name in "Trobo" at (2, 2) on RGB(0, 84, 120), RGB(181, 198, 214), white while pressed |
 
-Clicking a player button copies its name into the field. Enter = OK, Escape = Quit (the
+The window is a plain Windows window with the arrow cursor (DirectInput starts only after
+this screen), and the field a standard `EDIT` control, text centred (E-0445). It opens
+holding `player's name`, focused, all of it selected: the first typed character replaces
+it. Typing replaces the selection; Backspace deletes the selection or the character
+before the caret; Left/Right/Home/End move the caret; Delete removes the selection or the
+character after it; a click in the field puts the caret at the nearest character (the
+cursor there is the I-beam). The caret blinks (Windows' 530 ms); the selection is drawn in
+the system highlight colour.
+
+Clicking a player button copies its name into the field, focused, all selected. Enter = OK, Escape = Quit (the
 field forwards their key-up to the window). OK with an empty field does nothing; with a
 name (compared case-insensitively):
 

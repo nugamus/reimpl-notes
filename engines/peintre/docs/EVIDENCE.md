@@ -2028,3 +2028,19 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
 - **Confidence:** proven
 - **Doc:** resolves Q-0250
 
+
+### E-0445 — The player screen is a plain Windows window: arrow cursor, a centred EDIT holding "player's name" selected
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** App_Init 0x4180c0 registers `WC_MS_ACCUEIL` with style 0x203, `hCursor =
+  LoadCursorA(0, IDC_ARROW)` (0x7f00) and creates DirectInput only after message 0x502, so
+  the screen runs on Windows' own cursor and messages. Accueil_WndProc 0x418c21 WM_CREATE:
+  the edit 0x65 is class `EDIT` (0x4a9830), style 0x50000001 (WS_CHILD | WS_VISIBLE |
+  ES_CENTER), text `player's name` (0x4a9820), EM_LIMITTEXT 20, font Trobo, then
+  `SetFocus` and `EM_SETSEL(0, -1)`. WM_COMMAND on a player button 0x68 + i (not in the
+  five-player mode): `SetWindowTextA(edit, name)`, `SetFocus(edit)`, `EM_SETSEL(0, -1)`.
+  WM_CTLCOLOREDIT (0x133) → 0x419684 with 1: transparent background, text 0xffffff, brush
+  0x785400. Enter/Escape act on WM_KEYUP (0x418b31, 0x418c21 case 0x101).
+- **Method:** PyGhidra decompile of 0x4180c0, 0x418c21, 0x419684, 0x418b31; string bytes
+  read with `pefile`.
+- **Confidence:** proven (the edit's caret, selection and I-beam are the Windows EDIT
+  control's own behaviour; the selection colour is the system highlight colour)
