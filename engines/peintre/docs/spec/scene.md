@@ -101,6 +101,12 @@ What the init callbacks add (every scene the same way, per-scene lists in the fl
   (some records use `length / 2`); a record with its own end rule applies it and returns
   **without posing**, so the node keeps the previous tick's frame; any other record
   wraps to frame 1 and is posed there in the same tick (a loop never shows `length`).
+- **Static tables** (E-0370): the object table, the animation records and the scene code's
+  own variables are initialised data of the EXE, set once per run. A load resolves the
+  handles and resets the frames to 1 (`LoadAnims<scene>`), and the init sets what it sets;
+  everything else keeps the value the last visit left: an object's changed cursor type
+  (0xFF once used), a track's playing flag, a scene's timers and flags outside the saved
+  block. None of it is saved, so a restart of the program starts them afresh.
 - **Extra box sets** (`LoadBox<Scene>`): more `.3DI` entries (`BOX1.3DI`..`BOX4.3DI`,
   `BOXBAS`/`BOXHAUT`) loaded into the handles at 0x6511e0.., swapped in and out of the
   collision world by a per-scene helper keeping the current one in 0x4e312c

@@ -1924,3 +1924,16 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
   mangeurs' clear: its initial 1 makes the cuckoo sound on a new player's first visit) and
   the 0x4abd60 half of Q-0220 (initial 1, so chambreb's test never passes; written only)
 
+### E-0370 — Scene tables are static data: cursor types and playing flags survive a reload
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** `LoadAnimsauberge` 0x419fde (disassembly): per record, `strcpy` the name,
+  0x435400 (load), `animHandle` (+0x64 → 0x4a9c8c), length via 0x437d90 (+0x6c), **frame
+  := 1** (`mov dword [edx + 0x4a9c98], 1`), node handle via 0x4014d3; no write to the
+  playing word (+0x74). Musee init 0x42ad92 only resolves handles (+0x38) and hides
+  start-hidden objects; the cursor type bytes (+0x32, e.g. 0x4aec1a for `vase`) are written
+  only by scene code at run time. The tables are in `.data` (0x4a9c28, 0x4ae7e8, …) and
+  nothing copies them back.
+- **Method:** disassembly (capstone) and the decompiled inits.
+- **Confidence:** proven
+- **Doc:** `scene.md` "What a scene is made of"
+
