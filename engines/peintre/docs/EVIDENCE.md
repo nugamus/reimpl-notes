@@ -1888,3 +1888,21 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
 - **Confidence:** likely
 - **Doc:** `movement.md` "Collision"
 
+### E-0368 — Scene track steps: end at frame >= length, special ends return unposed, loops pose frame 1; the museum star stops at 52; alternating tracks both restart at 1
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** the per-scene step functions 0x41a2ab (auberge), 0x41cee9, 0x424c4c,
+  0x4256af, 0x426f34, 0x427b98 (maisonet), 0x428c8c, 0x429b94, 0x42b5fe (musee), 0x42d26a:
+  each adds the step (`DAT_00598ec0`, some `>> 1`) to `frame`, tests `length <= frame` (or
+  `length / 2 <= frame`), and in the per-record branches sets flags and `return`s before
+  the common tail; the tail sets `frame = 1` when `length <= frame` and calls
+  `0x438290(animHandle, base + frame, base + frame, 0, 0)`. 0x42b5fe record 0 (the star):
+  `frame >= 0x34` and `0x4aeb24 == 0` → `playing = 0, frame = 0x34`; else `length <= frame`
+  → `playing = 0`; both fall through to the pose. 0x42b776 line "start the star's track"
+  tests `0x4aba44 == 0 && frame != 0x34` (not the playing flag). 0x427b98 records 2/3
+  (maisonet's bird): each end sets both frames to 1 and swaps the playing flags. Musee init
+  0x42ad92 has no write to the star's node or its record: after the star is taken the node
+  stays at its rest pose (inside the stand; only a tip shows in the engine's frame).
+- **Method:** decompiled (the files in `notes/decomp/`).
+- **Confidence:** proven
+- **Doc:** `scene.md` "What a scene is made of"; resolves Q-0400, Q-0402, Q-0404
+

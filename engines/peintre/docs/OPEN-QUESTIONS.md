@@ -256,7 +256,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** nothing visible: the `peintre` engine ends a track when `frame >= end` (end =
   length, or length / 2), holds `frame` at `end`, and poses "the last frame" at `length`.
   An off-by-one would show as a one-frame difference in the final pose.
-- **Status:** open
+- **Status:** RESOLVED (E-0368): ends at frame >= length; a special end returns unposed, a loop poses frame 1
 
 ### Q-0401 — The museum robot's screen scroll: which node, which way first?
 - **Context:** `musee.md` "Speaking" (the screen scrolls every 10 ticks, 0x4399d0 with
@@ -275,7 +275,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** `maisonet.md`, `jardin.md`, E-0361, E-0362.
 - **Blocks:** the engine resets the second track's frame to 1 when it ends, so the
   alternation shows both tracks every round.
-- **Status:** open
+- **Status:** RESOLVED (E-0368): each end sets both tracks' frames to 1
 
 ### Q-0403 — The café mirror: what does 0x650fe0 hold before the first swap?
 - **Context:** `cafe.md` "The mirror": each frame the texture is swapped "from the current
@@ -292,7 +292,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** the engine follows the doc: `etoile` is visible and clickable again on every
   museum load, and 0x4aeb24 starts at 0 on each load. If the original hides it (through its
   track or elsewhere) the star can be taken twice here.
-- **Status:** open
+- **Status:** RESOLVED (E-0368): nothing hides it; untracked, it rests inside the stand
 
 ### Q-0405 — Carrying with a level-triggered click: does a long click drop the object at once?
 - **Context:** interaction.md "Mouse": `click` is the button's level each tick. cafe,

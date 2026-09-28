@@ -96,7 +96,11 @@ What the init callbacks add (every scene the same way, per-scene lists in the fl
   the bundle (missing: "LoadAnims<scene>::%s manque"), `length` is the first word of its
   data (0x437d90), the node is found by name. A playing record advances `frame` by the
   elapsed ticks each frame and poses the node (0x438290 with `animHandle + frame` as both
-  keys, blend 0); what happens at the end (stop, loop, flag) is per scene (E-0318).
+  keys, blend 0); what happens at the end (stop, loop, flag) is per scene (E-0318). The
+  step functions share one shape (E-0368): `frame += step`; the end is `frame >= length`
+  (some records use `length / 2`); a record with its own end rule applies it and returns
+  **without posing**, so the node keeps the previous tick's frame; any other record
+  wraps to frame 1 and is posed there in the same tick (a loop never shows `length`).
 - **Extra box sets** (`LoadBox<Scene>`): more `.3DI` entries (`BOX1.3DI`..`BOX4.3DI`,
   `BOXBAS`/`BOXHAUT`) loaded into the handles at 0x6511e0.., swapped in and out of the
   collision world by a per-scene helper keeping the current one in 0x4e312c
