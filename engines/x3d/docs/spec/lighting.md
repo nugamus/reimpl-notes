@@ -84,6 +84,9 @@ specified (no corpus material uses it).
   truncated to integers, alpha 0; vertex specular = S truncated; specular enabled.
   Pixel = texture · D / 255 + S, each channel saturated at 255. (The texture blend state
   is never set, so it is Direct3D's default modulate.)
+  The specular term is part of the same pixel, so a colour-keyed texel (`scene.md`) is
+  dropped with its specular: light never shows where the map is cut out (E-0626). An
+  engine that adds S in a second pass must cut that pass by the same key and threshold.
 - **Class 2, untextured:** diffuse = ⌊material.diffuse · D / 256⌋ per channel; specular
   per channel = T[⌊material.specular · D / 256⌋] with the material's table T:
   w = 128 − ⌊shininess · 120 / 100⌋, t₀ = 256 − w, step = ⌊strength · 256 / (w · 100)⌋,

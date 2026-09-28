@@ -4968,3 +4968,18 @@ An entry at `tentative` confidence must also have a matching line in
   340.0), frame 65); without it he walks to the door (162.0, 267.7), `ouvre01` frame 30.
 - **Method:** MCP decompile of `0x0040b400`; `dev_commands` `node`/`pos` runs.
 - **Confidence:** proven
+
+### E-0626 — Specular is added in the texture's own pass, so the colour key removes it too
+- **Binary/file:** `h3d.dll`, `xd3d.dll`; `Data/U06/Maps/Quai03.dmf`, `Arb.dmf`, `Lourde.dmf`.
+- **Evidence:** textured class-2 faces are one Direct3D pass with vertex specular enabled
+  (E-0143); the map's key is a DirectDraw source colour key on the texture
+  (`H3d_Set_Color_Key` `0x10001037`: one packed colour, `SetColorKey(DDCKEY_SRCBLT)`; for
+  palettised textures the key is the fourth `fb21` byte, a palette index), and keyed texels
+  are dropped before blending, specular included. Engine trace: with specular drawn as a
+  separate untextured additive pass, U06 (the only scene where the sun's light passes 255
+  on keyed maps) showed the key areas of `Quai03`/`Quai*` backdrops pure white
+  (255, 255, 255 sampled) and faint boxes around trees and lamp posts (user screenshots
+  2026-09-29); cutting that pass with the map's key removes both.
+- **Method:** MCP decompile of `H3d_Set_Color_Key`, `H3d_Add_Texture`, xd3d
+  `FUN_1001e6b0`; engine runs from the user's U06 save before/after.
+- **Confidence:** proven for the key; the single-pass specular is E-0143's reading.
