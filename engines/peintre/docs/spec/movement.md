@@ -130,7 +130,9 @@ all face box ends; moving the body updates two candidate lists: faces whose box 
 body's box on all three axes (**contacts**, body flag 4) and on x and z (**floors**, flag 8).
 The viewer body has flags 0xF (both sides, both lists).
 
-Narrow phase, sphere against a face (0x432220), with `d = n·c / 32768 - D` for the centre c:
+Narrow phase, sphere against a face (0x432220), with `d = n·c / 32768 - D` for the centre c
+(integer: each of the three products divided by 32768 rounding toward zero, then summed;
+the edge distances likewise, 0x431700). `d = 0` counts as in front:
 
 - no contact unless `-250 < d < 250`, or if any edge-plane distance is below -250;
 - the closest point: the projection of c on the plane when c is inside all three edges,
@@ -152,6 +154,22 @@ Per frame (0x4216b6), after the keyboard moved the camera:
    `trunc(trunc(d · 250 / |d|) + E')` (|d| = square root of the integer `d·d`): 250 units from the average edge point, away from it.
 3. There is a single pass per frame; resolving one wall can push into another, which the
    next frame resolves.
+
+**The closest point by edge mask** (0x432220): bit k set when edge distance k is below 0.
+Mask 0: the projection of c on the plane (float, truncated). One bit: the closest point of
+that edge, edge 0 from vertex 0 to 1, edge 1 from 1 to 2, edge 2 from 2 to 0. Two bits: the
+vertex the two edges share (bits 0+1: vertex 1, 0+2: vertex 0, 1+2: vertex 2). All three:
+the switch has no case and the previous face's point is reused (never seen in practice).
+
+**Consequence: inside corners leak** (E-0367). Averaging two face contacts in an inside
+corner leaves the viewer at `250 - step` from each wall instead of 250; walking diagonally
+into the corner and then along it ends a tick behind a one-sided wall, which from behind is
+ignored. `engines/peintre/tools/boxreach.py` (these rules, flood-filled over one tick's
+walk) finds such paths in the museum with every box set: e.g. set 1 (zone 0 unsolved)
+through the closed left doorway (the wall at x = -1693 meets the hall wall at z ≈ 3710) into
+the act 1 gallery, and from the galleries' back walls out of the building. The engine
+undoes a tick whose move crosses a wall face (|n.y| ≤ 16384) from its front through the
+triangle (a bug fix, not in the original).
 
 The per-frame counts are kept in 0x5bada8 (edges) / 0x5badac (faces); the last face's
 box-set word (+0x44 → +0x18) in 0x5bada0; nothing in the 3D reads them back.

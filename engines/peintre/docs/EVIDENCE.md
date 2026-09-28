@@ -1868,3 +1868,23 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
 - **Method:** decompiler listings `notes/decomp/MISSION.EXE__FUN_0042fbd6.c` (lines 50–90),
   `…__FUN_0041fda9.c`, `…__Load3DGGame.c`.
 - **Confidence:** proven
+
+### E-0367 — The one-pass averaged push-out leaks through one-sided walls at inside corners
+- **Binary/file:** `/MISSION.EXE`; `Data/Scenes_3D/MUSEE.BFG` (`BOX.3DI`, `BOX1..4.3DI`)
+- **Evidence:** rules of E-0304/E-0305 as read (integer `d` and edge distances with
+  per-product truncation, 0x432220 / 0x431700; the mask cases of 0x432220's switch) run by
+  `engines/peintre/tools/boxreach.py` from the museum entrance (-39, -209, 361), steps of 120
+  per tick in 16..48 directions: `BOX1.3DI` (the closing wall x ≈ -1693, z 3699..4458,
+  normal +x, two triangles) is crossed after a diagonal walk into the corner with the hall
+  wall z ≈ 3710 (normal +z): two face contacts average to a push of 125 on each axis, the
+  camera stays about 120 from the closing wall, the next step ends at d < 0 and the face is
+  ignored. Traced path (sim): (-1584, -208, 3946) → (-1685, -208, 3786) → (-1707, -208,
+  3955) → the act 1 gallery. With 32 directions every museum box set lets the viewer leave the
+  building (200,000 cells, x to -25,000). With a check that undoes a tick crossing a wall
+  triangle from its front: set 1 stays within x -1693..1729, z -168..5354; set 2 opens the
+  left gallery (x to -5236), set 3 also the centre (z to 8701), sets 4 and none all three.
+- **Method:** simulation of the spec'd rules over the corpus data; not observed in the
+  original (running it needs the user's OK), so "the original leaks" follows from the rules.
+- **Confidence:** likely
+- **Doc:** `movement.md` "Collision"
+
