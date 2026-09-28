@@ -149,6 +149,10 @@ nodes are animated in the order they were added (E-0606), so when enabled they o
 the body animation's pose of the face subtree. If two mouth slots are enabled at once, the
 one loaded later (order `A`, `B`, `Ch`, `Ch_yeux`, `E`, `F`, `O`, `Yeux`) wins; in
 particular slot 8 (`A`), left enabled when a talk ends, never hides another enabled slot.
+A clip without a sub-animation of the face's name leaves its slot empty; the only case is
+the booking clerk's `B.A3D` (U02_04), which still calls the face `$$$DUMMY.Dummy01`
+(E-0624). The engine fixes it by taking the sub-animation at the face's place (the same
+child of the face's parent) when the name is missing.
 
 ### Say(character, name)
 

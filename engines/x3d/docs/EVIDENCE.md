@@ -4943,3 +4943,15 @@ An entry at `tentative` confidence must also have a matching line in
   E-0422) start again after a load.
 - **Method:** MCP decompile.
 - **Confidence:** proven.
+
+### E-0624 — The booking clerk's B mouth clip names his face `$$$DUMMY.Dummy01`, so the original never loads it
+- **Binary/file:** `MissionMonet.exe`; `Data/U02/Anim/U02_04/*.A3D`, `U02_04.O3D`.
+- **Evidence:** `U02_04.O3D` has the face dummy `$$$DUMMY.*visage` under `tete`; seven of
+  the clerk's eight mouth clips (`A`, `CH`, `CH_YEUX`, `E`, `F`, `O`, `YEUX`) name it the
+  same, but `B.A3D` names it `$$$DUMMY.Dummy01` (same place under `tete`, same children in
+  the same order). `FUN_004217b0` takes the sub-animation by name (`FUN_0041c380`, a
+  recursive `_stricmp` search) and on no match leaves the slot 0, so slot 4 (`B`) falls
+  back to the first non-empty slot, `Yeux` (E-0125). No other talker of the game has a
+  clip without its face name (scan of the 14 talkers' eight clips each).
+- **Method:** `a3d.py` / `o3d.py` tree dump; MCP decompile of `0x004217b0`, `0x0041c380`.
+- **Confidence:** proven
