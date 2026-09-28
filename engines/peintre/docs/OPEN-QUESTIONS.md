@@ -120,7 +120,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** the 2D side only; the values the 3D side stores in 0x502860 are the
   world spec's.
 - **Blocks:** nothing if no scene passes 25; an engine can reject it.
-- **Status:** open
+- **Status:** RESOLVED (E-0377): no; only a save file could carry 25
 
 ### Q-0251 — What does leaving a zone with -3 (RetourM) do on the 3D side?
 - **Context:** 0x42f2c2 with -3 sets 0x50273c = 0, then 0x4e3144 (3D block +0x3C) = 0 and

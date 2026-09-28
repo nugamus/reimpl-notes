@@ -2019,3 +2019,12 @@ base 0x400000); "file offset" means an offset in `Data/mission.___`.
 - **Confidence:** proven
 - **Doc:** resolves Q-0200, Q-0220 (with E-0369), Q-0236, Q-0237
 
+### E-0377 — The 3D never asks for zone 25
+- **Binary/file:** `/MISSION.EXE`
+- **Evidence:** every write of the zone byte 0x502860 (operand scan): the constants 0..0x18,
+  once each, and two register stores in Load3DGame 0x42eff2 and Load3DGGame 0x42f1f0 (the
+  save file's +0x3E byte). Only a damaged or edited save could pass 25 to Entry2D.
+- **Method:** static scan.
+- **Confidence:** proven
+- **Doc:** resolves Q-0250
+
