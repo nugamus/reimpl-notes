@@ -91,3 +91,18 @@ protection).
   hold one more frame); a name/prefix census of all 939 files.
 - **Blocks:** knowing which stored frame is the rest pose; nothing for a static render.
 - **Status:** open (find the in-file flag; the parser accepts K in {F-1, F})
+
+### Q-0008 — The per-view camera (to composite actors into pre-rendered scenes)
+- **Context:** E-0016. Each scene view is a pre-rendered 800×600 background + `.fxi` depth
+  (E-0011); actors are placed in world 3D and projected with the camera the view was
+  rendered at, then depth-tested against the `.fxi`. The engine's rasteriser works
+  (E-0016) but needs that camera (eye position, look direction, vertical FOV, near/far) per
+  view, and the mapping from `.fxi` depth values to world Z, to place and occlude actors
+  correctly.
+- **What we checked:** the device init (`FUN_00436aa0`, 800×600×16, no projection there);
+  the `.scn` load path (`FUN_0040cb30` opens `Scene_N.scn` but does not parse camera data in
+  that function); the mesh upload (`FUN_004154b0`). The camera is set during the scene
+  render tick, from scene data whose location is not yet found.
+- **Blocks:** scene-accurate actor rendering and occlusion; picking/hotspots.
+- **Status:** open (find the scene render tick and the camera/view-matrix setup, and the
+  `.scn`/scene-data source of the camera)

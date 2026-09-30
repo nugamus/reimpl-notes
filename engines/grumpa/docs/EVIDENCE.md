@@ -239,3 +239,19 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   Confirms the vertex/face/winding decode, not just the byte counts.
 - **Method:** orthographic front-view render of `anb.parse()` output.
 - **Confidence:** proven
+
+### E-0016 — The 3D device: a software rasteriser on an 800×600×16 DirectDraw surface
+- **Binary/file:** decrypted `Grumpa.exe`; `FUN_00436aa0` (init), `FUN_0042db40` (device factory)
+- **Evidence:** `FUN_00436aa0` creates the `IFXDirectFX` device via `FUN_0042db40`
+  (`&DAT_00490538`, the "CreateFXDirectX" object) and initialises it through the device
+  vtable `+0x1c` with `(hwnd, 800, 600, 0x10, 0x10, 0x75)` — 800×600, 16-bit. It then
+  fetches a render context (vtable `+0x38`) and sets render states (`+0x94`: state 0x10/0x11
+  =2, 2=2, 3=0). The device imports only DDRAW/DSOUND (no Direct3D, E-0003), so the 3D is a
+  software rasteriser writing the 16-bit DirectDraw surface — the same 800×600 RGB555 page
+  the engine uses (E-0010). The ScummVM engine now has its own equivalent: `render3d.cpp`
+  (a perspective, z-buffered, flat-shaded triangle rasteriser) renders `.anb` meshes (E-0014)
+  correctly (verified: `000_N2N_Bear` renders as a bear).
+- **Method:** decompile of `FUN_00436aa0`; the engine's `render3d.cpp` + `grumpa_mesh` dev dump.
+- **Confidence:** proven (device setup, screen format, and that the renderer works); the
+  per-view camera (eye/orientation/FOV) that places actors in each pre-rendered scene is set
+  during the scene render tick from scene data not yet located (Q-0008)
