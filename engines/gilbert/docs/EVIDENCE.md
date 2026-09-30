@@ -1543,3 +1543,122 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   so a press there does nothing (0x44/0x45) or only plays click 1 (0x66).
 - **Method:** disassembly; item sizes from `wxi.py`.
 - **Confidence:** proven
+
+### E-0600 — The game ends when the sixth eggshell goes on the stand (event 2099); v199 counts eggs found
+- **Binary/file:** `games/gilbert/discs/cd/Program/Data/game/default.dat`
+- **Evidence:** CUseObj: each eggshell code (1060102, 6020200, 3040301, 4020100, 5021001,
+  2140100) on each stand state 2092000..2092005 (36 records) runs 2091..2096; each of those
+  is `state++ 2092000`, `remove <egg>`, `add v1 1`, `jump v1 == 6 -> 2099`; 2099 = `video
+  outro.mpg`, `set v198 1`. The only other v198 setter is 770, which no CCUA, CObjState,
+  CAnim, CUseObj, dialogue choice or jump names. v199 is added to only by 1060, 2141, 3041
+  (take events of eggs 1, 6, 3), 4026, 5021, 6508 (the events that hand out eggs 4, 5, 2)
+  and the unreferenced 795; nothing tests it (the panel draws it, rooms.md). The EXE reads
+  v198 every tick (E-0210).
+- **Method:** `gamedat.py` dump; reference scan over all event-ID fields.
+- **Confidence:** proven
+
+### E-0601 — A 582-action walkthrough from event 1 reaches event 2099 under logic.md's rules
+- **Binary/file:** `default.dat`; `games/gilbert/docs/flow.md` (## Walkthrough);
+  `engines/gilbert/tools/simulate.py`
+- **Evidence:** `python engines/gilbert/tools/simulate.py` → "582 steps; films intro.mpg …
+  outro.mpg; v198=1 v199=6 v1=6", "end reached"; `--selftest` ok. The simulator implements
+  logic.md (DoEvent/RunEvent all types, object lists with BuildSort and ClearAnims, StepAnim
+  and the tick, inventory, dialogues, topics) and checks each move as the EXE allows it: area
+  n reachable from Gilbert's entry cell through 0 cells of the control map (rooms.md, path
+  finder), clicked/taken objects listed in the close-up and (not) pickable, use pairs present
+  as CUseObj, dialogue choices in range. `rand()` is taken as 0 (the only type-18 cond 5
+  records are the lab assistant's random hint, 911020010, not on the path).
+- **Method:** simulation of the specs against the data.
+- **Confidence:** strong (the rules are the specs', not the binary run)
+
+### E-0602 — Progress that needs anim end events, and staying in the close-up
+- **Binary/file:** `default.dat` CAnim end events; logic.md "The tick", "The lists"
+- **Evidence:** 58 anims have an end event; the ones the ending needs: 30147/30157/30167
+  (3015/3016/3017, refinery, 0.9 s from the click), 41526 (4151, lemon, 1.05 s), 27146 (2773,
+  hydrogen, 4.3 s) then 27100 (2774, explosive symbol, 6.6 s), 27033 (2778, helium, 3.9 s),
+  20764 (2783, neon, 4.7 s), 20575 (2058, glass cutter, 4.1 s), 26106 (2357, microwave,
+  1.4 s), 26088 (2360, mortar, 4.5 s): sums of the chain durations from the state's CUA anim.
+  Only the open CUA's objects step (GEEllapsed), and GotoCUA's BuildCUAObjects(reset) runs
+  ClearAnims, which resets each listed state's anim to its base anim at time 0, so leaving
+  the close-up before the end event restarts the anim on return. With a constant 16 ms step
+  the simulator stalls on 30145 (80 ms): t reaches the duration exactly and wraps (E-0401),
+  hence its 15..17 ms cycle.
+- **Method:** anim-chain sums from `gamedat.py`; simulation.
+- **Confidence:** proven (data), strong (timing)
+
+### E-0603 — Room parts reached only through close-up events: mine, lava cave, glacier upper side
+- **Binary/file:** `default.dat`; `Data/maps/*/ctrl*.map`
+- **Evidence:** no area event of any room goes to R451..R463 except the mine rooms' own; the
+  way in is 4011 (click 4011001 in C401, door state 1 set only by 4010 = battery 5040100 on
+  4011000). R462 is entered only by 4120/4121 (C412), the button place 4123000 shown only by
+  4151. R600: from the map's start (812, 767), from (274, 477) and from (850, 500) the
+  reachable areas are {1, 2, 11, 12}; from (164, 229) they are {3, 13}; (164, 229) is set by
+  6032 (C603 far bank in state 1, after 6033) and 65001 (from R650); area 3 → R650. Before
+  6033 the far bank's state 0 runs 6031 (film gl_slip, R351 at 1208, 60).
+- **Method:** control-map flood fill (`simulate.py reachable`) and event scan.
+- **Confidence:** proven
+
+### E-0604 — Dead end: leaving the igloo after melting the ice queen shuts it for good
+- **Binary/file:** `default.dat` events 6081, 6084, 6502, 6503, 6112, 6020, 6110
+- **Evidence:** 6081 (C608 first event and event) jumps by v65 == 0 → 6084, then v35 == 0,
+  1, 4, 5, 7, 8 each to a handler, and finally `jump -> 6084`; 6084 sets the bridge 6081000,
+  whose state has click event 0. v35 := 6 only by 6502 (lava crucible on the queen), v35 :=
+  7 only by 6112 (bucket 1030200 on 6111000 in C611). C611 is opened only by 6503 (click the
+  melted queen in C602), C602 only by 6080 (bridge 6081001) and 6110 (C611's end event).
+  Simulated: the walkthrough up to 6502, then `back`, `back`, and C608 shows only 6081000 and
+  6082000, neither with a click event.
+- **Method:** event reading; `simulate.py`.
+- **Confidence:** proven
+
+### E-0605 — Dead end: the corkscrew before the bottle; event 1080 is the unwired repair
+- **Binary/file:** `default.dat` events 9905061, 6704, 6011, 1080, 1083, 6700; CObjState
+  10810 state 3
+- **Evidence:** 9905061: `inv+ 6010400`, `set v92 1`, `set v41 4`, `jump v44 == 1 -> 6704`.
+  6011 tests v41 == 0..3 only. The opened bottle 1080300 comes from 6704 and 6700 only; 6700
+  and 1080 are named by no object, anim, use, choice or jump; 6704 is also the use of
+  1080300 on 6012500. No CUseObj has 6010400 as its object. v44 := 1 by 1080, 1083 (and the
+  unreferenced 4). The crevice's state 3 click event is 1083 (closed bottle 1080200); 1080
+  = `jump v92 == 0 -> 1083`, else `inv+ 1080300` (opened), crevice state 2, v52, v44.
+  Simulated: moving `cua 108 click 1081003` after the kiosk dialogue leaves 1080200 in the
+  inventory and C603's use of 1080300 impossible.
+- **Method:** event reading; `simulate.py`.
+- **Confidence:** proven
+
+### E-0606 — Events that name objects already deleted, in every complete game
+- **Binary/file:** `default.dat`; `simulate.py` (FindObj on a deleted object is recorded)
+- **Evidence:** the walkthrough's replay reports 2341:20622, 2346:20642 (type 1 then type 8
+  on the jar just taken), 2057:41303 (after 2051), 6704:60102 (net, deleted by 5011),
+  9809021:50815 (oil, deleted by 5510), 6058:60508/60512/60513 (deleted by 91009121). The
+  net is unavoidable: balloons (6721) need three receipts (6712..6715 from four cans), the
+  cans come from 1011 (lifeguard), 9602001, 9605001 (needs paper 5012102 → 5012 → pulp
+  5012101 ← 5011, which deletes the net) and 9608001 (v55 == 2, after 9605001); 6704 needs
+  v41 == 3, which needs the neon balloon (v42), which needs the balloons. Per E-0405, type 8
+  only searches the inventory list; types 7, 15, 16 read the object's fields.
+- **Method:** simulation; dependency reading.
+- **Confidence:** proven (data), the original's reaction open (Q-0600)
+
+### E-0607 — Content the ending does not need
+- **Binary/file:** `default.dat`; `simulate.py`
+- **Evidence:** the flow.md walkthrough reaches 2099 without: C107 and v29 (beach artist),
+  v31 (cobalt paint), C105 and v4 (beach seller; v4 is tested only by 1050), v5 and v6
+  (tested only by 1052, 1056), the razor blade, iron ore, gold ore, the C408 can, stone,
+  mirror, tyre, the pipette, the paper/spade/small-eggshell sorter inputs, 3551/9510061,
+  6505, C619. A greedy pass that removed each walkthrough action in turn and kept the
+  removal when the end was still reached flagged these (and some redundant takes).
+- **Method:** simulation (prune by replay).
+- **Confidence:** proven for this walkthrough
+
+### E-0608 — Unused and hidden content
+- **Binary/file:** `default.dat`
+- **Evidence:** 101 event IDs are named by nothing (no CCUA field, CObjState click/take, CAnim
+  end, CUseObj, choice, jump, area cell, map symbol; event 1 counted as used), among them 2,
+  3, 4, 5, 7 (inventory, variables, 25 GotoWalkmap records in event 2), 770..800, 1080, 2052,
+  2055, 2061..2063, 2072, 2243..2260 (several), 2314, 2380, 3062, 4021, 6501, 6700, 6705,
+  6706, 22121..22128. Named but without records: 2125, 2126 (jumps), 9000..9002, 9191, 9292,
+  9393, 9494 (anim ends), 14 choice events. Dialogues 0 and 900 are named by events 800, 900
+  but do not exist; 30300, 31100, 31300, 31400, 50100, 80500, 80700, 100504 are never
+  started. CUAs never opened by any event: 109, 199, 201, 416. Dedications: 1048 (click
+  10420 state 0) adds 1 to v197 and at 99 starts dialogue 190000; 1802 (click 10230) does
+  the same with v196 and 190100; 1047/1801 (the CUAs' events and end events) zero them.
+- **Method:** reference scan over all event-ID fields; `gamedat.py` dump.
+- **Confidence:** proven

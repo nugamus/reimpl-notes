@@ -256,3 +256,29 @@ end, Q-0100.. `default.dat` and `ge.dll`).
 - **Blocks:** nothing. The engine lets the dialogue take the press and skips the room's
   mouse while one is open.
 - **Status:** open
+
+### Q-0600 — What did the original do with events that name objects it had deleted?
+- **Context:** E-0606: every complete game runs 6704's `inv+ 6010200` on the freed mosquito
+  net and, once the chair has appeared, 6058's hide/show on three freed objects at every exit
+  from C605; 9809021 hides the freed oil. FindObj's index keeps the pointer (Q-0401); type 7
+  reads the freed object's owner, types 15/16 its state and write `visible`.
+- **What we checked:** the data paths (E-0606) and RunEvent's cases (E-0405); not the heap's
+  behaviour after `delete` (whether the freed blocks were reused by then).
+- **Observed range:** —
+- **Blocks:** nothing for the engine, which treats a deleted object as absent (the events do
+  nothing), as `simulate.py` does; parity only if the original visibly misbehaved.
+- **Status:** open
+
+### Q-0601 — Should the engine repair the two dead ends in the data?
+- **Context:** E-0604: backing out of C602/C611 after melting the ice queen closes the
+  igloo for good (6081 has no case for v35 == 6). E-0605: taking the bottle after the
+  seller's corkscrew dialogue leaves it closed for good; event 1080, which would hand out
+  the opened bottle in that case, exists but the crevice runs 1083.
+- **What we checked:** every setter and test of v35, v41, v44, v92; the ways into C602/C611
+  and to 1080300.
+- **Observed range:** —
+- **Blocks:** the engine's choice. Candidate repairs from the data itself: treat v35 == 6
+  like 5 in 6081 (bridge down while the queen waits for the bucket), and run 1080 instead of
+  1083 for the crevice's state 3. Bug fixes are always on (CLAUDE.md), but these change
+  the game's data flow, so the user decides.
+- **Status:** open
