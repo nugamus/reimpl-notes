@@ -243,4 +243,6 @@ end, Q-0100.. `default.dat` and `ge.dll`).
 - **Observed range:** —
 - **Blocks:** the engine's choice: keep the original's behaviour (room shown, room anims
   frozen, silent menu) or treat it as a bug (return to mode 2).
-- **Status:** open
+- **Status:** open for the original; the engine treats it as a bug and fixes it always
+  (bug fixes are not options, CLAUDE.md): Menu in a close-up plays the menu music like
+  Menu in a room, and Continue returns to the close-up ge.dll still has open.
