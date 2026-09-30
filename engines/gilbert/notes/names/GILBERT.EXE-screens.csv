@@ -1,0 +1,26 @@
+address,name,evidence
+0047a838,cua::Load,E-0500 GotoCUA body: \data\maps\<room>\cua<n>.wxi (999: kartmap.wxi) into DXImageList8; mode 2; room music
+004794c0,cua::Draw,E-0502 mode 2 frame: clear; cua bkg item 0 at (64;50); objects; CUA frame; carried object
+00479618,cua::DrawObjects,E-0502 CUA table from last to first; picture +4 at (64+x;50+y); carried one skipped
+0046e414,cua::DrawFrame,E-0503 mode 2 panel: ibkg03; eggs; inventory box and items; radar; Menu/Kort/book/scroll/back; tooltips
+00473008,cua::HandleMouse,E-0504 mode 2 hover and press of 8/0x26/0x27/0x2c/0x2d/0x73; GEClickObjectInCUA on press
+00475b48,cua::HoverObjects,E-0505 first CUA object and last inventory item under the mouse (tooltips)
+00475c14,cua::PickUp,E-0506 mouse down in mode 2: pickable CUA object or inventory item onto the cursor
+00475d04,cua::Drop,E-0506 mouse up: GEObjectToInventory over the box; GEUseObjectOnObject on CUA objects
+00477fbc,ui::DrawTooltip,E-0505 description text of a CUA object or inventory item; black alpha 120 box; tan Arial 8
+00475ea4,inventory::Layout,E-0507 rectangles of the 12 shown inventory items (6 x 2 from the scroll top)
+004796f8,inventory::Draw,E-0507 inventory.wxi strip pattern per item at (378+27c;377+26r)
+00474a38,gecb::RefreshCUAObjects,E-0501 GEInit callback 4: GECUAGetObjectData into the 44-byte CUA table
+00474afc,gecb::RefreshInventory,E-0507 GEInit callback 5: GEInventoryGetObjectData into the 44-byte table; Layout
+0047454c,gecb::Dialog,E-0508 GEInit callback 6: title; text; choices; or the print message (language lines 20..25)
+00475fdc,dialog::Layout,E-0509 box size from choices; title (bold 9) and text lines; centred on (320;240)
+00479018,dialog::Draw,E-0509 black alpha 180 box; dh/dl corners and edges; text lines; choices tan or grey
+00473f74,dialog::HandleMouse,E-0510 choice hover; press -> GEDialogEnd(index)
+0046ec90,book::Draw,E-0511 mode 4 frame: backgrounds; list or page surface; buttons; arrows; title
+004734b8,book::HandleMouse,E-0513 hover/press of list items; links; tab buttons; arrows
+0046aa54,book::BuildList,E-0512 topic titles first..first+19 onto a 355x320 surface; hit rectangles
+0046ada0,book::BuildPage,E-0512 one topic's text onto a 355x1000 surface; links; pictures; wrapping at 344
+0046b2dc,book::SetFormat,E-0512 \f<n>: 0 regular 8; 1 +bold; 2 +underline; 3 +both; 4 regular 10; 5 bold 10
+0046f630,mode5::Draw,E-0514 unreachable mode 5 frame (DXImageList11 item 0; Menu/Kort/book)
+00472598,mode5::HandleMouse,E-0514 unreachable mode 5 mouse
+00463d3c,TPictureCollectionItem::StretchDraw,E-0509 (dest; rect; pattern) stretched to the rectangle

@@ -1,0 +1,32 @@
+address,name,evidence
+0047a190,room::Load,E-0300 GotoWalkmap body: w<n>/w<n>m/ctrl<n>/w<n>o into DXImageList4/5/DxMapLib3/DXImageList10; start scroll; room music
+00478674,room::Draw,E-0302 mode 1 frame: map layers 3 4; objects and Gilbert; layer 5 around Gilbert; panel; first-frame fade-in
+0047897c,room::DrawObjectsAndGilbert,E-0303 objects behind; shadow; Gilbert; objects in front
+00479544,ui::DrawCarriedObject,E-0302 carried CUA or inventory object at the mouse (inventory.wxi)
+0046dce8,ui::DrawRoomPanel,E-0306 ibkg03 frame; eggs (var 199); radar; Menu/Kort/book buttons
+004728ec,room::HandleMouse,E-0305 panel hover/press; walking (GEPathNewPath); cursors; edge scrolling
+00474108,room::CheckRunKey,E-0304 Ctrl held -> move divisor 20 else 30
+00476520,TPlayerSprite::DoMove,E-0304 Gilbert's step per direction set; frames; walk sounds; clamps
+00476c00,room::StepAreaCheck,E-0307 cell ahead of Gilbert; on the path -> GEWalkmapAreaHit(v-1); always true
+00476cbc,room::GilbertOnPath,E-0307 Gilbert's cell equals a GEPathGetItem cell
+00477eac,room::FadeOut,E-0301 gamma ramp entries 0..255 to a quarter
+00477f20,room::FadeIn,E-0301 gamma ramp entries 255..0 restored; shown := 1
+004743ac,gecb::SetDirection,E-0308 GEInit callback 20: facing 0..28 -> up/down/left/right set
+004742c4,gecb::NewTopic,E-0308 GEInit callback 21: new-topic flag; PlayWave(1; 10)
+004742f8,gecb::MapWidth,E-0308 GEInit callback 17: layer 3 width / 16
+0047431c,gecb::MapHeight,E-0308 GEInit callback 18: layer 3 height / 16
+00474340,gecb::GilbertX,E-0308 GEInit callback 13: Trunc(X) - scroll x + 48
+0047435c,gecb::GilbertY,E-0308 GEInit callback 14: Trunc(Y) - scroll y + 48
+00474378,gecb::MapCell,E-0308 GEInit callback 19: control-map cell (x; y)
+00475548,sound::LoadRoomWaveList,E-0308 \data\sounds\misc\<n>.wxs into DXWaveList3
+004612a4,TMaplibHolder::UpdateLayerSize,E-0301 layer n: columns rows and pixel size (AutoMap: from the picture)
+00461bc0,TMaplibHolder::DrawLayer,E-0302 tiles of layer n at an origin inside a rectangle
+00462f8c,TMaplibHolder::GetCell,E-0307 layer n map cell (x; y); 0 outside
+0044f5c4,TDxMaps::LoadFromFile,E-0300 ctrl<n>.map into DxMapLib3
+00463d8c,TPictureCollectionItem::DrawAlpha,E-0303 (dest; rect; pattern; alpha) blend 8 below 255
+00463c58,TPictureCollectionItem::PatternRect,E-0309 source rect of a pattern
+00463cc8,TPictureCollectionItem::GetWidth,E-0301 PatternWidth or picture width
+00463c30,TPictureCollectionItem::GetHeight,E-0303 PatternHeight or picture height
+00465a48,TCustomDXSpriteEngine::Move,E-0304 engine.Move(MoveCount) -> TSprite::Move
+00464f5c,TSprite::Move,E-0304 DoMove(MoveCount) then the children
+00446040,TCustomDXTimer::AppIdle,E-0304 LagCount = max(elapsed div interval; 1)

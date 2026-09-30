@@ -222,3 +222,25 @@ end, Q-0100.. `default.dat` and `ge.dll`).
 - **Blocks:** faithful walkmap drawing after such events; the engine must at least drop
   deleted objects from its lists.
 - **Status:** open
+
+### Q-0500 — What does the book show when a page is scrolled past row 680?
+- **Context:** E-0511, E-0513: the page surface is 355×1000; scrolling down adds 24 up to
+  999, and the frame draws the surface rows t..t + 320 (0x45bef8 with Rect(0, t, 355, t +
+  320)), so for t > 680 the source rectangle runs past the surface.
+- **What we checked:** the scroll arithmetic and the draw call; DelphiX's draw routine
+  0x45bef8 (clip, shrink or refuse a source rectangle outside the surface) was not read.
+- **Observed range:** t = 0, 24, …, 984, then 999.
+- **Blocks:** the bottom of long pages (the engine can clip: rows past 1000 are empty, i.e.
+  transparent).
+- **Status:** open
+
+### Q-0501 — Should Continue after Menu in a close-up return to the close-up?
+- **Context:** E-0504, E-0214: Menu (0x26) in mode 2 sets mode 0 without GECUAEnd and
+  without restarting the menu music; Continue then sets mode 1 (the room frame) while ge.dll
+  still has the CUA open (GameObj +0x38c), so GEEllapsed steps the CUA's anims, not the
+  room's, until the next room change or CUA end.
+- **What we checked:** gmenu::Action's mode 0 and mode 2 branches; ge.dll Ellapsed.
+- **Observed range:** —
+- **Blocks:** the engine's choice: keep the original's behaviour (room shown, room anims
+  frozen, silent menu) or treat it as a bug (return to mode 2).
+- **Status:** open

@@ -1201,3 +1201,326 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   0x47cf94 := 0. The room music name 0x47cf08 is not reset.
 - **Method:** disassembly.
 - **Confidence:** proven
+
+### E-0500 — cua::Load 0x47a838 (GEInit callback 3): the close-up's pictures, mode 2
+- **Binary/file:** `GILBERT.EXE` 0x474a28, 0x47a838; `Data/maps/<room>/cua*.wxi`,
+  `Data/maps/!global/kartmap.wxi`, `Data/maps/cua999.wxi`; `default.dat`
+- **Evidence:** callback 3 (0x474a28) passes its one argument (the CUA ID) to 0x47a838:
+  DXTimer1.Enabled := false (0x446240); StopAll; DXImageList8 (TgMain+0x320,
+  `ImageLibs.Imagelib3`, holder+0x50) emptied (0x4105a0) if it has items; ID = 999 (0x3e7) →
+  ResolvePath(`\data\maps\!global\kartmap.wxi`) loaded into DXImageList8 (0x4646e8); else
+  ResolvePath(`\data\maps\` + IntToStr(0x47ced4, the current room) + `\` + `cua` +
+  IntToStr(ID) + `.wxi`) (six-piece LStrCatN 0x403d10, strings 0x47aa18/0x47aa2c/0x47aa38/
+  0x47aa44), then GEWalkmapGetRadarRect(&l, &t, &w, &h) into 0x47ce7c..0x47ce88 (not for 999);
+  both: CUA object count 0x47ced8 := 0, mode 0x47ce74 := 2; room music 0x47cf08 ≠ '' →
+  PlayRoomMusic(name, looped); DXTimer1.Enabled := true. No gamma call (no fade). ge.dll's
+  GotoCUA 0x10009090 calls callback 3 (DAT_10028604) with the CUA ID, then callback 4, then
+  the first or later event. Corpus: 38 room folders each hold `cua999.wxi`, identical to
+  `kartmap.wxi` and `maps/cua999.wxi` (MD5 e0b62fa5…, 19 items); the loader never builds
+  that name for 999. 106 other `cua<n>.wxi`; item 0 is the background (`!cu<n>` 70, `!bk…`
+  in the 999 copies, one `!Cu`): 512×320 (68), 512×340 (2), 580×340 (1), kartmap 512×324.
+  Type-3 events name (walkmap, CUA) pairs: 105 pairs, all with a file in that walkmap's folder
+  except (250, 210) and (250, 209) (events 20011, 20012), whose files are in `maps/200/`;
+  their IDs 200·100 + 11/12 are area hits of room 200, so the current room's folder has them.
+- **Method:** disassembly; `wxi.py`; MD5; `gamedat.py` statistics.
+- **Confidence:** proven
+
+### E-0501 — gecb::RefreshCUAObjects 0x474a38 (callback 4): the CUA object table
+- **Binary/file:** `GILBERT.EXE` 0x474a38, 0x463c58; `GE.DLL` GameObj::CUAGetObjectData
+  0x10008830, BuildCUAObjects 0x10008220, BuildSort 0x10008000, ClearAnims 0x10008300,
+  StepAnim 0x10008520; `default.dat`
+- **Evidence:** count := GECUAGetNumObjects → 0x47ced8; for i < count, record r = 0x482810 +
+  0x2c·i: GECUAGetObjectData(i, &r+0, &r+4, &r+8, &r+0x10, &r+0x14, &r+0x18, &r+0xc) (pushed
+  last to first). ge.dll fills: +0 obj.id·100 + state number; +4 the state's current anim
+  (CObjState +0x28, set by ClearAnims to the cua_anim and replaced by StepAnim along `next`)
+  +0x28, or −1 when there is none; +8 the state's +0x1c; +0x10, +0x14 the cua_anim's +0x1c,
+  +0x20 (the first anim of the state, not the current one); +0x18 pickable (+0x20); +0xc the
+  text (+0x24). Then PatternRect(DXImageList8 item r+4, pattern 0) (0x463c58 copies the
+  pattern's source rectangle, (0, 0, w, h) for unpatterned pictures) and +0x1c := x + 64,
+  +0x20 := y + 50, +0x24 := w + x + 64, +0x28 := h + y + 50. ge.dll lists at most 100
+  visible objects of the CUA whose state has a cua_anim that exists, ordered by BuildSort:
+  repeatedly the remaining object with the largest anim z (+0x24; ties → the later one), so
+  index 0 has the highest z. Corpus: following every state's cua_anim through `next`, 1,138
+  anim steps name a picture index (+0x28) below the item count of their CUA's file (0 out of
+  range); picture 1 of cua101.wxi is `10101_00` = object 10101's anim 10180 with +0x28 = 1.
+- **Method:** disassembly; ge.dll decompiles; `gamedat.py` + `wxi.py` cross-check.
+- **Confidence:** proven
+
+### E-0502 — cua::Draw 0x4794c0, cua::DrawObjects 0x479618 and the mode 2 tick
+- **Binary/file:** `GILBERT.EXE` 0x469fa0 (case 2 at 0x46a1bf), 0x4794c0, 0x479618, 0x479544
+- **Evidence:** tick in mode 2: 0x4794c0; if dialogue open (0x47cf94): 0x4740fc (ret),
+  dialog::HandleMouse 0x473f74, dialog::Draw 0x479018; 0x47412c (ret); cua::HandleMouse
+  0x473008; ui::DrawCursor; Flip; stream updates (room music only when shown 0x47ce68,
+  dialogue, credits, menu, fifth). 0x4794c0 (only when CanDraw): Fill(back, 0); DXImageList8
+  item 0 at (64, 50); 0x479618; cua::DrawFrame 0x46e414; 0x479544. 0x479618: for i from
+  count − 1 down to 0, skipping i = carried CUA index 0x47cec0: if r+4 (unsigned) < the item
+  count of DXImageList8 → Draw(item r+4, back, 64 + r+0x10, pattern 0, 50 + r+0x14).
+  0x479544 (named ui::DrawCarriedObject by rooms, E-0302): carried CUA index ≠ −1 →
+  DXImageList7 item 0 (`inventory.wxi`), pattern = its r+8, at (mouse x − 16, mouse y − 16);
+  carried inventory index 0x47cebc ≠ −1 → the same strip, pattern = inventory r+8, at (mouse
+  x − 0x47cec8, mouse y − 0x47cecc).
+- **Method:** disassembly.
+- **Confidence:** proven
+
+### E-0503 — cua::DrawFrame 0x46e414: the panel in mode 2
+- **Binary/file:** `GILBERT.EXE` 0x46e414, 0x4796f8, 0x477fbc
+- **Evidence:** interface1 item 0 at (64, 50); GEGetVariable(199) (push 0xc7) into 0x47ce44:
+  0 → i2[4] at (296, 374), 1..6 → i2[0x99..0x9e]; i2[5] iscr13 (167×50) at (371, 375);
+  inventory::Draw 0x4796f8; i2[6] at (151, 347); radar pulse 0x47ce90 (direction 0x47ce94):
+  down by 1 below 1 → 0 and up, up by 1 from 150 (cmp 0x96) → 150 and down; FillRectAlpha
+  (152 + l, 348 + t, 152 + l + w, 348 + t + h) in $008EBDDD with that alpha; Pen.Mode 4,
+  Style 0, Color $0028B5F9, Brush clear, Rectangle of the same; i2[0x26] at (70, 368), i2[0x98]
+  ibutt45 (the red "Kort") at (70, 396), i2[0x2c] ibutt13 at (537, 380), i2[0x2d] ibutt12 at
+  (537, 400); new-topic flag 0x47ce98: 0 → i2[8] at (298, 333), else the blink of E-0306
+  (0x47ce9c down 2 to 50, up 8 to 200; i2[8] then DrawAlpha i2[0xa] in (298, 333)–(346,
+  373)); i2[0x77] at (509, 336), i2[0x73] at (513, 340). Hover 0x47cf2c: 0x26 → i2[0x28] at
+  (70, 368), 0x2c → i2[0x2e] at (537, 380), 0x2d → i2[0x2f] at (537, 400), 0x73 → i2[0x74] at
+  (513, 340). Pressed 0x47cf30: 0x26 → i2[0x2a], Action(0x26); 0x2c → i2[0x30], Action(0x2c);
+  0x2d → i2[0x31], Action(0x2d); 0x73 → i2[0x75], Action(0x73), same places. Then
+  ui::DrawTooltip(0x47ce4c, −1) and (−1, 0x47ce50). Items 8 and 0x27 get no hover or pressed
+  picture and no Action here; the only Action call sites with 0x27 are 0x46e405 (room panel)
+  and 0x46f9cb (mode 5). Pictures looked at: 0x98 and 0x76 are red "disabled" looks.
+- **Method:** disassembly; call-site scan of 0x46fa74 over 0x469000..0x47c000; PNGs.
+- **Confidence:** proven
+
+### E-0504 — cua::HandleMouse 0x473008 and gmenu::Action in mode 2
+- **Binary/file:** `GILBERT.EXE` 0x473008, 0x46fa74 (mode 2 branch), 0x4741e4, 0x47421c
+- **Evidence:** 0x47cf30 := −1; cua::HoverObjects 0x475b48; cursor 0x47ce8c := 0; hover
+  0x47cf2c := first of i2 items 8, 0x26, 0x27, 0x2c, 0x2d, 0x73 whose BoundsRect intersects
+  the mouse rectangle 0x4816a4, else −1. If the button state 0x47ceb4 differs from the last
+  seen 0x47ceb8: hover := −1; if the state is 1 (left): for every i < count whose rectangle
+  r+0x1c contains the mouse point (PtInRect) and the point is not in (509, 336)–(589, 396):
+  GEClickObjectInCUA(r+0); then 0x47cf30 := the same first-hit chain; 0x47ceb8 := state.
+  Action mode 2: 0x2c: PlayWave(1, 1), if 0x47cedc > 5: −6 and inventory::Layout; 0x2d:
+  PlayWave(1, 1), if 0x47cedc + 12 ≤ 0x47cee0: +6 and Layout; 0x26: PlayWave(1, 2), StopAll,
+  hover/press/page state −1, mode 0 (no menu frame counter reset, no `menu1`); 0x27:
+  PlayWave(1, 4), state −1, mode 5; 0x73 when no dialogue is open: PlayWave(1, 4), StopAll,
+  state −1, mode 1, GECUAEnd, room music (looped) if set. Every branch clears 0x47cfd0,
+  0x47cfc8, 0x47cf1c..0x47cf3c. ge.dll ClickObjectInCUA runs click_event only when the
+  state is not pickable.
+- **Method:** disassembly; ge.dll decompile.
+- **Confidence:** proven
+
+### E-0505 — Descriptions: cua::HoverObjects 0x475b48 and ui::DrawTooltip 0x477fbc
+- **Binary/file:** `GILBERT.EXE` 0x475b48, 0x477fbc, 0x478228
+- **Evidence:** 0x475b48: 0x47ce4c := the first CUA index (only in mode 2) whose r+0x1c
+  rectangle contains the mouse point, else −1; 0x47ce50 := the last inventory index whose
+  rectangle contains it, else −1. 0x477fbc(c, n) (nothing when both −1): c ≠ −1 → text :=
+  CUA r+0xc, x := r+0x1c, y := r+0x20 + (r+0x28 − r+0x20) div 2; n ≠ −1 → text := inventory
+  r+0xc, x := r+0x1c, y := r+0x20 − 10; empty text → nothing. Font Arial 8, style [] (byte
+  0x478230 = 0), colour $008EBDDD; w := TextWidth; x := min(x, 560), x := max(x, 80), y :=
+  max(y, 66); x + w > 560 → x −= w; FillRectAlpha((x − 4, y − 2, x + w + 4, y + 16), colour
+  0, alpha 0x78); TextOut(x, y) in the same font and colour.
+- **Method:** disassembly.
+- **Confidence:** proven
+
+### E-0506 — Carrying: mouse events, cua::PickUp 0x475c14, cua::Drop 0x475d04
+- **Binary/file:** `GILBERT.EXE` 0x46a488, 0x46a518, 0x46a568, 0x475c14, 0x475d04;
+  `GE.DLL` ObjectToInventory 0x10008b50, UseObjectOnObject 0x10008cc0; `default.dat`
+- **Evidence:** MouseMove stores the point (0x48169c, 0x4816a0) and the rectangle (x − 3,
+  y − 3, x + 3, y + 3) (0x4816a4); with the state −1 it sets 1 when Shift has ssLeft, 2 with
+  ssRight. MouseDown: state −1 → 1 (left) / 2 (right) / −1; then in mode 2 (any button)
+  0x475c14: for each CUA i whose rectangle contains the point and r+0x18 ≠ 0: carried CUA
+  0x47cec0 := i, offset (0x47cec8, 0x47cecc) := point − (left, top) (last match wins); for
+  each inventory i whose rectangle contains the point: carried inventory 0x47cebc := i, the
+  same offset. MouseUp (any button): state and last state := −1; in modes 1 and 2 with
+  something carried → 0x475d04. 0x475d04: mode ≠ 2 → both carries := −1. CUA count 0 →
+  both −1. Carried CUA ≠ −1 and the point in Rect(364, 367, 576, 429) →
+  GEObjectToInventory(CUA r+0 of the carried index). Then for each CUA j ≠ carried CUA index
+  whose rectangle contains the point: GEUseObjectOnObject(CUA r+0 at the carried CUA index,
+  CUA r+0 of j) (with no CUA object carried this reads index −1: the dword 44 bytes before
+  0x482810, i.e. record 100 of the walkmap table 0x4816b4 (0x482810 − 0x4816b4 = 101·44),
+  which ge.dll never fills (at most 100 walkmap objects): 0). Then carried inventory ≠ −1:
+  for each CUA j containing the point: GEUseObjectOnObject(inventory r+0, CUA r+0 of j).
+  Finally both carries := −1. ge.dll: ObjectToInventory moves the object to the inventory,
+  runs take_event, rebuilds the CUA list, calls callbacks 4 and 5; UseObjectOnObject finds
+  the CUseObj (obj, target), runs its event, same refresh; not found → a log line only.
+  Corpus: no CUseObj has obj 0 (203 use-objects).
+- **Method:** disassembly; ge.dll decompiles; `gamedat.py`.
+- **Confidence:** proven
+
+### E-0507 — The inventory: the strip, the table, layout and drawing (Q-0100: see E-0403)
+- **Binary/file:** `GILBERT.EXE` 0x474afc, 0x475ea4, 0x4796f8, 0x46fa74; `GE.DLL`
+  InventoryGetObjectData 0x10008da0, UpdateInventory 0x10009230; `Data/maps/!global/inventory.wxi`,
+  `inventory-num.wxi`; `default.dat`
+- **Evidence:** `inventory.wxi`: one item `inv`, 3563×20, PatternWidth 22, PatternHeight 0
+  (the whole height), fuchsia transparent: 161 cells (3563 div 22), indices 0..160. CObjState
+  +0x1c in default.dat: 0..160; all 69 pickable states have it ≠ 0; the 391 states with 0 are
+  not pickable. Callback 5: count := GEInventoryGetNumObjects → 0x47cee0; for i:
+  GEInventoryGetObjectData(i, &r+0, &r+8, &r+0xc) into r = 0x48396c + 0x2c·i (ge.dll: code,
+  state +0x1c, text); then 0x475ea4. ge.dll's inventory list is the objects moved to it that
+  are visible, in the order they arrived. 0x475ea4: first := 0x47cedc, last := min(first +
+  12, count); for k < count: first ≤ k < last, c := (k − first) mod 6, row := (k − first)
+  div 6 → r+0x1c := Rect(377 + 27c, 377 + 26row, 404 + 27c, 403 + 26row); else (0, 0, 0,
+  0). 0x4796f8: for k in first..last − 1, k ≠ carried inventory index: Draw(DXImageList7
+  item 0, back, 378 + 27c, pattern r+8, 377 + 26row). Scrolling: Action 0x2c / 0x2d (E-0504).
+  ResetState sets 0x47cedc := 0 (E-0309). `inventory-num.wxi` (128 items of 22×20 named
+  `<obj>_<state>`, `DELPHIXPICTURECOLLECTION`) has no loader in Gilbert.exe (no string).
+- **Method:** disassembly; `wxi.py`; `gamedat.py` statistics.
+- **Confidence:** proven
+
+### E-0508 — gecb::Dialog 0x47454c (callback 6) and the print message
+- **Binary/file:** `GILBERT.EXE` 0x47454c, 0x4747e8, 0x4747f4, 0x474800, 0x470b56;
+  `Data/misc/language.txt`
+- **Evidence:** print flag 0x47cfb0 = 0: title 0x484d5c := GEDialogGetTitle, length < 3 →
+  '  ' (two spaces, 0x4747e8); text 0x484d60 := GEDialogGetText, the same rule; n :=
+  GEDialogGetNumChoices → 0x484bc4; choice i := GEDialogGetChoice(i) into 0x484bc8[i];
+  dialogue open 0x47cf94 := 1. Flag set (book button 0x50, 0x470b56: PlayWave(1, 2); flag 1;
+  0x47454c; flag 0; open; pressed := tab): title := '   ' (0x4747f4); text := line 20 + LF,
+  then line + LF for each of lines 21..24 longer than 2 characters; one choice, line 25.
+  Lines (Danish): 20 "Hvis du vil udskrive tekster fra Ordlisten, Eksperimenterne eller
+  Gilberts venner:", 21 "1. Gem dit spil.", 22 "2. Luk Gilbert-spillet.", 23 "3. Klik på
+  knappen Start og vælg Programmer. Der vil du finde Gilbert-mappen.", 24 "4. Klik på Bed om
+  udskrift", 25 "Okay". ge.dll StartDialog 0x10009300 sets the current dialogue and calls
+  callback 6. Corpus: 354 dialogues, choices per dialogue 1 (2), 2 (303), 3 (32), 4 (10), 5
+  (5), 6 (1), 11 (1); texts with LF: 75, at most 7 LFs; 5 texts shorter than 3 characters;
+  titles are internal Swedish names ("Badvakt 01").
+- **Method:** disassembly; `language.txt` read; `gamedat.py`.
+- **Confidence:** proven
+
+### E-0509 — dialog::Layout 0x475fdc and dialog::Draw 0x479018
+- **Binary/file:** `GILBERT.EXE` 0x475fdc, 0x479018, 0x463d3c, 0x476514, 0x476518, 0x4794bc
+- **Evidence:** Layout, on the back buffer's canvas: Arial 8, style [] (0x476514 = 0); for
+  each choice (cx, cy) := TextExtent → 0x484ef8[i]; W := the largest cx; H := 18·n. Style
+  [fsBold] (0x476518 = 1), size 9: W := max(W, TextWidth(title)); 0x47cfa0 := that width;
+  H += TextHeight(title). Lines: text split at each LF (char 10), each piece Trimmed, into
+  0x484d64[0..L] (L = number of LFs, 0x47cf98). off 0x47cf9c := TextHeight(line 0) · L,
+  still in bold 9. Arial 8 []: W := max(W, TextWidth(line)); H += TextHeight(line) for each
+  line. Box 0x485870 := (310 − W div 2, 240 − H div 2, 330 + W div 2, 240 + H div 2).
+  Choice k: 0x485220[k] := (left + 5, top + 25 + 18k + off, right − 5, top + 41 + 18k +
+  off). Draw: Layout; FillRectAlpha((left, top − 16, right, bottom), 0, 0xb4); i2[0x9f] dh1
+  at (left − 2, top − 17), i2[0xa0] dh2 at (right − 8, top − 17), i2[0xa1] dh3 at (left − 2,
+  bottom − 8), i2[0xa2] dh4 at (right − 8, bottom − 8); StretchDraw (0x463d3c: item, dest,
+  rect, pattern 0) i2[0xa3] dl1 (10×3) to (left + 2, top − 17, right − 2, top − 14) and
+  (left + 2, bottom − 1, right − 2, bottom + 2), i2[0xa4] dl2 (3×10) to (left − 2, top − 14,
+  left + 1, bottom − 8) and (right − 1, top − 14, right + 2, bottom − 8); line i: TextOut
+  (left + 10, top − 6 + 12i, $008EBDDD, style 0, 8, Arial); choice k: TextOut(left + 10, top
+  + 20 + 18k + off) in $008EBDDD when k is the hover 0x47cfa8 or the pressed 0x47cfac, else
+  $007F7F7F. The title is never drawn: its only readers are 0x47454c (write) and Layout
+  (0x476173..0x4761fc, measure); 0x47cfa0 is otherwise only written (Layout, ResetState).
+- **Method:** disassembly; xref scan of the pointer slots.
+- **Confidence:** proven
+
+### E-0510 — dialog::HandleMouse 0x473f74, GEDialogEnd, voices
+- **Binary/file:** `GILBERT.EXE` 0x473f74, 0x469fa0, 0x474804; `GE.DLL` DialogEnd
+  0x10008f60; `default.dat`; `Data/Sounds/Dialog/`
+- **Evidence:** Layout; 0x47cfac := −1, 0x47cfa8 := −1; hover := the last k whose Rect(left
+  of choice k, its top, left + cx[k] + 10, its bottom) intersects the mouse rectangle. On a
+  change of the button state: if the state is 1, pressed := the last such k; pressed ≠ −1 →
+  dialogue open := 0, GEDialogEnd(pressed); last state := state. Main loop: modes 1, 2 and 4
+  run 0x473f74 and 0x479018 while 0x47cf94 is set (mode 4 instead of its own mouse handler;
+  mode 2 before cua::HandleMouse, which then sees no state change). ge.dll DialogEnd(i)
+  clears the current dialogue and runs choice i's event; with none current it does nothing.
+  Voices: callback 10 (E-0308) kind 1 plays `Sounds/Dialog/<name>.wav`. default.dat type-6
+  records: 455 with a numeric name, +0x44 = 1, +0x48 = 0; 213 with a music name, +0x44 = 0,
+  +0x48 = 1. The event that starts a dialogue holds the voice: e.g. event 9200000 = type 9
+  (dialogue 20000) and type 6 ("2156", +0x44 1). 377 distinct voice names; 611 files; one
+  name without a file ("8456"); 235 files never named.
+- **Method:** disassembly; ge.dll decompile; `gamedat.py` statistics; directory listing.
+- **Confidence:** proven
+
+### E-0511 — book::Draw 0x46ec90 and the mode 4 tick
+- **Binary/file:** `GILBERT.EXE` 0x469fa0 (case 4 at 0x46a2ae), 0x46ec90, 0x45bef8
+- **Evidence:** tick: 0x46ec90; dialogue open → 0x4740fc, 0x473f74, 0x479018; else 0x474130
+  (ret), book::HandleMouse 0x4734b8; ui::DrawCursor; Flip only when 0x47ce5c ≠ 0 (toggled at
+  the end of every tick); stream updates. 0x46ec90: i2[0] at (64, 50), i2[0x6f] s03bkg at
+  (64, 50); list ready 0x47cff8 and list view 0x47d008 → 0x45bef8(back, 135, 95, transparent,
+  list surface 0x486b60, Rect(0, 0, 355, 320)); page ready 0x47cfc4 and not list view →
+  0x45bef8(back, 135, 95, transparent, page surface 0x485884, Rect(0, t, 355, t + 320)), t =
+  Trunc(scroll 0x47cfd4); interface1 at (64, 50); i2[0x41] ilbkg01 at (64, 337); buttons
+  i2[0x4e] (88, 354), 0x4f (443, 387), 0x50 (325, 387), 0x51 (206, 387), 0x52 (206, 354),
+  0x53 (88, 387); arrows i2[0x69] pil13 (115, 93), 0x7e pil15 (503, 93), 0x81 pil16 (503,
+  343). Arrow hover 0x47cf44: 0x69 → 0x6a, 0x7e → 0x7f, 0x81 → 0x82; pressed 0x47cf48: 0x69
+  → 0x6b + Action(0x69), 0x7e → 0x80 + Action(0x63), 0x81 → 0x83 + Action(0x66). Button
+  hover 0x47cfc8: 0x4e..0x53 → 0x54..0x59; pressed 0x47cfd0: → 0x5a..0x5f, and for 0x4e,
+  0x51, 0x52, 0x53 tab 0x47cfd8 := pressed; Action(pressed) when hover = pressed. Title at
+  (192, 56) by tab: 0x4e → i2[0x7b] "Ordliste", 0x51 → 0x78 "Eksperimenter", 0x52 → 0x7a
+  "Tips", 0x53 → 0x79 "Gilberts venner". Button labels seen: 0x4e Ordliste, 0x4f Tilbage, 0x50
+  Udskriv, 0x51 Eksperimenter, 0x52 Tips, 0x53 Gilberts venner.
+- **Method:** disassembly; pictures rendered and composed.
+- **Confidence:** proven
+
+### E-0512 — book::BuildList 0x46aa54, book::BuildPage 0x46ada0, book::SetFormat 0x46b2dc
+- **Binary/file:** `GILBERT.EXE` 0x46aa54, 0x46ada0, 0x46b2dc, 0x46b2d8, 0x46b44c..0x46b454;
+  `GE.DLL` 0x100078e0, 0x10007900, 0x10007a00, 0x10007a20, 0x100079c0, 0x10007840,
+  0x10007ae0, BookParseNext 0x10007b00; `default.dat`
+- **Evidence:** BuildList(book, first): list ready := 0; the 355×320 surface 0x486b60 is
+  created once, colour key $FF00FF, filled with $FF00FF; canvas Brush clear, Arial 8 [],
+  colour $0026C4; x := 10, y := 0, count := 0, book 0x47d004 := book; last := min(first +
+  20, GEBookGetNumTopics(book)); for i = first..last − 1 (k = i − first): book[k] := book,
+  topic[k] := GEBookGetTopicFromIndex(book, i); rect[k].left := x + 135, top := y + 95 + 8;
+  parse GEBookGetTopicTitle(book, i): text → w := TextWidth, colour $192D80, TextOut(x, y),
+  x += w; format → SetFormat; tab → x := (x div 20 + 1)·20; LF → y += 12, x := 10; links and
+  pictures ignored; then rect[k].right := x + 135, bottom := y + 95 + 12 + 8; y += 12; x := 10.
+  count 0x47d000 := last − first; list ready, list view := 1. BuildPage(book, topic): 0x47cff0
+  := book, 0x47cff4 := topic; page ready 0x47cfc4 := 0; index := GEBookGetIndexFromTopic(book,
+  topic); the 355×1000 surface 0x485884 created once, key and fill $FF00FF; Arial 8 []
+  (0x46b2d0), colour $1A2E40; SetFormat(0); x := 10, y := 10, links 0x47cfec := 0, line
+  height h := 12; parse GEBookGetTopic(book, index): text: w := TextWidth; x + w > 344 → y
+  += h, x := 10, h := 12; a pending link → colour $192D80, style + fsUnderline (0x46b2d8 = 4),
+  link rect left := x + 135, top := y + 103; TextOut(x, y); x += w. Format → SetFormat. Link
+  (3) → linkBook 0x486518[n] := GEBookParseGetLinkBook, linkTopic 0x48683c[n] :=
+  GetLinkTopic, pending. Link end (4) → right := x + 135, bottom := y + 115, colour $1A2E40,
+  style − fsUnderline, n += 1, SetFormat(current 0x47cfe4). Picture (5) p: w := width of
+  bookimages item p (0x463cc8); x + w > 354 → new line; Canvas.Draw(x, y, the item's
+  graphic) (0x419d34); x += w; h := max(h, picture height). Tab → x := (x div 50 + 1)·50,
+  then > 344 → new line. LF → y += h, x := 10, h := 12. End: page ready, list view := 0.
+  SetFormat(f): 0 size 8 style []; 1 size 8, style + fsBold; 2 size 8, + fsUnderline; 3 size
+  8, + both; 4 size 10, []; 5 size 10, [fsBold]; others: nothing; 0x47cfe4 := f. ge.dll:
+  GetNumTopics(b) = the number of shown topics of book b; TopicFromIndex, GetTopicTitle,
+  GetTopic look a topic up by its rank +0x14 among the shown ones (0x10007840: the first
+  topic of the book whose +0x14 equals the argument); GetIndexFromTopic(b, id) = that topic's
+  +0x14 (−1 when hidden, 0 when there is no such ID). Parse tokens: 1 text (a single space,
+  or a run of characters up to a backslash or a character ≤ space), 2 `\f<n>`, 3 `\h<b>[:<t>]`,
+  4 `\h` without a number, 5 `\g<n>`, 6 `\t`, 7 LF (E-0106). Book topics: book 0 227 (15
+  shown at the start, titles `\f1Beduin`, …), 1 177 (all shown; `\f1 Advarselstekst`, …), 2
+  17, 3 33.
+- **Method:** disassembly; ge.dll decompiles; `gamedat.py`.
+- **Confidence:** proven
+
+### E-0513 — book::HandleMouse 0x4734b8 and gmenu::Action in mode 4
+- **Binary/file:** `GILBERT.EXE` 0x4734b8, 0x46fa74 (mode 4 table 0x470a13/0x470a7d), 0x4710fc
+- **Evidence:** 0x47cfc8 := −1, 0x47cf44 := −1, cursor 0x47ce8c := 0. List view: any list
+  rect k intersecting the mouse rectangle while the state is not 1 → cursor 7. Page view:
+  link rect n minus (0, t, 0, t) (t = Trunc(scroll)) the same. Mouse rectangle in (64, 360)–
+  (576, 430) → hover button := first of 0x4e..0x53 whose BoundsRect it hits, else −1. In
+  (500, 90)–(525, 360) or (114, 90)–(130, 125) → hover arrow := first of 0x7e, 0x81, 0x69,
+  else −1. On a change of the button state: page view, state 1, link n hit → cursor 7; book
+  0x47d004 := linkBook[n] and hover and pressed button := 0x52 / 0x4e / 0x53 / 0x51 for link
+  book 0 / 1 / 2 / 3, scroll := 0 (other books: no change); BuildPage(linkBook[n],
+  linkTopic[n]). List view, state 1, rect k hit → cursor 7, BuildPage(book[k], topic[k]).
+  Then, unless the cursor is 7 and only with state 1: pressed button 0x47cfd0 := the button
+  hit in the bar region (−1 if none), unchanged outside it; pressed arrow 0x47cf48 likewise.
+  Last state := state. Action mode 4 (first = item ≠ last action item): 0x4e: first and book
+  ≠ 1 → PlayWave(1, 2), BuildList(1, 0), scroll 0x47cfd4 := 0, first 0x47cffc := 0; 0x51: the
+  same with book 3; 0x52: book 0; 0x53: book 2; each then hover := −1. 0x4f: first →
+  PlayWave(1, 4), scroll := first := 0; pressed, hover, 0x47cf30, 0x47cf2c := −1; mode := 1.
+  0x50: E-0508. 0x63 (up): PlayWave(1, 1); page view: scroll −= 24.0, below 0.0 → 0; list
+  view: first −= 10, below 0 → 0, BuildList(book, first). 0x66 (down): PlayWave(1, 1); page
+  view: scroll += 24.0, ≥ 1000.0 → 999.0; list view: first += 10, above NumTopics(book) − 20
+  → that, below 0 → 0, BuildList. 0x69: PlayWave(1, 1), BuildList(book, 0), scroll := first
+  := 0. 0x63, 0x66, 0x69 clear the arrow hover and press. Opening from the room (item 8,
+  E-0306): LoadBookImages (`bookimages.wxi` into DXImageList12, E-0205), BuildList(1, 0),
+  tab and pressed 0x4e, mode 4.
+- **Method:** disassembly (floats 24.0, 0.0, 1000.0 at 0x4710fc..0x471104; 999.0 =
+  0x4479c000).
+- **Confidence:** proven
+
+### E-0514 — The map is CUA 999; mode 5 is unreachable
+- **Binary/file:** `GILBERT.EXE` 0x470570, 0x46f630, 0x472598, 0x46fa74; `default.dat`;
+  `Data/maps/!global/kartmap.wxi`
+- **Evidence:** room button "Kort" (0x27, E-0306) → GEWalkmapAreaHit(99999) (push 0x1869f):
+  event walkmap·100 + 99. default.dat: each of the 38 room walkmaps has that event, one type-3
+  record (walkmap = the room, CUA 999, comment "Till karta för snabb förflyttning");
+  walkmaps 900 and 999 have none. Walkmap 999 holds CUA 999 (9 objects 99901..99909,
+  visible, not pickable, texts "Til stranden", "Til ørkenen", "Til molen", "Til skoven" (2),
+  "Til gletsjeren", "Til lysningen", "Til laboratoriet", "Til minen"; anims with duration 0,
+  pictures 1, 3, 5, 7, 8, 11, 13, 15, 17 of kartmap.wxi (items bea1, des1, fis1, for1, for11,
+  gla1, hou1, lab1, min1; the other ten are never named). Click events 9901..9909: type 4
+  (walkmap 100, 352, 150, 552, 557, 600, 550, 254, 400 with a start point) and type 6.
+  Mode 5 is set only by Action(0x27) in mode 2 (0x470848) and its own Action branch
+  (0x470e43); Action(0x27) is called only from the room panel (mode 1) and from mode 5's
+  frame. Mode 5's frame draws DXImageList11 item 0, but no code loads DXImageList11 (only
+  0x46f654 reads TgMain+0x32c) and the form gives it no items.
+- **Method:** disassembly; call-site and field-offset scans; `gamedat.py`.
+- **Confidence:** proven

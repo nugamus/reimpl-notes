@@ -255,6 +255,10 @@ work happen only then (E-0214). *Click n* is `PlayWave(list 1, item n)` of `menu
 | Video 0x96 | click 0; `FullscreenVideo` toggled. |
 | Help arrows 0x84, 0x87 | nothing (the help text never scrolls). |
 
+"Reset the game state" (ResetState, after a successful new game or load) also sets
+MusicVolume 5, SoundVolume 4 and FullscreenVideo 0 in memory, whatever the settings were
+(rooms.md "State", E-0309).
+
 "Close the menu state": page, hover, pressed := −1, Help and About closed. Page-item
 actions also clear the page hover and press.
 
@@ -337,7 +341,8 @@ cannot load). Saving slot n (not when `InstallationType` = −1) writes `file=ga
   looped, wait), 8 StopWave(list, index), 9 load a wave list, 10 music(name, loop, kind:
   0 room music, 1 dialogue stream, 2 another stream), 11 nothing, 12 play a film, 13/14
   Gilbert's position, 15/16 nothing, 17/18 the room map's width/height in cells, 19 a map
-  cell, 20 (not read), 21 a sound (list 1 item 10), 22 nothing.
+  cell, 20 Gilbert's walking direction (rooms.md, E-0308), 21 a sound (list 1 item 10), 22
+  nothing.
 - `GEExit`, `GEInit` again, `GELoadFile(path)` (non-zero = loaded), `GEStartNewGame` (new
   game), `GEContinueGame` (after a load), `GESaveFile(path)`, `GEEllapsed` every tick,
   `GEGetVariable(198)` every tick.
