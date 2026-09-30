@@ -286,8 +286,9 @@ yellow for the picked row. `i2[0x45]` "Åbn" button at (258, 302) (hover `i2[0x4
 
 **Save (4)** (only when *can save*). `i2[0x23]`, `i2[0x40]` ("Gem spil") at (102, 63),
 `i2[0x39]` at (104, 100); hovered row filled as on page 3; rows k = 1..5 as on page 3 with
-the save top and picked row. When a row is picked for the first time, or another row is
-picked while editing, the name becomes that slot's name and editing starts. While a row is
+the save top and picked row. When a row is picked and editing is off (also after the
+arrows), or another row than the named one is picked while editing, the name becomes that
+slot's name and editing starts (E-0215). While a row is
 picked, the name field is filled with (196, 38, 0) at an alpha that falls by 2 per frame to
 0 and rises by 5 to 80, over and over, and the name is drawn at (119, 274), tan. `i2[0x44]`
 "Gem" button at (258, 302) (hover 0x48, pressed 0x4c), up at (301, 107), down at (301, 241).

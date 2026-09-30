@@ -121,7 +121,7 @@ happen to be stored.
 
 | Class (size) | Serialize | Fields |
 |---|---|---|
-| CWalkmap (0x38) | 0x1000acb0 | `+0x1c` list of CCUA; `+4` id; `+8` title (GEWalkmapGetTitle); `+0xc..+0x18` radar rectangle left, top, right, bottom (loaded from x, y, w, h; GEWalkmapGetRadarRect) |
+| CWalkmap (0x38) | 0x1000acb0 | `+0x1c` list of CCUA; `+4` id; `+8` title (GEWalkmapGetTitle); `+0xc..+0x18` radar rectangle left, top, right, bottom (16 raw bytes; GEWalkmapGetRadarRect returns x = left, y = top, w = right − left, h = bottom − top) |
 | CCUA (0x3c) | 0x10001720 | `+0x20` list of CObj; `+8` id; `+0xc` name; `+0x10` first_event (GotoCUA runs it while first_visit is set, then clears it); `+0x14` event (later visits); `+0x18` end_event (GECUAEnd); `+0x1c` first_visit (1 in all 72) |
 | CObj (0x34) | 0x10009e90 | `+0x14` list of CObjState; `+8` cua_id; `+0xc` id; `+0x10` visible (only visible objects are listed; events 15/16); u32 current state number (resolved to `+0x30`, the first state if absent) |
 | CObjState (0x2c) | 0x1000a230 | `+4` state; `+8` name (Swedish, internal); `+0xc` walkmap_anim (CAnim ID on the walkmap); `+0x10` cua_anim (CAnim ID in a CUA); `+0x14` click_event (GEClickObjectInCUA, only if not pickable); `+0x18` take_event (GEObjectToInventory); `+0x1c` unk_1c (to the EXE, Q-0100); `+0x20` pickable (events 12/13); `+0x24` text (Danish description, to the EXE) |

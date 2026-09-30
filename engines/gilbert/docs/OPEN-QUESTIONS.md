@@ -246,3 +246,13 @@ end, Q-0100.. `default.dat` and `ge.dll`).
 - **Status:** open for the original; the engine treats it as a bug and fixes it always
   (bug fixes are not options, CLAUDE.md): Menu in a close-up plays the menu music like
   Menu in a room, and Continue returns to the close-up ge.dll still has open.
+
+### Q-0302 — Does a dialogue opened in a room get the press, or does the room take it?
+- **Context:** rooms.md "The main loop in mode 1": room::HandleMouse runs every tick and
+  the dialogue after it (E-0304); by E-0305/E-0510 the room would see a press first.
+- **What we checked:** default.dat: no area event and no chain after a GotoWalkmap opens a
+  dialogue (event type 9) while a room is shown, so the case does not arise in the data.
+- **Observed range:** —
+- **Blocks:** nothing. The engine lets the dialogue take the press and skips the room's
+  mouse while one is open.
+- **Status:** open

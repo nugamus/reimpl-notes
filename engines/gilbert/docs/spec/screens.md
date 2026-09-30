@@ -320,7 +320,8 @@ book's first hidden topic (ge.dll's lookup by rank −1, E-0512).
 (E-0513)
 
 - Cursor 0, or 7 over a list title (list view) or a link (page view, rectangles moved up by
-  the scroll) while no button is held.
+  the scroll) while no button is held. Titles and links are hit by the 6×6 mouse rectangle,
+  for the cursor and for the press.
 - Hovered tab: the first bar button hit, when the mouse is in (64, 360)–(576, 430). Hovered
   arrow: the first of up, down, back-to-list hit, when the mouse is in (500, 90)–(525, 360)
   or (114, 90)–(130, 125).
