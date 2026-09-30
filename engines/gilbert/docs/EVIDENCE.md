@@ -173,3 +173,138 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
 - **Method:** decompiled 0x44f5c4, 0x44f50c, 0x44f710, 0x47a190;
   `python engines/gilbert/tools/parsers/ctrlmap.py` (+ `--selftest`).
 - **Confidence:** proven (layout); meaning of the cell values open (Q-0002)
+
+### E-0100 — `default.dat` is an MFC 6 CArchive: a header and 17 CObLists of 11 classes; 1/1 parses, every byte consumed
+- **Binary/file:** `Program/Data/game/default.dat` (702,971 B); `/gilbert-import/GE.DLL`
+- **Evidence:** `GELoadFile` 0x100026a0 → `GameObj::LoadFile` 0x100031f0 opens the file
+  with CFile mode 0x8000 (binary read), builds a loading CArchive, reads the header
+  (E-0102), then calls slot 2 of the CObList vtable 0x10020564 (`CObList::Serialize`
+  0x1001565f) on the members +0x36c, +0x2f1d4, +0x2f20c, +0x2f228, +0x2f244, +0x2f264,
+  reads u32 10, calls it on the ten 0x1c-byte members from +0x2f280, then on +0x2fa24.
+  `GESaveFile` 0x100026c0 → `GameObj::SaveFile` 0x100034e0 (mode 0x9001) writes the same
+  sequence. Validator: `default.dat: 7661 objects, 11 classes, 0 object references`;
+  CWalkmap 40, CCUA 72, CObj 308, CObjState 541, CUseObj 203, CEvent 3,712 (1,868 IDs),
+  CDialogs 354, CDialogChoice 786, CText 9, CTopic 454 (books 0..3: 227 177 17 33),
+  CAnim 1,182; every list holds only its class; `1/1 parsed, every byte consumed`.
+  Function names in `notes/names/GE.DLL-gamedat.csv`, applied to the project.
+- **Method:** PyGhidra decompilation of the functions named there;
+  `python engines/gilbert/tools/parsers/gamedat.py` (+ `--selftest`).
+- **Confidence:** proven
+
+### E-0101 — ge.dll's CArchive primitives are MFC 6's (statically linked): tags, counts, CStrings
+- **Binary/file:** `/gilbert-import/GE.DLL`
+- **Evidence:** `CObList::Serialize` 0x1001565f: storing, WriteCount 0x1001b38c (u16, or
+  0xFFFF + u32 from 0xFFFF on) then WriteObject 0x1001a88d per node; loading, ReadCount
+  0x1001b3ba then ReadObject 0x1001a90c + AddTail. ReadClass 0x1001ab44: u16 tag, 0x7FFF →
+  u32 big tag, else tag & 0x7FFF with bit 15 moved to bit 31; bit 31 clear → object
+  reference by index; 0xFFFF → CRuntimeClass load (u16 schema, u16 length, name) and a new
+  map entry; else class by index. WriteObject numbers new objects in the same map
+  (+0x30 counter) and writes 0x7FFF + u32 above 0x7FFE. CString: `<<` 0x1001ad12 writes u8
+  length < 0xFF, else 0xFF + u16 < 0xFFFE, else 0xFF 0xFFFF + u32, then the bytes; `>>`
+  0x1001ade2 via 0x1001ad8b (u16 0xFFFE = Unicode marker). int `>>` 0x100014c0 / `<<`
+  0x10001490 move 4 bytes at the buffer cursor +0x24 (end +0x28); mode bit 0 at +0x14 =
+  loading. In default.dat the first tags are at 0x338 (`28 00` count 40, `FF FF 01 00 08 00
+  CWalkmap`), class references appear as 0x8005 etc., and no object reference occurs.
+- **Method:** decompiled the addresses above; validator statistics.
+- **Confidence:** proven
+
+### E-0102 — The header: current walkmap, start position, 200 game variables
+- **Binary/file:** `default.dat` bytes 0x000..0x337; `/gilbert-import/GE.DLL`
+- **Evidence:** LoadFile 0x100031f0 reads u32 → +4, +8, +0xc, +0x10, then a u32 that must
+  be 200 (else the load fails), 200 u32 into +0x4c.., then u32 → +4 again. SaveFile
+  0x100034e0 writes the current walkmap's ID (`*(+0x388)+4`), the results of the GEInit
+  callbacks 13 and 14 (DAT_100285dc, DAT_100285d8), 0, 200, the 200 variables, the walkmap
+  ID. `GEContinueGame` → 0x100031c0 calls GotoWalkmap 0x10008fa0(+4, +8, +0xc, +0x10); the
+  event "Goto Walkmap %d [Start at %d,%d]" (type 4) calls it with walkmap, x, y, unk, so +8
+  and +0xc are the start position. `GEGetVariable`/`GESetVariable` → 0x10005490 /
+  0x100054b0 read/write +0x4c + 4n for n < 200. default.dat: 0, 320, 258, 0, 200, all
+  variables 0, 0.
+- **Method:** decompilation; validator.
+- **Confidence:** proven (the meaning of +0x10 is open, Q-0104)
+
+### E-0103 — Which class each list holds, from ge.dll's text loaders and finders
+- **Binary/file:** `/gilbert-import/GE.DLL`
+- **Evidence:** `GELoadTextFiles` → 0x100037e0 opens `db\walkmaps.txt` … and calls the
+  loaders, each of which `new`s one class (by size) and AddTails it: LoadWalkmaps
+  0x10003eb0 (0x38, +0x36c), LoadCUAs 0x10004080 (0x3c, into the walkmap's +0x1c),
+  LoadObjects 0x100042c0 (CObj 0x34 into the CUA's +0x20; CObjState 0x2c into the object's
+  +0x14; column 2 split as id = n / 100, state = n % 100), LoadBooks 0x10004600 (0x18 into
+  +0x2f280 + 0x1c·booktype, "Invalid booktype" when ≥ 10), LoadAnims 0x10004830 (0x30,
+  +0x2fa24), LoadUseObjs 0x10004a50 (0x10, +0x2f20c), LoadEvents 0x10004bc0 (0x60,
+  +0x2f228), LoadDialogs 0x10004ec0 (0x2c, +0x2f244), LoadDialogChoices 0x10005070 (0x10,
+  into the dialog's +4), LoadTexts 0x10005290 (0xc, +0x2f264). The inventory list
+  +0x2f1d4 receives CObjs from ObjectToInventory 0x10008b50 and event type 7; UpdateInventory
+  0x10009230 lists its objects with +0x10 set. After loading, BuildIndexLists 0x10005d70
+  and LoadFile set each CObj's owner +4 to its CCUA, IndexTopics 0x100077e0 renumbers
+  CTopic +0x14.
+- **Method:** decompilation; the validator checks the class of every list element.
+- **Confidence:** proven
+
+### E-0104 — The eleven Serialize layouts and the fields' meanings from their users
+- **Binary/file:** `/gilbert-import/GE.DLL`
+- **Evidence:** Serialize bodies (loading branch): CWalkmap 0x1000acb0 list +0x1c, u32 +4,
+  CString +8, 16 bytes +0xc; CCUA 0x10001720 list +0x20, +8, CString +0xc, +0x10..+0x1c;
+  CObj 0x10009e90 list +0x14, +8, +0xc, +0x10, u32 state → SetState 0x10009e40 (FindState
+  0x10009e70 by CObjState +4, else the first); CObjState 0x1000a230 +4, CString +8,
+  +0xc..+0x20, CString +0x24; CAnim 0x100011f0 +4, +8, +0xc, CString +0x10, +0x14..+0x2c;
+  CUseObj 0x1000a980 +4, +8, +0xc; CEvent 0x10002100 +4..+0x3c, CString +0x40, +0x44,
+  +0x48, CString +0x4c, +0x50, +0x54, +0x58, CString +0x5c; CDialogs 0x10001da0 list +4,
+  +0x20, CString +0x24, +0x28; CDialogChoice 0x10001aa0 +4, CString +8, +0xc; CTopic
+  0x1000a740 +4, CString +8, +0xc, +0x10, +0x14; CText 0x1000a4c0 +4, CString +8. Users:
+  walkmap title `GEWalkmapGetTitle` (+8), radar rectangle GetRadarRect 0x10005500 and the
+  loader (x, y, x+w, y+h); FindWalkmap 0x100054d0 (+4), FindCUA 0x10005e20 (CCUA +8),
+  FindObj 0x10005e40 (CObj +0xc), FindAnim 0x10005eb0 (CAnim +8), FindUseObj 0x10005ee0
+  (+4, +8), FindDialog 0x10005f10 (+0x20), GetText 0x10005f40 (CText +4 → +8). GotoCUA
+  0x10009090 runs +0x10 and clears +0x1c if +0x1c ≠ 0, else runs +0x14; CUAEnd 0x10008930
+  runs +0x18. ClickObjectInCUA 0x10008a20 runs state +0x14 unless state +0x20;
+  ObjectToInventory 0x10008b50 runs state +0x18; MakeObject(Not)Pickable set state +0x20.
+  BuildWalkmapObjects 0x10008170 takes the anim of state +0xc, BuildCUAObjects 0x10008220
+  and CUAGetObjectData 0x10008830 of state +0x10, both only for CObj +0x10 ≠ 0.
+  StepAnim 0x10008520 adds the timeGetTime delta to anim +4; past +0x14 it switches to anim
+  +0xc and returns +0x2c, which Ellapsed 0x10008590 runs as an event. BuildSort
+  0x10007e90/0x10008000 order by anim +0x24 ("ZOrder"). GE*GetObjectData hand state +0x1c,
+  +0x20, +0x24 and anim +0x1c, +0x20, +0x28 to the EXE. UseObjectOnObject 0x10008cc0
+  matches (+4, +8) and runs +0xc; DialogEnd 0x10008f60 runs the choice's +0xc;
+  GEDialogGetTitle/Text return +0x24/+0x28 (0x10008e50, 0x10008eb0), GEDialogGetChoice the
+  choice's +8. GEBookGetTopicTitle/GetTopic return topic +8/+0xc; FindTopic 0x10007880
+  (+4). Corpus: every CObj's state and cua_id match (308/308), object IDs unique, all
+  27 walkmap and 503 CUA anim IDs, 137 click and 35 take events, 203/203 use-object
+  events and codes, 413/417 jump targets resolve; 1,180 of 1,182 `next` IDs exist.
+- **Method:** decompilation; corpus checks in Python over `gamedat.parse`.
+- **Confidence:** proven (fields marked `unk_*` stay open: Q-0100..Q-0103)
+
+### E-0105 — CEvent types: RunEvent's switch on +8, and DoEvent's jump rule
+- **Binary/file:** `/gilbert-import/GE.DLL`
+- **Evidence:** RunEvent 0x100060f0 logs CString +0x5c, then switches on +8 with cases
+  1..10, 12..22 (log strings and operands in `docs/formats/README.md`); any other type
+  (0, 11) reaches the default, which logs "EventID=%d, EventType=%d". Case 18 switches on
+  +0xc: 0 ==, 1 !=, 2 <, 3 > of GetVariable(+0x10) against +0x14, 4 always, 5
+  `rand() % 101 <= +0x14`; when true it returns +0x18, every other path returns 0. DoEvent
+  0x10005f70 walks the event list for records with +4 == id, calls RunEvent on each and,
+  on a nonzero return, starts again with that ID. GEStartNewGame 0x10002680 → 0x100031a0
+  runs event 1; GEWalkmapAreaHit 0x10008710 runs `n % 100 + walkmap_id * 100`. Corpus:
+  records per type 0:443 1:57 2:314 3:117 4:239 5:5 6:671 7:163 8:74 9:474 10:43 12:30 13:1
+  14:7 15:96 16:51 18:417 19:324 20:58 21:1 22:127 (no 11, no 17); type 18 conditions
+  0:236 1:3 3:29 4:127 5:22.
+- **Method:** decompilation; string table dump; validator.
+- **Confidence:** proven
+
+### E-0106 — Topic text markup, from GEBookParseNext
+- **Binary/file:** `/gilbert-import/GE.DLL` 0x10007b00; the CTopic texts in `default.dat`
+- **Evidence:** the tokenizer returns 0 at the end; for `\` it reads the next letter: `f` →
+  number into +0x2f3c8 (GEBookParseGetFormat), returns 2; `g` → number into +0x2f3d4
+  (GetPicture), 5; `h` + digit → book into +0x2f3cc, optional `:` + topic into +0x2f3d0
+  (GetLinkBook/GetLinkTopic), 3, `h` without digit 4; `t` 6; other letters give a `\` text
+  token. Line feed → 7; a space or a run of characters up to a space/control/`\` → 1 with
+  the text in +0x2f3c4 (GEBookParseGetText). Corpus: `\f` 1,209, `\h` 974, `\t` 184, `\g`
+  33, no other codes.
+- **Method:** decompilation; regular-expression count over the topics.
+- **Confidence:** proven
+
+### E-0107 — `gamedat.ksy` compiles and parses all of default.dat
+- **Binary/file:** `engines/gilbert/docs/formats/gamedat.ksy`
+- **Evidence:** kaitai-struct-compiler (`-t python`) compiles it; the generated parser reads
+  default.dat to offset 702,971 of 702,971 with 40 walkmaps, 3,712 events, books 227 177 17
+  33 0 0 0 0 0 0 and 1,182 anims, the same as `gamedat.py`.
+- **Method:** compile to Python in a temporary folder and run it on the file.
+- **Confidence:** proven

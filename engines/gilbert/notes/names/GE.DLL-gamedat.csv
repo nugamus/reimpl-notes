@@ -1,0 +1,67 @@
+address,name,evidence
+10002ce0,GameObj::GameObj,(class name ours: the game object has no RTTI name) GEInit 0x10002560 allocates 0x2fa40 bytes and calls it; builds the 17 CObLists (ctor 0x100154dd)
+100031f0,GameObj::LoadFile,GELoadFile; CFile mode 0x8000 + CArchive load; header then 17 CObList::Serialize
+100034e0,GameObj::SaveFile,GESaveFile; CFile mode 0x9001 + CArchive store; mirrors LoadFile
+100031a0,GameObj::StartNewGame,GEStartNewGame; DoEvent(1) then UpdateInventory
+100031c0,GameObj::ContinueGame,GEContinueGame; GotoWalkmap(+4 +8 +0xc +0x10) then UpdateInventory
+10002f90,GameObj::DeleteAll,deletes the objects of the 17 lists before LoadFile reads
+100037e0,GameObj::LoadTextFiles,GELoadTextFiles; strings db\walkmaps.txt .. db\dialogchoice.txt
+10003eb0,GameObj::LoadWalkmaps,"string ""LoadWalkmaps: %d Walkmaps loaded."""
+10004080,GameObj::LoadCUAs,"string ""LoadCUAs: %d CUAs loaded."""
+100042c0,GameObj::LoadObjects,"string ""LoadObjects: %d objects loaded."""
+10004600,GameObj::LoadBooks,"string ""LoadBook: %d topics loaded."""
+10004830,GameObj::LoadAnims,"string ""LoadAnims: %d Anims loaded."""
+10004a50,GameObj::LoadUseObjs,"string ""LoadUseObjs: %d useobjs loaded."""
+10004bc0,GameObj::LoadEvents,"string ""LoadEvents: %d events loaded."""
+10004ec0,GameObj::LoadDialogs,"string ""LoadDialogs: %d dialogs loaded."""
+10005070,GameObj::LoadDialogChoices,"string ""LoadDialogChoices: %d choices loaded."""
+10005290,GameObj::LoadTexts,"string ""LoadTexts: %d Texts loaded."""
+10005490,GameObj::GetVariable,GEGetVariable; returns this+0x4c+4*n for n < 200
+100054b0,GameObj::SetVariable,GESetVariable; stores this+0x4c+4*n for n < 200
+100054d0,GameObj::FindWalkmap,searches list +0x36c by CWalkmap +4
+10005500,GameObj::GetRadarRect,GEWalkmapGetRadarRect; reads CWalkmap +0xc..+0x18
+10005d70,GameObj::BuildIndexLists,after LoadFile: all CCUAs into +0x14 and all CObjs (and inventory) into +0x30
+10005e20,GameObj::FindCUA,searches list +0x14 by CCUA +8
+10005e40,GameObj::FindObj,searches list +0x30 by CObj +0xc
+10005eb0,GameObj::FindAnim,searches list +0x2fa24 by CAnim +8
+10005ee0,GameObj::FindUseObj,searches list +0x2f20c by CUseObj +4 and +8
+10005f10,GameObj::FindDialog,searches list +0x2f244 by CDialogs +0x20
+10005f40,GameObj::GetText,GETextGetText; searches list +0x2f264 by CText +4
+10005f70,GameObj::DoEvent,"strings ""DoEvent: NULLEVENT"", ""Event: %d"", ""*** No event found ***"""
+100060f0,GameObj::RunEvent,"strings ""EventID=%d, EventType=%d"", ""Jump if %d(%d) equals %d"" ..; switch on CEvent +8"
+100077e0,GameObj::IndexTopics,numbers the shown topics (+0x10) of each book into +0x14
+10007880,GameObj::FindTopic,book < 10: searches list +0x2f280+0x1c*book by CTopic +4
+10007b00,GameObj::BookParseNext,GEBookParseNext; tokenises the topic text (\f \g \h \t)
+10008170,GameObj::BuildWalkmapObjects,"fills +0x2f3dc with the walkmap's visible objects, anim from state +0xc"
+10008220,GameObj::BuildCUAObjects,"fills the count +0x2fa20 with the CUA's visible objects, anim from state +0x10"
+10008300,GameObj::ClearAnims,"string ""ClearAnim: Can't find anim %d"""
+10008520,GameObj::StepAnim,advances CAnim +4 by the elapsed ms; past +0x14 switches to anim +0xc and returns event +0x2c
+10008590,GameObj::Ellapsed,GEEllapsed; timeGetTime delta into StepAnim for each shown object
+10008750,GameObj::WalkmapGetObjectData,"GEWalkmapGetObjectData; string ""WalkmapGetObjectdata: Can't find animindex %d"""
+10008830,GameObj::CUAGetObjectData,"GECUAGetObjectData; string ""CUAGetObjectdata: Can't find animindex %d"""
+10008930,GameObj::CUAEnd,"GECUAEnd; strings ""CUAEnd: Done CUA""; runs CCUA +0x18"
+10008a20,GameObj::ClickObjectInCUA,"GEClickObjectInCUA; string ""ClickObjectInCUA: Object %d. Launching event %d"""
+10008b50,GameObj::ObjectToInventory,"GEObjectToInventory; string ""ObjectToInventory: Adding object %d to inventory"""
+10008cc0,GameObj::UseObjectOnObject,"GEUseObjectOnObject; string ""UseObjectOnObject: Can't use %d on %d"""
+10008da0,GameObj::InventoryGetObjectData,GEInventoryGetObjectData
+10008f60,GameObj::DialogEnd,GEDialogEnd; runs the chosen CDialogChoice's +0xc
+10008fa0,GameObj::GotoWalkmap,"string ""Goto Walkmap: Can't find Walkmap %d"""
+10009090,GameObj::GotoCUA,"string ""Goto CUA: Can't find CUA %d""; runs CCUA +0x10 on the first visit, else +0x14"
+10009190,GameObj::UpdateCUA,"string ""UpdateCUA: %d objects"""
+10009230,GameObj::UpdateInventory,"string ""UpdateInventory: %d objects"""
+10009300,GameObj::StartDialog,sets the current dialog +0x2f260 from FindDialog
+10009e40,CObj::SetState,sets +0x30 to the state with that number (else the first)
+10009e70,CObj::FindState,searches the states list +0x14 by CObjState +4
+1001565f,CObList::Serialize,vtable 0x10020564 slot 2; WriteCount/ReadCount then WriteObject/ReadObject per element
+1001a88d,CArchive::WriteObject,called by CObList::Serialize when storing; tags 0x7fff big index
+1001a90c,CArchive::ReadObject,called by CObList::Serialize when loading
+1001aab3,CArchive::WriteClass,writes 0xffff + CRuntimeClass::Store or 0x8000|index
+1001ab44,CArchive::ReadClass,reads the u16 tag: 0x7fff big tag; 0xffff new class; 0x8000 class index
+1001b38c,CArchive::WriteCount,u16 or 0xffff + u32
+1001b3ba,CArchive::ReadCount,u16 or 0xffff + u32
+1001ad12,CArchive::operator<<(CString),u8 length (0xff: u16; 0xffff: u32) then the bytes
+1001ade2,CArchive::operator>>(CString),reads the length through 0x1001ad8b; 0xfffe marks Unicode
+1001ad8b,AfxReadStringLength,u8; 0xff then u16; 0xfffe Unicode; 0xffff then u32
+100014c0,CArchive::operator>>(int),reads 4 bytes at the buffer cursor +0x24 (end +0x28)
+10001490,CArchive::operator<<(int),writes 4 bytes at the buffer cursor +0x24
+100154dd,CObList::CObList,sets vtable 0x10020564 and the block size
