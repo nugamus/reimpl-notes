@@ -708,3 +708,496 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   GetGammaRamp and SetGammaRamp; the interface is not identified by its IID.
 - **Method:** disassembly.
 - **Confidence:** tentative (Q-0206)
+
+### E-0400 — GEInit, GEExit, the export wrappers and which ge.dll function calls each call-back
+- **Binary/file:** `/gilbert-import/GE.DLL`
+- **Evidence:** `GEInit` 0x10002560 stores arguments 1..22 in 0x1002860c, 0x10028608,
+  0x10028604, 0x10028600, 0x100285fc, 0x100285f8, 0x100285f4, 0x100285f0, 0x100285e4,
+  0x100285ec, 0x100285e8, 0x100285e0, 0x100285dc … 0x100285b8 (13..22 descending), then
+  `new` 0x2fa40 → `GameObj::GameObj` 0x10002ce0: +0x388 walkmap := 0, +0x38c CUA := 0,
+  PathMap ctor 0x10009350 on +0x390 (items, directions, count := 0), +0x2f1cc := 0, +0x2f1d0
+  (stopped) := 1, +0x2f260 dialogue := 0, +0x2fa1c/+0x2fa20 counts := 0, then
+  `srand(time(0))` (0x1000bc49 / 0x1000bc78). `GEExit` calls the virtual destructor and
+  clears the pointer 0x10028610; every export tests it first and returns 0, "" (0x100284e4)
+  or, for `GETextGetText`, 0. Cross-references to the call-back slots (capstone sweep of
+  `.text`): 1 GotoWalkmap 0x10008fa0; 2 GotoWalkmap and RefreshWalkmap 0x10009080 (called by
+  CUAEnd 0x10008930 and Ellapsed 0x10008590); 3 GotoCUA 0x10009090; 4 GotoCUA and UpdateCUA
+  0x10009190; 5 UpdateInventory 0x10009230; 6 StartDialog 0x10009300; 7, 8, 10, 11, 12, 21
+  RunEvent 0x100060f0; 13, 14 SaveFile 0x100034e0, PathNewPath 0x100055a0, PathEllapsed
+  0x10005890; 15, 16 PathNewPath, PathEllapsed; 17, 18, 19 PathNewPath; 20 PathEllapsed and
+  PathStop 0x10005d00; 9 and 22 only stored. `GameObj::Log` 0x10009340 is a bare `ret`.
+- **Method:** decompilation (`engines/gilbert/notes/decomp/`), disassembly; names in
+  `notes/names/GE.DLL-logic.csv`, applied to the project.
+- **Confidence:** proven
+
+### E-0401 — GEEllapsed and StepAnim: the tick
+- **Binary/file:** `/gilbert-import/GE.DLL` 0x10008590, 0x10008520
+- **Evidence:** Ellapsed: dt = timeGetTime() − +0x2f3d8, +0x2f3d8 := now; if +0x38c (CUA)
+  is 0 it steps the +0x2fa1c objects of +0x2f3dc, else the +0x2fa20 objects of +0x2f56c,
+  collecting each end event in a local array; if any step returned 1: RefreshWalkmap
+  (call-back 2) resp. UpdateCUA, then DoEvent for each nonzero end event in array order;
+  PathEllapsed(0) at the end in both branches. StepAnim: anim = state(+0x30)+0x28; skipped
+  if 0 or duration +0x14 is 0; `if (duration < time + dt)`: out = +0x2c, time := (time + dt)
+  % duration, state +0x28 := FindAnim(+0xc) if found, new anim time := 0, return 1; else
+  time := (time + dt) % duration, return 0. BuildWalkmapObjects and BuildCUAObjects(1) set
+  +0x2f3d8 := timeGetTime().
+- **Method:** decompilation.
+- **Confidence:** proven
+
+### E-0402 — The walkmap and CUA object arrays, ClearAnims, BuildSort, GetObjectData
+- **Binary/file:** `/gilbert-import/GE.DLL`; `default.dat`
+- **Evidence:** BuildWalkmapObjects 0x10008170 walks the current walkmap's CUA list (+0x20
+  head) and each CUA's object list (+0x24 head), keeps objects with +0x10 ≠ 0 whose state
+  +0xc anim exists, sets state +0x28 to it, stops at 100 (`99 < n`), then ClearAnims
+  0x10008300, timeGetTime, BuildSort 0x10007e90. BuildCUAObjects 0x10008220 (disassembly:
+  stores into +0x2f56c) keeps visible objects of the current CUA whose state +0x10 anim
+  exists, no +0x28 store, ClearAnims + time only when its argument ≠ 0, then 0x10008000.
+  ClearAnims, per listed object, per state (CObList::FindIndex 0x10015616 over +0x14, count
+  +0x20): anim field +0xc (walkmap) or +0x10 (CUA), skipped if 0, FindAnim or return 0,
+  state +0x28 := anim, anim +4 := 0. BuildSort (both): selection by `if (best <= z)` with
+  best from 0, z = FindAnim(state +0xc / +0x10)+0x24, into a scratch array 800 bytes on,
+  copied back. WalkmapGetObjectData 0x10008750 writes code (state +4 + obj +0xc × 100),
+  anim(+0x28)+0x28, state +0x1c, anim +0x1c, anim +0x20, state +0x20, state +0x24, returns
+  1; CUAGetObjectData 0x10008830 takes x/y from FindAnim(state +0x10) and the picture from
+  state +0x28 (−1 when 0). Corpus (`engines/gilbert/tools/logic_stats.py`): 1,182 anims,
+  1,181 IDs (40340 twice), no ID 0, z 0..10, duration 0 in 460, next = own ID in 470, end
+  events in 58, 5 anim IDs used by two objects of one walkmap or CUA; at most 72 objects
+  per walkmap and 31 per CUA.
+- **Method:** decompilation and disassembly; `python engines/gilbert/tools/logic_stats.py`.
+- **Confidence:** proven
+
+### E-0403 — What the EXE does with the object data: pictures, positions, inventory icons
+- **Binary/file:** `GILBERT.EXE` 0x474964, 0x474a38, 0x474afc, 0x479544, 0x4796f8;
+  `Data/maps/<room>/w<room>o.wxi`, `cua<id>.wxi`, `Data/maps/!global/inventory.wxi`
+- **Evidence:** call-back 2 (0x474964) calls GEWalkmapGetObjectData(i, rec, rec+4, rec+8,
+  rec+0x10, rec+0x14, rec+0x18, rec+0xc) into 0x2c-byte records, takes item `rec+4` of the
+  image list at [+0x2f4]+0xdc4 → +0x58, gets its rectangle and stores (x + 64, y + 50,
+  x + 64 + …, y + 50 + …) with x, y = rec+0x10, rec+0x14; call-back 4 (0x474a38) does the
+  same with GECUAGetObjectData and the list at +0x50. Call-back 5 (0x474afc):
+  GEInventoryGetObjectData(i, rec, rec+8, rec+0xc). The inventory draw (0x4796f8) draws
+  item 0 of the list at +0x4c with pattern `rec+8` in a 6-column grid (26 px rows); the
+  carried-object cursor (0x479544) draws item 0 of TgMain+0x31c (DXImageList7 =
+  `inventory.wxi`, E-0205) with pattern `rec+8` of the CUA or inventory record.
+  `inventory.wxi` holds one picture 3,563×20 with PatternWidth 22 (161 patterns); state
+  +0x1c ranges 0..160. Every CUA anim +0x28 of a CUA's objects is below the item count of
+  that CUA's `cua<id>.wxi` (477/477), every walkmap anim +0x28 below that of `w<room>o.wxi`
+  (27/27).
+- **Method:** disassembly (capstone); `wxi.py`; `logic_stats.py`.
+- **Confidence:** strong (the collections behind +0x50/+0x58 are inferred from the counts;
+  the rooms spec loads them)
+
+### E-0404 — Places, objects and inventory exports
+- **Binary/file:** `/gilbert-import/GE.DLL`
+- **Evidence:** GotoWalkmap 0x10008fa0: PathStop, FindWalkmap → +0x388, if found
+  BuildWalkmapObjects, call-back 1(id, x, y, arg4, 0), call-back 2. GotoCUA 0x10009090:
+  PathStop, FindCUA over +0x14 (all CUAs, BuildIndexLists 0x10005d70) → +0x38c, if found
+  BuildCUAObjects(1), call-back 3(id), call-back 4, then DoEvent(+0x10) and +0x1c := 0 when
+  +0x1c ≠ 0, else DoEvent(+0x14); its first argument is unused. CUAEnd 0x10008930: returns 0
+  without a CUA; keeps +0x18, clears +0x38c, BuildWalkmapObjects + call-back 2 if +0x388,
+  then DoEvent. WalkmapAreaHit 0x10008710: DoEvent(n % 100 + (+0x388)+4 × 100).
+  GetRadarRect 0x10005500: with a CUA, rect of CUA +4 (its walkmap, set by
+  BuildIndexLists), else of +0x388, else zeros; `GEWalkmapGetRadarRect` returns left, top,
+  right − left, bottom − top. ClickObjectInCUA 0x10008a20: DoEvent(state +0x14) only if
+  state +0x20 = 0. ObjectToInventory 0x10008b50: CObList::Find on owner +4 → +0x20, RemoveAt,
+  owner := 0, AddTail +0x2f1d4, DoEvent(state +0x18), BuildCUAObjects(0), UpdateCUA,
+  UpdateInventory. UseObjectOnObject 0x10008cc0: FindUseObj(+4, +8) → DoEvent(+0xc) and the
+  three updates. UpdateInventory: RemoveAll +0x2f1f0, AddTail each +0x2f1d4 object with
+  +0x10 ≠ 0, call-back 5. InventoryGetObjectData 0x10008da0 walks +0x2f1f4 (head of
+  +0x2f1f0); GEInventoryGetNumObjects → +0x2f1fc. FindObj 0x10005e40 searches +0x30, which
+  BuildIndexLists fills with every CUA's objects and the inventory at load time. CObj
+  default ctor 0x10009cf0 sets owner +4 := 0; CObjState ctor 0x1000a140 sets +0x28 := 0.
+- **Method:** decompilation.
+- **Confidence:** proven
+
+### E-0405 — Event types: the effects, their call-backs and order; SetState's fallback
+- **Binary/file:** `/gilbert-import/GE.DLL` 0x100060f0, 0x10009e40; `default.dat`
+- **Evidence:** RunEvent per case (decompilation and, for 22, disassembly 0x1000742f..): 1
+  Find on +0x2f1d4 → delete (vtable +4, 1), RemoveAt, UpdateInventory; else Find on owner
+  +0x20 → delete, RemoveAt, BuildCUAObjects(0), UpdateCUA. 2 SetState, 0x100082c0,
+  BuildCUAObjects(0), UpdateCUA. 3 error unless +0x1c and +0x20 ≠ 0, GotoCUA. 4 CUAEnd if
+  +0x38c ≠ 0, GotoWalkmap(+0x1c, +0x50, +0x54, +0x58). 5 FindTopic, +0x10 := 1, IndexTopics,
+  call-back 21(1). 6 +0x40 length 0 → call-back 7(+0x38, +0x3c, +0x48, 0), else call-back
+  10(+0x40, +0x48, +0x44). 7 returns early if owner +4 = 0 or Find fails; RemoveAt, owner
+  := 0, AddTail inventory, SetState(+0x24 % 100), +0x10 := 1, UpdateInventory,
+  BuildCUAObjects(0), UpdateCUA. 8 inventory branch of 1 only. 9 StartDialog(+0x34). 10
+  call-back 12(+0x4c) if its first byte ≠ 0. 12/13 FindObjWithState 0x10005e60 then
+  FindState → +0x20 := 1/0. 14 SetState(state +4 + 1), 0x100082c0, BuildCUAObjects(0),
+  UpdateCUA. 15/16: FindAnim(state +0x10) else log and leave; state +0x28 := anim, time 0;
+  +0x10 := 1/0; (15: 0x100082c0); BuildCUAObjects(0), UpdateCUA, UpdateInventory. 17
+  call-back 8(+0x38, +0x3c) or call-back 11(). 21 +0x10 := 0, IndexTopics, call-back 21(0).
+  22: both FindTopic, requires t2 title or text non-empty; t.title = t.title + t2.title,
+  t.text = t.text + t2.text (CString operator+ 0x10016122), t2's strings := empty;
+  IndexTopics, then +0x10 := 1, call-back 21(1). SetState: FindState, else
+  `FindIndex(+0x14, 0)` — a list node, not its data — stored in +0x30. Corpus
+  (`logic_stats.py`): object and state exist for all type 2 (314), 7 (163), 12 (30), 13 (1)
+  records; state + 1 exists for all 7 type-14 records; every type-15/16 object has a CUA
+  anim in some state (96, 51); type 3 walkmap operand = the CUA's walkmap in 76/117 (the
+  rest mostly CUA 999 from other walkmaps); no type-18 record jumps to its own ID; all 127
+  type-22 targets are shown in default.dat.
+- **Method:** decompilation, disassembly; `logic_stats.py`.
+- **Confidence:** proven
+
+### E-0406 — Sound operands: list, index, loop and stream kind (event 6)
+- **Binary/file:** `/gilbert-import/GE.DLL` RunEvent case 6; `GILBERT.EXE` 0x4748dc,
+  0x474804; `default.dat`
+- **Evidence:** case 6 passes (+0x38, +0x3c, +0x48, 0) to call-back 7 and (+0x40, +0x48,
+  +0x44) to call-back 10 (E-0405). Call-back 7 = 0x4748dc: PlayWave(arg1, arg2, arg3 ≠ 0,
+  arg4 ≠ 0) (0x475624, boot spec's PlayWave(list, index, looped, wait)). Call-back 10 =
+  0x474804(name, loop, kind): kind 0 plays `name` as room music (only if it differs from the
+  current room music name, which it then remembers), kind 1 stops all and plays the
+  dialogue stream, kind 2 stops all and calls 0x47513c; each with `loop`. Corpus: 670 named
+  records, +0x44 = 0 in 214 and 1 in 456, +0x48 = 1 in 213; one numbered record (list 2,
+  index 0, loop 0).
+- **Method:** decompilation (`GILBERT.EXE__FUN_00474804.c`), disassembly; `logic_stats.py`.
+- **Confidence:** proven
+
+### E-0407 — Dialogues, texts and variables
+- **Binary/file:** `/gilbert-import/GE.DLL`
+- **Evidence:** StartDialog 0x10009300: PathStop, FindDialog → +0x2f260 (0 if none),
+  call-back 6. DialogGetTitle 0x10008e10 / GetText 0x10008e70: CDialogs +0x24 / +0x28, or
+  "\*NO DIALOG\*" (0x10026da0) without a dialogue. GetNumChoices 0x10008ed0: CDialogs +0x10
+  (the choice list's count) or 0. GetChoice 0x10008ef0: FindIndex(+4, i) → choice +8, else
+  "\*NO CHOICE\*" (0x10026dac). DialogEnd 0x10008f60: +0x2f260 := 0, then FindIndex and
+  DoEvent(choice +0xc). GetText 0x10005f40: first CText with +4 = id → +8, else ""
+  (0x10028638). GetVariable 0x10005490 returns 0 for n > 199; SetVariable 0x100054b0 stores
+  for n < 200; neither checks n < 0.
+- **Method:** decompilation; string dump.
+- **Confidence:** proven
+
+### E-0408 — Book exports and the topic parser in detail
+- **Binary/file:** `/gilbert-import/GE.DLL` 0x100077e0, 0x10007840..0x10007b00; `default.dat`
+- **Evidence:** IndexTopics numbers each book's +0x10 ≠ 0 topics into +0x14 from 0 (else
+  −1) and their count into +0x2f398[book]. FindTopicByRank 0x10007840 searches the book by
+  +0x14. GetNumBookTypes 0x100078c0 counts books until one whose list count (+0x2f28c +
+  0x1c·n) is 0; GetNumTopics 0x100078e0 returns +0x2f398[book], 0 for book > 9; GetTopicTitle
+  0x10007900 / GetTopic 0x10007a20: +8 / +0xc by rank, "" for book ≥ 10 or no match;
+  GetTopicFromIndex 0x10007a00: +4 by rank or 0; GetIndexFromTopic 0x100079c0: +0x14 of the
+  topic with that +4 or 0 (no book bound check). ParseFirst 0x10007ae0: cursor +0x2f3c0 :=
+  text, ParseNext. ParseNext 0x10007b00: numbers through 0x1000be87 (C `atol`: white space,
+  sign, digits), digits skipped with the ctype digit test 0x1000bf1d, one ' ' skipped after
+  \f, \g, \h; \h stores the topic only after ':'; `\t` returns 6 without skipping; another
+  `\x` leaves the cursor on x with text "\" (0x10026bfc); LF (10) text "\n" (0x10026bf4) → 7;
+  ' ' text " " → 1; a byte < 0x20 is skipped before a run; runs end at '\', a byte 0..0x20
+  or NUL (signed compare: bytes ≥ 0x80 continue the run); an empty run sets "". default.dat:
+  books 0..3 non-empty, 4..9 empty; shown at start 15, 177, 17, 33.
+- **Method:** decompilation and disassembly; `gamedat.py`.
+- **Confidence:** proven
+
+### E-0409 — The path finder: grid, walkable cells, search, step cost, path arrays
+- **Binary/file:** `/gilbert-import/GE.DLL` 0x100055a0, 0x10009350..0x10009c30;
+  `GILBERT.EXE` 0x4742e8, 0x4742f0, 0x472bf6
+- **Evidence:** PathNewPath: call-backs 18 (h), 17 (w), 16, 15; "Path: Gridsize invalid" if
+  15 or 16 returns 0; start = (cb13 / cb15, cb14 / cb16) unsigned, target = (x / cb15, y /
+  cb16) signed; "Invalid map size" unless w < 0x65 and h < 0x51; PathMap +4 := w, +8 := h;
+  cells[x + 100y] (+0xc) := call-back 19(x, y); FindPath 0x100095a0; success → PathEllapsed(1)
+  and return 1, else PathStop and return 0. The EXE's call-backs 15 and 16 are `mov eax,
+  0x10; ret`; it calls GEPathNewPath(mouse x − [0x47d1b0], mouse y − [0x47d120]), the same
+  offsets call-backs 13/14 subtract from Gilbert's sprite position. Walkable 0x10009930:
+  PtInRect(+0x2ee10), cell 1 → no, 0 → yes, else cell = cell(target +0x2ee28/+0x2ee2c).
+  FindPath: ResetNodes 0x100094f0 (nodes of 0x14 bytes at +0x7d0c: parent, next, x, y, cost
+  0x7fffffff); rect = NormalizeRect(start, target) → InflateRect(3, 3, 4, 4) (0x1001c167:
+  left −= 3, top −= 3, right += 4, bottom += 4) → IntersectRect with (0, 0, w, h); Search
+  0x10009b60; if target +0 (parent) = 0: reset, rect = (0, 0, w, h), Search again; count the
+  parent chain from the target; fewer than 2 nodes → 0; else allocate count − 1 directions
+  (+0x2ee30) and cells (+0x2ee34), count at +0x2ee38 (GameObj +0x2f1c0/+0x2f1c4/+0x2f1c8),
+  filled backwards: direction = table 0x10026e2c[(dy·3 + dx) + 4] = 3 2 1 4 0 0 5 6 7, cell
+  = the parent's x, y. Search: tail +0x2ee0c := start, cost 0, loop Expand, next, clear next.
+  Expand 0x10009a70: skip the target; TryStep 0x100099c0 for (x+1,y) 0, (x+1,y−1) 1, (x,y−1)
+  2, (x−1,y−1) 3, (x−1,y) 4, (x−1,y+1) 5, (x,y+1) 6, (x+1,y+1) 7: PtInRect, Walkable,
+  StepCost(x, y, tx, ty, d), Relax 0x100098d0: c = from.cost + cost; `jge` to.cost ≥ c →
+  cost, parent; appended when to.next = 0 and to ≠ tail. StepCost 0x100097d0 (x87 code):
+  fild dx = tx − x, ndy = y − ty; dx ≠ 0: fpatan(ndy/dx, 1) × 57.29577951307855 (0x100204e8),
+  __ftol; dx = 0: 0, 90 or −90; dx < 0: +180; `(angle + 45·(16 − d)) mod 360` (idiv),
+  ≥ 180 → 359 − r; (r + 22.5 (0x100204e0)) × 0.0222… (0x100204d8) + 1.0, × 1.41 (0x100204c8)
+  for odd d, __ftol. `GEPathGetItem` returns +0x2f1c4[i] or (0, 0); `GEPathGetMapData` →
+  PathMap::GetCell 0x100094b0 (0 outside).
+- **Method:** decompilation and disassembly (capstone); constants read from the image.
+- **Confidence:** proven
+
+### E-0410 — Path stepping and the direction codes (settles GotoWalkmap's fourth argument)
+- **Binary/file:** `/gilbert-import/GE.DLL` 0x10005890, table 0x10026190; `GILBERT.EXE`
+  0x4743ac, 0x47491c, 0x47a6ed, 0x4765d2..0x4768da
+- **Evidence:** PathEllapsed(start): call-back 20(table[dirs[0]]), target := items[count > 1],
+  +0x2f1cc := 1, +0x2f1d0 := 0, flag 0x10028618 and distance 0x10028634 := 0, last position
+  := call-backs 13/14. PathEllapsed(0), when +0x2f1d0 = 0 and count ≠ 0: index ≥ count →
+  call-back 20(−1), +0x2f1d0 := 1; Gilbert's cell (cb13/cb15, cb14/cb16) = target →
+  call-back 20(table[dirs[k]]), k + 1, target := items[min(k, count − 1)], flag and distance
+  := 0; else distance += __ftol(fsqrt(dx² + dy²)) (0x10005c03), last := position; distance²
+  > cb16² + 2·cb15² sets the flag, ≤ returns unless the flag is set; then 8 if cell x <
+  target x, 0x18 if >, else 0x10 if cell y < target y (or equal), else 0; call-back 20 with
+  it. Table 0x10026190 = 8 4 0 28 24 20 16 12 for direction indices 0..7. PathStop 0x10005d00:
+  call-back 20(−1), +0x2f1d0 := 1. EXE call-back 20 (0x4743ac) sets the walking key set
+  [0x47d2f8]: codes 4, 8, 12 → 0x08, 20, 24, 28 → 0x04, 0, 4, 28 → 0x01, 12, 16, 20 → 0x02,
+  others clear them; the look-ahead in 0x476c00 moves x −16 for 0x04, +16 for 0x08, y −16
+  for 0x01, +16 for 0x02, so 0 N, 4 NE, 8 E, 12 SE, 16 S, 20 SW, 24 W, 28 NW. Call-back 1
+  (0x47491c) stores its fourth argument as a byte at +0xc of [0x47d6ac]; the room loader
+  (0x47a6ed) copies it to Gilbert's sprite +0x68, which the walking code sets to 4, 28,
+  12, 20, 16, 24, 8 (and one computed value) per direction (0x4765d2..0x4768da). CEvent
+  +0x58 in type 4: 0 (108), 4 (4), 8 (22), 12 (5), 16 (49), 20 (3), 24 (36), 28 (12).
+  SaveFile writes 0 for it (E-0102).
+- **Method:** decompilation and disassembly; data dump of the Delphi set constants
+  0x47451c.. (08, 04, 01, 02); `logic_stats.py`.
+- **Confidence:** proven
+
+### E-0411 — Control-map areas: the EXE's area hits and the events they reach (settles Q-0002)
+- **Binary/file:** `GILBERT.EXE` 0x476c00, 0x476cbc, 0x47055d; `/gilbert-import/GE.DLL`
+  0x10008710; the 39 `ctrl*.map`, `default.dat`
+- **Evidence:** 0x476c00 (called from the eight walking branches 0x476589..0x4768a8): Gilbert's
+  position (call-backs 13/14) moved 16 px along the walking keys, cell value v from map
+  layer 3 at (x >> 4, y >> 4) (the call-back 19 source); if 0x476cbc (Gilbert's current cell
+  is one of GEPathGetItem's cells) and 2 ≤ v ≤ 31: GEWalkmapAreaHit(v − 1). In game mode the
+  button item 0x27 (`ibutt15`) plays wave 1/4 and calls GEWalkmapAreaHit(99999)
+  (0x47055d via 0x470402). ge.dll adds walkmap × 100 (E-0404). Corpus: for 245 of the 247
+  (room, value ≥ 2) pairs of the control maps an event `room × 100 + v − 1` exists (missing:
+  room 556 value 10, room 558 value 10); values 0 and 1 in 38 rooms, 2..10, 12..16, 22..29
+  elsewhere; events `w × 100 + 99` exist for 32 walkmaps, e.g. 10099 = type 3 to CUA 999,
+  comment "Till karta för snabb förflyttning". With E-0409's walkable rule: 0 floor, 1 wall,
+  ≥ 2 an area (walkable only towards the same area, and reporting its event).
+- **Method:** disassembly; `logic_stats.py`; `gamedat.py` dump.
+- **Confidence:** proven (ge.dll side and the value mapping); the layer-3 source of the
+  cells is the rooms spec's
+
+### E-0412 — New game, continue, load and save: what they run
+- **Binary/file:** `/gilbert-import/GE.DLL` 0x100031a0, 0x100031c0, 0x100031f0, 0x100034e0
+- **Evidence:** StartNewGame: DoEvent(1), UpdateInventory. ContinueGame: GotoWalkmap(+4,
+  +8, +0xc, +0x10), UpdateInventory. LoadFile (after DeleteAll 0x10002f90): the lists, then
+  IndexTopics, BuildIndexLists, owner +4 of every CUA's objects; it does not touch +0x388,
+  +0x38c, +0x2f260 (the EXE always loads into a fresh object after GEExit/GEInit, boot spec
+  E-0214). SaveFile writes the current walkmap +4, call-backs 13 and 14, 0, then the lists
+  as they are in memory (E-0100).
+- **Method:** decompilation.
+- **Confidence:** proven
+
+### E-0300 — room::Load 0x47a190: GotoWalkmap's files, lists, start scroll and position
+- **Binary/file:** `GILBERT.EXE` 0x47491c (GEInit callback 1), 0x47a190, 0x4612a4, 0x44f5c4;
+  `GE.DLL` GEInit, GameObj::GotoWalkmap 0x10008fa0; `Data/maps/<n>/`
+- **Evidence:** callback 1 (stdcall, `ret 0x14`) stores its arguments in the record 0x480a6c:
+  +0 walkmap, +4 x, +8 y, +0xc byte (argument 4), +0xd := (argument 5 ≠ 0), then calls
+  0x47a190. 0x47a190: sound::StopAll; if the current room 0x47ced4 ≠ −1 → FadeOut 0x477eac
+  (E-0301); shown 0x47ce68 := 0; DXTimer1.Enabled := False; 0x47ce78 := 1; mode 0x47ce74 :=
+  0x99. Only when the walkmap differs from 0x47ced4: clear DXImageList4 (+0x310), 5
+  (+0x314), 10 (+0x328); ResolvePath of `\data\maps\` + IntToStr(n) + `\` + `w`/`ctrl` + n +
+  `.wxi`/`m.wxi`/`.map`/`o.wxi` (strings 0x47a7bc, 0x47a7d0, 0x47a7dc, 0x47a7e8, 0x47a7f8,
+  0x47a808, 0x47a818, 0x47a828); load `w<n>o.wxi` → DXImageList10, `w<n>.wxi` →
+  DXImageList4, `ctrl<n>.map` → TDxMaps.LoadFromFile 0x44f5c4 on screen+0xdc8 (the
+  TMaplibHolder) +0x30 (Maplib3 = DxMapLib3) +0x24, `w<n>m.wxi` → DXImageList5. Then 0x47ceac
+  := +0xd (no other reader: its pointer cell 0x47d5d8 is used once); 0x47ced4 := n;
+  UpdateLayerSize(3), UpdateLayerSize(4). Start scroll, x = +4: x ≥ 512 → sx := 256 − x,
+  raised to −(holder+0x11c − 512) if below; x < 512 → sx := 0; sprite X (+0x1c double) :=
+  |x| − |sx|. y = +8 the same with 320, 160 and holder+0x13c − 320 → sprite Y (+0x24). Then
+  0x47ce60 := sx + 64, 0x47ce64 := sy + 50; the direction set 0x47ce54 := the 5 bytes at
+  0x47a830 (all zero); sprite +0x68 := byte +0xc; mode := 0x47ce78 (1); RefreshWalkmapObjects
+  0x474964; GEWalkmapGetRadarRect → 0x47ce7c, 0x47ce80, 0x47ce84, 0x47ce88; object count
+  0x47ced0 := 0; if the room music name 0x47cf08 ≠ '' → PlayRoomMusic(name, 1);
+  DXTimer1.Enabled := True. ge.dll's GotoWalkmap calls callback 1 with (walkmap, x, y,
+  argument 4, 0) and then callback 2 (GEInit stores argument 1 in 0x1002860c, 2 in
+  0x10028608). TMaplibHolder (screen+0xdc8) per layer k = 1..8: Maplib +0x24 + 4k, Tilelib
+  +0x44 + 4k, PatternTile +0x67 + k, ShowTiles +0x6f + k, AutoMap +0x77 + k, columns +0xcc
+  + 4k, rows +0xec + 4k, width +0x10c + 4k, height +0x12c + 4k (UpdateLayerSize: AutoMap →
+  item 0's picture size and size ÷ pattern size; else the map's cells × item 0's pattern
+  size). The form (notes/exe-forms.md): Maplib3 = DxMapLib3, Tilelib2..5 = DXImageList2..5,
+  ShowTiles3 = False, AutoMap3 = False, all others True. Corpus: 38 room folders (100 … 650),
+  each with `w<n>.wxi`, `w<n>m.wxi`, `w<n>o.wxi`, `ctrl<n>.map` and `cua999.wxi`; in all 38
+  the room and `m` pictures are one item each, the same size, 64×64 patterns, Transparent
+  with clFuchsia, width and height multiples of 64 and equal to the control grid × 16;
+  `map.wxi` (Tilelib3) is one 512×16 item with 16×16 patterns. default.dat's walkmaps 900 and
+  999 have no folder. The `o` pictures: 182 items, PatternWidth/Height 0, Transparent, 62
+  clFuchsia, 120 clBlack, 52 of the latter without Picture.Data.
+- **Method:** capstone disassembly (a scratch annotator in `build/`); ge.dll decompiles in
+  `notes/decomp/`; `wxi.py`/`ctrlmap.py` parsing of every room folder.
+- **Confidence:** proven
+
+### E-0301 — Room fades: FadeOut 0x477eac, FadeIn 0x477f20
+- **Binary/file:** `GILBERT.EXE` 0x477eac, 0x477f20, 0x478674
+- **Evidence:** FadeOut (its argument 0x40 unused): for i = 0..255: work ramp 0x48108c (red
+  +0, green +0x200, blue +0x400, words) entry i := saved ramp 0x480a8c entry i shr 2 (each
+  channel), then SetGammaRamp(0, work) (primary+0x90, slot 4) — 256 calls, no clock.
+  FadeIn: for i = 255 down to 0: 0x48168c, 0x481690, 0x481694 := 0 (no other reader); work
+  entry i := saved entry i; SetGammaRamp(0, work); after the loop shown 0x47ce68 := 1. The
+  work ramp is zero-initialised data and is only written by these two functions. room::Draw
+  calls SetGammaRamp(0, saved) after FadeIn (E-0302).
+- **Method:** disassembly; pointer-cell reference search for the three globals.
+- **Confidence:** proven (the calls); the interface itself: Q-0206; the duration: Q-0300
+
+### E-0302 — room::Draw 0x478674 and TMaplibHolder::DrawLayer 0x461bc0
+- **Binary/file:** `GILBERT.EXE` 0x478674, 0x461bc0, 0x46248c, 0x479544
+- **Evidence:** only when CanDraw. X := Trunc(sprite +0x1c), Y := Trunc(+0x24); Fill(back,
+  0); DrawLayer(3, origin (0x47ce60, 0x47ce64), Rect(X, Y, X + 96, Y + 96)); DrawLayer(4, the
+  origin, Rect(64, 50, 576, 370)); DrawObjectsAndGilbert 0x47897c; DrawLayer(5, the origin,
+  Rect(X, Y, X + 96, Y + 96)); DrawRoomPanel 0x46dce8. If shown = 1 → DrawCarriedObject
+  0x479544 (carried CUA object 0x47cec0 from the records 0x482810 and inventory object
+  0x47cebc from 0x48396c, inventory.wxi, at the mouse − 16 and − the grab offset
+  0x47cec8/0x47cecc). If shown = 0: Flip; the same five steps again; Flip; FadeIn;
+  SetGammaRamp(0, saved); shown := 1. DrawLayer(holder EAX, layer DX, dest ECX; stack: a
+  flag never read, the rectangle R, origin y, origin x, and three zero words overwritten as
+  first column, first row, map index; `ret 0x1c`): nothing if ox > clip right (screen
+  +0x280) or oy > clip bottom (+0x284) or ox > R.right or oy > R.bottom; tile size = item
+  0's pattern size of the layer's Tilelib; if ox < clip left (+0x278) and ox < R.left:
+  first column c0 := (R.left − ox) div tile width, x := ox + c0·tile width (rows the same
+  with +0x27c and R.top); rows while y < clip bottom and y < R.bottom and row < rows; per
+  row, columns while x < clip right and x < R.right and column < columns; tile index =
+  (r0 + row)·columns + c0 + column when AutoMap, else the map cell; drawn only when
+  ShowTiles: PatternTile → Draw(item 0, x, y, pattern index), else Draw(item index, x, y,
+  pattern 0). The clip rectangle is (64, 50, 576, 430) (E-0200).
+- **Method:** disassembly, the layer switch tables 0x461c15 and 0x462527 decoded.
+- **Confidence:** proven
+
+### E-0303 — room::DrawObjectsAndGilbert 0x47897c: depth split, shadow, frame
+- **Binary/file:** `GILBERT.EXE` 0x47897c, 0x463d8c, 0x45c2a4; `Data/anims/gilbert.wxi`
+- **Evidence:** only when CanDraw. Pass 1, i = count 0x47ced0 − 1 down to 0 over the records
+  0x4816b4 (0x2c bytes): h := GetHeight(DXImageList10 item rec+4) (PatternHeight, else the
+  picture height, 0x463c30); if not (sprite Y + 96.0 (single at 0x479014) < oy + rec+0x14 +
+  h) → Draw(item, back, ox + rec+0x10, oy + rec+0x14, pattern 0). Shadow: if the frame
+  0x47cea4 ≤ 0x77 → DrawAlpha(gilbert.wxi item 1, back, Rect(X, Y, X + 96, Y + 96), pattern
+  = frame, alpha 0x46); else by sprite +0x68 (byte table 0x478b2a, jump table 0x478b47): 0 →
+  pattern 15, 4 → 60, 8 → 30, 12 → 90, 16 → 105, 20 → 75, 24 → 0, 28 → 45, other values →
+  no shadow. Gilbert: Draw(gilbert.wxi item 0, back, Trunc(X), Trunc(Y), frame). Pass 2: the
+  same loop, drawing the records pass 1 skipped. DrawAlpha 0x463d8c (EAX item, EDX dest, ECX
+  rect, stack pattern then alpha, `ret 8`): pattern in range → the surface blend 0x45c2a4
+  with the pattern's source rectangle and the item's Transparent flag, which picks blend 8
+  for alpha < 255 and 1 (copy) at 255. gilbert.wxi: item 0 `gilbert` 20,736×96, 96×96
+  patterns (216), fuchsia; item 1 `all` 14,391×120, 4 bpp, 120×120 patterns (119), fuchsia —
+  black silhouettes (looked at).
+- **Method:** disassembly; pictures rendered to PNG and looked at.
+- **Confidence:** proven (order, tests, patterns); the scaling of the 120×120 shadow into the
+  96×96 rectangle: strong (DelphiX's rectangle blend), Q-0301
+
+### E-0304 — Gilbert's movement: TPlayerSprite::DoMove 0x476520, the move count, Ctrl
+- **Binary/file:** `GILBERT.EXE` VMT 0x475b20 (slot +8 = 0x476520), 0x469fa0, 0x474108,
+  0x465a48, 0x464f5c, 0x446040, 0x47b740
+- **Evidence:** mode 1 of the main loop: 0x478674, 0x4728ec, 0x474108, (dialogue open
+  0x47cf94: 0x4740fc (empty), 0x473f74, 0x479018), 0x469854 on DXInput1,
+  DXSpriteEngine1.Move(1000 div (LagCount + 0x47cea8)) (0x465a48 → TSprite.Move 0x464f5c:
+  DoMove when +0x19, then the children), DrawCursor, Flip, stream updates (0x484ac8 when
+  0x47cee4 = 1 and shown = 1; 0x484acc when 0x47cee8; 0x484ad0 when 0x47ceec; 0x484ad4 when
+  0x47cee4; 0x484ad8 when 0x47cef4). 0x474108: GetAsyncKeyState(VK_CONTROL (0x11)) < 0 →
+  0x47cea8 := 20, else 30 (ResetState: 30). TDXTimer idle 0x446040: when timeGetTime − last ≥
+  Interval: LagCount := Max((elapsed) div Max(Interval, 1), 1). DoMove(MoveCount m):
+  inherited DoMove (TImageSprite 0x4651b8, AnimSpeed never set); f := Trunc(+0x5c single);
+  then by the set 0x47ce54 (bits 1 up, 2 down, 4 left, 8 right), first match: up+right: Y −=
+  m·0.053, X += m·0.053, base 60, +0x68 := 4; up+left: Y −, X −, 45, 28; down+right: Y +, X
+  +, 90, 12; down+left: Y +, X −, 75, 20; up: Y −= m·0.075, 15, 0; down: Y +, 105, 16; left: X
+  −= m·0.075, 0, 24; right: X +, 30, 8 (extended constants 0x476bd0 = 0.053, 0x476bdc =
+  0.075); each first calls StepAreaCheck 0x476c00 (E-0307, always true); frame 0x47cea4 :=
+  base + (f > 15 ? 0 : f), walking +0x6c := 1. No bit: f > 11 → 0; frame := table
+  (+0x68 via 0x47690a/0x476927): 0 → 168 + f, 4 → 144, 8 → 156, 12 → 204, 16 → 120, 20 →
+  192, 24 → 180, 28 → 132 (+ f); other facings leave the frame; +0x6c := 0. Counter +0x5c
+  += m·0.002 (0x476be8) idle, limit 11, or m·0.02 (0x476bf4) walking, limit 14; above the
+  limit → 0. Walking and f ≠ 0x47ceb0: f = 0 → PlayWave(1, 6, 0, 0), f = 6 → PlayWave(1, 7,
+  0, 0); 0x47ceb0 := f always. +0x6d := +0x6c. Clamps: Trunc(X) − 0x47ce60 < −48 → X :=
+  0x47ce60 − 48; W − 48 ≤ Trunc(X) − 0x47ce60 → X := W − 49 + 0x47ce60 (W = holder+0x118);
+  Y the same with 0x47ce64 and holder+0x138. CreatePlayerSprite 0x47b740: +0xfc :=
+  DXImageList9, +0x5c := 0, +0x60 := 11, +0x64 := 0, +0x68 := 0, image gilbert.wxi item 0, X
+  272, Y 210, 96×96; the rect (112, 98, 528, 322) goes to 0x480a7c (no reader). The
+  direction set is written only by room::Load and GEInit callback 20 (E-0308).
+- **Method:** disassembly; 80-bit constants decoded; pointer-cell reference search.
+- **Confidence:** proven
+
+### E-0305 — room::HandleMouse 0x4728ec: buttons, walking, cursors, edge scrolling
+- **Binary/file:** `GILBERT.EXE` 0x4728ec, 0x46a518, 0x46a568, 0x475d04
+- **Evidence:** pressed 0x47cf30 := −1; 0x475b48 (inventory hovers 0x47ce4c/0x47ce50);
+  hover 0x47cf2c := the first of interface2 8, 0x26, 0x27, 0x2c, 0x2d whose BoundsRect meets
+  the mouse rect, else −1. Rects A (74, 60, 566, 420), (72, 370, 132, 422) (built, not
+  used), C (289, 328, 351, 380), D (509, 336, 539, 366), E (74, 360, 566, 420). If
+  PtInRect(A, mouse) and not C, D or E: if the button state 0x47ceb4 = 1 →
+  GEPathNewPath(mx − 0x47ce60, my − 0x47ce64) (every tick); 0x47cec4 := 0; v := GetCell(3,
+  (mx − 0x47ce60) div 16, (my − 0x47ce64) div 16) as a signed 16-bit value: 1 → cursor
+  0x47ce8c := 6, ≥ 2 → 7, else 0. Otherwise cursor := 0 and: 64 ≤ mx ≤ 74 and 0x47ce60 <
+  64 → cursor 2, 0x47ce60 += 6, X += 6.0 (0x473004); else 566 ≤ mx ≤ 576 and 0x47ce60 ≥
+  −(holder+0x118 − 586) → cursor 3, 0x47ce60 −= 6, X −= 6; then my ≤ 60 and 0x47ce64 < 50 →
+  cursor 4, 0x47ce64 += 6, Y += 6; else 420 ≤ my ≤ 430 and 0x47ce64 ≥ −(holder+0x138 − 394)
+  → cursor 5, 0x47ce64 −= 6, Y −= 6 (0x47cec4 := 1 in these branches; it has no reader).
+  New button state (0x47ceb8 ≠ 0x47ceb4): hover := −1; if left: pressed := the first hit of
+  8, 0x26, 0x27, 0x2c, 0x2d, else −1; 0x47ceb8 := 0x47ceb4. MouseDown sets 0x47ceb4 (1 left,
+  2 right) only when it is −1; MouseUp sets it and 0x47ceb8 to −1 and, in modes 1 and 2 with
+  a carried object, calls 0x475d04, which outside mode 2 only clears 0x47cec0 and 0x47cebc.
+  The object records 0x4816b4 are read only by the draw (pointer cell 0x47d130: 0x47498b,
+  0x4789b9, 0x478f4a).
+- **Method:** disassembly.
+- **Confidence:** proven
+
+### E-0306 — ui::DrawRoomPanel 0x46dce8 and the room buttons' actions
+- **Binary/file:** `GILBERT.EXE` 0x46dce8, 0x46fa74 (mode 1 branch 0x4703ed);
+  `Data/maps/!global/interface2.wxi`
+- **Evidence:** interface1 item 0 at (64, 50); v := GEGetVariable(199) (kept in 0x47ce44):
+  0 → i2[4] iscr12, 1..6 → i2[0x99..0x9e] egg1..egg6, at (296, 374) (other values: none);
+  i2[6] iscr_radar (115×75) at (151, 347); pulse a = 0x47ce90 with direction 0x47ce94: down
+  by 1 to 0, then up by 1 to 50; R := (152 + l, 348 + t, 152 + l + w, 348 + t + h) from the
+  radar values (GEWalkmapGetRadarRect returns left, top, right − left, bottom − top of the
+  CWalkmap's +0xc..+0x18); FillRectAlpha(R, $008EBDDD, a); on the back buffer's canvas:
+  Pen.Mode 4, Pen.Style 0, Pen.Color $0028B5F9, Brush.Style 1, Rectangle(R); i2[0x26]
+  ibutt11 "Menu" at (70, 368), i2[0x27] ibutt15 "Kort" at (70, 396), i2[0xa8] ibutt43 at
+  (537, 380), i2[0xa9] ibutt42 at (537, 400); new-topic flag 0x47ce98 = 0 → i2[8] ibutt14 at
+  (298, 333); else b = 0x47ce9c with direction 0x47cea0: down by 2 to 50, then up by 8 to
+  200; i2[8] at (298, 333), then DrawAlpha(i2[0xa], Rect(298, 333, 346, 373), pattern 0,
+  alpha b). Hover: 8 → i2[9] at (298, 333), 0x26 → i2[0x28] at (70, 368), 0x27 → i2[0x29] at
+  (70, 396). Pressed: 8 → i2[0xa] at (298, 333), Action(8); 0x26 → i2[0x2a] at (70, 368),
+  Action(0x26); 0x27 → i2[0x2b] at (70, 396), Action(0x27). Action in mode 1: 8: PlayWave(1,
+  4); LoadBookImages; 0x46aa54(1, 0); 0x47cfd4 := 0x47cffc := 0; 0x47ce98 := 0; 0x47cfd8 :=
+  0x47cfd0 := 0x4e; hover/press/page state −1; mode := 4. 0x26: E-0214. 0x27: PlayWave(1,
+  4); GEWalkmapAreaHit(99999); state −1; mode := 2. 0x2c: PlayWave(1, 1); if 0x47cedc ≥ 6:
+  −6 and 0x475ea4. 0x2d: PlayWave(1, 1); if 0x47cedc + 12 ≤ 0x47cee0: +6 and 0x475ea4.
+  Names and sizes from `wxi.py`; pictures looked at (Menu, Kort, the scroll, arrows, radar
+  island, eggs).
+- **Method:** disassembly; pictures rendered to PNG.
+- **Confidence:** proven
+
+### E-0307 — Area hits: StepAreaCheck 0x476c00, GilbertOnPath 0x476cbc, GetCell 0x462f8c
+- **Binary/file:** `GILBERT.EXE` 0x476c00, 0x476cbc, 0x462f8c; `Data/maps/*/ctrl*.map`
+- **Evidence:** StepAreaCheck ignores its register arguments: gx := GilbertX (0x474340), gy
+  := GilbertY (0x47435c); −16 on gx if left, +16 if right, −16 on gy if up, +16 if down (the
+  set 0x47ce54); v := GetCell(3, gx div 16, gy div 16) (sign-extended 16-bit); if
+  GilbertOnPath: v − 2 in 0..29 → GEWalkmapAreaHit(v − 1) (three identical branches for
+  2..11, 12..21, 22..31); returns 1 in every case. GilbertOnPath: cx := GilbertX shr 4, cy :=
+  GilbertY shr 4 (logical shifts); true when some i < GEPathGetNumItems has
+  GEPathGetItem(i) = (cx, cy) (out-parameters 2 and 3). GetCell(holder, layer, map, stack x
+  then y): layer 3 without AutoMap: x > the map's width or x < 0 or y > height or y < 0 → 0;
+  else the low word of the u32 at index y·width + x of the map's data (TDxMaps.ReadData
+  0x44f50c reads the whole `size` = width·height·10 bytes, so x = width or y = height reads
+  the next row or the tail). Corpus: cell values 0 (52,995), 1 (65,847), 2..16 and 22..29;
+  the tails are zero except in 170 (u32 6,948 and 0x80000007 at tail indices 7 and 8, i.e.
+  row 36, x 7 and 8), 400, 461, 463, 550 (beyond the first row).
+- **Method:** disassembly; `ctrl*.map` statistics in Python.
+- **Confidence:** proven
+
+### E-0308 — The room's GEInit callbacks 2, 7..10, 13, 14, 17..21
+- **Binary/file:** `GILBERT.EXE` 0x474964, 0x4748dc, 0x474900, 0x4748cc, 0x475548,
+  0x475624, 0x474804, 0x47513c, 0x474340, 0x47435c, 0x4742f8, 0x47431c, 0x474378, 0x4743ac,
+  0x4742c4; `GE.DLL` GameObj::WalkmapGetObjectData 0x10008750, BuildWalkmapObjects
+  0x10008170
+- **Evidence:** 2: count := GEWalkmapGetNumObjects → 0x47ced0; for i: GEWalkmapGetObjectData(i,
+  &rec+0, &+4, &+8, &+0x10, &+0x14, &+0x18, &+0xc) into rec = 0x4816b4 + 0x2c·i; ge.dll fills
+  them with obj.id·100 + state, the anim's +0x28, the state's +0x1c, the anim's +0x1c, +0x20,
+  the state's +0x20 (pickable), +0x24 (text); ge.dll lists at most 100 visible objects whose
+  state has a walkmap anim. The EXE then stores PatternRect(DXImageList10 item +4, 0) at
+  +0x1c..+0x28 and offsets it: +0x1c := x + 64, +0x20 := y + 50, +0x24 := right + x + 64,
+  +0x28 := bottom + y + 50. 7: PlayWave(a1, a2, a3 ≠ 0, a4 ≠ 0). 8: StopWave(a1, a2). 9:
+  0x475548(n): if n ≠ 0x47cf0c: `\data\sounds\misc\` + n + `.wxs` → DXWaveList3, 0x47cf0c :=
+  n, flag 0x47cf00, SetSoundVolume. PlayWave(list, …) first calls 0x475548(list) when list ≠
+  1 and list ≠ 0x47cf0c, then plays item index of DXWaveList `list` (1..4). 10 (name, loop,
+  kind): kind 0 → if name ≠ 0x47cf08: PlayRoomMusic(name, loop); 0x47cf08 := name; kind 1
+  → StopAll, PlayDialogStream; kind 2 → StopAll, 0x47513c: `\data\sounds\misc\` + name +
+  `.wav` into stream 0x484ad8, SoundVolume, started, flag 0x47cef4. 13: Trunc(X) − 0x47ce60 +
+  0x30; 14: Trunc(Y) − 0x47ce64 + 0x30. 17: holder+0x118 div 16; 18: holder+0x138 div 16.
+  19 (a1, a2): GetCell(3, map 0, x = a1, y = a2) sign-extended. 20 (d): right := d ∈ {4, 8,
+  12}; left := d ∈ {20, 24, 28}; up := d ∈ {0, 4, 28}; down := d ∈ {12, 16, 20} (set include
+  0x402b88 / exclude 0x402b94 with the constants 0x47451c = 8, 0x474524 = 4, 0x47452c = 1,
+  0x474534 = 2). 21: 0x47ce98 := 1, PlayWave(1, 10, 0, 0). 12: movie::Play (E-0208).
+  Corpus: the 27 states with a walkmap anim all name a picture below their room's
+  `w<n>o.wxi` item count.
+- **Method:** disassembly; ge.dll decompiles; default.dat through `gamedat.py`.
+- **Confidence:** proven
+
+### E-0309 — ResetState 0x477964: the room variables at a new game or load
+- **Binary/file:** `GILBERT.EXE` 0x477964
+- **Evidence:** among others: 0x47ce44 := 0, 0x47ce4c, 0x47ce50 := −1, 0x47ce5c := 1,
+  0x47ce60 := 0x47ce64 := 0, shown 0x47ce68 := 0, 0x47ce6c := 0, mode and 0x47ce78 := 0x99,
+  radar 0x47ce7c..0x47ce88 := 0, cursor 0x47ce8c := 0, 0x47ce90 := 0, 0x47ce94 := 1,
+  0x47ce98 := 0, 0x47ce9c := 0, 0x47cea0 := 1, frame 0x47cea4 := 0, 0x47cea8 := 30,
+  0x47ceb0, 0x47ceb4, 0x47ceb8, 0x47cebc, 0x47cec0 := −1, 0x47cec4 := 0, 0x47cec8 :=
+  0x47cecc := 0, 0x47ced0 := 0, current room 0x47ced4 := −1, 0x47ced8, 0x47cedc, 0x47cee0
+  := 0, the stream flags 0x47cee4..0x47cef4 := 0, 0x47cf0c := 0, MusicVolume 0x47cf10 := 5,
+  SoundVolume 0x47cf14 := 4, FullscreenVideo 0x47cf18 := 0, the menu state (E-0210 values),
+  0x47cf94 := 0. The room music name 0x47cf08 is not reset.
+- **Method:** disassembly.
+- **Confidence:** proven

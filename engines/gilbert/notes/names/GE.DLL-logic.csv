@@ -1,0 +1,41 @@
+address,name,evidence
+100055a0,GameObj::PathNewPath,"GEPathNewPath; strings ""PathNewPath: Loading map"", ""Path: Can't go there"""
+10005890,GameObj::PathEllapsed,"strings ""PathEllapsed: Start path with direction %d"", ""Reached new map grid"", ""Stopped path"""
+10005d00,GameObj::PathStop,"GEPathStop; string ""Path: Stopped""; callback 20 (-1), +0x2f1d0 := 1"
+10005e60,GameObj::FindObjWithState,events 12/13; all-objects list +0x30 by CObj +0xc and a state with that number
+10007840,GameObj::FindTopicByRank,book list +0x2f280+0x1c*book by CTopic +0x14
+100078c0,GameObj::GetNumBookTypes,GEBookGetNumBookTypes; books until the first empty list
+100078e0,GameObj::BookGetNumTopics,GEBookGetNumTopics; shown-topic count +0x2f398[book]
+10007900,GameObj::BookGetTopicTitle,GEBookGetTopicTitle; title +8 of the topic with that rank
+100079c0,GameObj::BookGetIndexFromTopic,GEBookGetIndexFromTopic; rank +0x14 of the topic with that ID
+10007a00,GameObj::BookGetTopicFromIndex,GEBookGetTopicFromIndex; ID +4 of the topic with that rank
+10007a20,GameObj::BookGetTopic,GEBookGetTopic; text +0xc of the topic with that rank
+10007ae0,GameObj::BookParseFirst,GEBookParseFirst; cursor +0x2f3c0 := text then BookParseNext
+10007e90,GameObj::BuildSortWalkmap,"string ""BuildSort: ZOrder %d %d""; walkmap list +0x2f3dc by CAnim +0x24 descending"
+10008000,GameObj::BuildSortCUA,CUA list +0x2f56c by CAnim +0x24 of the state's cua anim descending
+100082c0,GameObj::ResetStateAnim,state +0x28 := FindAnim(state +0x10) with time 0
+10008710,GameObj::WalkmapAreaHit,GEWalkmapAreaHit; DoEvent(n % 100 + walkmap id * 100)
+10008740,GameObj::WalkmapGetNumObjects,GEWalkmapGetNumObjects; +0x2fa1c
+10008820,GameObj::CUAGetNumObjects,GECUAGetNumObjects; +0x2fa20
+10008d90,GameObj::InventoryGetNumObjects,GEInventoryGetNumObjects; +0x2f1fc
+10008e10,GameObj::DialogGetTitle,"GEDialogGetTitle; ""*NO DIALOG*"""
+10008e70,GameObj::DialogGetText,GEDialogGetText
+10008ed0,GameObj::DialogGetNumChoices,GEDialogGetNumChoices; CDialogs +0x10 (choice list count)
+10008ef0,GameObj::DialogGetChoice,"GEDialogGetChoice; ""*NO CHOICE*"""
+10009080,GameObj::RefreshWalkmap,calls GEInit callback 2
+10009340,GameObj::Log,empty (ret): the debug log sink
+10009350,PathMap::PathMap,"map at GameObj +0x390: cells 100x80 at +0xc, nodes at +0x7d0c, path +0x2ee30.."
+10009460,PathMap::ClearCells,8000 cells := 0
+10009470,PathMap::SetCell,cells[x + 100y] for 0 <= x < w and 0 <= y < h
+100094b0,PathMap::GetCell,GEPathGetMapData; 0 outside the map
+100094f0,PathMap::ResetNodes,every node: parent 0; next 0; x; y; cost 0x7fffffff
+10009550,NormalizeRect,min/max of two points
+100095a0,PathMap::FindPath,"search in the inflated rectangle, then the whole map; builds the direction and cell arrays"
+100097d0,PathMap::StepCost,"atan2 bearing to the target; ((angle diff + 22.5) / 45 + 1) * 1.41 for diagonals"
+100098d0,PathMap::Relax,cost update and FIFO append
+10009930,PathMap::Walkable,"cell 1 no, 0 yes, else equal to the target cell"
+100099c0,PathMap::TryStep,in rectangle and walkable: Relax with StepCost
+10009a70,PathMap::Expand,"eight neighbours, directions 0 E .. 7 SE"
+10009b60,PathMap::Search,FIFO label-correcting search from the start node
+10009c10,PathNode::PathNode,cost 0x7fffffff
+10009c30,PathNode::Reset,"x, y, cost 0x7fffffff"

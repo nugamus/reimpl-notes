@@ -37,7 +37,7 @@ end, Q-0100.. `default.dat` and `ge.dll`).
   the grid (`GEPathNewPath`, `GEWalkmapAreaHit`, Gilbert.exe's room code) not yet read.
 - **Observed range:** 0..29; at most 17 distinct values per room.
 - **Blocks:** walking, room exits and hot spots.
-- **Status:** open
+- **Status:** RESOLVED (see E-0409, E-0411; Gilbert.exe's side E-0305, E-0307): 0 floor, 1 wall (never walkable, the "no" cursor), 2..31 area n = value − 1: walkable only by a path whose target cell has the same value, and reached on a path it runs event walkmap × 100 + n (GEWalkmapAreaHit).
 
 ### Q-0100 — What is CObjState +0x1c?
 - **Context:** `default.dat`, CObjState field 7 (E-0104). ge.dll only hands it to the EXE
@@ -48,7 +48,7 @@ end, Q-0100.. `default.dat` and `ge.dll`).
   with a description text), counting up from 1 in file order at the start (1..19), then
   out of order (an inventory picture number?).
 - **Blocks:** the inventory and object drawing in the engine.
-- **Status:** open
+- **Status:** RESOLVED (see E-0403): the inventory icon, a pattern (0..160) of the one 22×20-pattern picture in `inventory.wxi`, used in the inventory grid and for the carried object on the cursor.
 
 ### Q-0101 — What are CAnim +0x18, +0x1c, +0x20 and +0x28?
 - **Context:** `default.dat`, CAnim (E-0104). +0x1c, +0x20 and +0x28 go to the EXE through
@@ -59,7 +59,7 @@ end, Q-0100.. `default.dat` and `ge.dll`).
   (175) — screen or room coordinates by their range; +0x28 0..246 (247 values) — a picture
   number by its range.
 - **Blocks:** drawing objects on walkmaps and in CUAs.
-- **Status:** open
+- **Status:** open for +0x18 (no reader in ge.dll's anim code); +0x1c, +0x20 and +0x28 answered for walkmaps (E-0308) and CUAs (E-0403): the picture's top-left corner and its item in `w<n>o.wxi` / `cua<id>.wxi`.
 
 ### Q-0102 — What do CEvent's sound operands +0x38, +0x3c, +0x44, +0x48 mean?
 - **Context:** event types 6 and 17 (E-0105): with an empty +0x40 the EXE callback gets
@@ -69,7 +69,7 @@ end, Q-0100.. `default.dat` and `ge.dll`).
 - **Observed range:** one numbered sound (2, 0) in 671 type-6 records; +0x44 1 in 456,
   0 in 215; +0x48 0 in 458, 1 in 213 (a loop flag?).
 - **Blocks:** sound playback.
-- **Status:** open
+- **Status:** RESOLVED (see E-0406): +0x38 wave list, +0x3c item (PlayWave), +0x48 loop flag (both forms), +0x44 stream kind for named sounds (0 room music, 1 dialogue voice, 2 other stream).
 
 ### Q-0103 — What is CDialogChoice +4?
 - **Context:** `default.dat`, CDialogChoice field 1; GEDialogGetChoice and GEDialogEnd
@@ -87,7 +87,7 @@ end, Q-0100.. `default.dat` and `ge.dll`).
 - **Observed range:** CEvent +0x58 in type 4: 0 (108), 16 (49), 24 (36), 8 (22), 28 (12),
   12, 4, 20 — multiples of 4 below 32 (a facing direction?).
 - **Blocks:** placing Gilbert on entering a walkmap.
-- **Status:** open
+- **Status:** RESOLVED (see E-0300, E-0304): Gilbert.exe stores it as the facing direction (0 up, 4 up-right, 8 right, 12 down-right, 16 down, 20 down-left, 24 left, 28 up-left); it picks the standing frames and the shadow.
 
 ### Q-0105 — Do the saved games match default.dat's layout byte for byte?
 - **Context:** GESaveFile writes the layout LoadFile reads (E-0100); no saved game is in the
@@ -174,4 +174,51 @@ end, Q-0100.. `default.dat` and `ge.dll`).
 - **Observed range:** —
 - **Blocks:** speeds tied to ticks: the credits scroll (0.5 px per tick), the save-field
   pulse, the menu-music start (10th tick).
+- **Status:** open
+
+### Q-0300 — How long do the room fades last?
+- **Context:** E-0301: FadeOut and FadeIn each call SetGammaRamp 256 times in a loop (one
+  ramp entry changed per call), with no clock or wait of their own.
+- **What we checked:** the two loops and their callers (room::Load, room::Draw's first
+  frame); the driver's SetGammaRamp timing (a vertical-blank wait or not) is not in the EXE.
+- **Observed range:** —
+- **Blocks:** the length of the fade between rooms in the engine (a fixed duration has to be
+  chosen; a capture of the original would settle it).
+- **Status:** open
+
+### Q-0301 — Is Gilbert's 120×120 shadow scaled into the 96×96 rectangle?
+- **Context:** E-0303: DrawAlpha(gilbert.wxi item 1 `all`, Rect(X, Y, X + 96, Y + 96),
+  pattern, 70); the item's patterns are 120×120.
+- **What we checked:** DrawAlpha 0x463d8c passes the pattern's source rectangle and the
+  destination rectangle to the surface blend 0x45c2a4 (blend 8 below alpha 255); the
+  DelphiX rectangle-blend routine that would stretch or crop was not read.
+- **Observed range:** —
+- **Blocks:** the shadow's exact size and position (stretched: 0.8 scale; cropped: the top-left
+  96×96 of the pattern).
+- **Status:** open
+
+### Q-0400 — What should SetState do when an object has no state with that number?
+- **Context:** `CObj::SetState` 0x10009e40 (E-0405): without a matching state it stores
+  `CObList::FindIndex(states, 0)`, a list node, as the current state, so the object's
+  fields are read from the node (garbage). Reached by events 2 and 14 (state + 1).
+- **What we checked:** every type-2 record names an existing state (314/314) and every
+  type-14 record names a state whose successor exists (7/7); whether an event 14 can run
+  twice on the same object at run time is not known statically.
+- **Observed range:** —
+- **Blocks:** nothing in the known data; the engine needs a defined fallback (the first
+  state, as the code evidently intends).
+- **Status:** open
+
+### Q-0401 — Should changes to objects shown on the walkmap appear before the next rebuild?
+- **Context:** the walkmap object list is rebuilt only by GotoWalkmap and CUAEnd (E-0402,
+  E-0404). Events 2, 14, 15, 16 change a listed walkmap object without a rebuild (its
+  entry keeps its old anim or visibility until then); events 1 and 8 delete an object but
+  leave its pointer in the walkmap list and in FindObj's index (a dangling pointer in the
+  original, E-0405).
+- **What we checked:** default.dat: 20 objects have a walkmap anim; events touching them:
+  type 15 (12), 2 (11), 1 (8), 16 (7), 7 (6). Whether these run while their walkmap is
+  shown (area and anim-end events) or only inside CUAs was not traced.
+- **Observed range:** —
+- **Blocks:** faithful walkmap drawing after such events; the engine must at least drop
+  deleted objects from its lists.
 - **Status:** open
