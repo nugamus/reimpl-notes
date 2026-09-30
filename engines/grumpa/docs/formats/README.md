@@ -61,6 +61,15 @@ whitespace.
 - `.txt` — UI text in cp1252 (`Text.txt` menu labels, `Credits.txt`, `Help.txt`), one
   language per `Local_*` / `UI/001_Menu` copy.
 
+## Scene views: colour + depth naming (E-0011)
+
+A pre-rendered node is a colour background plus a depth buffer, paired by name in
+`Bitmaps/`: `<scene>_<view>_IS.jpg` (Image Screen, 800×600 colour) and
+`<scene>_<view>_IZ.fxi` (Image Z, 16-bit depth). 173 such pairs. Animated scene elements
+instead have per-frame depth `<name>_Z####.fxi` (143 files: chest, pit trap, ...) with
+matching colour frame sequences. The engine draws the colour view, then composites the 3D
+actors against the depth buffer.
+
 ## Standard media (E-0007)
 
 `.jpg` (JFIF), `.tga` (Targa, magic `00 00 02 00`), `.bmp` (Windows BMP), `.wav`

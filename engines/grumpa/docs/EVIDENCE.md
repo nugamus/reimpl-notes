@@ -171,3 +171,16 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   with a real per-pixel depth buffer).
 - **Method:** decode + naming/dir census of `.fxi`; the `CFXSurface`/`CFXZBuffer` loaders.
 - **Confidence:** proven (format and role); the compositing pipeline itself specced later
+
+### E-0011 — Scene views: `<n>_<v>_IS.jpg` colour + `<n>_<v>_IZ.fxi` depth; `_Z####` animated depth
+- **Binary/file:** `games/grumpa/discs/cab/Bitmaps/`
+- **Evidence:** the naming pairs a colour background with a depth buffer: `100_1_IS.jpg`
+  (Image Screen) ↔ `100_1_IZ.fxi` (Image Z), 173 such pairs (175 `_IS` colour views, 173
+  with depth). A second group, 143 files `*_Z####.fxi` (e.g. `14_2_kista__Z0000..`,
+  `14_2_pittrap__Z0000..`), are per-frame depth for animated scene elements (a chest
+  "kista", a pit trap), matched by colour frame sequences. So a scene view = one
+  pre-rendered 800×600 colour image plus its 16-bit depth (E-0010), and animated props
+  carry their own depth frames. `<n>` is the scene/room number, `<v>` the view/node within
+  it. This is the on-disk half of the node model the engine composites actors into.
+- **Method:** naming/pairing census of `Bitmaps/`.
+- **Confidence:** proven
