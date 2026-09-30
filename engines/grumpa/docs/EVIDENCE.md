@@ -81,3 +81,57 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
 - **Method:** `tools/disc/edcscan.c` (EDC = CRC-32, reflected polynomial 0xD8018001, over
   bytes 0..0x80F of each mode-1 sector); ISO 9660 directory walk of `Grumpa.iso`.
 - **Confidence:** proven
+
+## Formats
+
+Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
+
+### E-0005 — `.atx`: text actor/object definitions, `<type><name>{ fields }` blocks; 114/114 parse
+- **Binary/file:** `games/grumpa/discs/cab/**/*.atx` (114 files: `Actors/`, `UI/*/`,
+  `Meshes/*.atx`)
+- **Evidence:** `engines/grumpa/tools/parsers/atx.py` parses 114/114 with no leftover
+  bytes. A file is a sequence of blocks, each an optional `<type><name>` header then a
+  `{ ... }` body of one field per line (a value, a whitespace-separated tuple, or a file
+  name with spaces; trailing comment from the first `/`). The first field is the actor id;
+  a header-less block overrides the one before it (`UI/090_Inventory/090_Inventory.atx`).
+  Header type codes in the corpus: 2, 3 (42), 4, 5 (65), 6, 22, 23, 27, 28 (5), 31, 37
+  (20), 38 (20), 39 (40) — CFX class codes. The loader
+  `CFXActorFactory::CreateFromATXFile` and the `CFX*` class names are strings in the
+  decrypted `Grumpa.exe` (E-0003).
+- **Method:** `python engines/grumpa/tools/parsers/atx.py` (over `games/grumpa/discs/cab`).
+- **Confidence:** proven (file shape; per-class field meaning is game logic, not yet specced)
+
+### E-0006 — Text configuration: `.btn`/`.shl` shell, `.sts` player status, `.tma` matrices, `.txt` UI text
+- **Binary/file:** `cab/**/*.btn` (30), `cab/Shell_*/grumpa.shl` (4), `cab/Save/**/Player.sts`
+  (7), `cab/Bitmaps/*.tma` (2), `cab/**/*.txt` (19)
+- **Evidence:** `.shl`/`.btn` are `key = value` ini for the InstallShield profile shell
+  (`FXProfileShell.exe`): `grumpa.shl` names window, background, `mov_name_*`, `btn_name_*`;
+  each `.btn` gives `image_lo/hi/bubble`, `pos_x/y`, `rect_l/t/r/b`, `sound_hoover/click`,
+  `execute_cmd` (`grumpa.exe`, a URL, or `shellmedia\grumpa.hlp`), `shutdown`. `.sts` is two
+  lines (player name, a counter), read by `CFXMenu::LoadPlayerInfo`. `.tma` is rows of
+  tab-separated floats for the `effect`/`effect_item` materials. `.txt` is cp1252 UI text
+  (`Text.txt` labels `Nytt Spel`/`Ladda Spel`/..., `Credits.txt`, `Help.txt`), one copy per
+  language. `value.shl` under `_MFC_*`/`_Support_*` is InstallShield's, not the game's.
+- **Method:** reading the files; `CFXMenu::LoadPlayerInfo` string in the decrypted EXE.
+- **Confidence:** proven
+
+### E-0007 — Images, sound and video are standard formats
+- **Binary/file:** `cab/**/*.{jpg,tga,bmp,wav,avi,mpg}`
+- **Evidence:** magic census (`engines/grumpa/notes/corpus-inventory.md`): `.jpg` 1745
+  (`ff d8 ff e0` JFIF), `.tga` 317 (`00 00 02 00` uncompressed Targa), `.bmp` 65 (`BM`),
+  `.wav` 1612 (`RIFF`), `.avi` 10 (`RIFF`), `.mpg` 4 (`00 00 01 ba` MPEG-1 system). The
+  game wraps them in `CFXBitmap`/`CFXSound` (strings in the decrypted EXE, E-0003). Read
+  with off-the-shelf decoders; not re-specced.
+- **Method:** `python engines/grumpa/tools/survey.py`.
+- **Confidence:** proven
+
+### E-0008 — `.fxi` is an 800×600 surface with a compressed body
+- **Binary/file:** `cab/**/*.fxi` (316 files)
+- **Evidence:** 8-byte header `u8 ver=1; u8 flag(2|0); u16 width; u32 height`; every file
+  is 800×600 (`width=0x0320`, `height=0x00000258`), but the body length varies per file
+  and is never `width*height*{1,2,3,4}` (test in the survey scratch: 0/316 for each), so
+  the pixels are compressed. 280 files have flag 2, 36 have flag 0. Loaded by
+  `CFXSurface`/`CFXTexture`/`CFXZBuffer` (strings, E-0003). The codec is read from those
+  methods in the decrypted EXE (Q-0004).
+- **Method:** header-vs-size correlation over all `.fxi`.
+- **Confidence:** proven (header + that the body is compressed); codec open (Q-0004)

@@ -48,3 +48,33 @@ protection).
 - **What we checked:** file-group names only.
 - **Blocks:** the run folder for the original and the engine's data paths.
 - **Status:** open
+
+### Q-0004 — What is the `.fxi` surface codec?
+- **Context:** E-0008. 8-byte header then a compressed 800×600 surface; body length varies.
+- **What we checked:** the header fields and that the body is not raw at 1/2/3/4 bytes per
+  pixel; the loader is `CFXSurface::CreateFromFile` in the decrypted `Grumpa.exe`.
+- **Blocks:** decoding backgrounds, textures and z-buffers; the engine's drawing.
+- **Status:** open (read `CFXSurface`/`CFXZBuffer` in Ghidra)
+
+### Q-0005 — `.scn` scene record layout
+- **Context:** 110 files; header `08 00 00 00`, `58 02 00 00` (600), then a float stream
+  (positions with a near-constant Y). Body length is not a whole number of 4-byte floats,
+  so the header/record size is not yet right.
+- **What we checked:** the corpus; not yet the `CFXScene` loader.
+- **Blocks:** scene geometry / collision.
+- **Status:** open
+
+### Q-0006 — `.abi` actor-instance and save-status layout
+- **Context:** 118 files; `Actors/Characters.abi`/`Items.abi` are actor tables,
+  `Save/**/<id>_status.abi` are per-actor save state. Read by
+  `CFXActorFactory::CreateFromABIFile` / `Load*GameStatus`.
+- **What we checked:** the corpus; not yet the loader.
+- **Blocks:** actor instancing and save/load.
+- **Status:** open
+
+### Q-0007 — `.anb` / `.amb` mesh and animation layout
+- **Context:** 939 `.anb` + 588 `.amb`; `CFXAMesh`/`CFXAMeshEx::CreateFromFile`. Binary
+  vertex/animation data.
+- **What we checked:** the corpus; not yet the loader.
+- **Blocks:** the 3D characters and items.
+- **Status:** open
