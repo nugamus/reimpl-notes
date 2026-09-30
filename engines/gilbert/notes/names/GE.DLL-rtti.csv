@@ -1,0 +1,44 @@
+address,name,evidence
+100011f0,CAnim::Serialize,vtable slot 2 of CAnim (slot 0 returns its CRuntimeClass)
+10001060,CAnim::GetRuntimeClass,returns CRuntimeClass "CAnim"
+10001100,CAnim::scalar_deleting_dtor,vtable slot 1 of CAnim
+10001000,CAnim::CreateObject,CRuntimeClass "CAnim" m_pfnCreateObject
+10001720,CCUA::Serialize,vtable slot 2 of CCUA (slot 0 returns its CRuntimeClass)
+10001560,CCUA::GetRuntimeClass,returns CRuntimeClass "CCUA"
+10001600,CCUA::scalar_deleting_dtor,vtable slot 1 of CCUA
+10001500,CCUA::CreateObject,CRuntimeClass "CCUA" m_pfnCreateObject
+10001aa0,CDialogChoice::Serialize,vtable slot 2 of CDialogChoice (slot 0 returns its CRuntimeClass)
+10001950,CDialogChoice::GetRuntimeClass,returns CRuntimeClass "CDialogChoice"
+100019e0,CDialogChoice::scalar_deleting_dtor,vtable slot 1 of CDialogChoice
+100018f0,CDialogChoice::CreateObject,CRuntimeClass "CDialogChoice" m_pfnCreateObject
+10001da0,CDialogs::Serialize,vtable slot 2 of CDialogs (slot 0 returns its CRuntimeClass)
+10001be0,CDialogs::GetRuntimeClass,returns CRuntimeClass "CDialogs"
+10001c90,CDialogs::scalar_deleting_dtor,vtable slot 1 of CDialogs
+10001b80,CDialogs::CreateObject,CRuntimeClass "CDialogs" m_pfnCreateObject
+10002100,CEvent::Serialize,vtable slot 2 of CEvent (slot 0 returns its CRuntimeClass)
+10001ea0,CEvent::GetRuntimeClass,returns CRuntimeClass "CEvent"
+10001f80,CEvent::scalar_deleting_dtor,vtable slot 1 of CEvent
+10001e40,CEvent::CreateObject,CRuntimeClass "CEvent" m_pfnCreateObject
+10009e90,CObj::Serialize,vtable slot 2 of CObj (slot 0 returns its CRuntimeClass)
+10009cc0,CObj::GetRuntimeClass,returns CRuntimeClass "CObj"
+10009d50,CObj::scalar_deleting_dtor,vtable slot 1 of CObj
+10009c60,CObj::CreateObject,CRuntimeClass "CObj" m_pfnCreateObject
+1000a230,CObjState::Serialize,vtable slot 2 of CObjState (slot 0 returns its CRuntimeClass)
+1000a070,CObjState::GetRuntimeClass,returns CRuntimeClass "CObjState"
+1000a120,CObjState::scalar_deleting_dtor,vtable slot 1 of CObjState
+1000a010,CObjState::CreateObject,CRuntimeClass "CObjState" m_pfnCreateObject
+1000a4c0,CText::Serialize,vtable slot 2 of CText (slot 0 returns its CRuntimeClass)
+1000a490,CText::GetRuntimeClass,returns CRuntimeClass "CText"
+1000a460,CText::CreateObject,CRuntimeClass "CText" m_pfnCreateObject
+1000a740,CTopic::Serialize,vtable slot 2 of CTopic (slot 0 returns its CRuntimeClass)
+1000a5b0,CTopic::GetRuntimeClass,returns CRuntimeClass "CTopic"
+1000a650,CTopic::scalar_deleting_dtor,vtable slot 1 of CTopic
+1000a550,CTopic::CreateObject,CRuntimeClass "CTopic" m_pfnCreateObject
+1000a980,CUseObj::Serialize,vtable slot 2 of CUseObj (slot 0 returns its CRuntimeClass)
+1000a8e0,CUseObj::GetRuntimeClass,returns CRuntimeClass "CUseObj"
+1000a930,CUseObj::scalar_deleting_dtor,vtable slot 1 of CUseObj
+1000a880,CUseObj::CreateObject,CRuntimeClass "CUseObj" m_pfnCreateObject
+1000acb0,CWalkmap::Serialize,vtable slot 2 of CWalkmap (slot 0 returns its CRuntimeClass)
+1000aaf0,CWalkmap::GetRuntimeClass,returns CRuntimeClass "CWalkmap"
+1000aba0,CWalkmap::scalar_deleting_dtor,vtable slot 1 of CWalkmap
+1000aa90,CWalkmap::CreateObject,CRuntimeClass "CWalkmap" m_pfnCreateObject
