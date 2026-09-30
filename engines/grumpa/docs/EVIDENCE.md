@@ -230,3 +230,12 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   no `.anb`. This is the renderable geometry for the 3D actors.
 - **Method:** decompile of `FUN_004157d0`; `python engines/grumpa/tools/parsers/anb.py`.
 - **Confidence:** proven (geometry, UVs, byte layout); the K=F vs F-1 discriminator open (Q-0007)
+
+### E-0015 — The `.anb`/`.amb` geometry decode is correct (meshes render as their objects)
+- **Binary/file:** `games/grumpa/discs/cab/Meshes/*.anb`
+- **Evidence:** projecting a parsed mesh's frame-0 vertices and triangles (E-0014) to an
+  image gives the recognisable object — `000_N2N_Bear.ANB` (252 verts, 500 tris) renders as a
+  low-poly bear (body, clawed arms, legs, eared head); `000_N2N_Boat.ANB` as a boat hull.
+  Confirms the vertex/face/winding decode, not just the byte counts.
+- **Method:** orthographic front-view render of `anb.parse()` output.
+- **Confidence:** proven
