@@ -184,3 +184,21 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   it. This is the on-disk half of the node model the engine composites actors into.
 - **Method:** naming/pairing census of `Bitmaps/`.
 - **Confidence:** proven
+
+### E-0012 — `.abi` = a stream of actor records (`u32 type, u32 id, class data`); type = the `.atx`/CFX class code
+- **Binary/file:** `games/grumpa/discs/cab/**/*.abi` (118: `Actors/Characters.abi`,
+  `Items.abi`, `Scenes/Scene_NNN.abi`, `Save/**/<id>_status.abi`)
+- **Evidence:** `CFXActorFactory::CreateFromABIFile` (`FUN_0040cef0`) opens the file as a
+  binary stream and loops until EOF: read `u32` (actor type), read `u32` (actor id),
+  `FUN_0040d270`→`CreateActor` (`FUN_0040d2f0`) makes the object, then the object's
+  serialize (vtable+4) reads its own fields from the stream; repeat. `CreateActor` is a
+  switch on the type that `new`s a class-specific size (`engines/grumpa/notes/actor-types.txt`,
+  34 types 0x02..0x2a). These type codes are the same as the `.atx` block `<type>` headers
+  (E-0005: 2,3,4,5,6,0x16,0x17,0x1b,0x1c,0x1f,0x25,0x26,0x27...), so `.atx` defines actor
+  templates by class, `.abi` stores actor instances/state by the same class code, and the
+  save files (`Save/**/<id>_status.abi`, `global.abi`) use the same record format
+  (`SaveGameStatus` `FUN_00410390`, `LoadGlobalGameStatus` `FUN_0040fdb0`). The scene loader
+  `FUN_0040cb30` loads `Scenes/Scene_N.scn` then `Scene_N.abi` per scene.
+- **Method:** decompile of `FUN_0040cef0`, `FUN_0040d2f0`, `FUN_0040cb30`.
+- **Confidence:** proven (record framing and type table); per-class serialize bodies pending
+  (Q-0006), so no byte-exact validator yet.

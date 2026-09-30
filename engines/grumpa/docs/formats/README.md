@@ -23,7 +23,7 @@ at `CFXActorFactory`, which loads `.atx`/`.abi` actors, `.scn` scenes, `.fxi` su
 | `.avi` `.mpg` | 10 + 4 | video | `gempeg`-style / MPEG-1 | — | E-0007 | standard |
 | `.fxi` | 316 | 16-bit Z-depth (also colour) | `CFXZBuffer` / `CFXSurface` | `fxi.py` | E-0009, E-0010 | done (316/316 parse + decode) |
 | `.scn` | 110 | binary | `CFXScene` | — | Q-0005 | header `08 00 00 00`, `0258`; float stream (layout TBD) |
-| `.abi` | 118 | binary | `CFXActorFactory::CreateFromABIFile` / status saves | — | Q-0006 | actor instances and save status (layout TBD) |
+| `.abi` | 118 | binary | `CFXActorFactory::CreateFromABIFile` / status saves | — | E-0012 | record framing done (`u32 type,u32 id,class data`); per-class fields Q-0006 |
 | `.anb` `.amb` | 939 + 588 | binary mesh | `CFXAMesh` / `CFXAMeshEx` | — | Q-0007 | vertex/anim data (layout TBD) |
 
 ## `.atx` — actor/object definitions (E-0005)

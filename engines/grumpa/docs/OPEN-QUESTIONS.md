@@ -71,13 +71,15 @@ protection).
 - **Blocks:** scene geometry / collision.
 - **Status:** open
 
-### Q-0006 — `.abi` actor-instance and save-status layout
-- **Context:** 118 files; `Actors/Characters.abi`/`Items.abi` are actor tables,
-  `Save/**/<id>_status.abi` are per-actor save state. Read by
-  `CFXActorFactory::CreateFromABIFile` / `Load*GameStatus`.
-- **What we checked:** the corpus; not yet the loader.
-- **Blocks:** actor instancing and save/load.
-- **Status:** open
+### Q-0006 — `.abi` per-class actor serialize bodies
+- **Context:** E-0012. The record framing is known (`u32 type, u32 id, class data`, looped
+  to EOF) and the 34 actor types with their object sizes
+  (`engines/grumpa/notes/actor-types.txt`). What remains for a byte-exact validator is each
+  class's serialize (vtable+4): the fields each actor type reads from the stream. The
+  common base (id, position, state) is shared; subclasses add their own.
+- **What we checked:** `CreateFromABIFile`, `CreateActor`; not yet each serialize.
+- **Blocks:** a 100% `.abi` validator; save/load; actor state.
+- **Status:** open (decompile the per-type serialize methods)
 
 ### Q-0007 — `.anb` / `.amb` mesh and animation layout
 - **Context:** 939 `.anb` + 588 `.amb`; `CFXAMesh`/`CFXAMeshEx::CreateFromFile`. Binary
