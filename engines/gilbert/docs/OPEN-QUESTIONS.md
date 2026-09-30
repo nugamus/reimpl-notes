@@ -281,4 +281,4 @@ end, Q-0100.. `default.dat` and `ge.dll`).
   like 5 in 6081 (bridge down while the queen waits for the bucket), and run 1080 instead of
   1083 for the crevice's state 3. Bug fixes are always on (CLAUDE.md), but these change
   the game's data flow, so the user decides.
-- **Status:** open
+- **Status:** RESOLVED (see E-0609): the engine repairs both, always on

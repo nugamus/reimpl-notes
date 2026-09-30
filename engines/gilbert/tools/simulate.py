@@ -17,6 +17,7 @@
     python engines/gilbert/tools/simulate.py              # replay the walkthrough, check the end
     python engines/gilbert/tools/simulate.py -v           # ... printing every event run
     python engines/gilbert/tools/simulate.py --upto N     # replay N lines, then list what can be done
+    python engines/gilbert/tools/simulate.py --repair     # with the engine's two data repairs (repair())
     python engines/gilbert/tools/simulate.py --selftest
 """
 
@@ -70,6 +71,31 @@ def reachable(room: int, start: tuple) -> frozenset:
                 elif v >= 2:
                     areas.add(v - 1)
     return frozenset(areas)
+
+
+def repair(g: dict) -> dict:
+    """The engine's load-time repairs of the two dead ends (flow.md, Q-0601): event 6081 lowers
+    the igloo's bridge while v35 == 6 (E-0604), the crevice's state 3 runs 1080 (E-0605), which
+    also gets 1083's topic join (E-0610)."""
+    ev = g["events_2f228"]
+    last = max(i for i, e in enumerate(ev) if e["id_04"] == 6081)
+    assert ev[last]["type_08"] == 18 and ev[last]["cond_0c"] == 4 and ev[last]["jump_18"] == 6084
+    extra = gamedat.Obj("CEvent")
+    extra.update(ev[last])
+    extra.update(cond_0c=0, var_10=35, value_14=6, jump_18=6085)
+    ev.insert(last, extra)
+    crevice = next(s for w in g["walkmaps_36c"] for c in w["cuas_1c"] for o in c["objs_20"]
+                   if o["id_0c"] == 10810 for s in o["states_14"] if s["state_04"] == 3)
+    assert crevice["click_event_14"] == 1083
+    crevice["click_event_14"] = 1080
+    # 1080's own path also gets 1083's topic join (E-0610).
+    join = next(e for e in ev if e["id_04"] == 1083 and e["type_08"] == 22)
+    last1080 = max(i for i, e in enumerate(ev) if e["id_04"] == 1080)
+    copy = gamedat.Obj("CEvent")
+    copy.update(join)
+    copy.update(id_04=1080)
+    ev.insert(last1080 + 1, copy)
+    return g
 
 
 class Game:
@@ -513,8 +539,9 @@ def walkthrough(text: str) -> list[tuple[int, str]]:
             if l.split("#")[0].strip()]
 
 
-def replay(lines, verbose=False, upto=None) -> Game:
-    game = Game(gamedat.parse((DATA / "game/default.dat").read_bytes()), verbose)
+def replay(lines, verbose=False, upto=None, repaired=False) -> Game:
+    g = gamedat.parse((DATA / "game/default.dat").read_bytes())
+    game = Game(repair(g) if repaired else g, verbose)
     game.new_game()
     for i, (n, line) in enumerate(lines):
         if upto is not None and i >= upto:
@@ -528,6 +555,30 @@ def replay(lines, verbose=False, upto=None) -> Game:
     return game
 
 
+def dead_ends(text: str) -> dict[str, str]:
+    """The walkthrough changed to walk into the two dead ends (E-0604, E-0605), then go on."""
+    def swap(t, a, b):
+        assert t.count(a) == 1, a
+        return t.replace(a, b)
+    melt = "cua 602 use 2071001 on 6021000\n"
+    waterfall = "back\nroom 600 area 12\ncua 603 use 1080300 on 6032000\n"
+    return {
+        # back out of C602 after melting the queen, back out of C608, walk in again
+        "igloo": swap(text, melt, melt + "back\nback\nroom 600 area 2\ncua 608 click 6081001\n"),
+        # take the bottle only after the seller's corkscrew dialogue
+        "bottle": swap(swap(text, "cua 108 click 1081003\n", ""), waterfall,
+                       "back\nmap 9901\nroom 100 area 25\nroom 151 area 12\ncua 108 click 1081003\n"
+                       "back\nmap 9906\nroom 600 area 12\ncua 603 use 1080300 on 6032000\n"),
+    }
+
+
+def ends(lines, repaired) -> bool:
+    try:
+        return replay(lines, repaired=repaired).vars[198] == 1
+    except SystemExit:
+        return False
+
+
 def selftest() -> None:
     g = Game(gamedat.parse((DATA / "game/default.dat").read_bytes()))
     g.new_game()
@@ -537,7 +588,12 @@ def selftest() -> None:
     lines = walkthrough(FLOW.read_text(encoding="utf-8"))
     end = replay(lines)
     assert end.vars[198] == 1 and end.films[-1] == "outro.mpg"
-    print(f"selftest ok ({len(lines)} steps)")
+    assert ends(lines, True)
+    text = FLOW.read_text(encoding="utf-8")
+    for name, t in dead_ends(text).items():
+        v = walkthrough(t)
+        assert not ends(v, False) and ends(v, True), name
+    print(f"selftest ok ({len(lines)} steps; the dead ends end only with the repairs)")
 
 
 def main(args) -> int:
@@ -547,7 +603,7 @@ def main(args) -> int:
     sys.stdout.reconfigure(encoding="utf-8")
     lines = walkthrough(FLOW.read_text(encoding="utf-8"))
     upto = int(args[args.index("--upto") + 1]) if "--upto" in args else None
-    game = replay(lines, "-v" in args, upto)
+    game = replay(lines, "-v" in args, upto, "--repair" in args)
     if upto is not None:
         print(f"after {min(upto, len(lines))} lines: room {game.walkmap['id_04']}, "
               f"CUA {game.cua and game.cua['id_08']}, eggs v199={game.vars[199]}, v1={game.vars[1]}")

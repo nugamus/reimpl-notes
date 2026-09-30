@@ -1662,3 +1662,34 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   the same with v196 and 190100; 1047/1801 (the CUAs' events and end events) zero them.
 - **Method:** reference scan over all event-ID fields; `gamedat.py` dump.
 - **Confidence:** proven
+
+### E-0609 — The engine's two load-time repairs end both dead ends and change nothing else
+- **Binary/file:** `default.dat`; `engines/gilbert/tools/simulate.py` (`repair`, `dead_ends`,
+  `--repair`, `--selftest`)
+- **Evidence:** `repair()` inserts into event 6081, just before its final `jump -> 6084`,
+  a type-18 record cond 0, v35 == 6, jump 6085 (6085 = bridge 6081001 and Gilbert 6082001:
+  down), and sets CObjState 10810 state 3's click event 1083 → 1080. `--selftest`: the
+  walkthrough ends with and without the repairs; the two dead-end variants (E-0604: `back`,
+  `back`, `room 600 area 2`, `cua 608 click 6081001` right after the melt; E-0605: the crevice
+  click moved after the corkscrew dialogue) fail without them (C608 shows only 6081000 and
+  6082000; 1080300 is never in the inventory) and reach 2099 with them. Data readers: v35 is
+  tested by 6021 (0, 1, 4, 5, 7), 6081, 6501 (5, unreferenced) and 6506 (7), none for 6;
+  while v35 == 6 the queen is in state 6021001, whose click is 6503, so 6021 does not run;
+  the new record comes after 6081's v35 == 8 case, so only v35 == 6 changes. 1083 is named
+  only by that crevice state and by 1080's own `jump v92 == 0 -> 1083`, so with v92 == 0 the
+  click does exactly what it did. With v92 == 1 it gives the opened bottle 1080300 (crevice
+  state 2, v52, v44 as 1083) but not 1083's topic join 11000+11007 nor the closed bottle
+  1080200, which only 6704 uses and which is then unreachable anyway (v41 == 4); using
+  1080300 on 6012500 can still run 6704 later.
+- **Method:** simulation; reference scan of v35 tests and of event 1083.
+- **Confidence:** proven
+
+### E-0610 — The repaired crevice path also joins 1083's book topic
+- **Binary/file:** `default.dat` events 1080, 1083; engine `logic.cpp` `Logic::repairData`
+- **Evidence:** E-0609: with v92 == 1 the repaired click runs 1080 to its end, which gives the
+  opened bottle but lacks 1083's type-22 record (topic join 11000 + 11007). The engine's repair
+  appends a copy of that record to 1080; with v92 == 0, 1080 jumps to 1083 at its first record,
+  so the copy never runs there and the topic is not joined twice. `simulate.py --repair`
+  mirrors it; `--selftest` still ends the walkthrough and both dead-end variants.
+- **Method:** event reading; simulation.
+- **Confidence:** proven

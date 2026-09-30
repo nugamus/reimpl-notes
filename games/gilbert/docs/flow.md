@@ -1005,8 +1005,8 @@ isdia 07 (6505); the paper 1030100 with salt (1082, sorter); the spade with came
 
 ### Dead ends
 
-States the game cannot leave, both reached by ordinary play (whether the engine repairs
-them: Q-0601):
+States the game cannot leave, both reached by ordinary play (the engine repairs both at
+load, always on: Q-0601, E-0609; `simulate.py --repair` applies the same patches):
 
 1. **Leaving the igloo with the queen melted** (E-0604, simulated): after event 6502
    (lava crucible on the queen, v35 := 6), C608's entry event 6081 has no case for v35 == 6
