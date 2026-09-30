@@ -1,0 +1,72 @@
+address,name,evidence
+0047b2f0,boot::Run,E-0204 boot sequence called from TgMain::DxScreen1Initialize
+00476d14,boot::ReadSettings,E-0201 reads \SOFTWARE\Pir\Gilbert\1.0 (TRegistry HKLM)
+0047705c,boot::WriteSettings,E-0201 writes FirstTime SoundVolume MusicVolume FullscreenVideo
+00477738,boot::CheckCD,E-0202 gilbert.nfo under CDPath then HDPath; language line 19 retry/cancel box
+004775d8,files::ResolvePath,E-0202 HDPath+rel if it exists else CDPath+rel else error box and boot::Exit
+00477854,text::LanguageLine,E-0203 line n of \data\misc\language.txt (CR-separated; trimmed)
+00478234,boot::LoadingStep,E-0206 loading panel laddbkg + lamps + text; flip; BusyWait(50)
+00477954,util::BusyWait,E-0206 n*1000000 iterations of dec/jnz
+0047b5fc,boot::Exit,E-0209 timer off; WriteSettings; logo3.mpg windowed; free; GEExit; CoUninitialize; Terminate
+004797f0,movie::Play,E-0208 \data\mpg\<name>; FullscreenVideo path 0x479b34 or gempeg windowed at (127;80)
+00479b34,movie::PlayFullscreen,E-0208 AMMultiMediaStream -> off-screen surface stretched to (0;0;640;480)
+0047ab54,boot::LoadInterfaceImages,E-0205 interface1/map/interface2/cursor.wxi into DXImageList1/3/6/14
+0047aad0,boot::LoadInventoryImages,E-0205 inventory.wxi into DXImageList7
+0047acc0,boot::LoadGilbertImages,E-0205 anims\gilbert.wxi into DXImageList9
+0047aa4c,book::LoadBookImages,E-0205 bookimages.wxi into DXImageList12
+0047b740,boot::CreatePlayerSprite,E-0204 TPlayerSprite from gilbert.wxi item 0 at (272;210) 96x96
+00471108,gmenu::InitSlotRects,E-0213 load rows 0x484ae0[1..6] and save rows 0x484b50[1..6]
+00474b7c,sound::Init,E-0207 DXSound1..6 Initialize; menu.wxs -> wave list 1; 2.wxs -> wave list 2
+004753c4,sound::LoadWaveList,E-0207 \data\sounds\misc\<file> into DXWaveList1..4
+00475624,sound::PlayWave,E-0207 (list; index; looped; wait)
+00475764,sound::StopWave,E-0207 (list; index)
+00475008,sound::PlayMenuMusic,E-0207 stream 0x484ad4 on DXSound4; \data\sounds\music\<name>.wav; not started
+00474c44,sound::PlayRoomMusic,E-0207 stream 0x484ac8 on DXSound1; started at once
+00474d84,sound::PlayDialogStream,E-0207 stream 0x484acc on DXSound2; \data\sounds\dialog\<name>.wav
+00474ec8,sound::PlayCreditMusic,E-0207 stream 0x484ad0 on DXSound3
+00475380,sound::StopAll,E-0207 stops and frees the five streams
+00475318,sound::StopMenuMusic,E-0207 frees stream 0x484ad4
+004757f0,sound::SetMusicVolume,E-0207 level 1..6 -> -5000..0 on the four music streams
+004758d4,sound::SetSoundVolume,E-0207 level 1..6 -> -5000..0 on stream 0x484ad8 and wave lists
+0046b490,gmenu::Draw,E-0212 mode 0 frame: backgrounds; buttons; counter 0x47ce6c
+0046b644,gmenu::DrawButtons,E-0212 right column normal/hover/pressed; credits back button; page
+0046bf58,gmenu::DrawPage,E-0215 page 1..7 (load; save; settings; help; credits)
+0046daac,gmenu::DrawHelp,E-0215 help page
+0046fa74,gmenu::Action,E-0214 button actions (mode 0) and in-game buttons (modes 1 2 4 5)
+0046f9d4,gmenu::CloseAll,E-0214 page/hover/press state to -1; help and credits off
+0046fa48,gmenu::CloseHelpCredits,E-0214 0x47cf88 := 0; 0x47cfb4 := 0
+0046fa5c,gmenu::ClearPageItem,E-0214 0x47cf44 := -1; 0x47cf48 := -1
+00471380,gmenu::HandleMouse,E-0213 hover and press hit tests on last-drawn picture rectangles
+00477d90,ui::DrawCursor,E-0211 clamp to (72..568; 58..422); cursor.wxi item at (x-16; y-16)
+0047afbc,gmenu::BuildHelpText,E-0215 help.txt onto a 440x1400 surface
+0047ad38,gmenu::BuildCreditsText,E-0215 credits.txt onto a 440x3000 surface
+004774dc,gmenu::ReadSlotNames,E-0216 .\gilbert.ini SLOT1..SLOT50 name
+00477198,gmenu::SlotFileName,E-0216 slot 0 default.dat else SLOTn file
+004772e0,gmenu::SaveSlot,E-0216 ini file/name + GESaveFile unless InstallationType = -1
+00477964,game::ResetState,E-0214 called after GELoadFile succeeds (new game and load)
+0047491c,gecb::GotoWalkmap,E-0217 GEInit callback 1 -> room loader 0x47a190
+00474964,gecb::RefreshWalkmapObjects,E-0217 GEInit callback 2
+00474a28,gecb::GotoCUA,E-0217 GEInit callback 3 -> 0x47a838
+00474a38,gecb::RefreshCUAObjects,E-0217 GEInit callback 4
+00474afc,gecb::RefreshInventory,E-0217 GEInit callback 5
+0047454c,gecb::Dialog,E-0217 GEInit callback 6
+004748dc,gecb::PlayWave,E-0217 GEInit callback 7
+00474900,gecb::StopWave,E-0217 GEInit callback 8
+004748cc,gecb::LoadWaveList,E-0217 GEInit callback 9
+00474804,gecb::Music,E-0217 GEInit callback 10
+0047453c,gecb::PlayFilm,E-0217 GEInit callback 12
+00460cd4,TDxScreen::SetClipRect,E-0200 copies the rect to screen+0x278 and both surfaces +0x9c
+0045ff5c,TDxScreen::Flip,E-0200 calls the primary's flip through screen+0x240
+0045ff8c,TDxScreen::CanDraw,E-0206 initialised and surface present
+00460d24,TDxScreen::TextOut,E-0206 (x; y; text; colour; style; size; font name) on the back buffer canvas
+0045c644,TDirectDrawSurface::Fill,E-0204 Blt COLORFILL|WAIT with EDX colour
+0045c670,TDirectDrawSurface::FillRectAlpha,E-0215 ColorToRGB(colour) or alpha<<24; blend 8
+00463cdc,TPictureCollectionItem::Draw,E-0205 (dest; x; y; pattern); stores x y at +0x58 +0x5c
+00463c00,TPictureCollectionItem::BoundsRect,E-0205 Rect(x; y; x+w; y+h) from +0x58 +0x5c
+00464428,TPictureCollection::GetItem,E-0205 Items[index]
+0040ee54,Classes::Rect,E-0200 (left; top; right; bottom; result)
+00407f74,SysUtils::Trim,E-0203 strips chars <= space at both ends
+0040826c,SysUtils::ExtractFilePath,E-0201 up to the last \ or :
+00403b88,System::LStrFromPChar,E-0208
+004028ec,System::Trunc,E-0215 fistp under control word 0x1f32
+00441370,TScreen::SetCursor,E-0200 Screen.Cursor := crNone

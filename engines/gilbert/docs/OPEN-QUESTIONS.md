@@ -96,3 +96,82 @@ end, Q-0100.. `default.dat` and `ge.dll`).
 - **Observed range:** n/a.
 - **Blocks:** reading original saves; `gamedat.py` should be run on one.
 - **Status:** open
+
+### Q-0200 — How long should the loading panel's busy wait last?
+- **Context:** E-0206, boot::LoadingStep 0x478234 → 0x477954(50): 50,000,000 iterations of
+  a `dec`/`jnz` loop after each of the five loading steps.
+- **What we checked:** the code; there is no clock involved, so the time depends on the CPU
+  (roughly 25–100 ms on the 300–500 MHz machines of 1999, ~1 cycle per iteration).
+- **Observed range:** —
+- **Blocks:** the length of the loading screen in the engine (a fixed delay has to be
+  chosen; a trace of the original on period hardware would settle it).
+- **Status:** open
+
+### Q-0201 — Which font measures the first loading line?
+- **Context:** E-0206: the text width that centres the line is taken from the back
+  buffer's canvas before 0x460d24 sets Arial 8, so each step measures with the font of the
+  previous text; for step 2 that is the canvas's initial font.
+- **What we checked:** the code order; the canvas's initial font is DelphiX/VCL state not
+  read.
+- **Observed range:** —
+- **Blocks:** a pixel-exact x of the first loading line only (the engine can centre with
+  Arial 8).
+- **Status:** open
+
+### Q-0202 — What exactly does FillRectAlpha's blend mode 8 compute?
+- **Context:** E-0215, 0x45c670 → 0x4585ac with mode 8 and ColorToRGB(colour) or
+  (alpha shl 24): the row highlights ((196, 38, 0), alpha 50) and the pulsing save field
+  (alpha 0..80).
+- **What we checked:** the call; DelphiX's `FillRectAlpha` passes
+  DXR_BLEND_SRCALPHA1_ADD_INVSRCALPHA2 (colour × a + destination × (1 − a)) if that is the
+  ninth value of TDXR_Blend; the blend routine 0x4585ac itself was not read.
+- **Observed range:** modes used: 8 only.
+- **Blocks:** exact highlight colours (the engine can use a plain alpha blend, a = alpha/255).
+- **Status:** open
+
+### Q-0203 — Which colour is transparent on the help and credits text surfaces?
+- **Context:** E-0215: the text surfaces are filled with colour 0 and drawn with the
+  transparent flag; the surfaces' TransparentColor is never set by the game.
+- **What we checked:** the calls; DelphiX's default for an off-screen surface's colour key
+  not confirmed in the binary.
+- **Observed range:** —
+- **Blocks:** nothing in practice (black transparent is the only reading that shows the
+  backgrounds as intended).
+- **Status:** open
+
+### Q-0204 — Which InstallationType values does the installer write?
+- **Context:** E-0201, E-0214, E-0216: the game only compares `InstallationType` with −1
+  (the value when the registry key is missing); −1 disables saving.
+- **What we checked:** Gilbert.exe's uses; the installer (`gSetup.exe`, `setup.ins`) not
+  read.
+- **Observed range:** −1 (default) and whatever the installer writes.
+- **Blocks:** nothing for the engine (it has no installer: use a value ≠ −1).
+- **Status:** open
+
+### Q-0205 — How large is the GDI text in pixels?
+- **Context:** E-0206, E-0215: TCanvas text with Font.Name 'Arial', Font.Size 8 (9, 11 in
+  the credits) on the 640×480 surface's DC.
+- **What we checked:** the font calls; the pixel height follows from the DC's logical DPI
+  (96 → 11 px for size 8), and GDI may antialias; no capture.
+- **Observed range:** sizes 8, 9, 11; styles regular and bold.
+- **Blocks:** pixel-exact text; the engine needs an Arial-metric font.
+- **Status:** open
+
+### Q-0206 — Is primary+0x90 the IDirectDrawGammaControl?
+- **Context:** E-0218: vtable slots 3 and 4 of the interface at primary+0x90, called with
+  (0, ramp), fit GetGammaRamp and SetGammaRamp.
+- **What we checked:** the calls and the ramp arrays; the QueryInterface that obtains the
+  interface (in the DelphiX/wDx surface code) not located.
+- **Observed range:** —
+- **Blocks:** the room fade-in (rooms spec), not the menu.
+- **Status:** open
+
+### Q-0207 — What is the menu's real frame rate?
+- **Context:** E-0204, E-0210: DXTimer1.Interval := 16 ms; each menu tick ends with a flip
+  of a screen created with doWaitVBlank and doFlip (E-0004).
+- **What we checked:** the interval; DelphiX's TDXTimer idle-loop scheduling and the
+  vertical-blank wait not read, no trace.
+- **Observed range:** —
+- **Blocks:** speeds tied to ticks: the credits scroll (0.5 px per tick), the save-field
+  pulse, the menu-music start (10th tick).
+- **Status:** open
