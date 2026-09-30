@@ -255,6 +255,14 @@ work happen only then (E-0214). *Click n* is `PlayWave(list 1, item n)` of `menu
 | Video 0x96 | click 0; `FullscreenVideo` toggled. |
 | Help arrows 0x84, 0x87 | nothing (the help text never scrolls). |
 
+Page presses are dispatched by page, not by item (E-0219): a page press of 0x44 **or**
+0x45 draws the pressed button and loads on page 3 (`i2[0x4d]`, Load action), saves on page
+4 (`i2[0x4c]`, Save action), and does nothing on other pages. The hit test finds 0x44
+before 0x45; both sit at (258, 302), so either works on either page. 0x63 and 0x66 run
+their action (click 1, scroll only on pages 3/4) on every page; their pressed pictures
+only on pages 3/4. 0x8a..0x96 act only on page 5, 0x73/0x84/0x87 (page items) only on
+page 6.
+
 "Reset the game state" (ResetState, after a successful new game or load) also sets
 MusicVolume 5, SoundVolume 4 and FullscreenVideo 0 in memory, whatever the settings were
 (rooms.md "State", E-0309).
@@ -351,6 +359,12 @@ cannot load). Saving slot n (not when `InstallationType` = −1) writes `file=ga
 
 - Hit tests use the last drawn place of each picture, so buttons of pages not shown can
   still be hit where they were last drawn; the actions check the page (E-0213, E-0215).
+  Visible effect (E-0219): on Settings, after Load or Save was shown, the stale
+  Åbn/Gem rectangle (258, 302)–(319, 326) covers the lower right of the video button
+  (246, 294)–(275, 323), where a press does nothing, and the stale down arrow ((301, 272)–
+  (316, 284) after Load, (301, 241)–(316, 253) after Save) covers the right edge of sound
+  button 6 (279, 247)–(308, 276), where a press only plays click 1 (all rectangles before
+  the mouse's ±3 widening).
 - The right-side gate stops at x 512 (mouse x ≤ 514), so the right end of the column
   buttons does not update the hover (E-0213).
 - A pressed column button stays pressed (drawn pressed, its action re-run) until the next

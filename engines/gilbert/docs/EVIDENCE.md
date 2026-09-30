@@ -1524,3 +1524,22 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   0x46f654 reads TgMain+0x32c) and the form gives it no items.
 - **Method:** disassembly; call-site and field-offset scans; `gamedat.py`.
 - **Confidence:** proven
+
+### E-0219 — Page presses dispatch on the page, not on which of 0x44/0x45 was hit; stale rectangles on Settings
+- **Binary/file:** `GILBERT.EXE` 0x46d5c9 (tables 0x46d5e9/0x46d63c), 0x46d68c, 0x46d731,
+  0x46d7c2, 0x471e24; `interface2.wxi` item sizes
+- **Evidence:** the pressed-page-item switch sends both 0x44 and 0x45 to 0x46d68c, which
+  tests the page (EDI): 3 → draw 0x4d, Action(0x45) (load); 4 → draw 0x4c, Action(0x44)
+  (save); any other page → nothing. So a press on (258, 302) loads on page 3 and saves on
+  page 4 whichever of the two the hit test found first (it tests 0x44 before 0x45,
+  0x471e24). 0x63 (0x46d731) and 0x66 (0x46d7c2) draw their pressed picture only on pages
+  3/4 but call Action(0x63/0x66) on every page; the action changes a scroll only on pages
+  3/4 and always plays click 1. Each of 0x63, 0x66 is one item drawn every frame by the
+  current page before HandleMouse runs, so on pages 3/4 its rectangle is the current one.
+  Sizes: 0x44, 0x45 61×24; 0x63, 0x66 15×12; 0x96 and 0x90..0x95 29×29. On page 5 the stale
+  rectangles of 0x44/0x45 (258, 302)–(319, 326) overlap the video button 0x96 (246, 294)–
+  (275, 323), and the stale 0x66 ((301, 272)–(316, 284) after Load, (301, 241)–(316, 253)
+  after Save) overlaps sound button 6 0x95 (279, 247)–(308, 276); these are tested first,
+  so a press there does nothing (0x44/0x45) or only plays click 1 (0x66).
+- **Method:** disassembly; item sizes from `wxi.py`.
+- **Confidence:** proven
