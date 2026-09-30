@@ -215,14 +215,18 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** decompile of `FUN_00416a90`; `python engines/grumpa/tools/parsers/amb.py`.
 - **Confidence:** proven
 
-### E-0014 — `.anb` holds a mesh's topology/UV/animation (header counts + record arrays)
+### E-0014 — `.anb` = the full mesh: geometry, UVs and vertex animation; 938/939 parse
 - **Binary/file:** `games/grumpa/discs/cab/Meshes/*.anb` (939)
-- **Evidence:** `FUN_004157d0` (called by `CreateFromFile` after the `.amb` vertices) reads
-  the `.anb`: a header of several `u32` counts (into `this+0x118`, and locals for the
-  section sizes), then arrays — `iStack_53c` records of `0x18` (24) bytes each (read in one
-  block, likely faces: indices + per-face data), `u16` separators, and `iStack_544` records
-  of 8 bytes each (likely UV or edge pairs). More sections follow (the function is 3,750
-  bytes, 27 callees). The full record semantics and the animation frames are not yet
-  decoded.
-- **Method:** decompile of `FUN_004157d0` (read-size census).
-- **Confidence:** strong (section framing); field meaning open (Q-0007)
+- **Evidence:** `FUN_004157d0` reads: `u32 frameCount F`, `u32 sectionCount S`, then per
+  section `u32 A (verts), u32 B (uvs), u32 C (faces)`, `A*24` frame-0 vertices (pos[3f] +
+  normal[3f], normal stored z,y,x), `C*6` face vertex-index triples (3×u16), `B*8` texture
+  coordinates (2×f32), `C*6` face uv-index triples (3×u16); then a trailing block of
+  `K*(ΣA)*24` = further animation frames (vertices only). `engines/grumpa/tools/parsers/anb.py`
+  parses 938/939 consuming every byte (193,420 base vertices, 358,673 triangles); the one
+  failure (`012_D2D_Grumpa_In_Boat.ANB`) carries 4,456 extra trailing bytes (a special
+  composite). K = F-1 frames for most meshes, K = F for the `X2Y` transition-animation clips
+  (N2N idle, N2W normal→walk, W2R walk→run, ...); the in-file discriminator between the two
+  is not yet pinned (Q-0007). A `.amb` (E-0013) is the same vertex block for a mesh that has
+  no `.anb`. This is the renderable geometry for the 3D actors.
+- **Method:** decompile of `FUN_004157d0`; `python engines/grumpa/tools/parsers/anb.py`.
+- **Confidence:** proven (geometry, UVs, byte layout); the K=F vs F-1 discriminator open (Q-0007)

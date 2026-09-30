@@ -25,7 +25,7 @@ at `CFXActorFactory`, which loads `.atx`/`.abi` actors, `.scn` scenes, `.fxi` su
 | `.scn` | 110 | binary | `CFXScene` | — | Q-0005 | header `08 00 00 00`, `0258`; float stream (layout TBD) |
 | `.abi` | 118 | binary | `CFXActorFactory::CreateFromABIFile` / status saves | — | E-0012 | record framing done (`u32 type,u32 id,class data`); per-class fields Q-0006 |
 | `.amb` | 588 | binary mesh | `CFXAMeshEx::CreateFromFile` | `amb.py` | E-0013 | done (`u32 count` + count×(pos+normal)) |
-| `.anb` | 939 | binary mesh | `FUN_004157d0` (faces/UV/anim) | — | E-0014 | sections mapped; fields Q-0007 |
+| `.anb` | 939 | binary mesh | `CFXAMeshEx` / `FUN_004157d0` | `anb.py` | E-0014 | done (938/939: geometry, UVs, anim); frame-count Q-0007 |
 
 ## `.atx` — actor/object definitions (E-0005)
 
