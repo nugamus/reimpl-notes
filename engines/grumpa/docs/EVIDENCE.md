@@ -202,3 +202,27 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** decompile of `FUN_0040cef0`, `FUN_0040d2f0`, `FUN_0040cb30`.
 - **Confidence:** proven (record framing and type table); per-class serialize bodies pending
   (Q-0006), so no byte-exact validator yet.
+
+### E-0013 — `.amb` mesh = `u32 count` + count×(pos[3f] + normal[3f]); 588/588 parse
+- **Binary/file:** `games/grumpa/discs/cab/Meshes/*.amb` (588)
+- **Evidence:** `CFXAMeshEx::CreateFromFile` (`FUN_00416a90`) opens `<base>.amb` binary and
+  reads a `u32` vertex count, then per vertex a 12-byte position (x,y,z, one block into
+  `this+0x150`) and a 12-byte normal (three reversed `u32` into `this+0x154`: z, then y,
+  then x). So `.amb` = `4 + count*24` bytes. `engines/grumpa/tools/parsers/amb.py` parses
+  588/588 consuming every byte (585 full + 3 four-byte stubs — a count with no data, which
+  the game tolerates); 8,043 vertices total. Faces, UVs and animation are not in `.amb`;
+  `CreateFromFile` then calls `FUN_004157d0` for the companion `.anb` (Q-0007).
+- **Method:** decompile of `FUN_00416a90`; `python engines/grumpa/tools/parsers/amb.py`.
+- **Confidence:** proven
+
+### E-0014 — `.anb` holds a mesh's topology/UV/animation (header counts + record arrays)
+- **Binary/file:** `games/grumpa/discs/cab/Meshes/*.anb` (939)
+- **Evidence:** `FUN_004157d0` (called by `CreateFromFile` after the `.amb` vertices) reads
+  the `.anb`: a header of several `u32` counts (into `this+0x118`, and locals for the
+  section sizes), then arrays — `iStack_53c` records of `0x18` (24) bytes each (read in one
+  block, likely faces: indices + per-face data), `u16` separators, and `iStack_544` records
+  of 8 bytes each (likely UV or edge pairs). More sections follow (the function is 3,750
+  bytes, 27 callees). The full record semantics and the animation frames are not yet
+  decoded.
+- **Method:** decompile of `FUN_004157d0` (read-size census).
+- **Confidence:** strong (section framing); field meaning open (Q-0007)

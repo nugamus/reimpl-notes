@@ -81,9 +81,12 @@ protection).
 - **Blocks:** a 100% `.abi` validator; save/load; actor state.
 - **Status:** open (decompile the per-type serialize methods)
 
-### Q-0007 — `.anb` / `.amb` mesh and animation layout
-- **Context:** 939 `.anb` + 588 `.amb`; `CFXAMesh`/`CFXAMeshEx::CreateFromFile`. Binary
-  vertex/animation data.
-- **What we checked:** the corpus; not yet the loader.
-- **Blocks:** the 3D characters and items.
-- **Status:** open
+### Q-0007 — `.anb` topology/UV/animation record semantics
+- **Context:** E-0013 resolved `.amb` (vertices + normals). E-0014 mapped the `.anb`
+  sections (`FUN_004157d0`): a header of u32 counts, then `count1` 24-byte records (faces?),
+  `count2` 8-byte records (UV/edges?), u16 separators, and more. What remains is the meaning
+  of each record (index widths, UV layout) and the animation frames, for a byte-exact
+  validator and the mesh renderer.
+- **What we checked:** `FUN_00416a90` (.amb, done), `FUN_004157d0` (.anb, section framing).
+- **Blocks:** rendering the 3D actors; a 100% `.anb` validator.
+- **Status:** open (decode the record fields in `FUN_004157d0`)
