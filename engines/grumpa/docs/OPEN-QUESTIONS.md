@@ -49,7 +49,7 @@ protection).
 - **Blocks:** the run folder for the original and the engine's data paths.
 - **Status:** open
 
-### Q-0004 — The `.fxi` block codec's per-mode pixel maths
+### Q-0004 — The `.fxi` block codec's per-mode pixel maths — RESOLVED (see E-0009)
 - **Context:** E-0009. The container and byte layout are proven (`fxi.py`, 316/316); what
   remains is how each sub-block mode fills the 8×8 block from its mask + colours: mode 1
   (1bpp, 2 colours), mode 2 (2bpp, 4 colours), mode 3 (raw 8×4 ×2), and how the low- and
@@ -58,7 +58,10 @@ protection).
 - **What we checked:** `FUN_00418de0` structure and byte reads; the surface fill loop in
   `FUN_004555c0`.
 - **Blocks:** actually rendering `.fxi` (backgrounds, textures); a round-trip test.
-- **Status:** open (read `FUN_00418de0`'s pixel writes in the disassembly)
+- **Status:** RESOLVED (E-0009). Each control byte's low nibble codes the high
+  byte of the block's pixels, its high nibble the low byte; per plane, mode 0 solid, 1
+  1bpp/2 values, 2 2bpp/4 values, 3 raw. `fxi.py` decodes 316/316. From the blit at
+  `0x00419f7a` and the mode writes at `0x004198c0`+.
 
 ### Q-0005 — `.scn` scene record layout
 - **Context:** 110 files; header `08 00 00 00`, `58 02 00 00` (600), then a float stream

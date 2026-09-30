@@ -21,7 +21,7 @@ at `CFXActorFactory`, which loads `.atx`/`.abi` actors, `.scn` scenes, `.fxi` su
 | `.jpg` `.tga` `.bmp` | 1745 + 317 + 65 | image | `CFXBitmap` etc. | — | E-0007 | standard JFIF / Targa / Windows BMP |
 | `.wav` | 1612 | sound | `CFXSound` | — | E-0007 | standard RIFF/WAVE |
 | `.avi` `.mpg` | 10 + 4 | video | `gempeg`-style / MPEG-1 | — | E-0007 | standard |
-| `.fxi` | 316 | binary image | `CFXSurface` / `CFXTexture` / `CFXZBuffer` | `fxi.py` | E-0009 | done (container: 316/316; block pixel maths Q-0004) |
+| `.fxi` | 316 | 16-bit Z-depth (also colour) | `CFXZBuffer` / `CFXSurface` | `fxi.py` | E-0009, E-0010 | done (316/316 parse + decode) |
 | `.scn` | 110 | binary | `CFXScene` | — | Q-0005 | header `08 00 00 00`, `0258`; float stream (layout TBD) |
 | `.abi` | 118 | binary | `CFXActorFactory::CreateFromABIFile` / status saves | — | Q-0006 | actor instances and save status (layout TBD) |
 | `.anb` `.amb` | 939 + 588 | binary mesh | `CFXAMesh` / `CFXAMeshEx` | — | Q-0007 | vertex/anim data (layout TBD) |

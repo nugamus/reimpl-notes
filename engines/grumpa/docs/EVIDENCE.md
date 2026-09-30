@@ -156,3 +156,18 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   on `0x00455380`/`0x004555c0` (`CFXSurface::CreateFromFile` chain) and `0x00418de0`
   (the codec); `python engines/grumpa/tools/parsers/fxi.py`.
 - **Confidence:** proven (container and codec structure; per-mode pixel maths pending, Q-0004)
+
+### E-0010 — Grumpa is a pre-rendered 3D adventure: 2D backgrounds + `.fxi` Z-depth buffers
+- **Binary/file:** `games/grumpa/discs/cab/Bitmaps/` (1745 `.jpg`, 317 `.tga`, 316 `.fxi`)
+- **Evidence:** all 316 `.fxi` are 16-bit images named `*_IZ` / `*_Z*` and live only in
+  `Bitmaps/`; decoded (E-0009, `fxi.py`) they are smooth depth ramps with the scene's
+  silhouettes (e.g. `100_1_IZ.fxi`, a ship over water: the ship's depth against a
+  water/sky depth plane). The loader `CFXZBuffer::CreateFromFile` reads `.fxi` as depth;
+  `CFXSurface::CreateFromFile` reads the same format as RGB555 colour (`FUN_004555c0`:
+  `(px>>7)&0xf8`, `(px>>2)&0xf8`, `px<<3` — a 555 unpack). So the scenes are pre-rendered:
+  a 2D colour background (`.jpg`/`.tga`) plus a matching `.fxi` depth buffer, and the 3D
+  actors (`.anb`/`.amb` meshes, `CFXCharacter`/`CFXItem`) are composited into it with
+  depth test. This is the engine's core architecture (like Ring's pre-rendered nodes, but
+  with a real per-pixel depth buffer).
+- **Method:** decode + naming/dir census of `.fxi`; the `CFXSurface`/`CFXZBuffer` loaders.
+- **Confidence:** proven (format and role); the compositing pipeline itself specced later
