@@ -125,7 +125,7 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** `python engines/grumpa/tools/survey.py`.
 - **Confidence:** proven
 
-### E-0008 — `.fxi` is an 800×600 surface with a compressed body
+### E-0008 — `.fxi` is a surface with a compressed body — SUPERSEDED by E-0009 (dimensions vary; codec found)
 - **Binary/file:** `cab/**/*.fxi` (316 files)
 - **Evidence:** 8-byte header `u8 ver=1; u8 flag(2|0); u16 width; u32 height`; every file
   is 800×600 (`width=0x0320`, `height=0x00000258`), but the body length varies per file
@@ -135,3 +135,24 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   methods in the decrypted EXE (Q-0004).
 - **Method:** header-vs-size correlation over all `.fxi`.
 - **Confidence:** proven (header + that the body is compressed); codec open (Q-0004)
+
+### E-0009 — Ghidra project `Grumpa.gpr` on the decrypted dump; the `.fxi` codec; 316/316 parse
+- **Binary/file:** `build/grumpa-import/GRUMPA.EXE` (= `build/grumpa/Grumpa.dump.exe`,
+  E-0003); `games/grumpa/discs/cab/**/*.fxi`
+- **Evidence:** the decrypted dump imports and analyses in Ghidra
+  (`ghidra_projects/Grumpa.gpr`, folder `/grumpa-import/`) and decompiles cleanly — the
+  `CFX*` methods are all reachable from their error strings. `.fxi` is loaded by
+  `FUN_00418de0` (the `fxi` arm of the extension switch `FUN_004189d0`:
+  `tga`/`raw`/`fxi`/`pcx`/`jpg` at `DAT_0049cc9c..8c`). It reads `u8 version, u8 flag,
+  u16 width, u16 height`, allocates a 16-bit surface (`FUN_00418910(this, w, h, 0x10)`),
+  reads three u32, then: flag 0 → `width*height*2` raw 16-bit pixels; flag != 0 →
+  `(width/8)*(height/8)` control bytes (one per 8×8 block, row-major), then per block two
+  sub-blocks (control byte low nibble, then high nibble), each a mode: 0 solid (1 B),
+  1 two-colour (8-B 1bpp mask + 2×u16, 10 B), 2 four-colour (16-B 2bpp mask + 4×u16, 20 B),
+  3 raw (64 B). `engines/grumpa/tools/parsers/fxi.py` parses 316/316 consuming every byte;
+  dimensions vary (173 are 800×600, the rest smaller, down to 56×56); flags 0:36, 2:280;
+  all four block modes occur. The stream reader is `FUN_004026c0(stream, dst, n)`.
+- **Method:** `python -m pyghidra.ghidra_launch ... -process GRUMPA.EXE ... decompile_one.py`
+  on `0x00455380`/`0x004555c0` (`CFXSurface::CreateFromFile` chain) and `0x00418de0`
+  (the codec); `python engines/grumpa/tools/parsers/fxi.py`.
+- **Confidence:** proven (container and codec structure; per-mode pixel maths pending, Q-0004)

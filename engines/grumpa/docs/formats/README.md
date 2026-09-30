@@ -21,7 +21,7 @@ at `CFXActorFactory`, which loads `.atx`/`.abi` actors, `.scn` scenes, `.fxi` su
 | `.jpg` `.tga` `.bmp` | 1745 + 317 + 65 | image | `CFXBitmap` etc. | — | E-0007 | standard JFIF / Targa / Windows BMP |
 | `.wav` | 1612 | sound | `CFXSound` | — | E-0007 | standard RIFF/WAVE |
 | `.avi` `.mpg` | 10 + 4 | video | `gempeg`-style / MPEG-1 | — | E-0007 | standard |
-| `.fxi` | 316 | binary image | `CFXSurface` / `CFXTexture` / `CFXZBuffer` | — | Q-0004 | 800×600 surface, **compressed body** (codec TBD) |
+| `.fxi` | 316 | binary image | `CFXSurface` / `CFXTexture` / `CFXZBuffer` | `fxi.py` | E-0009 | done (container: 316/316; block pixel maths Q-0004) |
 | `.scn` | 110 | binary | `CFXScene` | — | Q-0005 | header `08 00 00 00`, `0258`; float stream (layout TBD) |
 | `.abi` | 118 | binary | `CFXActorFactory::CreateFromABIFile` / status saves | — | Q-0006 | actor instances and save status (layout TBD) |
 | `.anb` `.amb` | 939 + 588 | binary mesh | `CFXAMesh` / `CFXAMeshEx` | — | Q-0007 | vertex/anim data (layout TBD) |
@@ -67,10 +67,20 @@ whitespace.
 (RIFF/WAVE), `.avi` (RIFF/AVI), `.mpg` (MPEG-1). Read with off-the-shelf decoders; the
 game's own `CFXBitmap`/`CFXSound` wrap them. Not re-specced here.
 
-## Binary formats pending the loader
+## `.fxi` — surface image (E-0009)
 
-`.fxi`, `.scn`, `.abi`, `.anb`/`.amb` are compiled binary (arrays of records / a
-compressed surface). Their field layouts and the `.fxi` codec are read from the loader
-methods in the decrypted `Grumpa.exe` (`CFXSurface::CreateFromFile`,
-`CFXScene`, `CFXAMesh::Serialize`, ...), which needs the Ghidra project; tracked as
-Q-0004..Q-0007 until specced from that code.
+Loaded by `FUN_00418de0` (decrypted `Grumpa.exe`). 18-byte header (`u8 version`,
+`u8 flag`, `u16 width`, `u16 height`, `u32`×3), a 16-bit surface. `flag == 0`: raw
+`width*height*2` pixels (36 files). `flag != 0`: `(width/8)*(height/8)` control bytes, one
+per 8×8 block; each block is two sub-blocks (the control byte's low nibble, then its high
+nibble), each a mode — 0 solid (1 B), 1 two-colour (8-B 1bpp mask + 2×u16, 10 B), 2
+four-colour (16-B 2bpp mask + 4×u16, 20 B), 3 raw (64 B) (280 files). `fxi.py` parses
+316/316 with every byte consumed. Dimensions vary (173 are 800×600, down to 56×56). The
+per-mode pixel maths (filling the 8×8 block from the masks/colours) is Q-0004.
+
+## Binary formats still pending the loader
+
+`.scn`, `.abi`, `.anb`/`.amb` are compiled binary (arrays of records). Their field layouts
+are read from the loader methods in the decrypted `Grumpa.exe` (`CFXScene`,
+`CFXActorFactory::CreateFromABIFile`, `CFXAMesh::Serialize`) in `ghidra_projects/Grumpa.gpr`;
+tracked as Q-0005..Q-0007 until specced.

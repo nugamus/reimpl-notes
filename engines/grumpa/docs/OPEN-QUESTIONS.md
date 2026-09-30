@@ -49,12 +49,16 @@ protection).
 - **Blocks:** the run folder for the original and the engine's data paths.
 - **Status:** open
 
-### Q-0004 — What is the `.fxi` surface codec?
-- **Context:** E-0008. 8-byte header then a compressed 800×600 surface; body length varies.
-- **What we checked:** the header fields and that the body is not raw at 1/2/3/4 bytes per
-  pixel; the loader is `CFXSurface::CreateFromFile` in the decrypted `Grumpa.exe`.
-- **Blocks:** decoding backgrounds, textures and z-buffers; the engine's drawing.
-- **Status:** open (read `CFXSurface`/`CFXZBuffer` in Ghidra)
+### Q-0004 — The `.fxi` block codec's per-mode pixel maths
+- **Context:** E-0009. The container and byte layout are proven (`fxi.py`, 316/316); what
+  remains is how each sub-block mode fills the 8×8 block from its mask + colours: mode 1
+  (1bpp, 2 colours), mode 2 (2bpp, 4 colours), mode 3 (raw 8×4 ×2), and how the low- and
+  high-nibble sub-blocks combine into the block. `FUN_00418de0`'s write branches are elided
+  in the decompiler output; they need the assembly.
+- **What we checked:** `FUN_00418de0` structure and byte reads; the surface fill loop in
+  `FUN_004555c0`.
+- **Blocks:** actually rendering `.fxi` (backgrounds, textures); a round-trip test.
+- **Status:** open (read `FUN_00418de0`'s pixel writes in the disassembly)
 
 ### Q-0005 — `.scn` scene record layout
 - **Context:** 110 files; header `08 00 00 00`, `58 02 00 00` (600), then a float stream
