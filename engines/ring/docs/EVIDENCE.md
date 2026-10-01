@@ -926,3 +926,16 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   `engines/ring/notes/decomp/vartim/`.
 - **Method:** decompiles.
 - **Confidence:** proven
+
+### E-0056 — Zone AS: entries, handlers, returning from a world, `GoZone` (DVD)
+- **Binary/file:** `RING_DVD.EXE` `GameSetZoneAS` 0x437ba0 (entries 999, 998, 5, 6), object
+  click 0x4364a0, animation 0x437110, before / after a movability 0x436c10 / 0x436d60, timer
+  0x436df0, sound 0x437190, return from a world 0x437750, world entries 0x44a7d0 (NI),
+  0x436270 (N2), 0x443710 (FO), 0x43ad00 (WA), `GoZone` 0x402280 → 0x40d220; helpers
+  0x406530 (an object in hand), 0x406550 (which), 0x406570 (drop it), 0x4060e0 (byte
+  variable), `PlyCinMul` 0x4016a0, `GetLanID` 0x4076b0, `GetLanCha` 0x407720.
+- **Evidence:** as written in `games/ring/docs/as.md`; decompiles in
+  `engines/ring/notes/decomp/as/`. The set-up (0x4635a0) is `engines/ring/notes/zones/as.md`.
+- **Method:** decompiles.
+- **Confidence:** proven for the handlers; the video names are the `DAT_0048d8..` strings
+  of the decompiles.
