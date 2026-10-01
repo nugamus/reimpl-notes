@@ -108,3 +108,10 @@ protection).
   SafeDiscLoader2 (as `sddump.py` does), then read the live view/projection matrix from the
   decrypted process — the fastest ground truth for the camera, near/far and scale. The
   static alternative is to trace the scene render tick to the device `SetTransform`.
+  Runtime prerequisites found: the original resolves its data via the registry key
+  `SOFTWARE\Idol FX\Grumpa` value `DataPath` (`FUN_00447840`/`FUN_00436aa0`; the read is
+  behind a SafeDisc stub) and errors "Cant Find Registry Key, Fatal Error" if absent — so a
+  runtime run needs that key set to the `cab` data folder, plus `startScene.txt` with a scene
+  number, launched through SafeDiscLoader2. Then dump the decrypted process (as `sddump.py`
+  does) and locate the perspective projection matrix (recognisable: 1/tan(fov) diagonal, a
+  ±1 in the w column) and the per-view world matrix near the device object.
