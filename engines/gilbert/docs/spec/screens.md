@@ -385,3 +385,6 @@ None of these screens fades; the only fades are the room's (`rooms.md`).
   1, 2, 14, 15, 16, an ending anim or re-entering the close-up refreshes the table (E-0515).
   The engine refreshes the close-up after events of type 12 and 13 that change a state, as
   after type 2; always on.
+- Nothing is drawn outside the clip rectangle (64, 50)–(576, 430) (`boot.md` "Conventions"),
+  so the original's 640×480 screen has a black border on every side. The engine's window is
+  the clip rectangle alone, 512×380; always on.
