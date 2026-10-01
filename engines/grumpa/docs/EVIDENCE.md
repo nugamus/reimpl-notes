@@ -556,3 +556,24 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** `abi.py` extraction of the 0x1a record strings across scenes.
 - **Confidence:** strong (mesh/texture names proven); the transform offset and the eight
   command hooks' roles remain to pin down.
+
+### E-0115 — The per-view camera is a look-at camera (eye -> scene target ~origin)
+- **Binary/file:** the scene view camera blocks (E-0105); the 0x1a meshes (E-0114); the
+  pre-rendered backgrounds.
+- **Evidence:** the camera block stores an eye position (`block[13..15]`) but no orientation
+  (all would-be rotation floats are 0, E-0105), yet different views of one scene have very
+  different eye positions (Scene_061: view 630 eye (-1453,-320,83), view 633 (16,352,5)). The
+  camera therefore **looks at a fixed scene target** (≈ the origin): `forward =
+  normalize(target - eye)`, up +Y (or +Z for a near-vertical top-down view). Projecting the
+  scene's world-space 0x1a meshes through this camera lands them on their features in the
+  matching background — Scene_061 view 633 (eye above, looking down) over the top-down
+  background `61_1` puts the `plattform` mesh on the floor's circular socket, and view 630
+  (eye to the side) over the side background `61_2` stands the platform as a pillar on the
+  corridor floor. So the top-down view pairs with the top-down background and the side view
+  with the side background (the view→background selection rule, Q-0011, is still to be pinned,
+  but the camera geometry is confirmed). NDC = `(block[2]·vx/vz, block[3]·vy/vz)`; the exact
+  target point and any field-of-view scaling (a small residual offset remains) are the
+  remaining calibration (Q-0008).
+- **Method:** wireframe overlay of the meshes through each view's camera on each background.
+- **Confidence:** strong (look-at model confirmed visually on two angles); exact target/FOV
+  and the view→background rule open.
