@@ -42,7 +42,7 @@ from inside the handler.
 Bytes (initial 0 unless said): 10000 Glug fed; 10100..10113 console (10102 tile placed,
 10103 hologram on, 10104 cross at 12, 10105 dam open, 10106 cross solved, 10107 boiling,
 10108..10112 mosaic entries, 10113 mosaic count); 10200 speaker done once; 10300 frog taken,
-10301 Mime's state (0, 1 tile asked, 2 tile given), 10302, 10303 back from FO; 10420 /
+10301 Mime's state (0, 1 tile asked, 2 tile given), 10302, 10303 back from RH (E-0101); 10420 /
 10421 valve open; 10430 tear in the casing, 10431 heater on; 10432 heat counter; 10500
 helmet taken, 10501 (initial 1) AG cells taken. Words 10100 (cross position 0..18), 10101,
 10600 / 10601 / 10602 (tile positions 0..47, initial 12, 0, 24). Dwords 10000 (where Glug
@@ -82,12 +82,12 @@ was called from), 10001 (that rotation's alpha). SY's float 90005 is the world's
 ## Entering (`GameSetZoneNI` 0x44a840, entry)
 
 AS enters through 0x44a7d0(0): `GoZone(2, 0)` when SY's byte 90009 is 0, else
-`GoZone(dword 90013, 10)` (E-0073). 0x44a7d0(3) is `GoZone(2, 3)` (called by FO, 0x4447c1,
+`GoZone(dword 90013, 10)` (E-0073). 0x44a7d0(3) is `GoZone(2, 3)` (called by RH's Rhine Gold, 0x4447c1, E-0101,
 after `PlyCin(1666)` and `BagRem(20403)`); 0x44a7d0(9) starts timer 9 (1 s).
 
 - **0**: `PlyCin(1540)`, play(14001, loop), `PlyCin(1541)`, `BagRemAll`, `BagAdd(10000)`,
   `PuzSetAct(10390)`, play(10001): the Mime's welcome (sound chain below).
-- **3** (back from FO): `TimStoAll`, puzzle 10410's movability 0 on (0x404a70), `PlyCin(1550)`,
+- **3** (back from RH): `TimStoAll`, puzzle 10410's movability 0 on (0x404a70), `PlyCin(1550)`,
   rotation 10301 at alpha 160, ran 85.7, `RotSetAct`, then `PuzSetAct(10392)`, play(14001,
   loop), play(10021), byte 10303 = 1.
 - **10** (resume): needs `Data\Save\alb.ars` (else the error "Wrong Erda AS / NI"),
@@ -259,7 +259,7 @@ press y 0x406790, press y < cur y 0x4067b0, cur x < ref x 0x406850, cur y < ref 
   /12. Every max(5, (120 − v) / 10) ticks: play(10415), 10432/(1 + rand() × 2 / 32768)
   shown (a burst on the layers). Volume of 10412 = min(100, v / 5 + 80). Above 120: timer 0
   stopped, sound types 3 and 1 stopped (0x406e40), `PlyCin(1538)`, **game over 4**.
-- 1 (1 s, steady steam): byte 10432 += 1; from 11 with byte 10303 = 1 (back from FO):
+- 1 (1 s, steady steam): byte 10432 += 1; from 11 with byte 10303 = 1 (back from RH):
   `TimStoAll`, stop all (0x400), float 90005 = 100, `PlyCin(1539)`, **AS 0x437750(1)**: NI done.
 
 **0x445a10 (the heater)**, after every valve, casing or cross change: with h = bytes 10431 +
@@ -343,7 +343,7 @@ water without Helmet&Frog, 3 riding from 10102 with the cross not at 12, 4 the h
    valves open keep it steady, one closed makes it boil (timer 0; game over at 120 s;
    opening a valve halves the heat).
 8. The door (10404) to 10415, the water with Helmet&Frog to 10406, the water there: on to RH
-   (`GoZone(3, 0)`). The other worlds lead back here through FO (entry 3, byte 10303).
+   (`GoZone(3, 0)`). RH leads back here (entry 3, byte 10303; `rh.md`, E-0101).
 9. With byte 10303 set, the heater steady (hologram, tear, both valves): after 11 s of timer
    1, `PlyCin(1539)` and AS's return 0x437750(1): NI is done (score 100).
 
