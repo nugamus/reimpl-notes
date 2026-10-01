@@ -199,3 +199,15 @@ scene, play a sound, set a state, pick up an item) must come from the game's eve
 system — the EC/CC vectors on the trigger, an id-keyed command table, or the per-scene script.
 Needs the 0x19 click-handling and event-dispatch code in the decrypted `Grumpa.exe`. This is
 the entry point to the game-logic layer (navigation, puzzles, dialogues, inventory).
+
+## Q-0011 — The view -> background mapping (which camera a shown background uses)
+
+A scene has several type-0x11 views, each with its own camera eye (E-0105), but a different
+number of background views `<n>_<k>_IS.jpg`: Scene_061 has 4 views (ids 630..633) but 2
+backgrounds (61_1, 61_2); Scene_100 has 2 views, 1 background; Scene_007 has 1 view, 1
+background. So the displayed background does not map 1:1 to `views[0]`. To place the 3D mesh
+actors (type 0x1a, E-0114, meshes authored in world space) and to drive multi-view
+navigation, the engine needs to know which view's camera matches the shown background. The
+view's camera "handle" is `view[+0x108] - 0x276` (FUN_0043d200); candidates: a background-index
+field in the view record, a handle->background convention, or a link in the `.scn` file
+(Q-0005). Needs the scene-display/camera-select code.
