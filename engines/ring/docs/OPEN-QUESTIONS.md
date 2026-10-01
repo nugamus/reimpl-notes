@@ -179,3 +179,25 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** every `push 0x59e3` in the EXE (0x4448b8, 0x4449e8, 0x458727).
 - **Blocks:** nothing (stopping a silent sound does nothing).
 - **Status:** open
+
+### Q-0040 — N2's handle plays sound 70401, which N2 never declares
+- **Context:** `games/ring/docs/n2.md` "Drag": 0x4349b0 (70103) plays and stops 0x11301
+  (70401); N2's set-up declares no sound 70401 (NI's handle uses its own 10401).
+- **What we checked:** N2's `SouAdd` calls (E-0094's emulated list).
+- **Blocks:** nothing (an unknown id is reported and ignored).
+- **Status:** open
+
+### Q-0041 — What does `CurSet(0x36)` show at N2's arrival?
+- **Context:** entry 0 of `GameSetZoneN2` (0x4362c0) sets cursor 0x36, the kind-1 cursor with
+  an empty name of `spec/boot.md`; tracking replaces the cursor every frame.
+- **What we checked:** the `CurAdd` table of `spec/boot.md`; kind 1 is a Windows cursor.
+- **Blocks:** nothing visible beyond one frame.
+- **Status:** open
+
+### Q-0042 — 0x433ee0 runs again at the end of line 70022
+- **Context:** N2's sound handler (0x435a00), 70022 ended: 0x433ee0 (which, its conditions
+  still holding, starts line 70017 again) and then play(70024), which cuts it.
+- **What we checked:** nothing between the two calls changes 0x433ee0's conditions.
+- **Blocks:** nothing (the later play wins).
+- **Status:** open
+

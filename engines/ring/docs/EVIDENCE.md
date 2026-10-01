@@ -1244,3 +1244,47 @@ is02n01p03s01.0001.bmp` … (`parsers/at2.py --file`).
   `engines/ring/notes/zones/rh.md` (`AddObj(..., 9)`).
 - **Method:** decompile.
 - **Confidence:** proven
+
+### E-0130 — Zone N2: entries, handlers and set-up (DVD)
+- **Binary/file:** `RING_DVD.EXE` `GameSetZoneN2` 0x4362c0 (entries 0, 10, 999), AS's entry
+  0x436270, object click 0x4341e0, button down 0x434740, drag 0x4349b0, before / after a
+  movability 0x435390 / 0x435410, timer 0x435470, animation 0x4354b0, on an accessibility
+  0x435970, sound 0x435a00, helpers 0x433ee0 (the test's start), 0x433fa0 / 0x4340c0 (the
+  heater off / on), 0x43d8f0 (`GoZone(5, 0)`); wrappers 0x404a50 / 0x404a60 (a puzzle's
+  movabilities on / off), 0x405830, 0x403030 / 0x403050 / 0x403070, 0x406130 / 0x406160
+  (`VarSetWord` / `VarGetWord`), 0x4062e0 (`VarGetStrg`), `PuzSet3DSouVol` 0x404d70. Video
+  names from the pushed `DAT_0048d7..` strings (capstone): 1389, 1494..1508.
+- **Evidence:** as written in `games/ring/docs/n2.md`; decompiles in
+  `engines/ring/notes/decomp/n2/`; the set-up in `engines/ring/notes/zones/n2.md` (E-0094).
+- **Method:** decompiles, disassembly.
+- **Confidence:** proven for the handlers as described.
+
+### E-0131 — N2's cross: NI's code without the dam base, writing NI's byte 10104 (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x4349b0, case 0x111da (70106): the start (0x4066b0(243,
+  276), `DAT_004a1c78` = sector − word 70016) and move are NI's 10106 code without the base
+  or 0x445930; the release (0x434f5a) stores word 70016 and `VarSetByte(0x2778, 0 / 1)`:
+  0x2778 = 10104, NI's "cross at 12" byte, then toggles rotation 70101's movabilities 1 / 2.
+- **Evidence:** `engines/ring/notes/decomp/n2/RING_DVD.EXE__FUN_004349b0.c`.
+- **Method:** decompile.
+- **Confidence:** proven (the write to NI's variable is the code as shipped).
+
+### E-0132 — N2 ends by `GoZone(5, 0)` with score 50 (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x435a00, sound 0x11173 (70003) ended: `PlyCin("1504")`,
+  `PlyCin("1505")`, `TimStoAll`, 0x406ea0(0x400), `VarSetFloa(0x15f96, 0x42480000)` (90006
+  = 50.0), 0x43d8f0(0) → `GoZone(5, 0)` (RO). N2's score is float 90006 (every score
+  change in 0x4341e0 / 0x4349b0 uses 0x15f96).
+- **Evidence:** the decompiles above.
+- **Method:** decompile.
+- **Confidence:** proven
+
+### E-0133 — Alberich's test: rounds, videos, sounds (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x4341e0 (the creature given: byte 0x1117f = (char)held −
+  100, play(0x11562 + it)), 0x435a00 (0x11559 / 0x1155a..b: `sprintf("N2_%dA", byte
+  0x1117e)`; 0x11562..0x11564: `sprintf("N2_%d%c", byte 0x1117e, byte 0x1117f + 0x43)`
+  (disassembly 0x435fe1..0x436007), play(byte 0x1117f + (byte 0x1117e + 0x1bc5) × 10);
+  0x115bc..0x115d9: the round tests and game over 2 (0x4360a9)). Videos `N2_1A`..`N2_3E`
+  exist in `DATA\N2\PLA`.
+- **Evidence:** the decompiles above; directory listing.
+- **Method:** decompile, disassembly.
+- **Confidence:** proven
+
