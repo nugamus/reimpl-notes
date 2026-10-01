@@ -1135,3 +1135,16 @@ is02n01p03s01.0001.bmp` … (`parsers/at2.py --file`).
   open.
 - **Method:** disassembly.
 - **Confidence:** proven
+
+### E-0092 — Pausing an animation on a frame (`ObjPrePauFraAni`) (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x403ac0, `aObject::ObjPrePauFraAni` 0x420e50, 0x42f150
+  (both animation lists), `aAnimation::PauseExactOnFrame` 0x416af0 (+0x42, +0x46, +0x4a = 1,
+  the direction choice), 0x416720 (the +0x4a branch), 0x416870 (+0x60 = 1 on a step),
+  0x416c90 (+0x14 = +0x18, +0x4a = 0, +0x60 = 0, 0x40c910(2)), 0x40c910 (only RO's
+  0x43a6f0, `spec/events.md`).
+- **Evidence:** `engines/ring/notes/decomp/pausefra/`, `layers/RING_DVD.EXE__FUN_00416720.c`,
+  `layers/RING_DVD.EXE__FUN_00416870.c`; `spec/animation.md` "Pausing on a frame". NI uses
+  it for Glug and the speaker (`games/ring/docs/ni.md`).
+- **Method:** decompiles.
+- **Confidence:** proven; the other controls of 0x416720 (+0x28, +0x32) stay unspecified.
+

@@ -74,3 +74,23 @@ unless puzzle +0x28 is set; then, in the pictures' order, an animation's handle 
 when the handle is active and its presentation shown, by 0x422940: the current frame at
 (x, y) with the draw type, but only while the animation is active (+0x26); a paused one
 still shows its frame (+0x2c is 1 from `Init`).
+
+## Pausing on a frame (`ObjPrePauFraAni`, E-0092)
+
+`ObjPrePauFraAni(object, presentation, frame, ms, direction)` (0x403ac0 → 0x420e50 →
+0x42f150) calls `aAnimation::PauseExactOnFrame(frame, ms, direction)` (0x416af0) on every
+animation of the presentation (puzzle and rotation lists). For frame − 1 within 0..frames −
+1 (else it is refused): target (+0x42) = frame − 1, hold time (+0x46) = `ms`, armed (+0x4a)
+= 1. Unless `direction` is 2 the direction is chosen to reach the target by the shorter way:
+a forward animation (mode 4, or ping-pong going forward) becomes backward (mode 8) when that
+is shorter, a backward one forward (4) when that is shorter; distances count the frames
+between the current frame and the target in each direction, wrapping over the start frame.
+
+In `Advancing` step 1's "otherwise" branch, before stepping (0x416720, after the paused
+test): when armed and the current frame is the target and the animation has stepped since
+(+0x60, set by every step, cleared below), the hold starts (+0x4a = the time, 2 if the time
+is 1) and the event 0x40c910(1, id) is raised (only RO handles it); while holding, the
+frame stays and nothing is raised until more than `ms` passed, then 0x416c90 restores the
+mode chosen at `Init` (+0x18), disarms (+0x4a = 0), clears +0x60, raises 0x40c910(2, id)
+and the step goes on in the same call.
+
