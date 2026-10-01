@@ -269,3 +269,20 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   the menu — the way to reach a scene for a runtime read of the live camera.
 - **Method:** depth-column analysis of `85_1_IZ.fxi`; decompile of `FUN_00436aa0`.
 - **Confidence:** proven (z-buffer nature; the startScene.txt hook); near/far/scale + camera open (Q-0008)
+
+### E-0018 — The gameplay layer: triggers (hotspots), scene commands, per-class actor serialize
+- **Binary/file:** decrypted `Grumpa.exe`; `FUN_00457ea0` (`CFXTrigger::Serialize`),
+  `FUN_0040f7b0` (`CFXActorFactory::LoadSceneCommands`)
+- **Evidence:** interaction/navigation is driven by `CFXTrigger` actors (type in the `.abi`,
+  E-0012): `CFXTrigger::Serialize` reads a region/position (`this+0x108..0x110`), a list of
+  `0x118`-byte sub-records, a block of fields (`0x170..0x188`), a 19-entry array, and a
+  `CFXSprite` — i.e. a hotspot with sub-triggers, a bubble/sprite and action data.
+  `LoadSceneCommands` reads `%s\Current\%s` (a count then that many command records): the
+  per-playthrough event/command list, stored in `Save/Current/` and updated as the game
+  runs (the dynamic scripting state). So the game logic = static `.abi` actors (triggers,
+  spawn/warp points, characters, items) + a dynamic command list per scene. Decoding each
+  CFX class's serialize (Q-0006) and the command set is the bulk of the remaining work — a
+  large layer on top of the rendering core that is complete.
+- **Method:** decompile of `FUN_00457ea0`, `FUN_0040f7b0`.
+- **Confidence:** strong (the layer's shape and the two entry points); per-class/per-command
+  fields open (Q-0006)
