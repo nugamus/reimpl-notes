@@ -191,3 +191,11 @@ fields are animation parameters (frame count/rate/loop), not screen coordinates,
 per-frame screen position, the compositing order/depth against the background, and the
 transparency (colour key? the JPG has no alpha). Needs the 0x0d draw path (not just
 `Serialize`) in the decrypted `Grumpa.exe`.
+
+## Q-0010 — How a 0x19 hotspot's action (scene change, interaction) is bound
+
+E-0108 recovers the clickable polygon, but the record has no inline target. The action (go to
+scene, play a sound, set a state, pick up an item) must come from the game's event/command
+system — the EC/CC vectors on the trigger, an id-keyed command table, or the per-scene script.
+Needs the 0x19 click-handling and event-dispatch code in the decrypted `Grumpa.exe`. This is
+the entry point to the game-logic layer (navigation, puzzles, dialogues, inventory).

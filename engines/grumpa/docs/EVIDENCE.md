@@ -413,3 +413,33 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** `abi.py` field extraction over the scene corpus; `Bitmaps/` frame listing.
 - **Confidence:** strong (JPG frame base and anim parameters proven; per-frame screen
   placement and the depth/alpha mechanism are open, Q-0009).
+
+### E-0107 — Type 0x0d sprite position, animation params and colour key
+- **Binary/file:** `FUN_0044ccb0` (0x0d Serialize); scene `.abi`; the `Bitmaps/` sprites.
+- **Evidence:** a 0x0d record's gate field (+0x20c) is 1 for every placed prop seen; when 1
+  the Serialize reads two more u32 at +0x190/+0x194 — the sprite's **screen position (x, y)**
+  in 800×600 pixels (cannons 272,256; flagga 392,48; butterfly3 120,240; fork_AI 520,32;
+  Boulder_left_cam2 229,560 — all inside the frame). The 8-u32 block before the gate holds
+  animation parameters (e.g. cannons `…,18,5,-1,…`, flagga `…,25,3,-1,…` = frame count, rate,
+  loop). The sprite JPGs are small (butterfly3 48×48, flagga 62×56, cannons 216×128), so each
+  is a positioned overlay, not a full frame; `sub_456d70` and the EC/CC vectors are empty for
+  these props. Transparency is a **colour key**: keyed sprites (butterfly3, w) are pure blue
+  `(0,0,254)` outside the art; the two leading header ints `h[0],h[1]` (0/1) likely select the
+  blend/key mode (smoke sprites like cannons use a different blend). Per-frame depth vs the
+  scene `_IZ.fxi` is still open (Q-0009).
+- **Method:** `abi.py` field extraction; Pillow inspection of the sprite JPGs.
+- **Confidence:** strong for position and frame/rate; colour-key value empirical; blend-mode
+  flags and depth open (Q-0009).
+
+### E-0108 — Type 0x19 is a clickable hotspot polygon (CFXTrigger)
+- **Binary/file:** `FUN_00457ea0` (0x19 Serialize); scene `.abi`.
+- **Evidence:** after its header, flag blocks, `sub_456d70`, EC and CC vectors, a 0x19 record
+  reads a count `k` then `k` pairs of **float (x, y)** — a screen-space polygon, the clickable
+  hotspot region — followed by a 16-byte tail (4 floats) and a mode u32; when mode==2 it adds
+  a list of named "bubbles". Example: Scene_007 id=660 polygon
+  `(355,306)(363,105)(481,115)(463,316)` is the central jungle path in view `7_1` (the
+  "walk forward" region). The action the hotspot triggers (e.g. go to another scene) is **not
+  an inline field** (the 19-u32 block is all zero); it binds through the game's event/command
+  system (Q-0010).
+- **Method:** `abi.py` field extraction over the scene corpus.
+- **Confidence:** strong (polygon shape and screen placement proven; action binding open).
