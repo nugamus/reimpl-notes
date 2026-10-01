@@ -32,10 +32,12 @@ layers. `ObjPrePauAni` / `ObjPreUnPauAni(object, presentation)` (0x420db0 → 0x
 
 ## Advancing (0x416870, time)
 
-Returns the current frame + 1. Nothing happens for an inactive animation. For a paused one
-(0x416720: +0x27 set) the frame stays and no event is raised. Otherwise:
+Returns the current frame + 1. Nothing happens for an inactive animation. Otherwise
+(E-0058):
 
-1. The first call after a start only clears "just started" and goes to step 4.
+1. The first call after a start only clears "just started" and goes to step 4, paused or
+   not: a started animation reports its frame once even when paused.
+   Otherwise, for a paused one (0x416720: +0x27 set) the frame stays and no event is raised.
 2. When `time − last step > frame time`: one step (never more), last step = time.
 3. Mode 4: frame + 1; at the frame count it wraps to the start frame. Mode 8: frame − 1;
    below the start frame it wraps to the last. Ping-pong: forward to the last frame, then

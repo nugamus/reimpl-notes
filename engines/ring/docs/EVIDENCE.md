@@ -948,3 +948,17 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   `spec/api.md` "Timers" corrected.
 - **Method:** disassembly.
 - **Confidence:** proven
+
+### E-0058 — A started animation reports its frame once, even when paused (supersedes part of E-0054) (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x416870: the "just started" byte (+0x4e) is tested
+  before the pause check 0x416720; when set it is cleared and the event 0x40cff0 is raised
+  with frame + 1 if that differs from the last reported (+0x61, −5 after a start). Only the
+  other branch calls 0x416720, which returns the frame (no step, no event) when +0x27
+  (paused) is set.
+- **Evidence:** `engines/ring/notes/decomp/layers/RING_DVD.EXE__FUN_00416870.c`. AS relies
+  on it: the dial (80018 presentation 1) is shown then paused at set-up; on the first frame
+  of rotation 80101 it reports frame 1, which equals byte 80004's initial 1, so the AS
+  handler (0x437110) enables the dial's accessibilities and sets byte 80005 = 1; the turns
+  then reach 11, 21, 31, 41, the values the "go" accessibility tests (`games/ring/docs/as.md`).
+- **Method:** decompile.
+- **Confidence:** proven
