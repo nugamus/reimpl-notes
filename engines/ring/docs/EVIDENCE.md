@@ -972,3 +972,21 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   constants only by address).
 - **Method:** disassembly.
 - **Confidence:** proven
+
+### E-0090 — Puzzle animations: arguments, frame files, advancing and drawing (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x403460 (`ObjPreAddAniToPuz`), 0x420650, 0x42e480
+  (`addAnimationToPuzzle`: `Init` arguments, flag bit 1 → +0x20 = 0, lists +0xd / +0x11,
+  `AddPreImg` with the first frame's handle, `AddPreAni`), 0x4219f0 (`aAnimationImage::Init`:
+  x +0x71, y +0x75, draw type +0x7d, one 0x42d320 handle per frame), 0x42d320 (handle
+  fields +0x70 ext, +0x79 zone, +0x7a kind, +0x7b load-from), 0x422950 (frame path
+  `\%s\%s\%s.%04d.%s` with `ANI`, the name twice, frame + 1, 0x40b7f0(+0x70); disk
+  formats with `DATA` and the zone folder; draws only while +0x26 is set), 0x40b7f0
+  (extensions `bmp tga cin cnm` for 0..3, `bma tgc` for 5, 6), `aPuzzle::Update` 0x41c320.
+- **Evidence:** `engines/ring/notes/decomp/puzani/`, `img/RING_DVD.EXE__aPuzzle__Update.c`;
+  `NI.AT2` holds `ni
+is02n01p03s01
+is02n01p03s01.0001.bmp` … (`parsers/at2.py --file`).
+  The set-ups' 140 calls use ext 0 (137) and 1 (3, draw type 3), flags 4, 6, 10, 16, 32.
+- **Method:** decompiles, disassembly (sprintf arguments), corpus listing.
+- **Confidence:** proven
+
