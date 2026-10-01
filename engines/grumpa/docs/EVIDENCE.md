@@ -443,3 +443,19 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   system (Q-0010).
 - **Method:** `abi.py` field extraction over the scene corpus.
 - **Confidence:** strong (polygon shape and screen placement proven; action binding open).
+
+### E-0109 — The scene command/event list (CC vector on actors)
+- **Binary/file:** scene `.abi`; the `CC`/`EC` element classes (`FUN_00409150`/`FUN_00409920`).
+- **Evidence:** the `CC` vector carried by triggers (0x19) and other actors is a **command
+  list**. Each `CC` entry is a 5-int command `(-1, targetId, opcode, arg, flag)` plus a nested
+  list of `EC` 5-int conditions `(id, a, opcode, b, flag)`. The `targetId` references another
+  actor in the same scene by its record id: in Scene_007 the central-path trigger id=660 lists
+  commands on ids 730 and 733 (the `burningroots`/`roots_with_acid` sprite props), 732
+  (`roots`), 660/663 (triggers) and 640/663 — so clicking the hotspot drives the other actors
+  (enable/play/animate), not a single "go to scene" field. The opcode column recurs (13 on
+  many self/other targets; 500, 42, 16, 11, 72, 50, 99, …) and is the command verb; the EC
+  sublists are guard conditions. This is the game's event system — triggers, puzzle state,
+  navigation and interactions all run through these per-actor command lists.
+- **Method:** `abi.py` extraction of the EC/CC vectors on 0x19 records.
+- **Confidence:** strong for the structure and the id cross-references; the opcode semantics
+  (the verb table) need the trigger's command-execution code (Q-0010).
