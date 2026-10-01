@@ -1190,3 +1190,57 @@ is02n01p03s01.0001.bmp` … (`parsers/at2.py --file`).
 - **Method:** disassembly, decompiles.
 - **Confidence:** proven; the wave (+0x65) is not traced (no set-up enables it).
 
+### E-0100 — Zone RH: entries, object clicks, movabilities, timer, animation and sound handlers (DVD)
+- **Binary/file:** `RING_DVD.EXE` `GameSetZoneRH` 0x445740 (entries 0, 10, 999), object click
+  0x443990, before / after a movability 0x444b40 / 0x444ba0, timer 0x444d30, animation
+  0x444dc0, sound 0x444e60; "on a movability" 0x44a1b0 and "on nothing" 0x442e30 are empty;
+  no button-down, drag, on-accessibility, take or list handler (`spec/events.md`). Video
+  names from the `DAT_0048de44..0048df90` strings (1666..1706), `rh_%d` 0x48df88 and
+  `rh_%d_l0` 0x48df74 with byte 21001 + 1 (`inc` at 0x444f56 / 0x445039; the files are
+  `RH_1..3.CNM`, `RH_1..3_L0.CNM`); score constants f32 [0x47e314] 1, [0x47e624] 2,
+  [0x47e620] 3, [0x47e2e0] 5 (`fadd dword` at 0x443b23.., 0x444781). 0x444b40 calls
+  0x4065e0 (`TimSto(0)`), 0x444ba0 0x4065a0 (`TimSta(0, 0x32)`); 0x444ba0's three
+  `to` tests are independent (`cmp edi, 0x4e2a / 0x4e34 / 0x4e3e`, each falling through).
+- **Evidence:** as written in `games/ring/docs/rh.md`; decompiles in
+  `engines/ring/notes/decomp/rh/`; the set-up `engines/ring/notes/zones/rh.md`.
+- **Method:** decompiles, disassembly (capstone), strings from the EXE.
+- **Confidence:** proven for the handlers.
+
+### E-0101 — RH ends by entering NI at 3 (corrects `ni.md`'s caller of 0x44a7d0(3)) (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x4447c1 `call 0x44a7d0` with 3 lies in RH's object-click
+  handler 0x443990 (the Rhine Gold, object 20700, after `PlyCin(1666)` and `BagRem(20403)`
+  at 0x4447b8), not in FO. `games/ring/docs/ni.md` ("Entering", entry 3) names FO as its
+  caller; NI's entry 3 is the return from RH (byte 10303 "back from FO" is set by it).
+- **Evidence:** disassembly 0x444750..0x4447dd; `engines/ring/notes/decomp/rh/RING_DVD.EXE__FUN_00443990.c`.
+- **Method:** disassembly.
+- **Confidence:** proven
+
+### E-0102 — RH's entry 10 reads NI's world record "alb" (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x445740 entry 10: `%sData\Save\alb.ars` (0x48e00c) tested
+  with 0x47bd10, SY's byte 90017, dword 90021, byte 90025 (world 1), `LoadSaveTimer` with
+  "alb" (0x487388), then 0x4696f0.
+- **Evidence:** `engines/ring/notes/decomp/rh/RING_DVD.EXE__aApplication__GameSetZoneRH.c`;
+  `spec/bag.md` (Erda's file per zone).
+- **Method:** decompile.
+- **Confidence:** proven
+
+### E-0103 — RH's statue head follows the view: timer 0 and `ObjPreAniSetActFra` (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x444d30: `RotGetAlp(20401)` (0x405ab0: stored alpha +
+  135.0 [0x47e280], less 360.0 [0x47e27c] above it) `fsub dword [0x47e698]` (35.0), `__ftol`;
+  0 < a < 0x92; `fmul qword [0x47e690]` (0.263157… = 5/19), `__ftol`; 1..0x1c and ≠
+  [0x4a1cdc]: 0x4039b0(20401, 0, f). `ObjPreAniSetActFra` 0x4039b0 → `aObject` 0x420ce0 →
+  0x42efd0 (both animation lists of the presentation) → `aAnimation::SetActiveFrame`
+  0x416aa0 (+0x22 = f − 1 for 1 ≤ f ≤ frames, else logged).
+- **Evidence:** disassembly (capstone); `engines/ring/notes/decomp/rh/`.
+- **Method:** disassembly, decompiles.
+- **Confidence:** proven
+
+### E-0104 — RH's click handler clears app+0x74 for Disgust and the goldfish (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x443990: `mov byte [this+0x74], 0` on the 20201 paths
+  (in hand; `unk_19` 1 with byte 20202 ≠ 0; the default LAB_00443c49) and on 20007 with an
+  object in hand; the 20004..20006 handler and 20007 `unk_19` 0 and 20201's first taking
+  leave it set, so those objects (flags 9) also go in hand (`spec/bag.md` "Taking").
+- **Evidence:** `engines/ring/notes/decomp/rh/RING_DVD.EXE__FUN_00443990.c`; set-up flags in
+  `engines/ring/notes/zones/rh.md` (`AddObj(..., 9)`).
+- **Method:** decompile.
+- **Confidence:** proven

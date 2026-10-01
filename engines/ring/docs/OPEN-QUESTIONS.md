@@ -165,3 +165,17 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** `aApplication::ObjAddBagAni` 0x402ed0; 0x4219f0's stores not mapped.
 - **Blocks:** nothing (every call uses the same values).
 - **Status:** open
+
+### Q-0030 — Who calls RH's entry 999?
+- **Context:** `games/ring/docs/rh.md` "Entering": entry 999 fills the bag with RH's late
+  items and shows 20501, like NI's test entry (Q-0020).
+- **What we checked:** no `push 0x3e7` followed by `push 3` before a `GoZone` call.
+- **Blocks:** nothing.
+- **Status:** open
+
+### Q-0031 — Sound 23011 is stopped by RH but never started
+- **Context:** RH's click handler stops 23011 (`1757.wav`, type 3) at the Daughter (20501
+  `unk_19` 0 and 2); the only other reference is its `SouAdd` in the set-up (0x458727).
+- **What we checked:** every `push 0x59e3` in the EXE (0x4448b8, 0x4449e8, 0x458727).
+- **Blocks:** nothing (stopping a silent sound does nothing).
+- **Status:** open
