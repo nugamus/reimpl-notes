@@ -577,3 +577,22 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** wireframe overlay of the meshes through each view's camera on each background.
 - **Confidence:** strong (look-at model confirmed visually on two angles); exact target/FOV
   and the view→background rule open.
+
+### E-0116 — Navigation: go-to-scene and change-view commands (reserved managers 185/186)
+- **Binary/file:** scene `.abi` trigger commands (E-0109); `FUN_0040e980` (scene-manager
+  tick), `FUN_0040cb30` (LoadScene), `FUN_00441fb0` (transition); reserved actors
+  `DAT_004b9bc4[0xb9]` (185) and `[0xba]` (186).
+- **Evidence:** the scene-manager is reserved actor id 0; its tick `FUN_0040e980` loads a
+  pending scene (`this+0x4d`) by calling `LoadScene` and broadcasting leave/enter commands.
+  **Navigation is a command to reserved actor 185 with opcode 31 (0x1f): `arg1` is the
+  destination scene number** — Scene_001's trigger 663 is `(185, 31, 211)` (tutorial → scene
+  211), Scene_061's trigger 660 is `(185, 31, 10)` (→ scene 10); 47 such commands across the
+  corpus, `arg1` always a valid other scene. **Changing the camera view within a scene is a
+  command to reserved actor 186 with opcode 16 (0x10): `arg1` is the view index** (Scene_001
+  `(186, 16, 1)`) — this is the view-selection rule (resolves Q-0011: the shown
+  background/camera is chosen by a 186/op16 command, not a fixed order). Other reserved
+  managers: 8, 10, 12, 13 (state/sound/music; opcodes 50/54/70), 600, 750/751, 940/941, 901.
+- **Method:** scan the trigger command lists for commands whose arg is a different scene
+  number; confirm the target/opcode with the scene-manager tick and transition code.
+- **Confidence:** strong (185/op31 = go-to-scene proven by arg = destination across 47 sites;
+  186/op16 = view change by arg = view index). The exact per-manager opcode set is further work.
