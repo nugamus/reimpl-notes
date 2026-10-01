@@ -1159,3 +1159,20 @@ is02n01p03s01.0001.bmp` … (`parsers/at2.py --file`).
 - **Method:** decompile.
 - **Confidence:** proven for what is written; the record layouts are not read here.
 
+### E-0094 — The zone set-ups' loops, unrolled by emulation (corrects the call lists of E-0028..) (DVD)
+- **Binary/file:** `RING_DVD.EXE` zone set-ups (SY 0x4662a0, NI 0x45eb30, RH 0x455a50, FO
+  0x44f3e0, RO 0x458a90, WA 0x44ab00, AS 0x4635a0, N2 0x45b610) contain 24 counted loops
+  around `sprintf` 0x46f069 (e.g. NI 0x46101a: `mov ebx, 0xd`, i = 0..12,
+  `sprintf(buf, "NIS01N01P02S01.%04d.bmp", i + 1)`, `ObjAddPre(10103)`,
+  `ObjPreAddImgToPuz(10103, i, 10100, buf, 504, 194, 1, 1, 1000)`, `dec ebx; jne`); the
+  static extraction (ring_calls.py) recorded one iteration with unknown arguments.
+- **Evidence:** `engines/ring/tools/ringemu.py` runs each set-up in Unicorn with every callee
+  of the static list stubbed (arguments read from the stack, the callee's purge applied;
+  `sprintf` formatted): its `--selftest` finds every fully resolved static call, with the
+  same arguments and in order, among the emulated ones. Calls: SY 285, NI 1142 (static
+  646), RH 415, FO 1021 (923), RO 1607 (392), WA 1120 (617), AS 373, N2 581 (473); the
+  static "?" arguments (e.g. `SouAdd`'s fourth and sixth) are now known.
+- **Method:** emulation of the original code, checked against the static extraction.
+- **Confidence:** proven for the paths the set-ups take (they have no data-dependent branches
+  outside the loops).
+
