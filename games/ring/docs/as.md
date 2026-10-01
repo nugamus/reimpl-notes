@@ -89,13 +89,14 @@ byte 80003 = 0.
 
 **Timer (0x436df0, id)**:
 
-- 2, 3, 4: play(80018 / 80019 / 80020, 1); timer 5 started (20 / 30 / 10 s) and timer 6
-  (10 s) when not running; when no dialogue plays (type 5), play(80004 + rand() × 12 /
-  32768, 1).
+- 2, 3, 4: play(80018 / 80019 / 80020, 1); timer 5 started (every 20 / 30 / 10 ms) and
+  timer 6 (every 10 ms) when not running; when no dialogue plays (type 5), play(80004 +
+  rand() × 12 / 32768, 1).
 - 5: byte 80001 += 1; the current rotation's beta += float 80001 × float 80002, its alpha +=
-  float 80001 × float 80002 × [0x47e300]; float 80001 × [0x47e338], float 80002 ×
-  [0x47e628]; when byte 80001 reaches 51: byte 80001 = 0, float 80002 = 2.0, timers 5 and
-  6 stopped (`TimSto`), 80016 hidden.
+  float 80001 × float 80002 × 0.5 (f32 [0x47e300]); float 80001 × −1.0, float 80002 ×
+  0.8333 (f64 [0x47e338], [0x47e628]; E-0059): a swaying that flips sides and dies away;
+  when byte 80001 reaches 51: byte 80001 = 0, float 80002 = 2.0, timers 5 and 6 stopped
+  (`TimSto`), 80016 hidden.
 - 6: rand() × 10 / 32768 even → 80016's presentations shown, odd → hidden.
 
 **Sound (0x437190, id, type, reason, ended)**, natural ends only:
@@ -133,7 +134,7 @@ shows the "insert CD" screen (not needed for the DVD).
 
 1. A new game starts on the island (80001) with timers 2..4: at 100 / 220 / 150 s and then
    periodically, ambient voices (80018..80020) and random whispers (80004..80015) play, and
-   timer 5 sways the view (a dizziness that fades out over 50 ticks) while timer 6 makes
+   timer 5 sways the view (a dizziness that fades out over 50 ticks of 10..30 ms) while timer 6 makes
    80016 flicker.
 2. The player walks down to the chamber (80101). The dial (80021 `unk_19` 1..4) turns the
    ring animation by 10..40 frames; it stops at the target frame (the animation event).

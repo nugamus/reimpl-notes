@@ -962,3 +962,13 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   then reach 11, 21, 31, 41, the values the "go" accessibility tests (`games/ring/docs/as.md`).
 - **Method:** decompile.
 - **Confidence:** proven
+
+### E-0059 — AS timer 5: periods in ms and the sway constants (refines E-0056) (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x436df0: `TimSta(5, 0x14 / 0x1e / 10)` and
+  `TimSta(6, 10)` (milliseconds, as every `TimSta`); 0x437014 `fmul dword [0x47e300]` = 0.5,
+  0x43703a `fmul qword [0x47e338]` = −1.0, 0x43705c `fmul qword [0x47e628]` = 0.8333….
+- **Evidence:** disassembly (capstone) and the constants read from the EXE;
+  `games/ring/docs/as.md` "Timer" corrected (it gave the periods in seconds and named the
+  constants only by address).
+- **Method:** disassembly.
+- **Confidence:** proven
