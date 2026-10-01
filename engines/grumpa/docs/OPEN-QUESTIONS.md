@@ -182,3 +182,12 @@ from HKLM\Software\Idol FX\Grumpa. The installer maps cab file groups to it: Bit
 Scenes/Actors/UI/Save keep names; `Sounds_`+`Sounds_<Lang>` merge into `Sounds/`;
 `Movies_<Lang>` (or ISO `Movies/`) -> `Movies/`. Proven by the no-CD's error
 `CFXSound::CreateFromFile ...\Sounds\ambient_combat.wav`. `C:\GrumpaData` reproduces it.
+
+## Q-0009 — How a type-0x0d sprite prop is placed and composited
+
+E-0106 shows 0x0d props are animated JPG frame sequences, but the record's integer header
+fields are animation parameters (frame count/rate/loop), not screen coordinates, and no
+`_Z####.fxi` depth file accompanies the sampled props (`cannons`, `butterfly3`). Open: the
+per-frame screen position, the compositing order/depth against the background, and the
+transparency (colour key? the JPG has no alpha). Needs the 0x0d draw path (not just
+`Serialize`) in the decrypted `Grumpa.exe`.

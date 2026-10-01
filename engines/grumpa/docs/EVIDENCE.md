@@ -397,3 +397,19 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   this model is validated against the pre-rendered backgrounds (Q-0008 sub-point).
 - **Method:** `abi.py` camera extraction; corpus statistics over all scene views.
 - **Confidence:** strong (values proven over the corpus); projection formula empirical.
+
+### E-0106 — Type 0x0d is an animated 2D sprite prop (JPG frame sequence)
+- **Binary/file:** decrypted `Grumpa.exe` `FUN_0044ccb0` (type 0x0d Serialize); scene `.abi`;
+  the `Bitmaps/` corpus.
+- **Evidence:** a 0x0d record ends with a pascal string naming a JPG frame base — e.g.
+  Scene_100 `cannons_0000.jpg`, `flagga_0000.jpg`; Scene_007 `butterfly3_0000.jpg`,
+  `burningroots_0000.jpg` — and the disc holds the matching frame sequence
+  (`cannons_0000.jpg`..`cannons_0009.jpg`+, `butterfly3_0000..0007.jpg`). The record's 8-u32
+  header holds small animation parameters (frame count / rate / loop flags, e.g. `18,5,-1`
+  and `25,3,-1`), and its `sub_456d70` block is all-zero (no 3D transform). So the bulk of a
+  scene's moving content is **animated 2D sprites** composited over the pre-rendered
+  background, and the `.anb`/`.amb` 3D meshes are for characters (type 0x03) — the engine's
+  3D camera path applies to characters, the 2D sprite path to props.
+- **Method:** `abi.py` field extraction over the scene corpus; `Bitmaps/` frame listing.
+- **Confidence:** strong (JPG frame base and anim parameters proven; per-frame screen
+  placement and the depth/alpha mechanism are open, Q-0009).
