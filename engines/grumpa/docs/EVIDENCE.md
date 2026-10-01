@@ -523,3 +523,19 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Confidence:** strong (the delay semantics match the dispatcher; the condition shape and
   the variable branch are clear). The full timed/conditional execution and the variable actor
   classes are the remaining work (Q-0010).
+
+### E-0113 — Trigger click dispatch and command enqueue
+- **Binary/file:** `FUN_00459640` (trigger DoCommand opcode 18), `FUN_00459740` (enqueue),
+  `FUN_004010f0` (point-in-polygon), `FUN_00408760` (push onto the global queue).
+- **Evidence:** the scene's input broadcasts a **click as opcode 18** carrying the packed
+  (x, y) (short lo/hi) to triggers. A trigger's handler (`FUN_00459640`) fires only if it is
+  active (`+0x10c`), the click is inside its polygon (`FUN_004010f0` on `this+0x140`), and its
+  state gate passes (`this+0x174` == the current value of a referenced variable actor, plus
+  flags at `+0x178/+0x17c/+0x180`); it then calls the enqueue `FUN_00459740`. The enqueue
+  walks the trigger's command vector (`this+0x12c`, stride 0x128) and copies each command —
+  `+0x104` when, `+0x108` targetId, `+0x10c` opcode, `+0x110`/`+0x114` args, `+0x118`
+  conditions — into a new node pushed onto the global command queue (`FUN_00408760`). This
+  pins the command field layout used by the dispatcher (E-0110) and confirms the engine's
+  click→fire model: a hit trigger queues its whole timed/conditional sequence.
+- **Method:** decompile the trigger DoCommand opcode-18 handler and the enqueue.
+- **Confidence:** proven (the polygon test, the field copy and the queue push are explicit).
