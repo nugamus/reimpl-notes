@@ -122,3 +122,21 @@ protection).
   needs the user to run once (elevated):
   `reg add "HKLM\Software\WOW6432Node\Idol FX\Grumpa" /v DataPath /t REG_SZ /d "<cab path>" /f`.
   The on-disk EXE is SafeDisc-encrypted so it cannot be patched to read HKCU instead.
+
+
+### Q-0008 UPDATE (2026-10-01) — camera is in the scene `.abi`; runtime routes SafeDisc-blocked
+- A scene view has only `<n>_<v>_IS.jpg` + `_IZ.fxi`; per scene only `Scene_N.scn` (the
+  walkmesh: nodes of position + up-vector, constant Y, E-0017 revisited) and `Scene_N.abi`
+  (actors). So the per-view camera is in `Scene_N.abi`, reachable only by parsing the actor
+  serialize tree. Scene_001.abi's first record is type 0x11, a container whose serialize
+  (`FUN_0043d200`) reads three lists of sub-objects (0x118/0x128/0x128-byte each) before a
+  0x68 (104-byte) block that may be the view matrix — so reaching it needs the nested
+  sub-object serializes (a deep, multi-function decode; Q-0006).
+- Runtime extraction is blocked: the user set `HKLM\Software\WOW6432Node\Idol FX\Grumpa  DataPath`, and dgVoodoo2 (third_party/dgVoodoo2_87_3, DDraw/D3DImm in `C:\GrumpaRun`)
+  lets SafeDiscLoader2 get further, but SafeDisc init hangs deterministically at 19/159
+  resolved imports (never reaches the scene). Safedisc2Cleaner fails ("can't get 2nd DLL" —
+  needs secdrv). The decrypted dump's 140 stub imports stay unresolved. So the live camera
+  cannot be read on this modern-Windows setup.
+- **Conclusion:** the camera (and thus actors-in-scenes) needs either a machine that runs
+  the SafeDisc original, or the deep offline `.abi` serialize-tree decode (Q-0006). Both are
+  multi-session. The rendering engine is ready for the camera once it is known.
