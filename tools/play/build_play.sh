@@ -44,3 +44,6 @@ fi
 # The engines are in development: no "unsupported game" dialog before each start.
 grep -q enable_unsupported_game_warning "$OUT/scummvm.ini" ||
 	sed -i '/^\[scummvm\]/a enable_unsupported_game_warning=false' "$OUT/scummvm.ini"
+# The game to start: the first section with a gameid (none yet: the launcher opens).
+awk '{sub(/\r$/, "")} /^\[/ {s = substr($0, 2, length($0) - 2)} /^gameid=/ {print s; exit}' \
+	"$OUT/scummvm.ini" > "$OUT/.play-target"
