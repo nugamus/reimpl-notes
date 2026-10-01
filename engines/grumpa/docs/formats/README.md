@@ -23,7 +23,7 @@ at `CFXActorFactory`, which loads `.atx`/`.abi` actors, `.scn` scenes, `.fxi` su
 | `.avi` `.mpg` | 10 + 4 | video | `gempeg`-style / MPEG-1 | — | E-0007 | standard |
 | `.fxi` | 316 | 16-bit Z-depth (also colour) | `CFXZBuffer` / `CFXSurface` | `fxi.py` | E-0009, E-0010 | done (316/316 parse + decode) |
 | `.scn` | 110 | binary | `CFXScene` | — | Q-0005 | header `08 00 00 00`, `0258`; float stream (layout TBD) |
-| `.abi` | 118 | binary | `CFXActorFactory::CreateFromABIFile` / status saves | — | E-0012 | record framing done (`u32 type,u32 id,class data`); per-class fields Q-0006 |
+| `.abi` | 118 | binary scene graph | `CFXActorFactory::CreateFromABIFile` | `abi.py` | E-0100..E-0103 | scenes + items done (111/111 byte-exact, 14 types); type 0x03 `CFXCharacter` open (Q-0006) |
 | `.amb` | 588 | binary mesh | `CFXAMeshEx::CreateFromFile` | `amb.py` | E-0013 | done (`u32 count` + count×(pos+normal)) |
 | `.anb` | 939 | binary mesh | `CFXAMeshEx` / `FUN_004157d0` | `anb.py` | E-0014 | done (938/939: geometry, UVs, anim); frame-count Q-0007 |
 
@@ -88,9 +88,39 @@ four-colour (16-B 2bpp mask + 4×u16, 20 B), 3 raw (64 B) (280 files). `fxi.py` 
 316/316 with every byte consumed. Dimensions vary (173 are 800×600, down to 56×56). The
 per-mode pixel maths (filling the 8×8 block from the masks/colours) is Q-0004.
 
+## `.abi` — scene graph / actor database (E-0100..E-0103)
+
+A serialized `CFXActorFactory` tree. `CFXActorFactory::CreateFromABIFile` (`FUN_0040cef0`)
+reads records to end-of-file:
+
+    record = u32 type, u32 id, <Serialize(mode 1)>
+
+`CreateActor` (`FUN_0040d2f0`) maps `type` to a `CFX*` class; each class's `Serialize`
+(vtable[1]) is called with mode 1. The read primitive `FUN_004026c0(archive, dst, n)` reads
+`n` bytes; `FUN_00430c50` reads a pascal string (`u32 len` + `len` bytes). A trailing chunk
+under 8 bytes (a `type` with no `id`) is ignored (e.g. `Scene_400.abi`, 4 padding bytes).
+
+Three vector element classes recur (E-0101): `EC` (`FUN_00409920`, 5 u32 = 20 B), `ClassC`
+(`FUN_00409150`, 5 u32 + `u32 n` + `n`×EC) and `ClassD` (`FUN_00409cf0`, an EC-vector then a
+ClassC-vector, type 3 only). Each actor body is fixed u32 runs, EC/ClassC vectors, pascal
+strings and inline embedded sub-objects; see `engines/grumpa/notes/actor-types.txt` and the
+per-type functions in `abi.py`.
+
+`abi.py` parses **111/111** scene + item files consuming every byte: **2004 records** over
+14 types — 0x11 view, 0x18/0x2a `CFXSound`, 0x19 `CFXTrigger`/`CFXSprite`, 0x0d, 0x1a, 0x07,
+0x1d, 0x1e, 0x20, 0x21, 0x22/0x25, 0x23/0x26, 0x24/0x27, 0x05 `CFXItem`. Two actors branch
+on a value they read (0x19 reads a bubble array iff +0x1ac == 2; 0x0d reads two extra u32 iff
++0x20c == 1); 0x20's transform vector is pre-sized to 5 by its ctor.
+
+**Per-view camera** (E-0103, resolves Q-0008): a 0x11 view ends with `u32 cam_id` + a
+0x68-byte block of 26 floats, handed to the render device. Across the corpus only floats
+`f1=1.0`, `f2∈[0.75,1.0]`, `f3∈[0.70,1.0]` (projection), `f13..f15` = camera position, `f19`
+= range/far, `f21=1.0` are non-zero (the rotation fields are 0 — axis-aligned views).
+
+Not modelled: type 0x03 `CFXCharacter` (`Scenes/Characters.abi`, `Actors/Characters.abi`) —
+its ~37 KB `Serialize` `FUN_00422f80` decompiles with broken control flow (Q-0006).
+
 ## Binary formats still pending the loader
 
-`.scn`, `.abi`, `.anb`/`.amb` are compiled binary (arrays of records). Their field layouts
-are read from the loader methods in the decrypted `Grumpa.exe` (`CFXScene`,
-`CFXActorFactory::CreateFromABIFile`, `CFXAMesh::Serialize`) in `ghidra_projects/Grumpa.gpr`;
-tracked as Q-0005..Q-0007 until specced.
+`.scn` is compiled binary (arrays of records); its field layout is read from `CFXScene` in
+the decrypted `Grumpa.exe` (`ghidra_projects/Grumpa.gpr`), tracked as Q-0005 until specced.

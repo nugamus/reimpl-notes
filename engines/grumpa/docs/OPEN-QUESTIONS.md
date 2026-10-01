@@ -79,7 +79,20 @@ protection).
   common base (id, position, state) is shared; subclasses add their own.
 - **What we checked:** `CreateFromABIFile`, `CreateActor`; not yet each serialize.
 - **Blocks:** a 100% `.abi` validator; save/load; actor state.
-- **Status:** open (decompile the per-type serialize methods)
+- **Status:** MOSTLY RESOLVED (2026-10-01, E-0100..E-0102). The serialize mode is 1; the 14
+  actor types that occur in the corpus are decoded and `engines/grumpa/tools/parsers/abi.py`
+  parses **111/111** scene + item `.abi` consuming every byte. Remaining: **type 0x03
+  `CFXCharacter`** (`Scenes/Characters.abi`, `Actors/Characters.abi`). Its ~37 KB serialize
+  `FUN_00422f80` decompiles with broken control flow (the decompiler's field order does not
+  match the bytes), so it was not modelled. Structure read so far, in order: header `f3`
+  + EC-vector (+0x11c); fixed block (+0x444, two vec3 at +0x16c/+0x160, five u32); a
+  `ClassD` vector (+0x664, `0x409cf0`); then — from the data, not the decompiler — a
+  character body with per-state string lists (`.anb` animations, `.wav` sounds, `.tga`
+  textures, each a `u32 count` + that many pascal strings, with a "normal" and an
+  "In_Boat" set), a 6-entry attachment/weapon table of `{pascal .ANB name, pascal .tga
+  name, 3 u32}`, and an opaque **binary skeleton blob** (~400 B of packed non-float data,
+  no obvious length prefix) that is the sticking point. Finishing type 0x03 needs a
+  disassembly-level reverse of `FUN_00422f80` (the decompiler is unusable for it).
 
 ### Q-0007 — The `.anb` trailing-frame count: F vs F-1
 - **Context:** E-0014. `.anb` geometry, UVs and the animation block are decoded (938/939
@@ -140,6 +153,22 @@ protection).
 - **Conclusion:** the camera (and thus actors-in-scenes) needs either a machine that runs
   the SafeDisc original, or the deep offline `.abi` serialize-tree decode (Q-0006). Both are
   multi-session. The rendering engine is ready for the camera once it is known.
+
+### Q-0008 RESOLVED (2026-10-01, E-0103) — the camera block is decoded (offline `.abi` route)
+The offline decode won. The type-0x11 view serialize `FUN_0043d200` reads, after its two
+`ClassC` vectors, a `u32 cam_id` and then a **0x68 block = 26 little-endian floats** at
+`this+0x14c`, handed to the render device
+`dev->vtable[0x38]()->vtable[0x48](*(this+0x1b4), block)`. Profiled over all 107
+single-view scenes (`abi.py`), the only non-zero/varying floats are: `f1=1.0`,
+`f2∈[0.75,1.0]`, `f3∈[0.70,1.0]` (projection scale/aspect/FOV), **`f13,f14,f15` = camera
+eye position (x,y,z)** (range ±~7000, scene-sized), `f19` = range/far (157..10291, scales
+with scene extent), `f21=1.0`; every other float (0, 4–12, 16–18, 20, 22–25) is 0 across the
+whole corpus — the rotation fields, zero because these views are axis-aligned. The engine
+can place actors at world `f13..f15` and project with `f2`/`f3` + `f19`.
+- **Remaining sub-point:** the exact meaning of `f2`/`f3`/`f19` (aspect vs vertical FOV vs
+  focal length, and near/far split) and the rotation fields need the device consumer
+  `vtable[0x48]` decompiled, or a non-axis-aligned view in a later corpus; the position is
+  unambiguous and sufficient to start compositing.
 
 ### Q-0001 RESOLVED (2026-10-01) — runnable SafeDisc-free Grumpa.exe
 The user supplied a no-CD `Grumpa.exe` (Grumpa_NoCD_Win_SV-NO-FI-DA): `.text` decrypted

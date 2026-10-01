@@ -302,3 +302,66 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** decompile of `FUN_0040d2f0`/`FUN_0040cef0`; `tools/ghidra/scripts/actor_vtables.py`.
 - **Confidence:** proven (the dispatch mechanism and two mappings); the per-type serialize
   fields remain (Q-0006)
+
+### E-0100 — `.abi` container: a flat record stream to EOF, serialize mode 1
+- **Binary/file:** decrypted `Grumpa.exe`; `CFXActorFactory::CreateFromABIFile`
+  (`FUN_0040cef0`); `games/grumpa/discs/cab/{Scenes,Actors}/*.abi`
+- **Evidence:** `CreateFromABIFile` opens the file as a C++ `ifstream` and loops: read
+  `u32 type` (`FUN_004026c0(&arc,&t,4)`), break on EOF, read `u32 id`, break on EOF,
+  `CreateActor(t,id)`, then `actor->vtable[1](&arc, mode)`. The mode pushed at the call
+  (`0x40d0b8 CALL [EDX+4]` with `PUSH EDI`/`PUSH EAX`) is **1**: type 0x05's full-load path
+  is its `case 1` arm (it has no `case 2`), and `Actors/Items.abi` parses exactly as that
+  arm. A trailing chunk shorter than 8 bytes (a `type` with no `id`) just ends the loop;
+  `Scene_400.abi` has 4 such padding bytes. So `.abi = { u32 type, u32 id, Serialize1 }*`.
+- **Method:** decompile `FUN_0040cef0`, `FUN_004026c0`/`FUN_00402220`; disasm of the call
+  site 0x40d02e..0x40d0b8; validator `engines/grumpa/tools/parsers/abi.py`.
+- **Confidence:** proven (container + mode; parser consumes 100% of scene + item files).
+
+### E-0101 — `.abi` shared vector element classes EC, ClassC, ClassD
+- **Binary/file:** decrypted `Grumpa.exe`; `FUN_00409920`, `FUN_00409150`, `FUN_00409cf0`;
+  vtables `PTR_FUN_004902ec`/`_004902e4`/`_004904b8`.
+- **Evidence:** actors hold std::vectors of three recurring classes, resolved via the resize
+  prototypes' vtables and serialized through `vtable[1]`:
+  `EC` (`0x409920`, stride 0x118) reads 5 u32 (20 B, a leaf);
+  `ClassC` (`0x409150`, stride 0x128) reads 5 u32 + `u32 n` + `n`×EC;
+  `ClassD` (`0x409cf0`, stride 0x124, type 3 only) reads an EC-vector then a ClassC-vector.
+  Two embedded inline sub-objects also recur, serialized in place with no type/id prefix:
+  `0x456d70` (14 u32 = 56 B) and `0x401c00` (2×0xc = 24 B). Pascal strings are read by
+  `FUN_00430c50` (`u32 len` + `len` bytes).
+- **Method:** decompile of the three serializers + `read_ptr.py` on their vtable[1] slots.
+- **Confidence:** proven (the parser reproduces every counted vector byte-for-byte).
+
+### E-0102 — `.abi` actor-type field layouts (mode-1 Serialize) decoded; validator at 100%
+- **Binary/file:** decrypted `Grumpa.exe`; the per-type serializers (see
+  `engines/grumpa/notes/actor-types.txt`); `engines/grumpa/tools/parsers/abi.py`.
+- **Evidence:** the mode-1 read sequence of every actor type present in the corpus is
+  decoded: 0x11 view, 0x18/0x2a `CFXSound`, 0x19 `CFXTrigger`/`CFXSprite`, 0x0d, 0x1a, 0x07,
+  0x1d, 0x1e, 0x20, 0x21, 0x22/0x25, 0x23/0x26, 0x24/0x27, 0x05 `CFXItem`. Two are
+  value-dependent: 0x19 reads a "bubble" array only when its +0x1ac field == 2, and 0x0d
+  reads two extra u32 only when its +0x20c field == 1. Type 0x20's transform vector is
+  pre-sized to 5 by its ctor `FUN_00434200`, so it reads 5×0x10 bytes with no in-stream
+  count. **Counts:** `abi.py` parses **111/111** scene + item `.abi` consuming every byte —
+  2004 records (0x05:66, 0x07:4, 0x0d:310, 0x11:180, 0x18:365, 0x19:397, 0x1a:260, 0x1d:47,
+  0x1e:40, 0x20:106, 0x21:158, 0x22:16, 0x23:31, 0x24:24), 4 trailing padding bytes total
+  (Scene_400). The 2 `CFXCharacter` (type 0x03) database files are not modelled (Q-0006).
+- **Method:** decompile of each serializer; iterative validation against the corpus.
+- **Confidence:** proven for the 14 listed types (byte-exact over the whole scene corpus);
+  type 0x03 open (Q-0006).
+
+### E-0103 — The per-view camera block (Q-0008)
+- **Binary/file:** decrypted `Grumpa.exe`; `CFX*View::Serialize` `FUN_0043d200`; the corpus
+  scene views.
+- **Evidence:** at the end of a type-0x11 view record (after its two `ClassC` vectors) the
+  view reads `u32 cam_id` then a **0x68-byte block = 26 little-endian floats**, stores it at
+  `this+0x14c` and hands it to the render device:
+  `dev=*(this+0x148); dev->vtable[0x38]()->vtable[0x48](*(this+0x1b4), block)` (the handle
+  `*(this+0x1b4) = view[0x108] - 0x276`). Over the 107 single-view scenes the only
+  non-zero/varying floats are: `f1=1.0`, `f2∈[0.75,1.0]`, `f3∈[0.70,1.0]` (projection
+  scale), `f13,f14,f15` = camera **position** x,y,z (range ±~7000), `f19` = range/far
+  (157..10291, scales with scene extent), `f21=1.0`; floats 0,4–12,16–18,20,22–25 are 0 in
+  the whole corpus (the rotation fields — these views are axis-aligned). The engine can
+  place actors at world position `f13..f15` and project with `f2/f3` + `f19`.
+- **Method:** decompile `FUN_0043d200`; `abi.py` camera extraction over all scenes.
+- **Confidence:** strong (block location, size and the position/range fields proven across
+  107 views); exact meaning of f2/f3/f19 and the device consumer `vtable[0x48]` not yet
+  decompiled (Q-0008 sub-point).

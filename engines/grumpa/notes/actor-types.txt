@@ -47,3 +47,43 @@
 0x21 ctor 0x42e4e0 vtable 0x4905bc serialize 0x42e670
 # remaining types (2,3,4,5,9,0xd,0xe,0x12,0x14,0x16,0x17,0x18,0x1a,0x1b,0x1c,0x1e,0x20,
 # 0x22-0x2a): same mechanism; run ctor_serialize.py on their ctors to fill in.
+
+# ===========================================================================
+# .abi grammar (E-0100..E-0103; parser engines/grumpa/tools/parsers/abi.py)
+# ===========================================================================
+# Container (CFXActorFactory::CreateFromABIFile, FUN_0040cef0): a flat stream of
+#   record = u32 type, u32 id, <Serialize(mode 1)>
+# looped until EOF; a trailing chunk < 8 bytes (can't form type+id) is ignored.
+# Serialize is vtable[1], called with mode 1 (FUN_0040cef0 pushes 1; type 5's full
+# load is the `case 1` arm, which rules out mode 2). Read primitive
+# FUN_004026c0(archive,dst,n) = read n bytes; FUN_00430c50 = pascal string (u32 len
+# + len bytes, bytes only if len>0).
+#
+# Complete type -> serialize map (from CreateActor FUN_0040d2f0 + ctor_serialize.py):
+# 02 0x444b60   03 0x422f80*  04 0x4388e0   05 0x43c4f0   06 0x414090   07 0x429d40
+# 08 0x432880   09 0x45a750   0d 0x44ccb0   0e 0x416770   11 0x43d200   12 0x457ad0(stub,=1)
+# 14 0x447cd0   16 0x4474e0   17 0x4351e0   18 0x4492d0   19 0x457ea0   1a 0x452100
+# 1b 0x4393d0   1c 0x430810   1d 0x44a250   1e 0x45b6f0   1f 0x43e380   20 0x434550
+# 21 0x42e670   22 0x428b10   23 0x417180   24 0x431810   28 0x43cbf0(stub,=1)  29 0x457ad0
+# 2a 0x4492d0(=0x18)  25=0x22  26=0x23  27=0x24
+#
+# Shared vector element classes (serialize = vtable[1]):
+#   EC      0x409920  stride 0x118  = 5 u32                      (20 B)
+#   ClassC  0x409150  stride 0x128  = 5 u32 + u32 n + n*EC       (24 + 20n B)
+#   ClassD  0x409cf0  stride 0x124  = EC-vec + CC-vec            (type 3 only)
+# Embedded inline sub-objects (serialized in place, no type/id):
+#   0x456d70  (ctor 0x456cf0, 0x140) = 14 u32 (56 B)  -- in 0x18,0x0d,0x19,0x1a
+#   0x401c00  (ctor 0x401bb0, 0x120) = 2*0xc  (24 B)  -- in 0x1a,0x1d
+#
+# Types present in the corpus (111 scene files + Items.abi), all 100% byte-exact:
+#   0x11 view, 0x18 CFXSound, 0x19 CFXTrigger/Sprite, 0x0d, 0x1a, 0x07, 0x1d, 0x1e,
+#   0x20, 0x21, 0x22, 0x23, 0x24, 0x05 CFXItem.  Per-type field order: see abi.py.
+# type 0x03 CFXCharacter (FUN_00422f80, ~37 KB) NOT modelled: decompiler recovers its
+#   control flow wrongly. Partial structure in OPEN-QUESTIONS Q-0006.
+#
+# Per-view camera (0x11 view, Q-0008): after the two ClassC vectors the view reads
+#   u32 cam_id, then a 0x68 block = 26 floats, stored at this+0x14c and handed to the
+#   render device (dev->vtable[0x38]()->vtable[0x48](handle, block)). Non-zero/varying
+#   floats across 107 views: f1=1.0, f2 in [0.75,1.0], f3 in [0.70,1.0] (projection),
+#   f13..f15 = camera position (x,y,z), f19 = range/far (157..10291), f21=1.0; all
+#   others 0 in the corpus (rotation fields, zero because these views are axis-aligned).
