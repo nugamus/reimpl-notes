@@ -1148,3 +1148,14 @@ is02n01p03s01.0001.bmp` … (`parsers/at2.py --file`).
 - **Method:** decompiles.
 - **Confidence:** proven; the other controls of 0x416720 (+0x28, +0x32) stay unspecified.
 
+### E-0093 — `LoadSaveTimer` keeps the timers, the bag and the playing sounds (DVD)
+- **Binary/file:** `RING_DVD.EXE` `aApplication::LoadSaveTimer` 0x40d4b0: the path
+  `%s%s\%s\%s.ars` (install prefix 0x402480), mode 1 reads / otherwise writes
+  (0x4295e0's access flags), then `aTimer::LoadSave(file, mode, GetTickCount(), 1)`,
+  `aList::LoadSave(file, mode)` (the bag, app+0x8d) and 0x469790(file, mode, tick, 0) (the
+  sounds); nothing else.
+- **Evidence:** `engines/ring/notes/decomp/save/RING_DVD.EXE__aApplication__LoadSaveTimer.c`;
+  `spec/bag.md` (Erda).
+- **Method:** decompile.
+- **Confidence:** proven for what is written; the record layouts are not read here.
+

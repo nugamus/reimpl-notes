@@ -162,6 +162,10 @@ the bag is tested:
   byte 90017.. = 0, dword 90021.. = the rotation and byte 90025 / 90027 / 90026 / 90028 =
   its +0x67 before the bag opened (0x495570). Then AS's 0x437750(13): the hub chamber
   (`games/ring/docs/as.md`). A failed save is logged and nothing happens.
+  `LoadSaveTimer(file, mode)` (0x40d4b0; mode 2 writes, 1 reads) keeps only three things in
+  `<install path>DATA\SAVE\<file>.ars`: the timers (`aTimer::LoadSave` with the tick
+  count), the bag (`aList::LoadSave`) and the playing sounds (0x469790); everything else
+  stays in memory while the player is in the hub (E-0093).
 - slot k: the object scroll + k goes in hand (+0x95). Then:
   1. the inventory list click event (0x40c1f0) gets the object (only FO has a handler,
      0x441d50; it uses some objects at once and then clears app+0x78);
