@@ -365,3 +365,35 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Confidence:** strong (block location, size and the position/range fields proven across
   107 views); exact meaning of f2/f3/f19 and the device consumer `vtable[0x48]` not yet
   decompiled (Q-0008 sub-point).
+
+### E-0104 — The `.abi` scene-load model and render-device injection
+- **Binary/file:** decrypted `Grumpa.exe`; `CFXActorFactory::CreateFromABIFile` `FUN_0040cef0`,
+  `CFXActorFactory::CreateActor` `FUN_0040d2f0`.
+- **Evidence:** `CreateFromABIFile` opens the file as a C++ ifstream (`FUN_00412c30(...,0x21)`
+  = `ios::in|ios::binary`) and loops to EOF: `read u32 type` (`FUN_004026c0(&stream,&type,4)`),
+  `read u32 id`, `CreateActor(type,id,&actor)` (`FUN_0040d270`→`FUN_0040d2f0`), then
+  `actor->vtable[1](&stream, 1)` — the Serialize of each `CFX*` class run in **load mode 1**.
+  `CreateActor` requires the factory's render device `*(factory+0x128)` (errors
+  `CFXActorFactory::CreateActor - m_pDevice NULL` when 0), `operator_new`s the class by its
+  type-keyed size (switch of 34 cases, sizes in `notes/actor-types.txt`), and immediately
+  injects the device: `actor->vtable[2](*(factory+0x128))`. So every actor holds the shared
+  render device at its own `+0x148`; the type-0x11 view's camera consumer
+  (`dev->vtable[0x38]()->vtable[0x48]`, E-0103) is that device.
+- **Method:** read `FUN_0040cef0` and `FUN_0040d2f0` (in `notes/decomp/`).
+- **Confidence:** proven (the record loop and the device-injection call are explicit).
+
+### E-0105 — Per-view camera block field values across the corpus
+- **Binary/file:** the scene `.abi` camera blocks (E-0103), extracted with `abi.py`.
+- **Evidence:** the 0x68 block is 26 little-endian floats; across every scene view the only
+  non-zero entries (0-based index) are: `[1]=1.0` and `[21]=1.0` (constants), `[2]` and `[3]`
+  = per-axis projection scale (x,y; 1.0 ⇒ 90° field of view, smaller ⇒ wider, e.g. Scene_001
+  `[2]=0.88 [3]=0.83`), `[13][14][15]` = camera eye position (x,y,z; e.g. Scene_007
+  `47.9, 530.9, 1146.1`), `[19]` = far/range (scene-sized, 157..10291). All other indices,
+  including the nine that would hold a 3×3 orientation, are 0 in the whole corpus, so the
+  views are orientation-identity: with the eye above and in front (+Y, +Z) of geometry that
+  sits toward −Z, the camera looks along **−Z** with up **+Y**. Engine camera model:
+  `eye=[13,14,15]`, `forward=(0,0,-1)`, `up=(0,1,0)`, NDC `= ([2]·vx/vz, [3]·vy/vz)`,
+  far `=[19]`. The exact device projection math (`vtable[0x48]`) is still to be decompiled;
+  this model is validated against the pre-rendered backgrounds (Q-0008 sub-point).
+- **Method:** `abi.py` camera extraction; corpus statistics over all scene views.
+- **Confidence:** strong (values proven over the corpus); projection formula empirical.
