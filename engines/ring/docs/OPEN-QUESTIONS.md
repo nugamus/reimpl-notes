@@ -226,9 +226,9 @@ original? (E-0221, E-0225)
 
 ### Q-0071 — The tree's "item there" tests
 0x437d60 (object 50503, nothing in hand) takes an item back when word 50000 % 10 == 1,
-% 100 ≥ 2, % 1000 ≥ 12, % 10000 ≥ 112 for `unk_19` 0..3: the last three are not digit tests
-(e.g. the Apple's 10 alone gives % 100 = 10 ≥ 2 but so does the Flower's 1 with nothing
-else? no: 1 % 100 = 1). Kept as coded; whether players can take an item that is not there
+% 100 ≥ 2, % 1000 ≥ 12, % 10000 ≥ 112 for `unk_19` 0..3: the last three are not
+per-digit tests (e.g. the Flower and the Leaf alone, 101, pass the Apple's 101 % 100 ≥ 2), so an
+item not on its branch can be taken (the bag gets it, the word goes negative in that digit,
 (score −2) is not checked. (E-0221)
 
 ### Q-0072 — WA's entry 999
