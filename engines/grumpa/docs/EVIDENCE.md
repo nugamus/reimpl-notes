@@ -286,3 +286,19 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** decompile of `FUN_00457ea0`, `FUN_0040f7b0`.
 - **Confidence:** strong (the layer's shape and the two entry points); per-class/per-command
   fields open (Q-0006)
+
+### E-0019 — The actor serialize dispatch: type -> constructor -> Serialize (vtable[1])
+- **Binary/file:** decrypted `Grumpa.exe`; `FUN_0040d2f0` (CreateActor), `FUN_0040cef0`
+  (CreateFromABIFile)
+- **Evidence:** `.abi` records are `u32 type, u32 id, <class serialize>` (E-0012).
+  `CreateFromABIFile` calls the actor's `Serialize` via `obj->vtable[1]`
+  (`(**(code**)(*actor + 4))()`). `CreateActor` news each type's object and runs its
+  constructor (the 4th arg to the array-ctor helper `FUN_0047bea5`), which installs the
+  vtable; so type -> ctor -> vtable -> `Serialize` (`engines/grumpa/notes/actor-types.txt`).
+  Confirmed: type 6 ctor `0x413a60` -> vtable `0x4903dc` -> serialize `0x414090`; type 0x19
+  ctor `0x457b80` -> serialize `0x457ea0` (`CFXTrigger::Serialize`). Decoding every type's
+  serialize (the fields each reads) is the systematic work that turns the `.abi` into a 100%
+  parser and the game-state model (Q-0006).
+- **Method:** decompile of `FUN_0040d2f0`/`FUN_0040cef0`; `tools/ghidra/scripts/actor_vtables.py`.
+- **Confidence:** proven (the dispatch mechanism and two mappings); the per-type serialize
+  fields remain (Q-0006)
