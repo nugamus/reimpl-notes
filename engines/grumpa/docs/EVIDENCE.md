@@ -255,3 +255,17 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Confidence:** proven (device setup, screen format, and that the renderer works); the
   per-view camera (eye/orientation/FOV) that places actors in each pre-rendered scene is set
   during the scene render tick from scene data not yet located (Q-0008)
+
+### E-0017 — `.fxi` depth is a standard screen-linear z-buffer; `startScene.txt` boots into a scene
+- **Binary/file:** `games/grumpa/discs/cab/Bitmaps/*_IZ.fxi`; `Grumpa.exe` `FUN_00436aa0`
+- **Evidence:** on a view with a flat floor (`85_1_IZ.fxi`), the decoded 16-bit depth down a
+  column is a straight linear ramp (0xa200, 0x94c0, 0x8780, … 0x1000, step ≈ 0xd40). A
+  perspective z-buffer value is affine in screen space across any planar surface, so a flat
+  floor giving a linear ramp confirms `.fxi` stores a perspective depth-buffer value
+  (`~1 - n/Z` scaled to 16 bit), not world Z. Compositing an actor needs the same
+  near/far/scale and the per-view camera to turn the actor's view-space Z into this value.
+  Separately, `FUN_00436aa0` opens `startScene.txt` from the data folder and parses it
+  (`FUN_004025a0`/`FUN_00407e70`): a dev hook to boot directly into a given scene, skipping
+  the menu — the way to reach a scene for a runtime read of the live camera.
+- **Method:** depth-column analysis of `85_1_IZ.fxi`; decompile of `FUN_00436aa0`.
+- **Confidence:** proven (z-buffer nature; the startScene.txt hook); near/far/scale + camera open (Q-0008)

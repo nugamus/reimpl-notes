@@ -104,5 +104,7 @@ protection).
   that function); the mesh upload (`FUN_004154b0`). The camera is set during the scene
   render tick, from scene data whose location is not yet found.
 - **Blocks:** scene-accurate actor rendering and occlusion; picking/hotspots.
-- **Status:** open (find the scene render tick and the camera/view-matrix setup, and the
-  `.scn`/scene-data source of the camera)
+- **Status:** open. Plan: boot into a scene with `startScene.txt` (E-0017) through
+  SafeDiscLoader2 (as `sddump.py` does), then read the live view/projection matrix from the
+  decrypted process — the fastest ground truth for the camera, near/far and scale. The
+  static alternative is to trace the scene render tick to the device `SetTransform`.
