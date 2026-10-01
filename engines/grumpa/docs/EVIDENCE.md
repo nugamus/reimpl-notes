@@ -479,3 +479,25 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** decompile `FUN_0040efa0`, `FUN_0040d270`; xref of the two globals.
 - **Confidence:** proven (the dispatch loop, the id-indexed table and the vtable[6] call are
   explicit). The per-class opcode tables (each class's `DoCommand`) are the next step (Q-0010).
+
+### E-0111 — The command opcode vocabulary (per-class DoCommand)
+- **Binary/file:** `FUN_0044e2c0` (sprite 0x0d DoCommand), `FUN_004594e0` (trigger 0x19
+  DoCommand), `FUN_00408670` (base, empty). Called as `actor->vtable[6](opcode, arg1, arg2)`
+  by the dispatcher (E-0110).
+- **Evidence:** a shared command vocabulary (same opcodes across classes, each toggling the
+  actor's state flags `+0x10c` "active/updating" and `+0x110` "visible/drawn"):
+  `0` play/start, `1` stop, `2` show (+0x110=1), `3` hide (+0x110=0), `11` activate (+0x10c=1),
+  `12` deactivate (+0x10c=0), `13` disable + set the one-shot latch (+0x210 sprite / +0x184
+  trigger; turns the actor fully off and blocks further commands until re-enabled), `52`
+  (0x34) clear the latch (re-enable — the only opcode honoured while latched), `86` (0x56)
+  reset/init, `500` full on (show + activate + play), `501` (0x1f5) full off. Trigger extras:
+  `14`/`15` set/clear +0x154, `18` and `22` take an argument (`FUN_00459640`/`FUN_00459a40`),
+  `23` sets the global `DAT_0049f200=-1`. Worked example — Scene_007's central-path trigger
+  (id 660, E-0109) on click: `burningroots`(730)→500 on, `roots_with_acid`(733)→500 on,
+  `roots`(732)→13 off, self(660)→13 off (one-shot), trigger 663→11 activate: the burn-the-roots
+  puzzle step.
+- **Method:** decompile the two `DoCommand` overrides; cross-check against the Scene_007
+  command list.
+- **Confidence:** strong (the opcode switches are explicit); a few sub-handlers
+  (`FUN_0044d7e0`, `FUN_00459640/a40`) and the opcodes on other classes (sound, character,
+  scene/navigation) remain to decode.
