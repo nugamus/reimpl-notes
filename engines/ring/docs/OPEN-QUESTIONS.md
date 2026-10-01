@@ -229,7 +229,7 @@ original? (E-0221, E-0225)
 % 100 ≥ 2, % 1000 ≥ 12, % 10000 ≥ 112 for `unk_19` 0..3: the last three are not
 per-digit tests (e.g. the Flower and the Leaf alone, 101, pass the Apple's 101 % 100 ≥ 2), so an
 item not on its branch can be taken (the bag gets it, the word goes negative in that digit,
-(score −2) is not checked. (E-0221)
+score −2). Kept as coded; not checked against the original. (E-0221)
 
 ### Q-0072 — WA's entry 999
 `GameSetZoneWA(999)` fills the bag for the desk; no `GoZone(6, 999)` caller was found
