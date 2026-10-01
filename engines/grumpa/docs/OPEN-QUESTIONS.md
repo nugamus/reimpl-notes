@@ -140,3 +140,16 @@ protection).
 - **Conclusion:** the camera (and thus actors-in-scenes) needs either a machine that runs
   the SafeDisc original, or the deep offline `.abi` serialize-tree decode (Q-0006). Both are
   multi-session. The rendering engine is ready for the camera once it is known.
+
+### Q-0001 RESOLVED (2026-10-01) — runnable SafeDisc-free Grumpa.exe
+The user supplied a no-CD `Grumpa.exe` (Grumpa_NoCD_Win_SV-NO-FI-DA): `.text` decrypted
+(entropy 6.53), `stxt*` loader sections gone, all 8 import DLLs resolved. Runs under
+dgVoodoo2 (C:\GrumpaNoCD); imported to Ghidra as `/grumpa-import/GRUMPA_NOCD.EXE` with full
+imports. Supersedes the SafeDiscLoader2 dump (which had unresolved stub imports).
+
+### Q-0003 RESOLVED (2026-10-01) — installed data layout
+Grumpa.exe reads `<DataPath>/{Scenes,Bitmaps,Meshes,Actors,UI,Sounds,Movies,Save}`, DataPath
+from HKLM\Software\Idol FX\Grumpa. The installer maps cab file groups to it: Bitmaps/Meshes/
+Scenes/Actors/UI/Save keep names; `Sounds_`+`Sounds_<Lang>` merge into `Sounds/`;
+`Movies_<Lang>` (or ISO `Movies/`) -> `Movies/`. Proven by the no-CD's error
+`CFXSound::CreateFromFile ...\Sounds\ambient_combat.wav`. `C:\GrumpaData` reproduces it.
