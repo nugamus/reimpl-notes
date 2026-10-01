@@ -1041,3 +1041,13 @@ is02n01p03s01.0001.bmp` … (`parsers/at2.py --file`).
 - **Method:** decompiles.
 - **Confidence:** proven for NI; the other worlds' entries (0x436270, 0x443710, 0x43ad00) not
   re-read here.
+
+### E-0091 — AS's world entries: bytes 90009..90012, dwords 90013..90016 (supersedes E-0056's wording, with E-0073) (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x44a7d0 / 0x436270 / 0x443710 / 0x43ad00 (argument 0):
+  byte 0x15f99 / 0x15f9a / 0x15f9b / 0x15f9c is 0 → `GoZone(2 / 8 / 4 / 6, 0)`; else
+  `GoZone(VarGetDwrd(0x15f9d / 0x15f9e / 0x15f9f / 0x15fa0), 10)`.
+- **Evidence:** `engines/ring/notes/decomp/as/` (the four functions); `games/ring/docs/as.md`
+  "Variables" and the 80019 handler corrected.
+- **Method:** decompiles.
+- **Confidence:** proven
+

@@ -25,8 +25,8 @@ the language's channel, `GetLanCha`), `GoZone(zone, entry)` is 0x402280 (below).
 Bytes 80000..80005 (initial 0, 0, 1, 0, 1, 0); floats 80001 = 1, 80002 = 2, 80003 = 100.
 Byte 80004 is the dial's target frame, 80005 the dial's current frame, 80003 cleared after
 a destination ride. SY's bytes 90001..90004 say whether the four worlds (NI, N2, FO, WA)
-are done; their dwords 90005..90008 hold the zone and 90009.. the entries to resume in
-(`GoZone`).
+are done; bytes 90009..90012 whether each was entered before, dwords 90013..90016 the
+zone to resume it in (entry 10; E-0091).
 
 ## Objects
 
@@ -65,8 +65,9 @@ are done; their dwords 90005..90008 hold the zone and 90009.. the entries to res
   80049 / 80058 / 80068, 1) (a monologue chain, below).
 - 80019 `unk_19` 0 and 2 → world NI when byte 90001 is 0; 1 and 4 → N2 when 90002 is 0;
   3 → FO when 90003 is 0; 5 → WA when 90004 is 0: `TimStoAll` then the world's entry
-  (0x44a7d0 / 0x436270 / 0x443710 / 0x43ad00 with 0): `GoZone(world, 0)` the first time,
-  else `GoZone(dword 90005.. , 10)` (resume).
+  (0x44a7d0 / 0x436270 / 0x443710 / 0x43ad00 with 0): `GoZone(world, 0)` while byte
+  90008 + n is 0, else `GoZone(dword 90012 + n, 10)` (resume), n = 1..4 for NI, N2, FO,
+  WA (E-0091).
 - 80021 `unk_19` 0 (go): by byte 80004 — 1: `PuzSetAct(80006)` and `PlyCin(1141)` when
   byte 90001 is 0, else `PlyCin(1142)` and presentation 0 of 80019 shown; 11:
   `PuzSetAct(80007)`, `PlyCin(1143)`; 21: `PuzSetAct(80009)`, `PlyCin(1144)`; 31:
