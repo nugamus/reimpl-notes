@@ -501,3 +501,25 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Confidence:** strong (the opcode switches are explicit); a few sub-handlers
   (`FUN_0044d7e0`, `FUN_00459640/a40`) and the opcodes on other classes (sound, character,
   scene/navigation) remain to decode.
+
+### E-0112 — Commands are timed and condition-guarded (the puzzle VM)
+- **Binary/file:** scene `.abi` trigger command lists (E-0109); the dispatcher `FUN_0040efa0`
+  (E-0110).
+- **Evidence:** the first int of a command (the `when` field the dispatcher compares to the
+  factory's current time) is a **delay in ticks**: `-1` fires immediately when the trigger is
+  clicked, a non-negative N fires N ticks later. Each command also carries a nested `EC`
+  **condition list** (the sublist in the CC, E-0109): the command runs only if the condition
+  holds. A condition `EC` tests another actor's state — e.g. Scene_061's gate trigger (661)
+  branches on actor 269 (a state variable): commands guarded by `(269,0,0,…)` run when its
+  value is 0, those guarded by `(269,0,1,…)` when it is 1. Worked example (trigger 661):
+  immediately hide the `doorclosed` sprite (open the gate) and deactivate itself; then at
+  +10 ticks show the door again, trigger sounds (ids 600/644), and — depending on variable
+  269 — activate triggers 664/665. So a trigger enqueues a **timed, conditional command
+  sequence**: this is the game's puzzle/logic VM. A first engine slice runs only the immediate
+  (`when==-1`), unconditional commands (verified: the gate opens on click); the timed and
+  guarded commands need a per-tick command queue and the variable/counter actor classes.
+- **Method:** dump the trigger command lists with their `when` and condition fields; confirm
+  against the running engine (scene 61 gate).
+- **Confidence:** strong (the delay semantics match the dispatcher; the condition shape and
+  the variable branch are clear). The full timed/conditional execution and the variable actor
+  classes are the remaining work (Q-0010).

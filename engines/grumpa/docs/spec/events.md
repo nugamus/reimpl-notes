@@ -46,3 +46,13 @@ roots, disable itself, arm the next trigger: the burn-the-roots puzzle step.
 The click→enqueue code path, actors' initial `active`/`visible` state at scene entry, scene
 navigation (the go-to-scene opcode/class), and the remaining classes' opcodes (sound,
 character, inventory, dialogue). These complete the playable loop.
+
+## Timing and conditions (E-0112)
+
+A command's first field is a `when` delay in ticks: `-1` fires the moment the trigger is
+clicked, a non-negative N fires N ticks after. Each command also has a nested `EC` condition
+list; it runs only if the guard holds (a guard tests another actor's state — e.g. a variable
+actor like id 269: run when its value is 0 vs 1). So a clicked trigger enqueues a timed,
+conditional sequence. The engine currently runs only the immediate, unconditional commands
+(`when==-1`, no condition); the timed/guarded ones need a per-tick command queue and the
+variable/counter actor classes (Q-0010).
