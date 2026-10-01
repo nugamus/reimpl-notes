@@ -539,3 +539,20 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   click→fire model: a hit trigger queues its whole timed/conditional sequence.
 - **Method:** decompile the trigger DoCommand opcode-18 handler and the enqueue.
 - **Confidence:** proven (the polygon test, the field copy and the queue push are explicit).
+
+### E-0114 — Type 0x1a is a textured 3D animated mesh actor (scene characters/props)
+- **Binary/file:** `FUN_00452100` (0x1a Serialize); scene `.abi`; `Meshes/`, `Bitmaps/`.
+- **Evidence:** a 0x1a record ends with two pascal strings naming an `.ANB` mesh and a `.tga`
+  texture, e.g. Scene_061: `061_Sword of Might Pullout.ANB`/`som.tga`,
+  `grumpa_try_sword_061.ANB`/`000_grumpa.tga`, `grumpa_success_sword_061.ANB`,
+  `boulder B_at ground.ANB`/`boulder.tga`, `plattform_up.anb`/`plattform.tga`,
+  `blade_up.ANB`. So **type 0x1a is the scene's 3D animated-mesh actor** — the characters
+  (Grumpa's per-scene animations) and 3D props — rendered through the per-view camera
+  (E-0105) with the `.anb` geometry (E-0014) and `.tga` texture, composited against the
+  `_IZ.fxi` depth. It carries a world transform (the `sub_456d70`/sub-object blocks of its
+  record) and **eight** `CC` command lists (distinct event hooks: enter, click, success, …;
+  E-0109). The scene's moving content is therefore 2D sprite props (0x0d, E-0106) plus 3D
+  mesh actors (0x1a); the standalone character database is type 0x03 (Q-0006).
+- **Method:** `abi.py` extraction of the 0x1a record strings across scenes.
+- **Confidence:** strong (mesh/texture names proven); the transform offset and the eight
+  command hooks' roles remain to pin down.
