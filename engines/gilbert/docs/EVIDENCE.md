@@ -1693,3 +1693,22 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   mirrors it; `--selftest` still ends the walkthrough and both dead-end variants.
 - **Method:** event reading; simulation.
 - **Confidence:** proven
+
+
+### E-0515 — The EXE re-reads the CUA table only through call-back 4; PickUp tests the copy
+- **Binary/file:** `GILBERT.EXE` 0x474a38, 0x4741ec, 0x4741f4, 0x475c14, 0x473f74;
+  `GE.DLL` GEInit, RunEvent, UpdateCUA 0x10009190, FUN_10005890
+- **Evidence:** a scan of 0x401000..0x47c000: 0x474a38 occurs only as an immediate pushed to
+  GEInit (0x46fcb1, 0x46ffa9, 0x47b577); the thunks GECUAGetNumObjects 0x4741ec and
+  GECUAGetObjectData 0x4741f4 are called only from 0x474a38 (0x474a3e, 0x474a7f). Readers of
+  the table 0x482810 (0x473233, 0x475b7a, 0x475c31, 0x475d9b.., 0x478015.., 0x479561,
+  0x479649) only read the copy; nothing after GEDialogEnd (0x4740a7) or elsewhere in the
+  mode 2 tick refreshes it. cua::PickUp tests the copy: `cmp dword [ebx − 4], 0` at 0x475c5e
+  with ebx = record + 0x1c, i.e. record +0x18 (pickable). ge.dll calls call-back 4
+  (DAT_10028600) only from GotoCUA and UpdateCUA; UpdateCUA is called by ObjectToInventory,
+  UseObjectOnObject, Ellapsed (an anim passing its duration) and RunEvent types 1, 2, 14,
+  15, 16; type 12 (and 13) only sets the state's +0x20. Ellapsed's per-tick FUN_10005890
+  calls call-backs 13..16 (DAT_100285dc..d0), not 4. GEClickObjectInCUA reads ge.dll's live
+  flag (E-0504).
+- **Method:** capstone scan; ge.dll decompiles.
+- **Confidence:** proven

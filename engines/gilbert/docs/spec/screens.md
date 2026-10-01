@@ -375,3 +375,13 @@ None of these screens fades; the only fades are the room's (`rooms.md`).
 - The book redraws on every tick but flips on every second one (E-0511).
 - The dialogue's choice rows sit lower for texts with several lines, by the bold 9-point line
   height per line feed, though lines are 12 apart (E-0509).
+
+## Bug fixes
+
+- The EXE's copy of an object's pickable flag changes only when ge.dll calls call-back 4. An
+  event that makes a state pickable (type 12) without a refresh (e.g. a dialogue choice in
+  close-up 304, whose anims never end) leaves the object neither draggable (PickUp reads the
+  copy) nor clickable (ge.dll's click sees it pickable) until a take, a use, an event of type
+  1, 2, 14, 15, 16, an ending anim or re-entering the close-up refreshes the table (E-0515).
+  The engine refreshes the close-up after events of type 12 and 13 that change a state, as
+  after type 2; always on.
