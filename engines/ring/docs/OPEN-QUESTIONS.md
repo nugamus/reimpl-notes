@@ -234,3 +234,10 @@ score −2). Kept as coded; not checked against the original. (E-0221)
 ### Q-0072 — WA's entry 999
 `GameSetZoneWA(999)` fills the bag for the desk; no `GoZone(6, 999)` caller was found
 (like Q-0020, Q-0030). (E-0220)
+
+### Q-0060 — Why does RO clear the lever (byte 40804) when entering the egg puzzle?
+- **Context:** the after-movability handler 0x43c450, kind 1, from 40000 or to 40010, sets
+  byte 40804 (the pipe room's lever) to 0, although the lever is elsewhere (puzzle 40060)
+  and is reset on leaving the pipe room anyway (0x43c290). Harmless as coded.
+- **How to answer:** none needed for the engine (kept as coded); a trace of the original
+  would only confirm.

@@ -1409,3 +1409,57 @@ is02n01p03s01.0001.bmp` … (`parsers/at2.py --file`).
 - **Evidence:** `engines/ring/notes/decomp/wa/`; `wa.md` "Animation", "Sound", "Flow".
 - **Method:** decompiles.
 - **Confidence:** proven
+
+### E-0190 — Zone RO: set-up, entries, places and objects (DVD)
+- **Binary/file:** `RING_DVD.EXE` set-up 0x458a90 (`engines/ring/notes/zones/ro.md`, emulated,
+  E-0094), `GameSetZoneRO` 0x43d910 (entry 0: alpha 0, ran 85.3, `BagRem(70000)`,
+  `PlyCin("1506")` 0x48db9c, `BagAdd` 40000, 0x9c4c, 0x9c4d, `PuzSetAct(0x9ca4)`,
+  play(0x9efc); entry 10: `%sData\Save\log.ars`, bytes 0x15fa2 / 0x15faa, dword 0x15fa6,
+  `LoadSaveTimer("log", 1)`), 0x43d8f0 (`GoZone(5, 0)`, called by N2, E-0132).
+- **Evidence:** `engines/ring/notes/decomp/ro/`; `games/ring/docs/ro.md` "Places",
+  "Variables", "Objects", "Entering".
+- **Method:** decompiles, set-up call list.
+- **Confidence:** proven
+
+### E-0191 — Zone RO: object click, button down, the tiles, the pipes, the keyboard (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x43afa0 (40010, 40011 cells with bytes 0x9e35 + c, the
+  neighbours 0x9e2b / 0x9e3f / 0x9e34 / 0x9e36 + c, step byte 0x9f65, the solution test over
+  0x9e4a..0x9e71, the 2000-move shuffle; 40201 with 0x4a1cc0 / 10, `"%d"` 0x4823e0, string
+  0x9fc5), 0x43b9a0 (40202: play(0x9e34 + k), `"%1d"` 0x48db14 of k − 7, string 0x9fc6, the
+  codes 0x48db08 / 0x48dafc / 0x48daf0 / 0x48dae4), the score writes `VarSetFloa(0x15f96)`
+  with f32 0x424f3333 (51.8), 0x4280999a (64.3), 0x42960000 (75.0), 0x429d3333 (78.6),
+  0x42ab6666 (85.7), 0x42c80000 (100.0); videos 0x48dacc "1780", 0x48dad4 "1781", 0x48dadc
+  "1782", 0x48db20 "1783", 0x48db18 "1784"; `VarSetStrg` 0x4062b0 → `aVar::VarSetStrg`
+  0x4255b0.
+- **Evidence:** `engines/ring/notes/decomp/ro/RING_DVD.EXE__FUN_0043afa0.c`, `…0043b9a0.c`;
+  disassembly at 0x43afca (the `"%d"` argument is `unk_19`) and 0x43ba29 (k − 7).
+- **Method:** decompiles, disassembly, strings read from the EXE.
+- **Confidence:** proven
+
+### E-0192 — Zone RO: drags, timers, movabilities, animations (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x43bbf0 (lever 0x9c7c: limit (0, 0)–(640, 480), max 0x47,
+  |dx| × f64 [0x47e630] = 1/6, release rounding with f32 [0x47e638] = 0.1; dials 0x9ca5 +
+  `unk_19`: max 0x61, wrap, the solution bytes 0x9e99..0x9e9d = 10, 90, 60, 50, 50 or 40,
+  videos 0x48db20 / 0x48db18), drag getters 0x406890 / 0x4068a0 (0x426180 / 0x4261a0),
+  0x406730 / 0x406770 / 0x406710 / 0x4066d0; 0x43c500 (timers 0, 1: bytes 0x9f66 / 0x9f67
+  to 10 / 90); 0x43c290 (before: kind 2, from 0x9c7c or to 0x9c45; "1785" 0x48db34;
+  `"00000000"` 0x48db28); 0x43c450 (after); 0x43c5e0 (ids 0x9ca4..0x9caa frames 1, 0x1e,
+  0x46; `"6543210"` 0x48db44, `"0000000"` 0x48db3c; ids 0x9d09..0x9d0f, bytes 0x9fc5..0x9fcb
+  = 0x1a, 0x9fcf..0x9fd5 = 0x46); `PuzSetMovOnOrOff` wrappers 0x404a70 (on) / 0x404a90
+  (off).
+- **Evidence:** `engines/ring/notes/decomp/ro/`; disassembly of 0x43bbf0's `__ftol` inputs.
+- **Method:** decompiles, disassembly.
+- **Confidence:** proven
+
+### E-0193 — Zone RO: sounds and the end; RO leads back to AS (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x43d4a0: chains 0x9efc → 0x9efd, 0x9f02..0x9f07 →
+  0x9efe → 0x9eff → 0x9f00; 0x9f00: stop all 0x400, "1788" 0x48db84, `RotSet3DSouOff`,
+  `RotSetAmbSouOff` / `RotSetAmbSouOn` 0x405de0 / `PuzSetAmbSouOn` 0x404b90 (0x9e9c),
+  `RotSetMovRidNam` 0x405870 (`ro0102` 0x48db7c … `1796` 0x48db54, `ro0502` 0x48db4c);
+  0x9dd0: "1787" 0x48db8c; 0x9e9b: stop(0x9c43), `TimStoAll`, "1786" 0x48db94,
+  0x437750(2). No call to 0x408db0 in 0x43afa0..0x43d910.
+- **Evidence:** `engines/ring/notes/decomp/ro/RING_DVD.EXE__FUN_0043d4a0.c`,
+  `RING_DVD.EXE__RotSetMovRidNam.c`. `spec/events.md` lists the pause event 0x40c910's only
+  handler (0x43a6f0) under WA, not RO.
+- **Method:** decompiles, strings read from the EXE.
+- **Confidence:** proven
