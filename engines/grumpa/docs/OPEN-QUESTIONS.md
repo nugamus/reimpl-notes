@@ -115,3 +115,10 @@ protection).
   number, launched through SafeDiscLoader2. Then dump the decrypted process (as `sddump.py`
   does) and locate the perspective projection matrix (recognisable: 1/tan(fov) diagonal, a
   ±1 in the w column) and the per-view world matrix near the device object.
+  The exact registry key is `HKLM\Software\Idol FX\Grumpa` value `DataPath` (the
+  InstallShield template `Software\COMPANY_NAME\TITLE_MAIN` in `data1.hdr`; for the 32-bit
+  game, `HKLM\Software\WOW6432Node\Idol FX\Grumpa`). Setting it needs admin, which this
+  session lacks (HKCU is ignored by the game), so the runtime route is blocked here — it
+  needs the user to run once (elevated):
+  `reg add "HKLM\Software\WOW6432Node\Idol FX\Grumpa" /v DataPath /t REG_SZ /d "<cab path>" /f`.
+  The on-disk EXE is SafeDisc-encrypted so it cannot be patched to read HKCU instead.
