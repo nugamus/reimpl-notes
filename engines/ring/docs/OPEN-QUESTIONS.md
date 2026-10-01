@@ -201,3 +201,18 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **Blocks:** nothing (the later play wins).
 - **Status:** open
 
+### Q-0050 — FO's dead animation branches and test entry
+FO's animation handler (0x442b60) reacts to ids 30002..30005 that no set-up call assigns,
+shows / hides 30110 presentations 6 and 9 (30110 has four), and pauses 30110/1 at frame 202
+of a 200-frame animation (never reached; timer 5 unpauses it anyway). Entry 999
+(`GameSetZoneFO` 0x443760) has no caller found. Dead as coded, or reached by data not in
+the DVD? (E-0165, E-0160)
+
+### Q-0051 — FO's before-movability tests that cannot match
+0x4420b0 tests kind 2 (puzzle → rotation) with `from` 30701..30704 (rotations) and 35111 →
+30101 (35111 has no movability in the set-up). Both are unreachable as declared. (E-0164)
+
+### Q-0052 — FO's button-down / take handler
+0x441860 is FO's handler for both 0x40bd40 and 0x40bed0 and only reads the object in hand
+for 30016; no FO object has flag 2 or 8. Left over from an earlier design? (E-0166)
+

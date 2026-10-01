@@ -1288,3 +1288,69 @@ is02n01p03s01.0001.bmp` … (`parsers/at2.py --file`).
 - **Method:** decompile, disassembly.
 - **Confidence:** proven
 
+### E-0160 — Zone FO: entries, world entry and resume (DVD)
+- **Binary/file:** `RING_DVD.EXE` `GameSetZoneFO` 0x443760 (entries 0, 10, 999; 10 reads
+  `%sData\Save\sie.ars`, bytes 0x15fa3 = 90019, 0x15fab = 90027, dword 0x15fa7 = 90023,
+  `LoadSaveTimer("sie", 1)`), AS's world entry 0x443710 (byte 0x15f9b = 90011, dword
+  0x15f9f = 90015); video names from the `DAT_0048dd..` strings (1217, 1218).
+- **Evidence:** `games/ring/docs/fo.md` "Entering"; decompiles `engines/ring/notes/decomp/fo/`.
+- **Method:** decompiles, strings read from the EXE.
+- **Confidence:** proven
+
+### E-0161 — Zone FO: object clicks (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x43dac0 (switch on the object; the shared tails
+  0x43e058 (scroll order), 0x43ed58 (pedestals solved), 0x43edfe (drop)); score constants
+  f64 [0x47e640] 100, [0x47e648] 2.2, [0x47e650] 9.9, [0x47e658] 4.4, [0x47e660] 1.1,
+  [0x47e668] 6.6, [0x47e670] 3.3, [0x47e678] 5.5, [0x47e680] 4.0 added to SY's float 90007
+  (0x406260 / 0x406230); 0x405820 = `RotSetMovOnOrOff(rotation, 0)`, 0x404a70 / 0x404a90 =
+  `PuzSetMovOnOrOff(puzzle, 1 / 0, from, to)`, 0x406e60 the type volume.
+- **Evidence:** `games/ring/docs/fo.md` "Object click", "The end".
+- **Method:** decompile, constants read from the EXE.
+- **Confidence:** proven
+
+### E-0162 — Zone FO: the dial drag and the drag getters (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x441890 (phase 1: 0x406660(2), play(30500, 2),
+  0x4066b0(0x1b8, 0xf8); phase 2: stop(30500, 0x400); phase 3: the four quadrant tests,
+  byte 30016 ± 1 wrapping 0..48, then volume(30500, trunc(0x4068b0 + [0x47e688] 80.0)));
+  getters 0x406870 (ref x < cur x), 0x406830 (ref y < cur y), 0x406770 (prev x < cur x),
+  0x406730 (cur x < prev x), 0x406710 (prev y < cur y), 0x4066d0 (cur y < prev y), 0x4068b0 →
+  0x4261c0 (√ of 0x426180² + 0x4261a0², |cur − prev| in x and y).
+- **Evidence:** `engines/ring/notes/decomp/fo/`; disassembly at 0x441cf1..0x441d04.
+- **Method:** decompiles, disassembly.
+- **Confidence:** proven
+
+### E-0163 — Zone FO: the bag click (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x441d50: the place = 0x402720 (current puzzle, app+0x81)
+  when 0x402700, else 0x402730 (current rotation) when 0x402710; object 30019 only; each
+  handled case writes app+0x78 = 0; `RotGetAlp` 0x405ab0, `RotGetBet` 0x405b40, `RotGetRan`
+  0x405bb0.
+- **Evidence:** `games/ring/docs/fo.md` "Bag click".
+- **Method:** decompile.
+- **Confidence:** proven
+
+### E-0164 — Zone FO: before and after a movability (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x4420b0 (from, to, index, `unk_19`, kind), 0x442580 (to,
+  from, …, kind); `RotSetMovRidNam` 0x405870 (rotation, index, name →
+  `aMovability::SetRideName`), the name "fom" at 0x48dd58.
+- **Evidence:** `games/ring/docs/fo.md`.
+- **Method:** decompiles.
+- **Confidence:** proven
+
+### E-0165 — Zone FO: timers, animations, sounds and the ending (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x442810 (timers 0..5), 0x442b60 (animation ids 30000,
+  30001, 30006, 30007, 30008; 30002..30005 assigned nowhere in the set-up), 0x442e40 (sound
+  ends; 30120..30136 with SY's object 6 and 0x437750(3)); animation ids from the set-up
+  (`ObjPreSetAniIdeOn*`: 30025/0 → 30006, 30040/4 → 30008, 30045/7 → 30000, 30050/1 →
+  30009, 30109/0 → 30007, 30110/1 → 30001; 30110/1 has 200 frames, 30109/0 202).
+- **Evidence:** `games/ring/docs/fo.md`; `engines/ring/notes/zones/fo.md`, `sy.md` (object 6).
+- **Method:** decompiles, the emulated set-up (E-0094).
+- **Confidence:** proven
+
+### E-0166 — Zone FO: button down and take do nothing; no game over (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x441860 (object 30016: reads 0x406530 / 0x406550,
+  nothing else); every `AddObj` of the FO set-up has flags 1 except 30016 (4), so neither
+  0x40bd40 (flag 2) nor 0x40bed0 (flag 8) is raised; the FO handlers call no 0x408db0.
+- **Evidence:** the decompiles' call lists, `engines/ring/notes/zones/fo.md`.
+- **Method:** decompiles, set-up listing.
+- **Confidence:** proven
+
