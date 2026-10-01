@@ -939,3 +939,12 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
 - **Method:** decompiles.
 - **Confidence:** proven for the handlers; the video names are the `DAT_0048d8..` strings
   of the decompiles.
+
+### E-0057 — `TimSta` is 0x4065a0, `TimSto` 0x4065e0 (supersedes the addresses in E-0055) (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x4065a0 pushes two arguments and calls 0x425c00
+  (`aTimer::StartTimer`), `ret 8`; 0x4065e0 pushes one and calls 0x425d80 (kill), `ret 4`.
+  AS's new-game entry calls 0x4065a0 with (2, 100000), (3, 220000), (4, 150000) at 0x437d20.
+- **Evidence:** disassembly (capstone). E-0055 had the two wrappers' addresses swapped;
+  `spec/api.md` "Timers" corrected.
+- **Method:** disassembly.
+- **Confidence:** proven

@@ -107,9 +107,9 @@ are saved with the game.
 
 ## Timers (`aTimer`, app+0x91; E-0055)
 
-`TimSta(id, ms)` (0x4065e0 → `aTimer::StartTimer` 0x425c00) refuses an id already running,
-else records (id, start tick, count 0, ms) and calls `SetTimer(window, id, ms)`: a
-repeating Windows timer. `TimSto(id)` (0x4065a0 → 0x425d80, also named `TimSta` by its
+`TimSta(id, ms)` (0x4065a0 → `aTimer::StartTimer` 0x425c00; E-0057) refuses an id already
+running, else records (id, start tick, count 0, ms) and calls `SetTimer(window, id, ms)`: a
+repeating Windows timer. `TimSto(id)` (0x4065e0 → 0x425d80, also named `TimSta` by its
 error string) kills it and drops the record; `TimStoAll` (0x406610 → `aTimer::StopAll`
 0x425b30) all of them. 0x406640(id) tells whether a timer with that id runs (0x425f00).
 On `WM_TIMER` (0x40b4a0), unless app+0x6a is set, the current zone's timer handler gets the
