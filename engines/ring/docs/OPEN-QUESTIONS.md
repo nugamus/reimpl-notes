@@ -157,3 +157,11 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** `aApplication::BagAdd` only (`engines/ring/notes/decomp/bag/`).
 - **Blocks:** the inventory spec.
 - **Status:** open
+
+### Q-0013 — What are `ObjAddBagAni`'s second and third arguments (1 and 3 in every call)?
+- **Context:** `spec/bag.md` "Drawing". `ObjAddBagAni(object, 1, 3, frames, 12.5, 4)` passes
+  them to `aAnimationImage::Init` (0x4219f0) next to a constant 4 (taken as the image kind,
+  `LSTICON`, which matches where the frames are).
+- **What we checked:** `aApplication::ObjAddBagAni` 0x402ed0; 0x4219f0's stores not mapped.
+- **Blocks:** nothing (every call uses the same values).
+- **Status:** open

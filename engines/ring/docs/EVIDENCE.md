@@ -1051,3 +1051,87 @@ is02n01p03s01.0001.bmp` … (`parsers/at2.py --file`).
 - **Method:** decompiles.
 - **Confidence:** proven
 
+
+### E-0060 — The inventory (`aList`, app+0x8d): fields, set-up, pictures, hot spots (DVD)
+- **Binary/file:** `RING_DVD.EXE` constructor 0x416d70; `aApplication::Init` 0x408920..0x408a38
+  (0x417d20(0, 0), 0x417d40(18, 42, 44, 100), 0x417d60(0, 0), 0x417dd0(6), 0x417d80(0, 24,
+  30, 448), 0x417da0(610, 24, 30, 448), 0x4192a0(7, 48), 0x4192c0(627, 48), 0x417de0(335,
+  8), 0x419280(500); `aList::openImage` 0x417440 with "bagbgr.tga", "bagarr.tga" (×2),
+  "menu_gur.tga" and the fixed "erda_gun.tga" / "erda_gur.tga", folder "LIST\"); setters
+  disassembled (capstone, 0x417d40/0x417d80/0x417da0 are not functions in Ghidra); hot
+  spots 0x4178c0; `SetZone` 0x402210 → 0x417cc0 / 0x417cf0 (Erda on / off).
+- **Evidence:** `engines/ring/notes/decomp/bag/` (`FUN_00416d70`, `aList__openImage`,
+  `FUN_004178c0`, `aApplication__SetZone`); the pictures are members `\list\*.tga` of the
+  language `SY.AT2` (`bagbgr` 640×87, `bagarr` 6×6, `menu_gur` 52×16, `erda_gu?` 52×40, read
+  with `tools/parsers/at2.py` + `tgc.py`). Written up in `spec/bag.md` "Fields", "Hot spots".
+- **Method:** decompiles, disassembly, corpus.
+- **Confidence:** proven
+
+### E-0061 — Inventory contents: add, remove, remove all, is in (DVD)
+- **Binary/file:** `RING_DVD.EXE` `BagAdd` 0x406330, `BagRem` 0x4063e0, `BagRemAll`
+  0x406470, `BagIsIn` 0x4064a0; `aList::add` 0x417e80 (returns at once when 0x4184d0 finds
+  the object; inserts object and item at index 0; icon "%s%s%s.tga" with "LSTICON\",
+  "\LSTICON\%s.tga" for the archive, "dummy.tga"; count +0x2c, scroll +0x28 = 0 when count >
+  +0x24), 0x4181c0 (remove; scroll 0 when count ≤ +0x24), 0x418360, 0x4184d0;
+  `ObjAddBagAni` 0x402ed0; `aAnimation::Alloc` 0x421d10 (image kind switch at 0x421d82:
+  1, 2 `ANI`, 3 `CURSOR`, 4 `LSTICON`).
+- **Evidence:** decompiles in `engines/ring/notes/decomp/bag/`; `SY.AT2` holds
+  `\lsticon\<icon>.tga` and `\lsticon\<icon>\<icon>.NNNN.tga` (74 folders/files families,
+  1,434 members); the zones' `ObjAddBagAni` arguments from `engines/ring/notes/zones/*.md`.
+  Answers Q-0022 (another agent's): a second `BagAdd` of the same object does nothing.
+- **Method:** decompiles, corpus.
+- **Confidence:** proven (the meaning of `ObjAddBagAni`'s second and third arguments: Q-0013)
+
+### E-0062 — Opening and closing the inventory; drawing it (DVD)
+- **Binary/file:** `RING_DVD.EXE` window procedure 0x40eec0 (`WM_RBUTTONUP` → 0x40afe0 at
+  0x40f1ef); 0x40afe0, show 0x4192e0, hide 0x419350 (→ 0x417e00), 0x40de90 / 0x40ded0
+  (0x4103c0 writes rotation +0x67); draw 0x418ca0 from `RenderFrame` 0x40ed20 (after puzzle
+  1, before 0x409520 / 0x408dd0 / 0x427c70 / the cursor); `StartMenu` 0x40dc80 hides it at
+  0x40dccd and 0x40de36 and drops the object in hand; 0x40b7b0 (sets app+0x66) is called
+  only with 1, 2, 4 and a value loaded from a save (call-site scan), so mode 3 is unused.
+- **Evidence:** decompiles `FUN_0040afe0`, `FUN_004192e0`, `FUN_00419350`, `FUN_0040de90`,
+  `FUN_0040ded0`, `FUN_00418ca0`, `RenderFrame`, `aApplication__StartMenu`, `WndProc` in
+  `engines/ring/notes/decomp/bag/`; capstone for 0x4103c0. `spec/bag.md` "Opening and
+  closing", "Drawing".
+- **Method:** decompiles, disassembly.
+- **Confidence:** proven
+
+### E-0063 — Inventory tracking and clicks; Erda (DVD)
+- **Binary/file:** `RING_DVD.EXE` tracking 0x408dd0 (bag shown → 0x418a70 only; object in
+  hand → cursor 2 on accessibilities, 1 on nothing); 0x418a70 (arrows scroll with the 500 ms
+  repeat, menu flag 0x4a1928, slot → the name text 0x42c550 / 0x414df0 at y +0x59 = 90,
+  Erda flag 0x4a1929); `MouseLeftEvent` 0x409d90 (bag shown → 0x418520; on 1: event
+  0x40c1f0, hide, app+0x77 / app+0x78, 0x40b860, `SetCursorPos(320, 240)`);
+  `aList::checkClickOnListHotSpots` 0x418520 (Erda: `LoadSaveTimer("alb" / "sie" / "log" /
+  "bru", 2)`, `VarSetDwrd` 0x4061b0 and `VarSetByte` on 90009..90028, 0x437750(13)); the
+  window procedure passes the raw window position while the bag is shown; app+0x77 is only
+  ever set to 1 and app+0x78 cleared only by FO's 0x441d50 (byte-store scan of `.text`).
+- **Evidence:** decompiles in `engines/ring/notes/decomp/bag/` (`FUN_00408dd0`,
+  `FUN_00418a70`, `aList__checkClickOnListHotSpots`, `aApplication__MouseLeftEvent`,
+  `FUN_0040c1f0`, `FUN_00441d50`); strings at 0x487388 "alb", 0x487340 "sie", 0x4872f8
+  "log", 0x4872b0 "bru". `spec/bag.md` "Tracking", "Clicking".
+- **Method:** decompiles, disassembly scan.
+- **Confidence:** proven
+
+### E-0064 — The object in hand: cursors, dropping, using, taking (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x406530 / 0x406550 / 0x406570 (bag +0x95,
+  `DeleteTypeDelete(2)`); 0x40b860 (`CurAdd(1, "%s_p" or icon, …, 2, …)`, `CurAdd(2, "%s_a"
+  or icon, …)` from object +0x15.. / +0x32.., `CurSetOffset` 0x402860); `MouseLeftEvent`:
+  object click 0x40bbb0 without a drop, flag-8 event 0x40bed0 then (app+0x74) drop +
+  `aList2::SetObjectClicked` 0x4191f0 + 0x40b860, app+0x75 drop after the "movability
+  done" event (0x40af60); app+0x74 cleared by WA (0x43932e..0x439f30) and RH
+  (0x443c49..0x443e1d), app+0x75 never (byte-store scan).
+- **Evidence:** decompiles in `engines/ring/notes/decomp/bag/`; the zones' `ObjSetPasCur` /
+  `ObjSetActCur` arguments (`engines/ring/notes/zones/*.md`), `SY.AT2` members
+  `\cursor\<icon>_p.tga`. `spec/bag.md` "The object in hand".
+- **Method:** decompiles, disassembly scan, corpus.
+- **Confidence:** proven
+
+### E-0065 — Opening the inventory writes rotation +0x67 (refines E-0046)
+- **Binary/file:** `RING_DVD.EXE` 0x4103c0 `mov byte [ecx+0x67], (arg != 0)`, called by
+  0x40de90 (1, bag opened) and 0x40ded0 (0, bag closed).
+- **Evidence:** disassembly. E-0046 listed the save loader's stores (0x40d34d / 0x40d359) as
+  the only writes of +0x67; this setter is another. Q-0012 (the value before either) stays
+  open.
+- **Method:** disassembly.
+- **Confidence:** proven

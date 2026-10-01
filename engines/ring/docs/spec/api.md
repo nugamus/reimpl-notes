@@ -71,7 +71,7 @@ Rotation angles, "ran" and the transition kind byte are specified with the rende
 | `ObjPreHid` | 0x403d00 / 0x403e80 | the same | hides one / all (`aObject::HidePresentation`) |
 | `ObjPreHidDeaPuz` | 0x403d80 / 0x403f00 | the same | hides one / all and frees their pictures (`aObjectPresentation::HideWithDeallocPuzzle`) |
 | `ObjSetPasCur`, `ObjSetActCur`, `ObjSetPasDraCur`, `ObjSetActDraCur` | 0x403f80, 0x404030, 0x4040e0, 0x404190 | int object, then 7 dwords unk_2..unk_8 | the object's cursors, stored verbatim at +0x15/+0x32/+0x4f/+0x6c (0x420b70 …) with the load-from byte from `ART_BAG`. Observed: `22, 22, 20, 4, 12.5, 4, 4` (active), `22, 22, 0, 3, 0, 0, 3` (passive) |
-| `ObjAddBagAni` | 0x402ed0 | int object, int unk_2, u8 unk_3, int unk_4, f32 unk_5, u8 unk_6 | the object's inventory animation (`aAnimationImage::Init` with the object's icon name 0x426cb0, from the bag archive per `ART_BAG`) |
+| `ObjAddBagAni` | 0x402ed0 | int object, int unk_2, u8 unk_3, int frames, f32 fps, u8 flags | the object's inventory animation (`aAnimationImage::Init` with the object's icon name 0x426cb0, image kind 4 = `\lsticon\<icon>\`, from the archive when `ART_BAG` is set; in the zones `(o, 1, 3, frames, 12.5, 4)` with 20 frames (82 calls), 13 (2) or 1 (1): `spec/bag.md`, Q-0013) |
 | `PuzAddMovToRot` | 0x404450 | int puzzle, int rotation, str ride, int x1, y1, x2, y2, u8 enabled, int cursor, int unk_10 | a movability of kind 2 |
 | `PuzAddMovToPuz` | 0x4046c0 | int puzzle, int puzzle, str ride, x1, y1, x2, y2, u8 enabled, int cursor, int unk_10 | kind 3 |
 | `RotAddMovToRot` | 0x4050f0 | int rotation, int rotation, str ride, x1, y1, x2, y2, u8 enabled, int cursor, int unk_10 | kind 0 |

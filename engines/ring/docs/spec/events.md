@@ -58,4 +58,4 @@ from `WM_KEYDOWN`). In SY the dialogues' OK / yes buttons have key 13, cancel / 
 Right button up (0x40afe0), when no drag is active and the menu is not up (app+0x6f): if
 puzzle 1 (SY's dialog puzzle, looked up by id with 0x40b760) is missing or its mode (+0x24)
 is not 2, it toggles the inventory: hides it (0x419350,
-0x40ded0) when shown, else shows it (0x406570, 0x4192e0, 0x40de90).
+0x40ded0) when shown, else shows it (0x406570, 0x4192e0, 0x40de90). The inventory itself: `spec/bag.md`.

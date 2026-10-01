@@ -34,7 +34,7 @@ load-from byte (`ART_CURSOR`, `spec/boot.md`):
 
 The archive holds `cur_idle.0001..0015`, `cur_muv.0001..0020`, `cur_hotspot.0001..0019`
 and the single pictures `cur_back`, `cur_busy`, `cur_menuidle`, `cur_menuactive`,
-`ni_handsel` (plus the inventory cursors, `spec/inventory.md` to come). File lookup is
+`ni_handsel` (plus the inventory cursors, `spec/bag.md`). File lookup is
 case-insensitive (`spec/resources.md`).
 
 The cursors of the game set-up are listed in `spec/boot.md` ("Game set-up"); read with the
@@ -93,7 +93,8 @@ finds the first enabled hot spot under the mouse; a hot spot contains (x, y) whe
 
 While an object is being dragged, or an inventory object is in hand (0x406530), the
 cursors chosen above are replaced: drag active → 4 on the dragged hot spot, else 3;
-object in hand → 2 on a hot spot, 1 elsewhere (`spec/inventory.md`).
+object in hand → 2 on an accessibility, 1 on nothing, a movability keeps its own
+(`spec/bag.md`, E-0063).
 
 The accessibility and "nothing" events are raised every frame the mouse is on (or off)
 a hot spot, not once on entering. `unk_19` is the last argument of `ObjAddPuzAcc` /
@@ -111,7 +112,7 @@ tracking; on the first hit in puzzle 1, then the current puzzle (rotations:
 - when the object's flag byte (`AddObj`'s last argument, object +0xc) has bit 0 set, the
   object-click event (0x40bbb0) gets (object, `unk_19`, puzzle id, 1); if the mode is now
   4 (a zone change is pending) the click ends;
-- bit 3 set: the event 0x40bed0 (`spec/inventory.md`);
+- bit 3 set: the event 0x40bed0 (`spec/bag.md`);
 - then tracking runs once more.
 
 A click in puzzle 1 in mode 2 that hits nothing ends there. A hit on a movability takes
