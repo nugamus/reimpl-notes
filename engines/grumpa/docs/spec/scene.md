@@ -54,3 +54,13 @@ Open (Q-0008 sub-point): the exact device projection — whether `block[2]/[3]` 
 depth (linear vs 1/z) — awaits the device `vtable[0x48]` decompile. The model above is
 calibrated against the pre-rendered backgrounds; when static and runtime disagree, the
 rendered result wins.
+
+## 2D sprite props (type 0x0d, E-0106, E-0107)
+
+Most moving scene content is animated 2D sprites, not 3D meshes. A type-0x0d record carries:
+a JPG frame-base name (`cannons_0000.jpg`, `butterfly3_0000.jpg`), an 8-u32 animation block
+(frame count, rate, loop flags), two leading flag ints `h[0],h[1]` (blend/key mode), and —
+when its gate field (+0x20c) is 1 — a screen position `(x, y)` in 800×600 pixels at
++0x190/+0x194. The engine draws the sprite's current frame at `(x, y)` over the background
+with a blue colour key (pixels near `(0,0,255)` are transparent). Open (Q-0009): the exact
+blend modes (smoke sprites differ), and per-frame depth occlusion against the `_IZ.fxi`.
