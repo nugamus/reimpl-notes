@@ -459,3 +459,23 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** `abi.py` extraction of the EC/CC vectors on 0x19 records.
 - **Confidence:** strong for the structure and the id cross-references; the opcode semantics
   (the verb table) need the trigger's command-execution code (Q-0010).
+
+### E-0110 — The event VM: global command queue and per-actor DoCommand dispatch
+- **Binary/file:** `FUN_0040efa0` (the dispatcher); `FUN_0040d270` (actor registration);
+  `FUN_0040f4c0`/`FUN_0040f7b0` (Save/LoadSceneCommand); globals `DAT_004b9bc4` (actor table),
+  `DAT_004b9b9c` (command list), `DAT_004b9ba0` (pending count).
+- **Evidence:** actors are registered in a **flat global array indexed by id**:
+  `FUN_0040d270` stores the new actor at `DAT_004b9bc4[id]` and writes the id to `actor+0x108`.
+  Events run through a **global command list** `DAT_004b9b9c` (a doubly linked list). Each node
+  is a 5-int command `(when, targetId, opcode, arg1, arg2)` (the CC base fields, E-0109). The
+  dispatcher `FUN_0040efa0` walks the list and, for every command whose `when` equals the
+  factory's current time (`factory+0x130`), calls the target's **`DoCommand` = vtable index 6
+  (offset 0x18)**: `actor->vtable[6](opcode, arg1, arg2)`; a `targetId` of −1 broadcasts to
+  every actor in the table. The command is then unlinked and the pending count decremented.
+  So: triggers (0x19) enqueue their CC command templates; the dispatcher routes each to
+  `DAT_004b9bc4[targetId]->DoCommand(opcode, …)`; **the opcode meaning is per actor class** (a
+  sprite interprets play/show/hide, a trigger enable/disable, etc.). Navigation, puzzles,
+  inventory and dialogue all run on this one queue.
+- **Method:** decompile `FUN_0040efa0`, `FUN_0040d270`; xref of the two globals.
+- **Confidence:** proven (the dispatch loop, the id-indexed table and the vtable[6] call are
+  explicit). The per-class opcode tables (each class's `DoCommand`) are the next step (Q-0010).
