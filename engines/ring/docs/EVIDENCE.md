@@ -1176,3 +1176,17 @@ is02n01p03s01.0001.bmp` … (`parsers/at2.py --file`).
 - **Confidence:** proven for the paths the set-ups take (they have no data-dependent branches
   outside the loops).
 
+### E-0095 — The juggle effect (DVD)
+- **Binary/file:** `RING_DVD.EXE` `RotSetJugOn` 0x405c70 (+0x66 = 1, +0x39, +0x41),
+  0x40f990 (defaults: +0x39 = 30.0), 0x410410 (first load: +0x31 = 0, tick 0x495708, the
+  weight table 0x49d7b8..0x49f7b8, 32 floats per 0x100-byte row, `rand()` × +0x39 ×
+  [0x47e310] = 1/32767), 0x410610 (0x49d7b4 = (tick − 0x4a17b8) × 0.001; +0x31 += it below
+  1.0, then 1.0 at 0x4107ab), 0x40f9e0 (0x40ffb3..0x410065: for rows 0..[0x49d738] and
+  columns 0..[0x49d73c], `sin(t × +0x41 × 1.05)` [0x47e2ac] and `cos(t × +0x41 × 0.95 + w)`
+  [0x47e2a8], × +0x31 × w, ×65536 [0x47e330] to int (0x410900), added to the grid's u
+  (0x495718) and v (0x499718) entries (0x410920)), 0x410361 (+0x31 during a turn).
+- **Evidence:** disassembly and `engines/ring/notes/decomp/juggle/`; the set-ups call it
+  twice: `RotSetJugOn(10406, 10, 1)` (NI's water) and `RotSetJugOn(20701, 10, 1)`.
+- **Method:** disassembly, decompiles.
+- **Confidence:** proven; the wave (+0x65) is not traced (no set-up enables it).
+

@@ -168,7 +168,30 @@ their events); then each animated layer takes its animation's state: stopped →
 makes the layer dirty when shown). The 3D sounds follow the view (`spec/sound.md`), then
 the patches are applied.
 
+## Juggle (`RotSetJugOn`, E-0095)
+
+`RotSetJugOn(rotation, amplitude, speed)` (0x405c70; amplitude and speed range-checked)
+sets the rotation's juggle flag (+0x66), amplitude (+0x39, default 30.0 from 0x40f990) and
+speed (+0x41). When the node is first loaded (0x410410): the effects' strength (+0x31) = 0,
+the load tick is kept (0x495708), and a weight table of 32 × 32 floats (0x49d7b8, rows of
+64) is filled with `rand() × amplitude × (1 / 32767)` (0x47e310); the rest of each row
+(columns 32..63) stays 0.
+
+Every frame of the rotation (0x410610): dt = (now − the last frame's tick) × 0.001; while
+the strength is below 1.0 it grows by dt, then is held at 1.0 (0x41077f..0x4107ab). An
+animated turn sets it to 1 − t at each step (`Clicking a movability`). In the camera update
+(0x40f9e0), after the grid is computed (0x411c90) and when the juggle flag is set, with t =
+(now − the load tick) × 0.001 s, every grid vertex (row j = 0..28, column i = 0..40, weight
+w = table[j][i]) gets, in 16.16 panorama units (×65536, truncated, 0x410900, added 0x410920):
+
+- column += sin(t × speed × 1.05) × strength × w;
+- row += cos(t × speed × 0.95 + w) × strength × w.
+
+So the picture ripples by up to `amplitude` panorama pixels; columns 32..40 do not move
+(their weights are 0). The "wave" (+0x65: the view plane's corners oscillating) is
+computed the same way but no Ring set-up turns it on.
+
 ## Not yet specified
 
-The juggle effect (+0x65, `RotSetJugOn`) and the wave (+0x66), Space (+0x28), the
+Space (+0x28), the
 movability events' handlers per zone.
