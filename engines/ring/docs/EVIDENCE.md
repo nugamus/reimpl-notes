@@ -990,3 +990,54 @@ is02n01p03s01.0001.bmp` … (`parsers/at2.py --file`).
 - **Method:** decompiles, disassembly (sprintf arguments), corpus listing.
 - **Confidence:** proven
 
+### E-0070 — Zone NI: entries, handlers, the heater, the Flow (DVD)
+- **Binary/file:** `RING_DVD.EXE` `GameSetZoneNI` 0x44a840 (entries 0, 3, 10, 999), object
+  click 0x445c80, button down 0x4472b0, drag 0x4477d0, on an accessibility 0x44a120, on a
+  movability 0x44a1b0 (empty), before / after a movability 0x449080 / 0x449320, timer
+  0x4497b0, animation 0x4499e0, sound 0x44a1c0 (dispatcher table, `spec/events.md`); the
+  heater 0x445a10, the hologram 0x445930, NI → RH 0x445720 (`GoZone(3, 0)`); the set-up's
+  picture loops at 0x461018 (13), 0x4613f9 (19 + 19), 0x4615b7 (14), 0x4617d8 (14),
+  0x461cd7 / 0x461e0d (1..12), 0x462355 (1..12 after an empty 0), 0x462622 / 0x4626f1 /
+  0x4627c3 (48). Score constants f32 [0x47e624] 2, [0x47e620] 3, [0x47e2e0] 5, [0x47e69c] 8
+  (`fadd dword`, e.g. 0x445dd1, 0x446a89). Video names from the `DAT_0048e0..` strings.
+  One-argument `ObjPreSho` / `ObjPreHid` calls are 0x403e00 / 0x403e80 (e.g. 0x446c3e,
+  0x44aad2). Drag getters 0x4066b0 (reference +8/+0xc), 0x4066f0, 0x406750, 0x406790,
+  0x4067b0, 0x4067d0, 0x4067f0, 0x406810, 0x406850, 0x4068c0..0x4068f0 → 0x426200..0x426260;
+  0x426140 shifts current → previous on a move; 0x426040 sets all three points to the press.
+- **Evidence:** as written in `games/ring/docs/ni.md`; decompiles in
+  `engines/ring/notes/decomp/ni/`. Set-up list `engines/ring/notes/zones/ni.md`.
+- **Method:** decompiles, disassembly (capstone) for constants, loop counts and call targets.
+- **Confidence:** proven for the handlers; the Flow is read from them, not played.
+
+### E-0071 — Game over: 0x408db0(n), mode 4, 0x431190(zone, n), `End.bmp` (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x408db0: 0x40b7b0(4), app+0x70 = n, 0x406ea0(0x40).
+  0x431190: jump table 0x431280 by zone − 2; zone 2: `SetZone(1)` (0x402210(1)), then by n − 1
+  the table 0x43129c → 0x4311c6 / 0x4311d4 / 0x431213, each pushing 0x65 + (app+0x4b ≠ 0),
+  2, 4000, 16, 0, "End.bmp" (0x48cf10) and calling 0x401000; all then `StartMenu(0)`
+  (0x40dc80). 0x401000 loads the picture (load-from 'e'/'f') and shows it (waits for
+  Escape's release first).
+- **Evidence:** disassembly of 0x431190..0x43127b; decompiles of 0x408db0, 0x401000 in
+  `engines/ring/notes/decomp/ni/`.
+- **Method:** disassembly, decompiles.
+- **Confidence:** proven for zone 2; 0x401000's timing is not traced.
+
+### E-0072 — NI's exits: to RH, from FO, back to AS (DVD)
+- **Binary/file:** `RING_DVD.EXE` object 10460's click → 0x445720(0) → `GoZone(3, 0)`;
+  FO's 0x4447a5..0x4447c1: `PlyCin("1666")`, `BagRem(20403)`, 0x44a7d0(3) → `GoZone(2, 3)`;
+  NI entry 3 sets byte 10303 = 1; timer 1 with byte 10432 ≥ 11 and byte 10303 = 1: float
+  90005 = 100.0 (0x42c80000), `PlyCin(1539)`, 0x437750(1).
+- **Evidence:** decompiles 0x445c80, 0x445720, 0x44a840, 0x4497b0; disassembly at 0x4447a5.
+- **Method:** decompiles, disassembly.
+- **Confidence:** proven
+
+### E-0073 — AS's entry into NI reads byte 90009 and dword 90013 (corrects E-0056's as.md wording) (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x44a7d0(0): byte 0x15f99 (90009) = 0 → `GoZone(2, 0)`; else
+  `GoZone(VarGetDwrd(0x15f9d = 90013), 10)` (0x4061e0 is `aVar::VarGetDwrd`). NI's resume
+  entry 10 reads byte 90017, dword 90021, byte 90025. Float 90005 is NI's score
+  (`VarSetFloa` 0x406230). `games/ring/docs/as.md` says "dwords 90005..90008 hold the zone"
+  and "dword 90005.."; for NI the zone is dword 90013 and 90005 is a float.
+- **Evidence:** `engines/ring/notes/decomp/as/RING_DVD.EXE__FUN_0044a7d0.c`,
+  `RING_DVD.EXE__FUN_004061e0.c`; NI decompiles.
+- **Method:** decompiles.
+- **Confidence:** proven for NI; the other worlds' entries (0x436270, 0x443710, 0x43ad00) not
+  re-read here.

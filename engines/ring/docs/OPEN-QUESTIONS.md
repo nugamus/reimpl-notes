@@ -133,3 +133,27 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
 - **What we checked:** every byte store to +0x67 in `.text` (E-0046).
 - **Blocks:** nothing; the engine takes 0 (the view turns with the mouse).
 - **Status:** open
+
+### Q-0020 — Who enters NI at entry 999?
+- **Context:** `GameSetZoneNI` 0x44a840 entry 999 fills the bag with six NI objects, sets byte
+  10106 and starts at 10415 (`games/ring/docs/ni.md`). No `GoZone(2, 999)` was found in the
+  zone code read (AS, NI).
+- **What we checked:** the NI and AS handlers; a linear scan for `GoZone` calls is unreliable
+  (data in `.text`).
+- **Blocks:** nothing (a test entry, likely).
+- **Status:** open
+
+### Q-0021 — NI's handle and speaker drags stop sound 10401 only when it is not playing
+- **Context:** 0x4477d0 releases of 10103 and 10201: `if (!0x406ef0(10401)) stop(10401)`;
+  the moves start it `if (!0x406ef0(10401))`. 0x406ef0 → 0x469540 is taken as "plays" from
+  its other uses (0x445c80's 10901 test).
+- **What we checked:** the decompile; 0x469540 not decompiled.
+- **Blocks:** whether the scrape sound stops at release; the engine follows the code.
+- **Status:** open
+
+### Q-0022 — Does `BagAdd` of an object already in the bag add it twice?
+- **Context:** NI's 10505 (AG cells) click gives `BagAdd(10505)` every time; its
+  accessibility is never disabled. `BagAdd` → `aList::add` (0x406330).
+- **What we checked:** `aApplication::BagAdd` only (`engines/ring/notes/decomp/bag/`).
+- **Blocks:** the inventory spec.
+- **Status:** open
