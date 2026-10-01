@@ -216,3 +216,21 @@ the DVD? (E-0165, E-0160)
 0x441860 is FO's handler for both 0x40bd40 and 0x40bed0 and only reads the object in hand
 for 30016; no FO object has flag 2 or 8. Left over from an earlier design? (E-0166)
 
+### Q-0070 — WA's animations that are never shown
+Object 51000's animations on the message puzzles 51001..51013, object 50001's on the
+arrival close-ups 50001 / 50002, and 50700's presentations 2, 3 (puzzles 50701, 50702) are
+declared in the set-up but no WA code shows them (`ObjPreSho` on them appears nowhere in
+`engines/ring/notes/decomp/wa/` or the set-up). Unless `PuzSetAct` shows anything (it does
+not, per `spec/animation.md`), they are never drawn. Checked against a capture of the
+original? (E-0221, E-0225)
+
+### Q-0071 — The tree's "item there" tests
+0x437d60 (object 50503, nothing in hand) takes an item back when word 50000 % 10 == 1,
+% 100 ≥ 2, % 1000 ≥ 12, % 10000 ≥ 112 for `unk_19` 0..3: the last three are not digit tests
+(e.g. the Apple's 10 alone gives % 100 = 10 ≥ 2 but so does the Flower's 1 with nothing
+else? no: 1 % 100 = 1). Kept as coded; whether players can take an item that is not there
+(score −2) is not checked. (E-0221)
+
+### Q-0072 — WA's entry 999
+`GameSetZoneWA(999)` fills the bag for the desk; no `GoZone(6, 999)` caller was found
+(like Q-0020, Q-0030). (E-0220)

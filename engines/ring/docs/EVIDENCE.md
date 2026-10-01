@@ -1354,3 +1354,58 @@ is02n01p03s01.0001.bmp` … (`parsers/at2.py --file`).
 - **Method:** decompiles, set-up listing.
 - **Confidence:** proven
 
+### E-0220 — WA's entries and AS's way in (DVD)
+- **Binary/file:** `RING_DVD.EXE` `aApplication::GameSetZoneWA` 0x43ad50 (entries 0, 10 with
+  `%sData\Save\bru.ars` 0x48dab8 and `LoadSaveTimer("bru", 1)`, 999), 0x43ad00 (byte 90012,
+  dword 90016), the zone switch 0x40d220 (case 6); videos `1880` 0x48da3c, `1881` 0x48da34.
+- **Evidence:** `engines/ring/notes/decomp/wa/`; `games/ring/docs/wa.md` "Entering".
+- **Method:** decompiles; strings read from the EXE.
+- **Confidence:** proven
+
+### E-0221 — WA's object click handler (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x437d60 (objects 50100, 50105, 50202, 50203, 50300,
+  50301, 50302, 50400, 50402, 50501..50503, 50600, 50601, 50700); the progress block (byte
+  50012, 50700's presentations and accessibilities, rotation 50103's movabilities 2 / 3);
+  videos 1849..1864 (0x48d93c..0x48d9b4); score float 90008 (0x15f98) with f32 constants
+  [0x47e314] 1, [0x47e624] 2, [0x47e620] 3, [0x47e2e0] 5, the ending's 0x42c80000 = 100.0.
+- **Evidence:** `engines/ring/notes/decomp/wa/RING_DVD.EXE__FUN_00437d60.c`; `wa.md` "Object click".
+- **Method:** decompile.
+- **Confidence:** proven
+
+### E-0222 — WA's take handler: the desk, the golem's parts, the grid (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x4392a0 (objects 50101..50104, 50431..50437, 50451..50457,
+  50499; app+0x74 cleared on every path but the takings; dword 50000 sums 7654321 / 654321;
+  the grid's cells `ObjPreSetImgCooOnPuz` 0x4037c0 → 0x42eba0 with x = 53 × (v / 10) + 162,
+  y = 37 × (v % 10) + 115, dwords 51000 + v, the right cells 51030, 51061, 51001, 51033,
+  51026, 51046, 51042 for 50451..50457; `ObjPreSetImgOriCooOnPuz` 0x403810 → 0x42ebf0 (the
+  handle's +0x55 / +0x59 = +0x5d / +0x61); videos 1865..1867).
+- **Evidence:** `engines/ring/notes/decomp/wa/RING_DVD.EXE__FUN_004392a0.c` and the
+  `ObjPreSetImg*` decompiles; `wa.md` "Take".
+- **Method:** decompiles.
+- **Confidence:** proven
+
+### E-0223 — WA's movability handlers: the music by area (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x439f40 (before), 0x43a050 (after; the leaf's second way);
+  videos 1868..1871.
+- **Evidence:** `engines/ring/notes/decomp/wa/`; `wa.md` "Before / After a movability".
+- **Method:** decompiles.
+- **Confidence:** proven
+
+### E-0224 — The hold-on-frame event 0x40c910 goes to WA, not RO (supersedes part of E-0092) (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x40c910: id 1 goes to the empty default 0x44a110; any
+  other id, by the zone (0x402450): case 6 (WA) → 0x43a6f0(phase, id), every other zone the
+  empty default. E-0092 / `spec/animation.md` said "only RO handles it"; `spec/events.md`'s
+  table already shows WA. WA's 0x43a6f0: id 50004 phase 2, id 50003 phases 1 and 2; video
+  `1872` 0x48d9f4.
+- **Evidence:** `engines/ring/notes/decomp/wa/RING_DVD.EXE__FUN_0040c910.c`,
+  `RING_DVD.EXE__FUN_0043a6f0.c`; `wa.md` "Hold on a frame".
+- **Method:** decompiles.
+- **Confidence:** proven
+
+### E-0225 — WA's animation and sound handlers; the ending to AS (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x43a400 (animation 50001: the switches' pairs and frames),
+  0x43a860 (sound chains 50001..50003, 50009..50016, 50021..50036; `PlyCinMul` videos
+  1873..1878 by language, 1879; then `TimStoAll`, 0x406ea0(0x400), 0x437750(4)).
+- **Evidence:** `engines/ring/notes/decomp/wa/`; `wa.md` "Animation", "Sound", "Flow".
+- **Method:** decompiles.
+- **Confidence:** proven
