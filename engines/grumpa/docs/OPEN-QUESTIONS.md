@@ -268,3 +268,36 @@ game clears the folder. Who clears or copies `Current/` (new game, load) is not 
 - **Blocks:** weapons in the inventory; the panel's save/load icons (Help.txt: diskette =
   saved games, door = main menu). The engine uses ScummVM's save/load instead.
 - **Status:** open
+
+## Q-0400 — How `Sounds_` and `Sounds_<lang>` merge into the installed `Sounds` folder
+
+The game opens `<data>\Sounds\<name>` (E-0405). The cabinet has a common group `Sounds_` (550
+files) and one per language (`Sounds_Swedish` 241 ... `Sounds_Danish` 280); 182..203 names are
+in both with different bytes. The engine assumes the language group is installed over the
+common one (the language file wins). Needs the setup script (`<Support>Script` group) or an
+installed copy.
+
+## Q-0401 — What the speaker's talking flag does
+
+Playing a voice line sets `+0x67c = 1` in the speaker's mesh object (E-0405). Whether that
+selects a talk animation, moves the mouth, or only blocks other lines is not read yet. The
+engine logs the speaker.
+
+## Q-0402 — The six-value header vector of a character
+
+`n × u32` after `visible` (E-0400): 6 values per character, e.g. Grumpa (32, 100, 5, 2, 1, 0),
+pirate rat (20, 60, 12, 0, 0, 0), Ratbeard (32, 400, 40, 18, 1, 0). The second looks like
+health; the others need the combat code.
+
+## Q-0403 — Character roles: following, riding, combat
+
+DoCommand opcodes 0x2c..0x30 and 0x54 give a character a role (mesh `+0x564` = 1..7: player
+control, follower, ...), and the rule/reaction lists (E-0401) drive behaviour. Not specced:
+movement, the animation state machine over the `.anb` list, combat.
+
+### Q-0006 RESOLVED (2026-10-02, E-0400, E-0401) — type 0x03 `CFXCharacter`
+The original's own Serialize, run under Unicorn on both `Characters.abi` files
+(`tools/abiemu.py`), consumes every byte (44 + 44 records) and gives the grammar; `abi.py`
+`t_03` implements it and now parses 113/113 `.abi` files. The "binary skeleton blob" was the
+ClassD rule vector and CC command lists; the decompiler's broken control flow no longer matters.
+Field meanings: E-0402; the shared actor header (`id` read twice) is E-0400.

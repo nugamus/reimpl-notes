@@ -925,3 +925,153 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** decompile; reading the corpus.
 - **Confidence:** proven for slots, add and toggle; the left equipment slot and the two
   buttons are Q-0502.
+
+### E-0400 — Every `.abi` Serialize reads the id again; the actor header is `id, active, visible, n × u32`
+- **Binary/file:** `CFXActorFactory::CreateFromABIFile` `FUN_0040cef0`; Serialize arms of type
+  0x0d (`0x44ceb8`), 0x11 (`FUN_0043d200`), 0x18 (`FUN_004492d0`), 0x03 (`0x4231f0`).
+- **Evidence:** after reading `u32 type` and `u32 id` the loader seeks back 4 bytes
+  (`0x40d073..0x40d087`: `push 1; push 1; push -4; call streambuf->vtable[0x20]` = seekoff(-4,
+  cur, in), skipped only on a failed stream), so each Serialize starts at the id and reads it
+  again into `+0x108`. Every Serialize (mode 1) then reads `+0x10c` (**active**, the flag
+  `Update` tests), `+0x110` (**visible**, the flag `Draw` tests; E-0403), then `u32 n` and `n`
+  elements of the class at vtable `0x4902dc`, whose Serialize (`0x409107`) reads one u32 into the
+  element's `+0x104`. Over the non-character records of the 111 scene files and Items.abi, `n`
+  is always 1 and the element 0, except one 0x22 record (element 1); characters have n = 6
+  (E-0402). `abi.py`'s older per-type grammars read the same byte counts with other boundaries
+  (`raw(12)` = active, visible, n; then the element counted as an "EC vector" count), so the byte
+  totals hold but the field meanings in those grammars and in `scene.cpp`'s 0x0d/0x1a readers
+  are shifted by one u32 (their "visible" is `n`). Run under Unicorn (`tools/abiemu.py`), the
+  original's 0x11 Serialize on `Scene_001.abi` reads `+0x108 = 0x276` (the id), `+0x10c = 1`,
+  `+0x110 = 0`, `n = 1`, element 0, then `+0x1c8`, `+0x1b8`, ...
+- **Method:** disassembly of the loader; emulation of the original Serialize; corpus count.
+- **Confidence:** proven.
+
+### E-0401 — `CFXCharacter` (type 0x03) layout, from the original's own Serialize run on the corpus
+- **Binary/file:** constructor `0x41c9b0` (object 0x698 B, `CreateActor` case 3 at `0x40d5ab`),
+  vtable `0x49046c`: [1] Serialize `FUN_00422f80` (modes 1, 2 and 8 share the arm `0x4231f0`),
+  [2] SetDevice `FUN_0041daf0`, [3] Draw `FUN_004226a0`, [5] Update `FUN_00421a60`,
+  [6] DoCommand `FUN_0041e0d0`. `Actors/Characters.abi` (44 records, 51,645 B) and
+  `Scenes/Characters.abi` (44 records, 46,648 B).
+- **Evidence:** `tools/abiemu.py` maps the decrypted dump, builds each record's object with its
+  constructor, runs SetDevice up to `0x41df6e` (it sizes the attachment arrays `+0x368..+0x38c`
+  first; past that point it only creates DirectDraw surfaces) and runs Serialize(mode 1) with the
+  archive read `FUN_004026c0`, `operator new` and `delete` replaced. The original code consumes
+  **both files completely: 44 + 44 records, every byte**, and logs each read with its caller. The
+  record grammar from that trace and the read sites (after the type; `[x]` = object offset):
+
+      u32 id [0x108], active [0x10c], visible [0x110]; u32 n; n × u32     (E-0400; n = 6)
+      u32 [0x444] home scene; f32×3 [0x16c] position; f32×3 [0x160] orientation (y = yaw, rad)
+      f32 [0x28c], f32 [0x5fc], f32 [0x290]; u32 [0x48c]; u32 [0x490]
+      u32 n; n × ClassD (EC-vec + CC-vec)                        0x423321 -> [0x660] rules
+      CC-vec                                                     0x4234fa -> [0x640]
+      CC-vec                                                     0x4236c9 -> [0x650]
+      u32 n; n × {pstr text; CC-vec}                             0x423898 -> [0x674]/[0x684]
+      CC-vec                                                     0x423ac0 -> [0x630]
+      u32 n; n × {u32 character id; CC-vec}                      0x423c8f -> FUN_004254c0
+      u32 [0x434]; u32 n [0x2e8]; n × pstr  .anb animations
+      u32 n [0x330]; n × pstr .wav sounds; u32 [0x440] texture index
+      u32 n [0x30c]; n × pstr .tga textures
+      u32 n [0x344]; n × {pstr .ANB; pstr .tga; u32 [0x36c+4i]; u32 [0x37c+4i]; u32 [0x38c+4i]}
+      u32 [0x128]; u32 [0x13c]; u32 [0x140]; u32 n; n × (u32, u32) [0x12c]
+
+  (CC = 5 u32 + `u32 m` + m × EC, EC = 5 u32; E-0101.) The message block's loop body
+  (`0x4238a8..0x423aaa`) reads a pascal string into a heap copy pushed on `+0x674`, then a CC
+  vector pushed on `+0x684`; its count is 0 in all 88 records, so that body is known from the
+  code only. `FUN_004254c0` is `CFXCharacter::AddReactCharacter` (error string at `0x42552b`).
+  `tools/parsers/abi.py` `t_03` implements the grammar; its record boundaries equal the
+  emulator's for all 88 records; `abi.py` now parses **113/113 `.abi` files (2,092 records,
+  15 types)** consuming every byte.
+- **Method:** emulation of the original Serialize (Unicorn) with a logged read primitive;
+  disassembly of the loops whose counts are 0 in the corpus.
+- **Confidence:** proven (the original code parses the files); field meanings in E-0402.
+
+### E-0402 — `CFXCharacter` field meanings and the database load
+- **Binary/file:** `FUN_00443220` (boot), `CFXCharacter::DoCommand` `FUN_0041e0d0`,
+  `Actors/Characters.abi`.
+- **Evidence:** `FUN_00443220` loads `"%s\Actors\Characters.abi"` then `"%s\Actors\Items.abi"`
+  through `CreateFromABIFile(path, 8)` (`push 8` at `0x44324b`, `0x44327a`); mode 8 takes the same
+  Serialize arm as mode 1 for type 3. No string names `Scenes\Characters.abi`; the copy in
+  `Scenes/` is not loaded (it differs: an older build of the same 44 ids). One record per
+  character *form*; the database (by id): 10 Grumpa (`000_N2N_Grumpa.anb`, 26 animations,
+  5 textures, 6 carried objects), 11 Grumpa in the boat, 12 on the dragonfly, 13 on the bear,
+  88 on the seahorse; 16 the Scharlakanskraken companion; 19/42 Monkey Champion; 20/22/25 Golem;
+  17 Hulk; 23 Parrot; 26 Foxy Lady; mounts 21 Dragonfly, 27 Boat, 28 Bear, 87 Seahorse; the
+  rest enemies (pirate rats 30..32/34/35, snake 33, turtle boss 36, rat leaders 37/38,
+  crocodiles 39..41, sharks 43/44/85, crocodile boss 47, hyena boss 55, scorpion 56, spider 64,
+  captain Ratbeard 69, skeleton captain 78, diver 79, octopus 80, piranhas 81..83). Fields:
+  `[0x444]` the scene the character is in (−1: none, placed by a spawner, E-0404); `[0x16c]`
+  world position and `[0x160]` orientation (only `y` is non-zero bar one record: the yaw);
+  `[0x128]` 0 = a creature, 1 = a mount, 2 = a rider form whose parts are `[0x13c]` and
+  `[0x140]` (11 = 10 + 27, 12 = 10 + 21, 13 = 10 + 28, 88 = 10 + 87); a mount's pair list
+  `(10, form)` names the rider form it makes with Grumpa (Boat `(10, 11)`, Dragonfly `(10, 12)`,
+  Bear `(10, 13)`, Seahorse `(10, 88)`); Grumpa's pairs (87→88, 27→11, 21→12, 28→13) the
+  reverse. The animation names follow `<nnn>_<from>2<to>_<name>.anb` (N normal, W walk, R run,
+  D down, J jump, A1..A3 attacks, ...): entry 0 is the idle `N2N`. `[0x440]` selects the
+  texture (DoCommand 0x35 sets it, clamped to the `[0x30c]` count). The `n × u32` header vector
+  (E-0400) holds 6 values per character (Q-0402).
+- **Method:** disassembly; the decoded database (E-0401).
+- **Confidence:** proven for the load, home scene, position, mount links and lists; the stat
+  vector's meaning is open (Q-0402).
+
+### E-0403 — When a character is in the scene; its `DoCommand` opcodes
+- **Binary/file:** `FUN_004226a0` (Draw), `FUN_00421a60` (Update), `FUN_0041e0d0` (DoCommand),
+  `FUN_00410bf0` (scene entry).
+- **Evidence:** Draw runs only if `visible [0x110]` and `[0x444] == [0x448]`
+  (`0x4226c2..0x4226dc`); Update only if `active [0x10c]` and `[0x444] == [0x448]`
+  (`0x421a6b..0x421a85`). `[0x448]` is the current scene: scene entry (`FUN_00410bf0`, after
+  `LoadScene`) queues the broadcast `(when −1, target −1, opcode 0x17, arg1 = scene number)`
+  (`0x410c0d..0x410c1e`) and DoCommand 0x17 stores `arg1` in `[0x448]`. Opcodes: 2 show
+  (`visible = 1`, `[0x444] = [0x448]`: the character joins the current scene), 3 hide, 0xb/0xc
+  active on/off, 0xd disable (state 2, active = visible = 0, `[0x444] = −1`, latch `[0x46c]`
+  that only 0x34 clears), 0x29 place at another actor's position/orientation and show, 0x47
+  place at actor `arg1`'s position, 0x35 texture index, 0x36 move to scene `arg1`
+  (`[0x444] = arg1`), 0x2c/0x2d/0x2e/0x2f/0x30/0x54 take a role (control, follow, mount: they
+  set `[0x444] = [0x448]`, active, visible and a role in the mesh object's `+0x564`), 0x44 show
+  message `arg1` (E-0405).
+- **Method:** disassembly and decompilation.
+- **Confidence:** proven for the presence rule and the listed opcodes; the role opcodes'
+  behaviour (combat, following, riding) is not specced (Q-0403).
+
+### E-0404 — Spawners (type 0x1d) place characters whose home scene is −1
+- **Binary/file:** type 0x1d Serialize `FUN_0044a250`, spawn `FUN_0044b120`, strings
+  `"Spawn C_ID: %d S_ID: %d"` (`0x49e9f4`, `0x49e9b8`).
+- **Evidence:** a 0x1d actor holds spawn points (stride 300 = `0x12c`): a position (`+0x104`
+  vec3), an orientation (`+0x110` vec3) and a list of character ids (`+0x120`). Spawning point
+  `i` picks a random id from its list (re-drawn if that character is already spawned, list at
+  `+0x148`, at most 60 tries), moves the character there (`FUN_004250a0`), sets its orientation,
+  `active = visible = 1`, DoCommand(2) (so `[0x444]` becomes the current scene), state 5, and
+  records the id.
+- **Method:** decompilation.
+- **Confidence:** proven.
+
+### E-0405 — Voice lines: `CFXSound` (0x18/0x2a), its speaker and its on-end commands; no subtitles
+- **Binary/file:** CFXSound vtable `0x49089c` ([1] Serialize `FUN_004492d0`, [2] Init
+  `FUN_00448840`, [4] Update `FUN_00448db0`, [6] DoCommand `FUN_00448a40`); load `FUN_00448970`,
+  play `FUN_00449200`/`FUN_00448f70`, stop `FUN_00449280`/`FUN_00449040`, on-end
+  `FUN_00448bb0`; manager 185 `FUN_0042f4e0`; `Local_*`, `Sounds_*`.
+- **Evidence:** after the header (E-0400) the sound reads ten u32 — `[0x184]` volume flag,
+  `[0x188]` volume (DirectSound hundredths of a dB, e.g. −690), `[0x190]` pan flag, `[0x194]`
+  pan, `[0x198]` frequency flag, `[0x19c]` frequency (11025/22050/44100), `[0x1a4]` loop,
+  `[0x1a0]` playing, `[0x1b0]` play on scene entry, `[0x3ac]` **speaker** (a character id, 0 =
+  none) — then a timer sub-object (56 B), the file name (pascal string, `[0x208]`) and a CC vector
+  of commands. The file opened is `sprintf("%s%s", soundDir, name)` (`0x448983..0x448999`), where
+  `soundDir` (`0x4ba1e8`) is `"%s\Sounds"` of the data path (`0x43723e..0x437262`); the flags
+  apply volume (`IDirectSoundBuffer::SetVolume`, vtable `0x3c`, `FUN_00449180`), pan (`0x40`),
+  frequency (`0x44`). DoCommand: 0 and 500 play (deferred to the next Update while `[0x1bc]` is
+  set), 1 and 501 stop, 0xb/0xc active, 0xd stop and latch, 0x17 (scene entry) plays if
+  `[0x1b0] == 1`, 0x56 load. Play (`FUN_00448f70`) marks the speaker talking (its mesh object's
+  `+0x67c = 1`, after `FUN_00425980` on it) and starts the buffer, looping iff `[0x1a4] == 1`;
+  stop clears the talking flag. A non-looping sound stops itself when its timer runs out, and
+  stopping (`FUN_00449280`) queues every command of its CC vector (`FUN_00448bb0`): the
+  sound's own list runs "on end". So a dialogue is a chain of voice lines, each a CFXSound whose
+  speaker talks while it plays and whose end commands start the next line. In the scenes the
+  speaker is 0 (323 sounds), 16 (39: the Scharlakanskraken companion, the `*_sch_*` / `Sch_*` files), 26 (2, Foxy Lady) or 69 (1, Ratbeard). There is
+  no text: `Local_<lang>` holds only `Text.txt` (14 menu strings), `Help.txt`, `Credits.txt`,
+  `license.txt`, and the characters' message lists (E-0401) are empty; a message would be
+  shown by character opcode 0x44 through manager 185 opcode 16 (`FUN_0042f4e0`: copy the string
+  to `+0xbd4`, alpha 255 fading by 255/arg per step). Files: `Sounds_` holds 550
+  language-independent sounds, `Sounds_<lang>` 241..280 voices; 182..203 names exist in both,
+  never with the same bytes.
+- **Method:** decompilation; corpus listing of the 0x18 fields (`abi.py` grammar); `cmp`.
+- **Confidence:** proven for the fields, playback, speaker and on-end commands; how the
+  installer merges `Sounds_` and `Sounds_<lang>` into one `Sounds` folder is Q-0400.

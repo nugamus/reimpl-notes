@@ -23,7 +23,7 @@ at `CFXActorFactory`, which loads `.atx`/`.abi` actors, `.scn` scenes, `.fxi` su
 | `.avi` `.mpg` | 10 + 4 | video | `gempeg`-style / MPEG-1 | — | E-0007 | standard |
 | `.fxi` | 316 | 16-bit Z-depth (also colour) | `CFXZBuffer` / `CFXSurface` | `fxi.py` | E-0009, E-0010 | done (316/316 parse + decode) |
 | `.scn` | 110 | binary (3 actor records) | `CFXActorFactory::CreateFromABIFile` | `scn.py` | E-0500 | done (110/110; walk mesh, scene links, view list) |
-| `.abi` | 118 | binary scene graph | `CFXActorFactory::CreateFromABIFile` | `abi.py` | E-0100..E-0103 | scenes + items done (111/111 byte-exact, 14 types); type 0x03 `CFXCharacter` open (Q-0006) |
+| `.abi` | 118 | binary scene graph | `CFXActorFactory::CreateFromABIFile` | `abi.py` | E-0100..E-0103, E-0400, E-0401 | done: 113/113 byte-exact (scenes, items, both character databases), 15 types |
 | `.amb` | 588 | binary mesh | `CFXAMeshEx::CreateFromFile` | `amb.py` | E-0013 | done (`u32 count` + count×(pos+normal)) |
 | `.anb` | 939 | binary mesh | `CFXAMeshEx` / `FUN_004157d0` | `anb.py` | E-0014 | done (938/939: geometry, UVs, anim); frame-count Q-0007 |
 
@@ -117,8 +117,20 @@ on a value they read (0x19 reads a bubble array iff +0x1ac == 2; 0x0d reads two 
 `f1=1.0`, `f2∈[0.75,1.0]`, `f3∈[0.70,1.0]` (projection), `f13..f15` = camera position, `f19`
 = range/far, `f21=1.0` are non-zero (the rotation fields are 0 — axis-aligned views).
 
-Not modelled: type 0x03 `CFXCharacter` (`Scenes/Characters.abi`, `Actors/Characters.abi`) —
-its ~37 KB `Serialize` `FUN_00422f80` decompiles with broken control flow (Q-0006).
+**Actor header** (E-0400): the loader seeks back over the id, so every Serialize reads `id`
+again, then `active`, `visible`, `u32 n` and `n` u32 (n = 1, element 0 in every scene record;
+6 per character). The older per-type grammars in `abi.py` count `active, visible, n` as one
+12-byte run and the element as an "EC count"; the byte totals are right, the meanings are the
+ones here.
+
+**Type 0x03 `CFXCharacter`** (`Actors/Characters.abi`, `Scenes/Characters.abi`; E-0401,
+E-0402): 44 + 44 records, every byte consumed, the grammar taken from the original's own
+Serialize run under Unicorn (`tools/abiemu.py`). After the header: home scene, position,
+orientation, three floats and two u32; a ClassD rule vector; three CC vectors and a message
+list (`pstr` + CC vector, empty in the corpus); a reaction list (character id + CC vector);
+the `.anb` animation, `.wav` sound and `.tga` texture name lists (with the texture index between
+the last two); the carried-object table (`.ANB`, `.tga`, 3 u32); kind and parts; a pair list.
+Exact order in E-0401 and `abi.py` `t_03`.
 
 ## `.scn` — walk mesh, scene links and view list (E-0500)
 
