@@ -239,8 +239,8 @@ whole file (a missing file fails); `Add` (0x47a5e0) appends; 0x47a790 removes on
 
 `StartMenu(1)` copies the screen into a 640×480 24-bit picture (`CopyBufferToImage`,
 0x49556c). Opening the save screen scales it with `aImage::Zoom(0.40645, 1.0)` (0x413a90:
-width × 0.40645, height × 1.0, so 260 × 480; rows 0 .. 478 copied by nearest neighbour,
-the last row left as created) and writes it as `<install>\data\SY\Image\osc.bmp`
+width × 0.40645, height × 1.0, so 260 × 480; rows 0 .. 478 copied, pixel (x, y) from the
+snapshot's (trunc(x / 0.40645), y) (E-0265), the last row left as created) and writes it as `<install>\data\SY\Image\osc.bmp`
 (`aImage::Save` 0x4135a0), which the save screen shows and the save's OK copies to
 `ArSa<n>.bmp`. The load screen shows `ArSa<n>.bmp` of the selected game.
 
@@ -262,6 +262,12 @@ above, so this page stays the checklist of what a save holds. Reasons, all from 
 - the records are raw dumps of the original's objects, including fields we do not use or
   know (Q-0091) and times relative to the tick count; ScummVM's own records can drop or
   name them.
+
+In the engine the save and load screens list ScummVM's slots: the save screen's OK writes the
+first free slot (from 1; 0 is ScummVM's autosave) with the F12 game, its description line,
+the typed name and the 260 × 480 picture in the body; the load screen lists every slot, newest
+first, and its Delete removes the slot. A save from ScummVM's own menu takes the game and the
+screen as they are at that moment.
 
 Loading the original's `.ars` files stays possible later as an import (read the header,
 skip the size and time check as `CHECKLOADSAVE: 0` does, ignore the name bytes after the

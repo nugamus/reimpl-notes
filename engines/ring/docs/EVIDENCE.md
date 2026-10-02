@@ -1729,3 +1729,28 @@ is02n01p03s01.0001.bmp` … (`parsers/at2.py --file`).
   disassembly of 0x415230, 0x470abe; push scan; `spec/events.md` handler table.
 - **Method:** decompiles, disassembly, scan.
 - **Confidence:** proven.
+
+### E-0265 — `aImage::Zoom`'s pixel mapping (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x413b53..0x413bbc: per destination row y (0 .. height − 2)
+  the source row is `__ftol(y / zy)` (`fild`, `fdiv [esp+0x38]`, 0x46fe1c), per column x
+  (0 .. width − 1) the source column `__ftol(x / zx)`; the three bytes of the source pixel
+  (`SetOffset` 0x412dc0) are copied. `__ftol` truncates. With zx = 0.40645 and zy = 1.0 the
+  picture is 260 × 480 and pixel (x, y) is the snapshot's (trunc(x / 0.40645), y).
+- **Evidence:** disassembly of 0x413b40..0x413bc4;
+  `engines/ring/notes/decomp/save/RING_DVD.EXE__aImage__Zoom.c`.
+- **Method:** disassembly.
+- **Confidence:** proven.
+
+### E-0266 — The load list's row layout and draw type (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x46bf90 with flag bit 0 (rows one under the other): text 1
+  (+0xd6) at y = row step (+0x69, 45) × r − its height (+0x18) / 2 + 45 / 2 + row y (+0x5d,
+  127) + origin y (+0x4d, 0); text 2 (+0xda) at y = gap (+0x6d, 3) − its height / 2 + text
+  1's height + 45 / 2 + 45 r + 127; the icon (+0x41, `load_gua`'s height +0x2d) at x = +0xb1
+  (311) + origin x, y = +0xb5 (137) − height / 2 + 45 / 2 + 45 r + origin y. Init 0x46d130
+  creates every list picture with `FUN_0042d320(…, name, 0, 0, 1, param_15, 1000, …)`, where
+  param_15 is the argument after the picture names in the set-up call (3, E-0263), the draw
+  type the draw reads back (0x42d7a0).
+- **Evidence:** `engines/ring/notes/decomp/save/RING_DVD.EXE__FUN_0046bf90.c` (row text and
+  icon placement), `…__FUN_0046d130.c`; `engines/ring/notes/calls/sy_setup.jsonl`.
+- **Method:** decompiles.
+- **Confidence:** proven for the formulas; equal text heights give line 2 = line 1 + height + 3.

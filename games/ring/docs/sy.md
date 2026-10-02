@@ -204,9 +204,11 @@ Evidence: E-0260, E-0261, E-0263. Background `Load.bmp`; objects (flag 1, cursor
 - 4 rows; row r's centre line at y = 127 + 45 / 2 + 45 r (C division); row hot spots
   (kind 3, index r) x 335..635, y 127 − 35 / 2 + 45 / 2 + 45 r .. 127 + 35 / 2 + 45 / 2 +
   45 r;
-- each row: an icon at x 311, centred on the row (`load_gun.tga`; the selected row
-  `load_gua.tga`), and two text lines in font 1 at x 335: the entry's name split at its
-  first `#`; line 1 centred on the row's centre line, line 2 three pixels under it; colour
+- each row: an icon at x 311 whose centre is at y = 137 + 45 / 2 + 45 r, 10 pixels under
+  the row's centre line (`load_gun.tga`; the selected row `load_gua.tga`; E-0266), and two
+  text lines in font 1 at x 335: the entry's name split at its first `#`; line 1 centred on
+  the row's centre line (top = centre − height / 2), line 2's top three pixels under line
+  1's bottom (E-0266); colour
   (255, 95, 0), the selected row (245, 235, 50); no background;
 - up arrow: picture at (330, 349), hot spot (320, 339)–(360, 379) (kind 1); down arrow:
   (330, 380), hot spot (320, 370)–(360, 410) (kind 2). The pictures come from the SY
@@ -214,7 +216,8 @@ Evidence: E-0260, E-0261, E-0263. Background `Load.bmp`; objects (flag 1, cursor
   hot spot disabled), `up_gua.tga` / `down_gua.tga` when it can, `up_gur.tga` /
   `down_gur.tga` drawn while the mouse is on a usable arrow. Up can be used when the first
   shown entry is not the first; down when first shown + 4 < the number of entries;
-- the selected entry's picture at (0, 0), draw type 1 (`spec/save.md`, "Thumbnails").
+- the selected entry's picture at (0, 0), draw type 1 (`spec/save.md`, "Thumbnails"); the
+  arrows and icons are drawn with draw type 3 (the 3 after the picture names, E-0266).
 
 The list is drawn with the puzzle (0x46bf90); row hot spots past the last entry are
 disabled. Hovering (0x46bd80): on a usable arrow or a row the cursor is 57
