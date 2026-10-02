@@ -22,7 +22,7 @@ at `CFXActorFactory`, which loads `.atx`/`.abi` actors, `.scn` scenes, `.fxi` su
 | `.wav` | 1612 | sound | `CFXSound` | — | E-0007 | standard RIFF/WAVE |
 | `.avi` `.mpg` | 10 + 4 | video | `gempeg`-style / MPEG-1 | — | E-0007 | standard |
 | `.fxi` | 316 | 16-bit Z-depth (also colour) | `CFXZBuffer` / `CFXSurface` | `fxi.py` | E-0009, E-0010 | done (316/316 parse + decode) |
-| `.scn` | 110 | binary | `CFXScene` | — | Q-0005 | header `08 00 00 00`, `0258`; float stream (layout TBD) |
+| `.scn` | 110 | binary (3 actor records) | `CFXActorFactory::CreateFromABIFile` | `scn.py` | E-0500 | done (110/110; walk mesh, scene links, view list) |
 | `.abi` | 118 | binary scene graph | `CFXActorFactory::CreateFromABIFile` | `abi.py` | E-0100..E-0103 | scenes + items done (111/111 byte-exact, 14 types); type 0x03 `CFXCharacter` open (Q-0006) |
 | `.amb` | 588 | binary mesh | `CFXAMeshEx::CreateFromFile` | `amb.py` | E-0013 | done (`u32 count` + count×(pos+normal)) |
 | `.anb` | 939 | binary mesh | `CFXAMeshEx` / `FUN_004157d0` | `anb.py` | E-0014 | done (938/939: geometry, UVs, anim); frame-count Q-0007 |
@@ -41,9 +41,9 @@ Text, read by `CFXActorFactory::CreateFromATXFile`. A file is a sequence of bloc
 }
 ```
 
-The first field of a block is the actor id (`// Actor ID  FX_INVENTORY= 30`). A block
-without a `<type><name>` header overrides the block before it (seen in
-`090_Inventory.atx`). Header type = the CFX class; the corpus uses
+The first field of a block is the actor id (`// Actor ID  FX_INVENTORY= 30`). The reader
+skips lines until one holds `<`, so a block without a `<type><name>` header is never read
+(the second block of `090_Inventory.atx`, E-0504). Header type = the CFX class; the corpus uses
 2, 3 (item, 42×), 4 (inventory), 5 (character, 65×), 6, 22, 23, 27, 28, 31, 37 (global
 counter, 20×), 38, 39. The field list per class is game logic and not yet specced
 (fields stay opaque). `atx.py` checks the shape: 114/114 parse, every byte in a block or
@@ -120,7 +120,24 @@ on a value they read (0x19 reads a bubble array iff +0x1ac == 2; 0x0d reads two 
 Not modelled: type 0x03 `CFXCharacter` (`Scenes/Characters.abi`, `Actors/Characters.abi`) —
 its ~37 KB `Serialize` `FUN_00422f80` decompiles with broken control flow (Q-0006).
 
-## Binary formats still pending the loader
+## `.scn` — walk mesh, scene links and view list (E-0500)
 
-`.scn` is compiled binary (arrays of records); its field layout is read from `CFXScene` in
-the decrypted `Grumpa.exe` (`ghidra_projects/Grumpa.gpr`), tracked as Q-0005 until specced.
+Read by `LoadScene` through the same `CreateFromABIFile` as the `.abi` (`u32 type, u32 id,
+Serialize(mode 1)` to EOF), just before `Scene_<n>.abi`. Exactly three records:
+
+    type 0x08, id 600  walk mesh
+        u16 nv, u16 nf
+        nv * { f32 x, y, z; f32 unk[5] }        unk[0..2] always (0, 1.0, 0)
+        nf * { u16 v0, v1, v2 }                 vertex indices (< nv)
+        nf * u16 unk                            per-face value (0,1,2,3,12,13,19,20)
+    type 0x14, id 601  scene links ("CFXToScene")
+        u32 np, np * u32                         state slots (State, Scene_ID; 0 in the corpus)
+        u32 n,  n * { f32 x, y, z; f32 unk_r; u32 scene }        exits
+        u32 m,  m * { f32 x, y, z; f32 rx, ry, rz; u32 scene }   entries (arriving from scene)
+    type 0x09, id 602  view list
+        u32 n
+        n * { u32 len, char colour[len]; u32 len, char depth[len] }   "<v>_IS.jpg", "<v>_IZ.fxi" (NUL included)
+        n * f32 unk_m1[16]                       per view (rotation + translation)
+        n * f32 unk_m2[16]                       per view (projection-shaped)
+
+`scn.py` parses 110/110, every byte consumed. Open meanings: Q-0500, Q-0501.

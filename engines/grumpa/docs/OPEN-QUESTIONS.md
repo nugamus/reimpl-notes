@@ -238,3 +238,33 @@ the gate and never fires walk-in triggers. Open: the sphere fields' layout (the 
 `500_status.abi` and `remote.abi`. LoadGameStatus reads `Current/<n>_status.abi` on scene
 entry (E-0202), so these would seed scenes 1, 211, 307 and 500 on a first visit unless a new
 game clears the folder. Who clears or copies `Current/` (new game, load) is not read yet.
+
+### Q-0005 RESOLVED (2026-10-02, E-0500) — `.scn` = walk mesh + scene links + view list
+`parsers/scn.py` parses 110/110. Field meanings still open are Q-0500/Q-0501.
+
+### Q-0203 RESOLVED (2026-10-02, E-0501) — new game empties `Current\`
+
+### Q-0500 — `.scn` fields without a meaning yet
+- **Context:** E-0500: the walk mesh's vertex floats 3..7 and per-face u16, the exit's
+  fourth float (a radius?), and the two 0x14 slots (State, Scene_ID).
+- **What we checked:** the Serialize functions and corpus statistics (floats 3..5 always
+  0, 1.0, 0; floats 6, 7 vary, −1.7e38 in ~8 %; face u16 ∈ {0,1,2,3,12,13,19,20}).
+- **Blocks:** walking / collision and scene-exit regions (the walk code, not yet read).
+- **Status:** open
+
+### Q-0501 — The view list's two 4×4 matrices
+- **Context:** E-0500: type 9 has two 64-byte matrices per view; the first looks like a
+  view matrix, the second like a Direct3D projection (near ≈ 59.6).
+- **What we checked:** values in Scene_001; not the code that consumes them
+  (`FUN_0045ae00` loads them on a view switch, Q-0201).
+- **Blocks:** the exact camera for 3D actors (Q-0008).
+- **Status:** open
+
+### Q-0502 — The inventory's left equipment slot and its two buttons
+- **Context:** E-0504: `FUN_00437d00` op 18 — the left equipment slot rect `+0x228` and
+  the buttons `+0x258`/`+0x248` (they send 61/60 to actor 1, the second only when the
+  current scene is not 1) lie behind `ud2` bytes in the dump, where the decompile stops.
+- **What we checked:** decompiler; disassembly up to the `ud2`.
+- **Blocks:** weapons in the inventory; the panel's save/load icons (Help.txt: diskette =
+  saved games, door = main menu). The engine uses ScummVM's save/load instead.
+- **Status:** open

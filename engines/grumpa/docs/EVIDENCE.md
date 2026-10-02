@@ -794,3 +794,134 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   stop.
 - **Method:** decompile; field statistics over the corpus.
 - **Confidence:** proven (logic); R tentative (Q-0200).
+
+### E-0500 — `.scn` = three actor records (walk mesh 0x08, scene links 0x14, view list 0x09) read by `CreateFromABIFile`; 110/110 parse
+- **Binary/file:** decrypted `Grumpa.exe`: `FUN_0040cb30` (LoadScene), `FUN_0040cef0`
+  (CreateFromABIFile), Serialize `FUN_00432880` (type 8), `FUN_00447cd0` (type 0x14,
+  "CFXToScene" in its error strings), `FUN_0045a750` (type 9), element serializers
+  `FUN_0045a370`/`FUN_0044c750`, `FUN_0045a2a0`/`FUN_00401c00`, `FUN_00409000` (state
+  slot); `games/grumpa/discs/cab/Scenes/*.scn`
+- **Evidence:** LoadScene builds `%s\Scenes\Scene_%03d.scn` and passes it to the same
+  `CreateFromABIFile` as the `.abi`, then loads `Scene_%03d.abi`. CreateFromABIFile reads
+  `u32 type, u32 id`, then seeks back 4 bytes (`streambuf vtable[0x20](…, -4)`), so each
+  Serialize re-reads the id as `+0x108`. Every `.scn` holds exactly three records:
+  type 8 id 600 (`u16 nv, u16 nf, nv×32 B vertices, nf×3 u16 indices, nf×u16`; then
+  `FUN_00432c60` builds per-face neighbours from shared edges), type 0x14 id 601 (`u32 np,
+  np×u32` — the base class's "State" slot and the class's "Scene_ID" slot, 4 bytes each via
+  `FUN_00409000` —, `u32 n, n×20 B` exits, `u32 m, m×28 B` entries), type 9 id 602
+  (`u32 n, n×(pstr .jpg, pstr .fxi), n×64 B, n×64 B`). `parsers/scn.py` parses **110/110**,
+  every byte consumed: 33,397 vertices, 51,383 faces, 214 exits, 268 entries, 166 views.
+  Corpus statistics: vertex floats 3..5 are always (0, 1.0, 0); floats 6, 7 vary (0 in
+  ~58 %, −1.7e38 in ~8 %); the per-face u16 takes 0 (70 %), 1, 13, 2, 3, 19, 12, 20; the two
+  0x14 slots are 0 in all 110 files. An exit is `f32 x,y,z, f32 r, u32 scene` (e.g.
+  Scene_003 → scenes 308, 303, 306, 307), an entry `f32 x,y,z, f32 rx,ry,rz, u32 scene`
+  (Scene_001: (116.9, 60.8, 206.3), ry = −3.08, scene 211); each scene in an exit list has
+  an entry in the other direction. Type 9 names the view backgrounds (`1_1_IS.jpg`,
+  `1_1_IZ.fxi`) in view order; its first 64-byte matrix per view is a rotation +
+  translation (Scene_001: orthonormal 3×3, last row (−35.8, 1.28, 471.7, 1)), the second has
+  the shape of a Direct3D projection (1, 1.3333, Q = 1.0203, 1 at [2][3], −60.78 at [3][2]).
+- **Method:** decompile of the functions above (PyGhidra headless on a copy of the
+  project); `python engines/grumpa/tools/parsers/scn.py` (+ `--selftest`).
+- **Confidence:** proven (layout, 100 % of the corpus); the meaning of the exit radius, the
+  vertex floats 3..7, the per-face u16 and the two matrices is tentative (Q-0500, Q-0501).
+
+### E-0501 — Status files are written with Serialize mode 5 (id first); global actors and the queue have their own files; new game empties `Current\`
+- **Binary/file:** `FUN_00410390` (SaveGameStatus), `FUN_004100c0`/`FUN_0040fdb0`
+  (Save/LoadGlobalGameStatus), `FUN_0040f4c0` (SaveSceneCommands), `FUN_0040c7d0`
+  (factory ctor), `FUN_00441fb0` (new game), `FUN_00443220`; `Save/Current/*`
+- **Evidence:** complements E-0202/E-0203. SaveGameStatus calls each scene actor's Serialize
+  with mode 5, which writes `+0x108` (the id) and then the mode-4 fields, so a status file is
+  `{u32 id, mode-4 body}*`, which LoadGameStatus reads back (id, then mode 4). The global
+  actors (ids < 600) go to `Current\global.abi` the same way. The factory ctor names the
+  queue file `remote.abi`; the shipped one is 4 zero bytes (count 0). The shipped
+  `001/211/307/500_status.abi` start with id 600 (walk mesh: mode 4 reads `+0x10c`,
+  `+0x110` and 0x71 bytes at `+0x3048`). Mode 4 of the two inventory classes: item (type 5)
+  `+0x10c`, `+0x110`, its slots, `+0x288` scene, `+0x28c` position, `+0x298` rotation,
+  `+0x4f0` latch; inventory (type 4) `+0x10c`, `+0x110`, `+0x140` (9 occupied flags),
+  `+0x164` (9 item ids), `+0x218` (2 flags) and `+0x220` (2 ids: the equipment slots).
+  New game (`FUN_00441fb0`): broadcast ops 25 and 36, run the immediate list, empty
+  `Current\` (`FUN_00441950`), reload the global actors (`FUN_00443220`: Characters.abi,
+  Items.abi, global/global2.atx, the score and inventory `.atx`), then LoadScene(start
+  scene, 0) — so the shipped `Current\` files never reach a new game (resolves Q-0203).
+- **Method:** decompile.
+- **Confidence:** proven
+
+### E-0502 — A saved game is a copy of `Current\` in `Save\Player<n>\` plus `Player.sts` and `Player.tga`
+- **Binary/file:** `FUN_004420d0` (save into a slot), `FUN_00442d40` (load a slot),
+  `FUN_00441950` (empty `Current\`), `FUN_00441c20` (empty `Player<n>\`), `FUN_00441240`
+  (LoadPlayerInfo); `games/grumpa/discs/cab/Save/Player*/`, `Local_Swedish/Help.txt`
+- **Evidence:** saving: empty `%s\Player%d`, SaveGlobalGameStatus, SaveGameStatus(current
+  scene `FUN_00410c60`), SaveSceneCommands, then FindFirstFile/copy every file of
+  `\Current\` into `\Player%d\`, then write `Player.sts` (the player's name, newline, the
+  current scene number from `FUN_00410c60`) and `Player.tga` (a screenshot via
+  `CFXSurface::SaveToFile`; the shipped templates are 38,444 B). Loading: broadcast ops 25
+  and 36, run the immediate list, empty `Current\`, copy `\Player%d\*` into `\Current\`.
+  Six slots `Player1..6` ship with `Player.sts` = `Player 1\r\n0`; `Save/Player/` is the
+  template. Help.txt: saving and loading go through two icons on the inventory panel (a
+  diskette: the saved games, click a box to save there; a door with an arrow: the main
+  menu, whose Load entry lists them).
+- **Method:** decompile; reading the corpus.
+- **Confidence:** proven (file flow); the panel icons' code path is Q-0502.
+
+### E-0503 — Items: global type-5 actors 100..179; State 1 gone, 3 carried, 4 in a scene, 6 on the cursor
+- **Binary/file:** `FUN_00443220`, CFXItem vtable `0x49076c`: Serialize `FUN_0043c4f0`,
+  DoCommand `FUN_0043bd30`, draw `FUN_0043baf0`, drop `FUN_0043c340`; cursor
+  `FUN_00446150`/`FUN_00446640`; `Actors/Items.abi`
+- **Evidence:** Items.abi = 66 type-5 records, ids 100..179. Mode 1 reads `+0x108` id,
+  `+0x10c` active, `+0x110` visible, `+0x4d8`, the "State" slot, four strings (`IO_*.ANB`
+  world mesh, `IT_*.tga` its texture, `IC_*.tga` the 32×32 inventory icon, `IS_*.wav` the
+  spoken name), `+0x288` scene (−1 none), `+0x28c` position, `+0x298` rotation, `+0x7d8`,
+  `+0x7ec`, `+0x7f0`, a pair list. DoCommand: 52 clears the latch `+0x4f0` (everything else
+  is ignored while latched); 0/1 play/stop the spoken name; 2 show; 3/11/12 visible/active;
+  13 disable (drops it from the cursor, State 1, latch, scene −1); 16 `SetState(arg)` (and
+  drops it from the cursor unless arg is 6); 23 arg = current scene; 42 add to the
+  inventory (actor 90, State 3), or — inventory full — drop it beside Grumpa (State 4 at
+  actor 3's position, checked against the walk mesh actor 600); 43 reload; 54 arg: put in
+  scene arg (State 4); 71 arg: place at actor arg's position (State 4); 86 load if it lies
+  in the current scene, else unload. Op 18 (a click, `arg1 = x | y<<16`): if State 4, in
+  the current scene and shown, the click is in its screen rectangle `+0x4dc` (widened to
+  60 px when narrower than 40) and the cursor (actor 2) holds nothing, add it to the
+  inventory (State 3) and play the pick-up sound. Holding an item (`FUN_00446150(cursor,
+  id)`) stores the id at cursor `+0x140` and sets the item's State to 6; −1 clears it.
+  Special adds (`FUN_004387d0`): 174 (Water Drop) sends (8, 50, 100), 177..179 (coins) send
+  (8, 9, 1), and set State 1 — counted by actor 8, not carried.
+  Corpus (scene command lists, `abi.py` grammar): 53 commands send 42 to an item, 45 send
+  43, 37 send 16; conditions on items are `(item, 0, 6, 0, 0|1)` 209 times and
+  `(item, 0, 3|1, 0, …)` 7 times — slot 0 (State) == 6, "this item is on the cursor", is how
+  using an item on a hotspot is written (e.g. Scene_007 trigger 660: 133 Wood Splinter On
+  Fire held → the burning roots; Scene_001 trigger 663: 100 and 134 carried → scene 211).
+- **Method:** decompile; corpus scan.
+- **Confidence:** proven
+
+### E-0504 — The inventory panel (actor 90, type 4): 9 slots and two equipment slots, toggled by op 19 (right click)
+- **Binary/file:** type 4 vtable `0x49071c`: Serialize `FUN_004388e0`, DoCommand
+  `FUN_00437d00`, draw `FUN_00438500`, layout `FUN_00438660`, add `FUN_004387d0`;
+  `FUN_004106c0` (CreateFromATXFile); `UI/090_Inventory/090_Inventory.atx`,
+  `Local_Swedish/Help.txt`
+- **Evidence:** CreateFromATXFile skips lines until one holds `<`, then reads the type and
+  expects `{`, so a block without a `<type><name>` header is skipped: the second block of
+  `090_Inventory.atx` is never read (the "overrides" reading in `docs/formats/README.md`
+  does not hold). Mode 6 reads id 90, two zeros (`+0x10c`, `+0x110`: hidden), x 480,
+  y 170, the panel image `Inventory.jpg` (307×139), the slot image
+  `InventorySlot_####.jpg` (96×96, frames 0..2) and the "inventory is full" voice. Layout
+  (`FUN_00438660`): equipment slots (x, y, 96×96) and (x+210, y, 96×96); nine 86×86 slot
+  rectangles in a 3×3 grid, left edge x + (panelW − 258)/2, top y + panelH; two buttons
+  (x+70..x+100, y+96..y+132) and (x+200..x+232, y+96..y+132). Draw (when visible): the
+  panel at (x, y), then per slot the slot image at frame = the slot's occupied flag and
+  the item's icon at slot + (32, 32), then the icons of the two equipment slots at
+  slot + (32, 32). DoCommand: 19 toggles (show + activate; or hide + deactivate), ignored
+  while Ctrl is down (`GetKeyState(0x11)`) or while locked; 11 unlock, 12 lock (and
+  hide); 0/1 deactivate; 2/3 visible. Op 18 (click), per slot: empty cursor and an item in
+  the slot → the item goes on the cursor (State 6) and its name is spoken, the slot
+  empties; an item on the cursor and the slot empty → it goes into that slot (State 3);
+  both → the held item is added to the first free slot. The right equipment slot takes only
+  134 (Shield) or 138 (Shield of Protection) and tells actor 10 to wear it
+  (`FUN_00421780(…, 0|5, 1)`), taking it back out sends `(…, 0|5, 0)`. Add: an item already
+  in a slot is not added twice; the first slot with flag 0 takes it; with none free, the
+  "inventory full" voice plays and the item drops beside Grumpa. Help.txt: right click
+  shows the inventory; nine items; a weapon goes in the box left of Grumpa, a shield right;
+  left click an item to make it the cursor, then click a glittering object to use it;
+  clicking where nothing glitters drops it on the ground beside Grumpa.
+- **Method:** decompile; reading the corpus.
+- **Confidence:** proven for slots, add and toggle; the left equipment slot and the two
+  buttons are Q-0502.
