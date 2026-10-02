@@ -1965,3 +1965,138 @@ is02n01p03s01.0001.bmp` … (`parsers/at2.py --file`).
 - **Method:** raw case-blind byte search of each EXE for the other's code strings.
 - **Confidence:** proven for the strings; what each CD-only string does beyond the noted
   uses is not analysed (Q-0100).
+
+### E-0350 — UNR chunks: picture and tile-table headers; two codecs, one per program (ISO, Prophet)
+- **Binary/file:** `RING_ISO.EXE` SControl 0x42c680 (reads 0x2f header bytes to +0x10005,
+  then u32 size bytes), TControl 0x42d160 (`mov al, 1; ret`), `aCinMov::Play` 0x415a80
+  (chunk switch 0x415b8e, picture read 0x42c310 with depth 0x20 pushed at 0x415c98);
+  `LEGEND.EXE` SControl 0x422fc0, TControl 0x423170, `aCinMov::Play` 0x4a51c0; every UNR
+  `.cnm`, `.ci2` and `.at3` member
+- **Evidence:** ISO SControl takes the tile table at payload + u32 +4 (`[ebx+0x10009]`,
+  0x42c6d5), ntiles = u16 +8, tile width = u16 +0xa (`<< 2` = bytes per tile), then calls
+  one picture decoder by depth 0x20, interlace byte and tile bytes (8 or 16; 0x42d05d..
+  0x42d127, 8 variants). LEGEND SControl decodes a tile table only if u32 +4 < u32 +0
+  (0x424240 with ntiles +8 and width +0xa `<< 2`), then DecompressSeq 0x423630 for depth
+  0x20; TControl reads 8 bytes (u32 size, u16 ntiles, u16 width) and decodes size bytes as
+  a tile table. DecompressSeq reads width +0xc, height +0x10 and the stream from the
+  payload start. Play (LEGEND) handles 'S' and 'U' with the same ReadImage and skips
+  (SkipFrame) only an 'S' when behind time. Corpus: ISO, 33,469 'S', all with tiles;
+  Prophet videos, 2,903 'T', 2,903 'U' and 8,620 'S' without tiles, in groups of a 'T',
+  a 'U' and up to three 'S' (2,854 groups of five); `.at3`, 1,820 'S' with tiles. +0x14
+  and +0x18 are equal (1250 ISO, 1500 or 2500 Prophet videos, 0 `.at3`), 19 zero bytes
+  follow; tile width is 4 in every chunk. Header +0x0c is 1250 in all 440 distinct ISO
+  files, 1500 or 2500 in all 1,887 Prophet ones (the program picks the codec, not the
+  file).
+- **Method:** disassembly (capstone) of the addresses above; census over the corpus.
+- **Confidence:** proven
+
+### E-0351 — UNR tile tables (v1 ISO, v2 Prophet)
+- **Binary/file:** `RING_ISO.EXE` 0x42c717..0x42cb94 (16-byte tiles); `LEGEND.EXE` 0x424240
+  (16-byte tiles from 0x4242bf)
+- **Evidence:** both copy tile width × 4 raw bytes to tile 0, then loop ntiles times from
+  tile 1, each tile first a copy of the previous one. ISO: bit mask `al` from 0x80 rotated
+  right, next byte on carry (MSB first); 3 bits n, then for each of 16 bytes n + 1 bits,
+  and when non-zero 1 sign bit (`sub bh, bl` twice when set). LEGEND: 64-bit MMX window
+  loaded from qwords, `psrlq` after each field (LSB first), refill at ≤ 30 bits; per byte
+  lane (`inc esi` ×4, writes at +0, +4, +8, +0xc) 3 bits n; n = 7: four 8-bit values;
+  else four n-bit values (mask table 0, 1, 3, .. 0x3f), each with a sign bit when
+  non-zero (`psubb` / `paddb`). Both loops run ntiles times, so they decode a tile ntiles
+  too; in every one of the 40,012 tables of the corpus (33,469 ISO, 2,903 'T', 1,820
+  `.at3`) the stream ends in the last byte after tile ntiles − 1 (tile ntiles would need
+  bits past the data), and no picture uses tile ntiles.
+- **Method:** disassembly; `parsers/cnm.py` (stream-end check in `decode_unr`).
+- **Confidence:** proven
+
+### E-0352 — UNR header byte +0x1a: interlaced pictures, tiles at half scale
+- **Binary/file:** `LEGEND.EXE` `aImageFileCinema::ReadHeader` 0x421c30 (header read to
+  this+0x1044), Init 0x421af0 (0x421bf9: if byte this+0x105e, call 0x422ec0), 0x422ec0
+  (`mov byte [ecx+0x5404c], 1`), 0x42472e (tile doubling), 0x4236d6 and 0x423eb5 (rows
+  and drawing); `RING_ISO.EXE` 0x42d01c (doubling on `[ebx+0x10004]`), 0x436465
+- **Evidence:** this+0x105e is header +0x1a. When set, the tile decoder shifts u32 0 ..
+  4·ntiles − 1 (tiles 0 .. ntiles − 1) left by one (both EXEs), and the picture decoders
+  use h/2 + 1 tile rows and the interlaced layout (README "UNR video codec"). Corpus: set
+  in all 440 ISO files and one Prophet video, clear elsewhere.
+- **Method:** disassembly.
+- **Confidence:** proven
+
+### E-0353 — UNR v1 picture (Ring ISO, interlaced 4-pixel tiles)
+- **Binary/file:** `RING_ISO.EXE` 0x436440..0x438082
+- **Evidence:** index width from ntiles: mask 0x3ff / 0x7ff / 0xfff for ntiles < 0x400 /
+  0x800 / 0x1000 (0x436547), the index bits read into `dx` from bit 13, 14 or 15 down to
+  bit 4 (index × 16 = tile offset); flag bit 0 = index, 1 = vector. Three loops: tile row
+  0 (W = width/4 tiles; only `0100` → esi − 0x10 and `001000` → esi − 0x20, other vectors
+  write nothing and do not advance), the middle rows (count h/2 + 1 − (1 − h&1) − 1, esi
+  += 4·width after each but the last), and, when h is even (bit 29 of `eax`), a last row
+  on the next picture row. Vector sources (middle rows, w = width, bytes): `1` −8w; `01`+k:
+  −0x10, −8w−0x10, −8w+0x10, −16w; `00`+k: −24w−0x20, −24w+0x20, −32w−0x10, −32w+0x10,
+  −16w−0x10, −16w+0x10, −24w, −32w, −0x20, −8w−0x20, −8w+0x20, −16w−0x20, −16w+0x20,
+  −24w−0x10, −24w+0x10, −40w; the last row has 4w, 12w, 20w, 28w, 36w where these have
+  8w, 16w, 24w, 32w, 40w. Middle rows also write esi − 4w: `(new >> 1) + ([esi − 8w] >>
+  1)` per u32, the plain new value for `1` (0x436b66). The index reader's shortcut at
+  0x43675d masks with `and bx, 0xc00` (0x436763) where 0xc0 is meant, but it runs only
+  when bit 0x40 ends a byte after reading bit by bit from the flag, which cannot happen
+  (it needs 9 or more bits in one byte): every earlier byte end takes another shortcut.
+- **Method:** disassembly, the 3 × 16 vector blocks extracted by script; the dead path
+  confirmed by E-0357, which matches the decoder without it.
+- **Confidence:** proven
+
+### E-0354 — UNR v2 picture (Prophet)
+- **Binary/file:** `LEGEND.EXE` `aCinemaCompression::DecompressSeq` 0x423630..0x4241e0
+- **Evidence:** W = width / tile width; index bits = bit length of ntiles (0x423824);
+  0x1000 u32 marks at this+0x1000c and 0x10000 u32 of histories at this+0x1404c cleared
+  per call (`rep stosd`); map at [this+0x10008] (AllocBuffer 0x422e30: width × height +
+  0x80 bytes, zeroed). Group bit (0x423940): 1 copies 16 bytes from 2W back (0x423e33);
+  0: 8 entries by the low 3 bits of the window: bit 0 set → above (0x423990, no history
+  push); 2 → neighbour list (0x4239db: marks the value above, then takes left if pos ≥ 2
+  and col ≥ 1, up-left if pos ≥ 2W + 2 and col ≥ 1, up-right if pos ≥ 2W − 2 and col ≤
+  W − 2, up-up if pos ≥ 4W, each if not marked, pos and col counting 2 per entry from 1;
+  one candidate → it, up to 2 → 1 bit, more → 2 bits, read from the list buffer
+  this+0x1400c); 6 → history slot k + 1 of the entry above (0x423c69, no push); 4 → above
+  ± (d + 1) (0x423ce0); 0 → index (0x423d9d). Push (all but bit 0 and 6, when pos ≥ 2W):
+  the u16 slot pointer at +0 goes +2 up to 0x20, then 0, the value stored at the new
+  pointer. The column counter goes +2 per entry and +16 per group, and is reset (entry)
+  or reduced by 2W (group) when ≥ 2W, each time taking W off the remaining count; 0 ends
+  the map. Drawing (0x424170): every non-zero entry copies its 16-byte tile, 0 skips;
+  interlaced (0x423ed8): row 0 plain, then `paddd` with the pixels two rows back and
+  `psrlq 1` into the row between, an even height ending with a plain row.
+- **Method:** disassembly; the Ghidra decompile
+  `notes/decomp/LEGEND.EXE__aCinemaCompression__DecompressSeq.c` loses the MMX parts.
+- **Confidence:** proven
+
+### E-0355 — The UNR corpus decodes in full
+- **Binary/file:** every UNR file: Ring ISO `.cnm` (456 files, 440 distinct, + 1 damaged),
+  Prophet `.ci2` (67), `.at3` members (2,045, 1,820 distinct)
+- **Evidence:** `cnm.py`: 2,780 distinct `.cnm`/`.ci2`/members pass (453 HBR, 2,327 UNR);
+  46,812 UNR pictures decoded (33,469 ISO, 11,523 Prophet video, 1,820 `.at3`) with
+  40,012 tile tables. Every picture and tile stream ends in the last byte of its part; no
+  index reaches past ntiles − 1, no v1 vector reads outside the picture, no v1 row 0 codes
+  another vector, no v2 neighbour choice falls past its candidates. Under 8 tiles a row (31
+  `.at3` pictures, 4 to 28 pixels wide) the v2 row count lets the decoder run past the
+  map; the bits of the drawn entries are all in the file. Pictures are bottom-up: frame 30
+  of ISO `as/pla/ass00n01_s00n02.cnm` decodes to the same raster as DVD `AS/PLA/1001.CNM`
+  frame 30 (HBR, which the engine draws bottom-up, `movie.cpp`), and Prophet pictures read
+  bottom-up are upright (`.at3` icons and faces, video frames).
+- **Method:** `python engines/ring/tools/parsers/cnm.py` (100%); PNG dumps checked by eye.
+- **Confidence:** proven
+
+### E-0356 — The ISO EXE plays chunks in order; the damaged FO video stops after frame 131 (answers Q-0005)
+- **Binary/file:** `RING_ISO.EXE` `aCinMov::Play` 0x415a80, `aImageFileCinema::ReadHeader`
+  0x42c1b0; ISO disc 4 `data/fo/Pla/fos03n02_s05n01.cnm`
+- **Evidence:** Play reads one type byte per chunk (0x415b81) and switches on it; the
+  control table pointer this+0x1a4 is written by ReadHeader (0x42c287) and freed
+  (0x42c07e, 0x42c099), never used to seek. An unknown type takes the default case
+  0x415fa9 ("Error in typeCinData" logged), which joins the common exit 0x415ff7, as after
+  Escape or the last frame. The file's first 132 pictures decode (tile and picture
+  streams end in their last bytes); the chunk after them, at 0x6d4d29, starts with 0xe2,
+  so the original ends the video after frame 131.
+- **Method:** disassembly; decode of the file's chunks up to the break.
+- **Confidence:** proven
+
+### E-0357 — The UNR decoder matches the original code on every picture
+- **Binary/file:** `RING_ISO.EXE` 0x42c6d3 (tiles, then 0x436440); `LEGEND.EXE` 0x424240,
+  0x423630; every distinct UNR file
+- **Evidence:** `engines/ring/tools/unr_oracle.py` runs the original tile and picture code in
+  Unicorn (object fields as in its docstring) and compares the 32-bit picture with
+  `ringdec.c`'s after every picture: 2,327 files, 46,812 pictures, 0 differences.
+- **Method:** emulation of the original code.
+- **Confidence:** proven

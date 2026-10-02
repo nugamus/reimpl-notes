@@ -4,7 +4,8 @@ meta:
   file-extension: [cnm, ci2]
   endian: le
 doc: |
-  Container only; frame payloads are sized, not decoded (codec pending). Two variants by
+  Container and chunk headers; the payloads are bit streams (README "HBR video codec",
+  "UNR video codec"; E-0028, E-0350..E-0357). Two variants by
   magic: "CNM HBR\0" (Ring DVD and CD version; RING_DVD.EXE aImageFileCin 0x42a6b0,
   aCinMov::Play 0x415990) and "CNM UNR\0" (Ring ISO version, Prophet; LEGEND.EXE
   aImageFileCinema::ReadHeader 0x421c30, aCinMov::Play 0x4a51c0). Chunk types: 'A' 'B' 'Z'
@@ -45,7 +46,7 @@ types:
       - {id: width, type: u4}
       - {id: height, type: u4}
       - {id: unk_19, type: u1, doc: "32"}
-      - {id: unk_1a, type: u1}
+      - {id: interlaced, type: u1, doc: "1: half the rows decoded, tiles at half scale (E-0352)"}
       - {id: tracks, type: u1}
       - {id: table_count, type: u4, doc: "= frame_count"}
       - {id: frame_count_2, type: u4}
@@ -57,9 +58,38 @@ types:
   chunk:
     seq:
       - {id: type, type: u1}
-      - {id: size, type: u4}
+      - id: unr_picture
+        type: unr_picture
+        if: _root.magic[4] == 0x55 and (type == 0x53 or type == 0x55)
+      - id: unr_tiles
+        type: unr_tiles
+        if: _root.magic[4] == 0x55 and type == 0x54
+      - id: size
+        type: u4
+        if: _root.magic[4] == 0x48 or (type != 0x53 and type != 0x54 and type != 0x55)
       - id: rest
         size: >-
-          (type == 0x53 or type == 0x55) ? (_root.magic[4] == 0x48 ? 16 : 0x2b) + size :
-          type == 0x54 ? (_root.magic[4] == 0x48 ? 8 : 4) + size : size
+          (type == 0x53 or type == 0x55) ? 16 + size : type == 0x54 ? 8 + size : size
+        if: _root.magic[4] == 0x48 or (type != 0x53 and type != 0x54 and type != 0x55)
         doc: header remainder and payload; HBR 'T' also has 2n + 2 bytes after the payload
+  unr_picture:
+    doc: "'S' / 'U' (E-0350)"
+    seq:
+      - {id: size, type: u4}
+      - {id: map_size, type: u4, doc: "picture stream bytes; < size: a tile table follows"}
+      - {id: ntiles, type: u2, doc: "tiles in the table, tile 0 included"}
+      - {id: tile_width, type: u2, doc: "4 in every file"}
+      - {id: width, type: u4}
+      - {id: height, type: u4}
+      - {id: unk_14, type: u4, doc: "1250 Ring ISO, 1500 or 2500 Prophet videos, 0 .at3"}
+      - {id: unk_18, type: u4, doc: "= unk_14"}
+      - {id: zero, size: 19}
+      - {id: picture, size: "map_size < size ? map_size : size"}
+      - {id: tiles, size: size - map_size, if: map_size < size}
+  unr_tiles:
+    doc: "'T', v2 only (E-0350)"
+    seq:
+      - {id: size, type: u4}
+      - {id: ntiles, type: u2}
+      - {id: tile_width, type: u2}
+      - {id: tiles, size: size}

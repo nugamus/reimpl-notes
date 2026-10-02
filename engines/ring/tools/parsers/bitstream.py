@@ -84,6 +84,16 @@ def _load():
                                  ctypes.POINTER(ctypes.c_uint32), ctypes.POINTER(ctypes.c_uint16),
                                  ctypes.POINTER(ctypes.c_uint16), ctypes.c_int,
                                  ctypes.POINTER(ctypes.c_uint16), ctypes.c_size_t]
+        u8p, u16p, u32p = (ctypes.POINTER(t) for t in (ctypes.c_uint8, ctypes.c_uint16,
+                                                       ctypes.c_uint32))
+        ip = ctypes.POINTER(ctypes.c_int)
+        lib.ring_unr_tiles.argtypes = [ctypes.c_int, ctypes.c_char_p, ctypes.c_size_t,
+                                       ctypes.c_int, ctypes.c_int, u8p, u32p]
+        lib.ring_unr1_frame.argtypes = [ctypes.c_char_p, ctypes.c_size_t, ctypes.c_int,
+                                        ctypes.c_int, u8p, u32p, ctypes.c_int, ctypes.c_int, u32p]
+        lib.ring_unr2_frame.argtypes = [ctypes.c_char_p, ctypes.c_size_t, ctypes.c_int,
+                                        ctypes.c_int, u8p, u32p, ctypes.c_int, ctypes.c_int,
+                                        ctypes.c_int, u16p, u16p, u32p, ip]
         _lib = lib
     return _lib
 
@@ -148,6 +158,53 @@ def hbr(buf: bytes, pos: int, end: int, runs: bytes, tiles, ntiles: int, ring, b
     if n < 0:
         raise ValueError(HBR_ERRORS[n])
     return out, n
+
+
+UNR_ERRORS = {-1: "bits past the buffer", -2: "tile index out of range",
+              -3: "copy from before the picture", -4: "vector the first row cannot use",
+              -5: "unsupported layout"}
+
+
+class Unr:
+    """State of one UNR video (RING_ISO.EXE 0x42c680 / LEGEND.EXE 0x423630): the tile
+    table, the picture (u32 per pixel, kept between frames) and v2's neighbour list."""
+
+    def __init__(self, version: int, width: int, height: int, interlaced: bool):
+        self.lib = _load()
+        self.version, self.w, self.h, self.interlaced = version, width, height, interlaced
+        self.tiles = (ctypes.c_uint8 * (4096 * 16))()
+        self.out = (ctypes.c_uint32 * (width * height))()
+        self.map = (ctypes.c_uint16 * (width * height // 2 + 64))()  # as the original's
+        self.list = (ctypes.c_uint16 * 4)()
+        self.limit = 0
+
+    def load_tiles(self, buf: bytes, ntiles: int) -> int:
+        """Decode a tile table of ntiles tiles; returns the bits used (counting the 16 raw
+        bytes)."""
+        end = ctypes.c_uint32()
+        r = self.lib.ring_unr_tiles(self.version, buf, len(buf), ntiles, self.interlaced,
+                                    self.tiles, ctypes.byref(end))
+        if r < 0:
+            raise ValueError("tiles: " + UNR_ERRORS[r])
+        self.limit = ntiles
+        return end.value
+
+    def frame(self, buf: bytes, ntiles: int) -> tuple[int, int]:
+        """Decode one picture into self.out; returns (bits used, v2's count of left-over
+        neighbour list reads)."""
+        end, n = ctypes.c_uint32(), ctypes.c_int()
+        if self.version == 1:
+            if not self.interlaced:
+                raise ValueError("v1 without interlace: no file uses it")
+            r = self.lib.ring_unr1_frame(buf, len(buf), ntiles, self.limit, self.tiles,
+                                         self.out, self.w, self.h, ctypes.byref(end))
+        else:
+            r = self.lib.ring_unr2_frame(buf, len(buf), ntiles, self.limit, self.tiles,
+                                         self.out, self.w, self.h, self.interlaced, self.map,
+                                         self.list, ctypes.byref(end), ctypes.byref(n))
+        if r < 0:
+            raise ValueError("frame: " + UNR_ERRORS[r])
+        return end.value, n.value
 
 
 def selftest() -> None:

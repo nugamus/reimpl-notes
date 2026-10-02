@@ -66,7 +66,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   by the table, only that frame is lost.
 - **What we checked:** the file; the ISO EXE's Play has not been read yet.
 - **Blocks:** faithful playback of one ISO-version video (FO zone transition).
-- **Status:** open
+- **Status:** RESOLVED (E-0356): Play reads in order; the video ends after frame 131.
 
 ### Q-0006 — How does the DVD EXE resolve a data path (install dir vs CD path)?
 - **Context:** spec/boot.md: paths are built from app+0x6b (0x402460), the string at
@@ -300,4 +300,13 @@ Check the other sound classes' vtables, if there are any.
   18, 19; the EXEs open `<install>DATA\sy.at2` (`spec/resources.md`, Q-0008).
 - **What we checked:** the lists; not the Borland installers.
 - **Blocks:** nothing for ScummVM (the engine opens `DATA/<LAN>/SY.AT2`).
+- **Status:** open
+
+### Q-0110 — What do the UNR timing fields (+0x0c, picture +0x14/+0x18) do?
+- **Context:** UNR header +0x0c is 1250 (Ring ISO) or 1500/2500 (Prophet); each picture
+  header has two equal u32 at +0x14/+0x18 (1250, 1500, 2500, or 0 in `.at3` pictures;
+  E-0350). The decoders read neither (SControl copies the 0x2f bytes, DecompressSeq and
+  0x436440 use only size, map size, ntiles, tile width, width and height).
+- **What we checked:** the decoders and the ISO ReadHeader; not Play's timing code.
+- **Blocks:** nothing in decoding; possibly the frame rate (HBR's +0x12 is 1250 too).
 - **Status:** open

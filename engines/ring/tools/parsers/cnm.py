@@ -1,6 +1,6 @@
 """`.cnm` / `.ci2` video containers (and the `CNM UNR` images inside Prophet's `.at3`).
 Spec: engines/ring/docs/formats/cnm.ksy, E-0024. HBR frames are decoded in full
-(decode_hbr); UNR frame payloads are walked by their size fields only (codec pending).
+(decode_hbr, E-0028), UNR frames too (decode_unr, E-0350..).
 
 Two variants, told apart by the magic:
 
@@ -18,15 +18,17 @@ Two variants, told apart by the magic:
 `aImageFileCinema::ReadHeader` (LEGEND.EXE 0x421c30), SControl 0x422fc0, TControl
 0x423170, SkipFrame 0x422f20, `aCinMov::Play` 0x4a51c0:
     0x00 magic, 0x08 u32 frame_count, 0x0c u32 unk_timing, 0x10 u8, 0x11 u32 width,
-    0x15 u32 height, 0x19 u8 (32), 0x1a u8, 0x1b u8 tracks (0..3), 0x1c u32 table_count,
-    0x20 u32 frame_count again, 0x24 u32 unk_table_size, 0x28 u32 unk_flag, zeros to 0xc0
+    0x15 u32 height, 0x19 u8 (32), 0x1a u8 interlaced, 0x1b u8 tracks (0..3),
+    0x1c u32 table_count, 0x20 u32 frame_count again, 0x24 u32 unk_table_size, 0x28 u32 unk_flag, zeros to 0xc0
     tracks x 16 bytes (u8 channels, u8 bits, u32 rate, 10 zero bytes)
     table_count x { u32 video_offset, u32 audio_offset }   (all zero when unk_flag = 1)
     chunks: 'A' 'B' 'Z': u32 size + bytes; 'S' 'U': 0x2f-byte header (u32 size, ...) +
             size bytes; 'T': 8-byte header (u32 size, u16, u16) + size bytes
 
 The image chunks ('S' + 'U') number frame_count. Exceptions (TRAILING, DAMAGED) are
-listed with their reasons.
+listed with their reasons. UNR has two codecs, chosen by the program, not the file: v1 in
+the Ring ISO EXE, v2 in Prophet's; in the corpus unk_timing (+0x0c) tells them apart (1250 in
+every Ring ISO file, 1500 or 2500 in every Prophet file).
 
     python engines/ring/tools/parsers/cnm.py            # corpus
     python engines/ring/tools/parsers/cnm.py --selftest
@@ -130,6 +132,51 @@ def decode_hbr(data: bytes, starts: list[int], frames: int, width: int, height: 
     return {"decoded_frames": images, "decoded_sizes": dict(sizes)}
 
 
+def decode_unr(data: bytes, starts: list[int], frames: int, width: int, height: int,
+               version: int, interlaced: bool) -> dict:
+    """Decode every UNR 'T', 'S' and 'U' chunk (README "UNR video codec"; RING_ISO.EXE
+    0x42c680 v1, LEGEND.EXE 0x423630 v2). 'S'/'U' payload = index stream (first `offset`
+    bytes), then, if offset < size, a tile table; 'T' payload = a tile table. Each stream
+    must end in the last byte of its part (byte padding only)."""
+    from bitstream import Unr
+
+    u = Unr(version, width, height, interlaced)
+    images, stale, have_tiles = 0, 0, False
+    for at in starts:
+        t = chr(data[at])
+        if t not in "TSU" or images == frames:
+            continue
+        try:
+            if t == "T":
+                size, ntiles, tsize = struct.unpack_from("<IHH", data, at + 1)
+                parts = [(data[at + 9:at + 9 + size], "tiles")]
+            else:
+                size, off, ntiles, tsize, w, h = struct.unpack_from("<IIHHII", data, at + 1)
+                if (w, h) != (width, height):
+                    raise ParseError(f"frame {w}x{h}", at)
+                body = data[at + 0x30:at + 0x30 + size]
+                parts = ([(body[off:], "tiles")] if off < size else []) + [(body[:off], "map")]
+            if tsize != 4:
+                raise ParseError(f"tiles of {tsize} pixels", at)
+            for part, kind in parts:
+                if kind == "tiles":
+                    used = u.load_tiles(part, ntiles)
+                    have_tiles = True
+                else:
+                    if not have_tiles:
+                        raise ParseError("picture before any tile table", at)
+                    used, n = u.frame(part, ntiles)
+                    stale += n
+                if not len(part) * 8 - 8 < used <= len(part) * 8:
+                    raise ParseError(f"{t} {kind} stream ends at bit {used} of {len(part) * 8}", at)
+        except ValueError as exc:
+            raise ParseError(f"{t} chunk: {exc}", at) from None
+        images += t in "SU"
+    if stale:
+        raise ParseError(f"{stale} neighbour choices past the list", 0)
+    return {"decoded_frames": images}
+
+
 def parse(data: bytes) -> dict:
     r = Reader(data)
     magic = r.bytes(8)
@@ -144,7 +191,7 @@ def parse(data: bytes) -> dict:
                 "audio": (ch, bits, rate), "unk_timing": timing, "unk": (unk16, unk1f), **body}
     r.check(magic == UNR, f"bad magic {magic!r}", 0)
     frames, timing, b10, width, height = r.u32(), r.u32(), r.u8(), r.u32(), r.u32()
-    b19, b1a, tracks = r.u8(), r.u8(), r.u8()
+    b19, interlaced, tracks = r.u8(), r.u8(), r.u8()
     count, frames2, table_size, flag = r.u32(), r.u32(), r.u32(), r.u32()
     r.check(tracks <= 3 and frames2 == frames and count == frames, "header counts", 0x1b)
     r.check(r.bytes(0xc0 - r.pos) == bytes(0xc0 - 0x2c), "header tail not zero")
@@ -162,8 +209,11 @@ def parse(data: bytes) -> dict:
     else:
         bad = [(v, a) for v, a in table if v not in starts or (a and a not in starts)]
         r.check(not bad, f"table entries off the chunk chain: {bad[:3]}")
+    body.update(decode_unr(data, body["starts"], frames, width, height,
+                           1 if timing == 1250 else 2, bool(interlaced)))
     return {"variant": "UNR", "frames": frames, "width": width, "height": height,
-            "audio": audio, "unk_timing": timing, "unk": (b10, b19, b1a, table_size, flag),
+            "audio": audio, "unk_timing": timing, "interlaced": interlaced,
+            "unk": (b10, b19, table_size, flag),
             **body}
 
 
@@ -183,6 +233,58 @@ def selftest() -> None:
         pass
     else:
         raise AssertionError("stray byte accepted")
+    _selftest_unr()
+
+
+def _bits(fields: list[tuple[int, int]], lsb_first: bool) -> bytes:
+    """Pack (value, width) fields: v1 MSB first, v2 LSB first (value bits low to high)."""
+    bits = []
+    for v, n in fields:
+        bits += [(v >> i) & 1 for i in (range(n) if lsb_first else reversed(range(n)))]
+    bits += [0] * (-len(bits) % 8)
+    if lsb_first:
+        return bytes(sum(b << i for i, b in enumerate(bits[k:k + 8])) for k in range(0, len(bits), 8))
+    return bytes(int("".join(map(str, bits[k:k + 8])), 2) for k in range(0, len(bits), 8))
+
+
+def _unr_file(timing: int, interlaced: int, w: int, h: int, chunks: list[bytes]) -> bytes:
+    head = UNR + struct.pack("<IIBIIBBBIIII", 1, timing, 0, w, h, 32, interlaced, 0, 1, 1, 0,
+                             timing != 1250)
+    head += bytes(0xc0 - len(head))
+    table = struct.pack("<II", 0xc0 + 8 if timing == 1250 else 0, 0)
+    return head + table + b"".join(chunks)
+
+
+def _selftest_unr() -> None:
+    from bitstream import Unr
+
+    tile0 = bytes(range(1, 17))
+    # v2, 32x2, plain: 'T' with 2 tiles (tile 1 = tile 0 with lane 0 raw 10, 20, 30, 40),
+    # then 'S' without tiles: a group of 8 new indices 1 (000 + 2 bits), a group copied up.
+    tiles = tile0 + _bits([(7, 3), (10, 8), (20, 8), (30, 8), (40, 8)] + [(0, 3)] * 3, True)
+    stream = _bits([(0, 1)] + [(0, 3), (1, 2)] * 8 + [(1, 1)], True)
+    t = b"T" + struct.pack("<IHH", len(tiles), 2, 4) + tiles
+    sc = b"S" + struct.pack("<IIHHIIII", len(stream), len(stream), 2, 4, 32, 2, 0, 0) + bytes(19)
+    assert parse(_unr_file(1500, 0, 32, 2, [t, sc + stream]))["decoded_frames"] == 1
+    u = Unr(2, 32, 2, False)
+    u.load_tiles(tiles, 2)
+    u.frame(stream, 2)
+    want = bytes([10, 2, 3, 4, 20, 6, 7, 8, 30, 10, 11, 12, 40, 14, 15, 16])
+    assert bytes(u.out)[:16] == want and bytes(u.out)[-16:] == want, bytes(u.out)[:16]
+    # v1, 4x3, interlaced: tile 1 = tile 0 + 1 in byte 0 (n = 0: 1-bit deltas, sign 0);
+    # rows 0 and 2 get tiles 1 and 0 (0 + 10-bit index), row 1 their average.
+    tiles = tile0 + _bits([(0, 3), (1, 1), (0, 1)] + [(0, 1)] * 15, False)
+    stream = _bits([(0, 1), (1, 10), (0, 1), (0, 10)], False)
+    body = stream + tiles
+    sc = b"S" + struct.pack("<IIHHIIII", len(body), len(stream), 2, 4, 4, 3, 0, 0) + bytes(19)
+    assert parse(_unr_file(1250, 1, 4, 3, [sc + body]))["decoded_frames"] == 1
+    u = Unr(1, 4, 3, True)
+    u.load_tiles(tiles, 2)
+    u.frame(stream, 2)
+    t0 = [v << 1 & 0xFFFFFFFF for v in struct.unpack("<4I", tile0)]  # interlaced: doubled
+    t1 = [v << 1 & 0xFFFFFFFF for v in struct.unpack("<4I", bytes([2]) + tile0[1:])]
+    got = struct.unpack("<12I", bytes(u.out))
+    assert got == tuple(t1 + [(a >> 1) + (b >> 1) for a, b in zip(t0, t1)] + t0), got
 
 
 if __name__ == "__main__":
