@@ -596,3 +596,19 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   number; confirm the target/opcode with the scene-manager tick and transition code.
 - **Confidence:** strong (185/op31 = go-to-scene proven by arg = destination across 47 sites;
   186/op16 = view change by arg = view index). The exact per-manager opcode set is further work.
+
+### E-0117 — Reserved manager actors are created at boot (navigation mgr 185 = type 0x12)
+- **Binary/file:** `FUN_00436aa0` (boot init) and `FUN_00435a00`, which call the actor
+  register `FUN_0040d270` with fixed ids; `DAT_004b9bc4` (actor table).
+- **Evidence:** the game creates its reserved manager actors at boot by id (not from a `.abi`):
+  `FUN_00436aa0` registers id `0xb9` (185) as **type 0x12** (`FUN_0040d270(factory, 0x12,
+  0xb9, …)`), i.e. the navigation / scene manager that handles opcode 31 = go-to-scene
+  (E-0116). The other reserved managers (id 0 the scene loader, 186 the view/camera manager,
+  269 a state variable, 600/750/751/901/940/941 sound/music/state) are created the same way,
+  by id, in the boot setup. Their per-class `DoCommand`s (reached via the global dispatcher,
+  E-0110) implement go-to-scene, change-view, variable set/test, etc. Decoding these manager
+  `DoCommand`s is what remains for the full event VM (the per-tick queue + conditions, E-0112)
+  and the exact view→camera selection (Q-0008/Q-0011).
+- **Method:** decompile `FUN_00436aa0`; the `FUN_0040d270(factory, type, id, …)` call.
+- **Confidence:** proven for id 185 = type 0x12; the other reserved ids are created by the
+  same mechanism (their exact types/classes are the next step).
