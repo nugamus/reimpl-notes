@@ -1,0 +1,581 @@
+{"fn": "FUN_0043ba24", "at": "0043ba33", "callee": "FUN_00402210", "addr": "00402210", "args": [8], "purge": 0, "exe_addr": "00409c54"}
+{"fn": "FUN_0043ba24", "at": "0043ba4a", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [70000, {"str": "N2S00N01"}, 0, 1], "purge": 0, "exe_addr": "0040d7c0"}
+{"fn": "FUN_0043ba24", "at": "0043ba61", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [70001, {"str": "N2S00N02"}, 0, 3], "purge": 0, "exe_addr": "0040d7c0"}
+{"fn": "FUN_0043ba24", "at": "0043ba78", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [70100, {"str": "N2S01N01"}, 0, 1], "purge": 0, "exe_addr": "0040d7c0"}
+{"fn": "FUN_0043ba24", "at": "0043ba8f", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [70101, {"str": "N2S01N02"}, 0, 1], "purge": 0, "exe_addr": "0040d7c0"}
+{"fn": "FUN_0043ba24", "at": "0043baa6", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [70300, {"str": "N2S03N01"}, 0, 2], "purge": 0, "exe_addr": "0040d7c0"}
+{"fn": "FUN_0043ba24", "at": "0043babd", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [70400, {"str": "N2S04N01"}, 0, 0], "purge": 0, "exe_addr": "0040d7c0"}
+{"fn": "FUN_0043ba24", "at": "0043bad4", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [70500, {"str": "N2S05N01"}, 0, 2], "purge": 0, "exe_addr": "0040d7c0"}
+{"fn": "FUN_0043ba24", "at": "0043baeb", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [70600, {"str": "N2S06N01"}, 0, 0], "purge": 0, "exe_addr": "0040d7c0"}
+{"fn": "FUN_0043ba24", "at": "0043bb02", "callee": "aApplication::AddRot", "addr": "00404dc0", "args": [70200, {"str": "N2S07N01"}, 0, 1], "purge": 0, "exe_addr": "0040d7c0"}
+{"fn": "FUN_0043ba24", "at": "0043bb10", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [72001], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bb29", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [72001, {"str": "TR_AS_RO_BS.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bb37", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [72002], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bb50", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [72002, {"str": "TR_AS_RO_CS.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bb5e", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [72003], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bb77", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [72003, {"str": "TR_AS_RO_DS.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bb85", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [72004], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bb9e", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [72004, {"str": "TR_AS_RO_ES.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bbac", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [72005], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bbc5", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [72005, {"str": "TR_AS_RO_FS.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bbd3", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [72006], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bbec", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [72006, {"str": "TR_AS_RO_HS.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bbfa", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [72007], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bc13", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [72007, {"str": "TR_AS_RO_IS.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bc21", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [72008], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bc3a", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [72008, {"str": "TR_AS_RO_JS.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bc48", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [72009], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bc61", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [72009, {"str": "TR_AS_RO_KS.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bc6f", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [72010], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bc88", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [72010, {"str": "TR_AS_RO_MS.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bc96", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [70000], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bcaf", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [70000, {"str": "N2EXTRA_1A.0001.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bcbd", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [70100], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bcd6", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [70100, {"str": "N2S01N01P02.0001.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bce4", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [70102], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bcfd", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [70102, {"str": "N2S01N01P03.0001.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bd0b", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [70300], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bd24", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [70300, {"str": "N2S03N01P01S01.0001.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bd32", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [70301], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bd4b", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [70301, {"str": "N2S03N01P01S02.0001.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bd59", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [70302], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bd72", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [70302, {"str": "N2S03N01P01S04.0001.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bd80", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [70303], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bd99", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [70303, {"str": "N2S02N01P02S02.0001.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bda7", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [70304], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bdc0", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [70304, {"str": "N2S02N01P02S03.0001.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bdce", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [70305], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bde7", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [70305, {"str": "N2S00N01P01S01.0001.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bdf5", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [70306], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043be0e", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [70306, {"str": "N2S03N01P01S03.0001.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043be1c", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [70410], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043be35", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [70410, {"str": "N2S04N03P01.0001.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043be43", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [70411], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043be5c", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [70411, {"str": "N2S04N03P03.0001.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043be6a", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [70500], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043be83", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [70500, {"str": "N2S05N01P01.0001.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043be91", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [70501], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043beaa", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [70501, {"str": "N2S05N01P01L01.0001.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043beb8", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [70510], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bed1", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [70510, {"str": "N2S05N01P02.0001.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bedf", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [70511], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bef8", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [70511, {"str": "N2S05N01P02L01.0001.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bf06", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [70520], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bf1f", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [70520, {"str": "N2S05N01P03.0001.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bf2d", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [70521], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bf46", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [70521, {"str": "N2S05N01P03L01.0001.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bf54", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [70600], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bf6d", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [70600, {"str": "N2S07N01P01S01.0001.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bf7b", "callee": "aApplication::AddPuz", "addr": "00404240", "args": [70601], "purge": 0, "exe_addr": "0040c7c8"}
+{"fn": "FUN_0043ba24", "at": "0043bf94", "callee": "aApplication::PuzAddBgrImg", "addr": "004043c0", "args": [70601, {"str": "N2S07N01P01S04.0001.bmp"}, 0, 16, 1], "purge": 0, "exe_addr": "0040c848"}
+{"fn": "FUN_0043ba24", "at": "0043bfc0", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [70000, 70001, {"str": "N2S00N01_S00N02"}, 1585, 4294967202, 1815, 111, 1, 53, 7], "purge": 0, "exe_addr": "0040da64"}
+{"fn": "FUN_0043ba24", "at": "0043bfe9", "callee": "RotSetMovToRot", "addr": "00405250", "args": [70000, 0, 0, 0, 1118529126, 0, 2, 1119092736, 0, 1118529126], "purge": 0, "exe_addr": "0040dbb8"}
+{"fn": "FUN_0043ba24", "at": "0043c018", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [70000, 70400, {"str": "N2S00N01_S04N01"}, 2515, 4294967131, 2796, 106, 1, 53, 3], "purge": 0, "exe_addr": "0040da64"}
+{"fn": "FUN_0043ba24", "at": "0043c041", "callee": "RotSetMovToRot", "addr": "00405250", "args": [70000, 1, 0, 0, 1118529126, 0, 2, 1132920832, 0, 1118529126], "purge": 0, "exe_addr": "0040dbb8"}
+{"fn": "FUN_0043ba24", "at": "0043c073", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [70000, 70200, {"str": "N2S00N01_S02N01"}, 314, 4294967035, 817, 167, 1, 53, 0], "purge": 0, "exe_addr": "0040da64"}
+{"fn": "FUN_0043ba24", "at": "0043c09c", "callee": "RotSetMovToRot", "addr": "00405250", "args": [70000, 2, 0, 0, 1118529126, 0, 2, 1127809024, 0, 1118529126], "purge": 0, "exe_addr": "0040dbb8"}
+{"fn": "FUN_0043ba24", "at": "0043c0cb", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [70001, 70000, {"str": "N2S00N02_S00N01"}, 3397, 4294967215, 3600, 129, 1, 53, 7], "purge": 0, "exe_addr": "0040da64"}
+{"fn": "FUN_0043ba24", "at": "0043c0f4", "callee": "RotSetMovToRot", "addr": "00405250", "args": [70001, 0, 0, 0, 1118529126, 0, 2, 1132920832, 0, 1118529126], "purge": 0, "exe_addr": "0040dbb8"}
+{"fn": "FUN_0043ba24", "at": "0043c126", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [70001, 70300, {"str": "N2S00N02_S03N01"}, 2132, 4294967098, 2640, 211, 1, 53, 0], "purge": 0, "exe_addr": "0040da64"}
+{"fn": "FUN_0043ba24", "at": "0043c14f", "callee": "RotSetMovToRot", "addr": "00405250", "args": [70001, 1, 0, 0, 1118529126, 0, 2, 1125515264, 0, 1118529126], "purge": 0, "exe_addr": "0040dbb8"}
+{"fn": "FUN_0043ba24", "at": "0043c17e", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [70001, 70100, {"str": "N2S00N02_S01N02"}, 1008, 31, 1218, 230, 1, 53, 0], "purge": 0, "exe_addr": "0040da64"}
+{"fn": "FUN_0043ba24", "at": "0043c1a7", "callee": "RotSetMovToRot", "addr": "00405250", "args": [70001, 2, 0, 0, 1118529126, 0, 2, 1132920832, 0, 1118529126], "purge": 0, "exe_addr": "0040dbb8"}
+{"fn": "FUN_0043ba24", "at": "0043c1d3", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [70001, 70400, {"str": "N2S00N02_S04N01"}, 3227, 4294967220, 3364, 61, 1, 53, 0], "purge": 0, "exe_addr": "0040da64"}
+{"fn": "FUN_0043ba24", "at": "0043c1fc", "callee": "RotSetMovToRot", "addr": "00405250", "args": [70001, 3, 0, 0, 1118529126, 0, 2, 1132920832, 0, 1118529126], "purge": 0, "exe_addr": "0040dbb8"}
+{"fn": "FUN_0043ba24", "at": "0043c22e", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [70100, 70101, {"str": "N2S01N01_S01N02"}, 1186, 4294967153, 1534, 195, 1, 53, 0], "purge": 0, "exe_addr": "0040da64"}
+{"fn": "FUN_0043ba24", "at": "0043c25d", "callee": "RotSetMovToRot", "addr": "00405250", "args": [70100, 0, 0, 1050253722, 1118529126, 0, 2, 1119092736, 1050253722, 1118529126], "purge": 0, "exe_addr": "0040dbb8"}
+{"fn": "FUN_0043ba24", "at": "0043c28c", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [70101, 70100, {"str": "N2S01N02_S01N01"}, 2951, 4294967171, 3350, 193, 1, 53, 0], "purge": 0, "exe_addr": "0040da64"}
+{"fn": "FUN_0043ba24", "at": "0043c2bb", "callee": "RotSetMovToRot", "addr": "00405250", "args": [70101, 0, 0, 1050253722, 1118529126, 0, 2, 1132920832, 1050253722, 1118529126], "purge": 0, "exe_addr": "0040dbb8"}
+{"fn": "FUN_0043ba24", "at": "0043c2ea", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [70101, 70600, {"str": "N2S01N02_S06N01_VAR2"}, 1323, 4294967239, 1587, 225, 1, 53, 16], "purge": 0, "exe_addr": "0040da64"}
+{"fn": "FUN_0043ba24", "at": "0043c319", "callee": "RotSetMovToRot", "addr": "00405250", "args": [70101, 1, 0, 1050253722, 1118529126, 0, 2, 1124204544, 1050253722, 1118529126], "purge": 0, "exe_addr": "0040dbb8"}
+{"fn": "FUN_0043ba24", "at": "0043c348", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [70101, 70600, {"str": "N2S01N02_S06N01_VAR1"}, 1323, 4294967239, 1587, 225, 0, 53, 0], "purge": 0, "exe_addr": "0040da64"}
+{"fn": "FUN_0043ba24", "at": "0043c377", "callee": "RotSetMovToRot", "addr": "00405250", "args": [70101, 2, 0, 1050253722, 1118529126, 0, 2, 1130364928, 1050253722, 1118529126], "purge": 0, "exe_addr": "0040dbb8"}
+{"fn": "FUN_0043ba24", "at": "0043c3a6", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [70200, 70000, {"str": "N2S07N01_S00N01"}, 108, 4294967136, 578, 156, 1, 53, 7], "purge": 0, "exe_addr": "0040da64"}
+{"fn": "FUN_0043ba24", "at": "0043c3d5", "callee": "RotSetMovToRot", "addr": "00405250", "args": [70200, 0, 0, 1050253722, 1118529126, 0, 2, 1127481344, 1050253722, 1118529126], "purge": 0, "exe_addr": "0040dbb8"}
+{"fn": "FUN_0043ba24", "at": "0043c407", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [70300, 70001, {"str": "N2S03N01_S00N02"}, 318, 4294967094, 789, 226, 1, 53, 7], "purge": 0, "exe_addr": "0040da64"}
+{"fn": "FUN_0043ba24", "at": "0043c436", "callee": "RotSetMovToRot", "addr": "00405250", "args": [70300, 0, 0, 1050253722, 1118529126, 0, 2, 1134559232, 1050253722, 1118529126], "purge": 0, "exe_addr": "0040dbb8"}
+{"fn": "FUN_0043ba24", "at": "0043c465", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [70400, 70000, {"str": "N2S04N01_S00N01"}, 1200, 4294967169, 1508, 143, 1, 53, 7], "purge": 0, "exe_addr": "0040da64"}
+{"fn": "FUN_0043ba24", "at": "0043c48e", "callee": "RotSetMovToRot", "addr": "00405250", "args": [70400, 0, 0, 0, 1118529126, 0, 2, 1119092736, 0, 1118529126], "purge": 0, "exe_addr": "0040dbb8"}
+{"fn": "FUN_0043ba24", "at": "0043c4bd", "callee": "RotAddMovToPuz", "addr": "00405360", "args": [70400, 70410, {"str": ""}, 3011, 4294967085, 3280, 29, 1, 53, 0], "purge": 0, "exe_addr": "0040dd50"}
+{"fn": "FUN_0043ba24", "at": "0043c4da", "callee": "RotSetMovToPuz", "addr": "004054b0", "args": [70400, 1, 0, 0, 1118529126, 0, 2], "purge": 0, "exe_addr": "0040dea0"}
+{"fn": "FUN_0043ba24", "at": "0043c509", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [70500, 70600, {"str": "N2S05N01_S06N01"}, 546, 4294966951, 980, 120, 1, 53, 0], "purge": 0, "exe_addr": "0040da64"}
+{"fn": "FUN_0043ba24", "at": "0043c538", "callee": "RotSetMovToRot", "addr": "00405250", "args": [70500, 0, 0, 1050253722, 1118529126, 0, 2, 1110441984, 1050253722, 1118529126], "purge": 0, "exe_addr": "0040dbb8"}
+{"fn": "FUN_0043ba24", "at": "0043c56a", "callee": "RotAddMovToPuz", "addr": "00405360", "args": [70500, 70500, {"str": ""}, 1139, 4294967092, 1520, 156, 1, 52, 0], "purge": 0, "exe_addr": "0040dd50"}
+{"fn": "FUN_0043ba24", "at": "0043c58a", "callee": "RotSetMovToPuz", "addr": "004054b0", "args": [70500, 1, 0, 1050253722, 1118529126, 0, 2], "purge": 0, "exe_addr": "0040dea0"}
+{"fn": "FUN_0043ba24", "at": "0043c5b9", "callee": "RotAddMovToPuz", "addr": "00405360", "args": [70500, 70510, {"str": ""}, 1787, 4294967153, 2033, 108, 1, 52, 0], "purge": 0, "exe_addr": "0040dd50"}
+{"fn": "FUN_0043ba24", "at": "0043c5d9", "callee": "RotSetMovToPuz", "addr": "004054b0", "args": [70500, 2, 0, 1050253722, 1118529126, 0, 2], "purge": 0, "exe_addr": "0040dea0"}
+{"fn": "FUN_0043ba24", "at": "0043c605", "callee": "RotAddMovToPuz", "addr": "00405360", "args": [70500, 70520, {"str": ""}, 2228, 4294967178, 2411, 80, 1, 52, 0], "purge": 0, "exe_addr": "0040dd50"}
+{"fn": "FUN_0043ba24", "at": "0043c625", "callee": "RotSetMovToPuz", "addr": "004054b0", "args": [70500, 3, 0, 1050253722, 1118529126, 0, 2], "purge": 0, "exe_addr": "0040dea0"}
+{"fn": "FUN_0043ba24", "at": "0043c654", "callee": "RotAddMovToRot", "addr": "004050f0", "args": [70600, 70101, {"str": "N2S06N01_S01N02"}, 863, 4294967085, 1123, 101, 1, 53, 0], "purge": 0, "exe_addr": "0040da64"}
+{"fn": "FUN_0043ba24", "at": "0043c683", "callee": "RotSetMovToRot", "addr": "00405250", "args": [70600, 0, 0, 1050253722, 1118529126, 0, 2, 1132920832, 1050253722, 1118529126], "purge": 0, "exe_addr": "0040dbb8"}
+{"fn": "FUN_0043ba24", "at": "0043c6b2", "callee": "aApplication::PuzAddMovToPuz", "addr": "004046c0", "args": [70102, 70100, {"str": ""}, 0, 420, 640, 464, 1, 55, 0], "purge": 0, "exe_addr": "0040cbf8"}
+{"fn": "FUN_0043ba24", "at": "0043c6e4", "callee": "aApplication::PuzAddMovToPuz", "addr": "004046c0", "args": [70410, 70411, {"str": ""}, 250, 280, 320, 370, 1, 52, 0], "purge": 0, "exe_addr": "0040cbf8"}
+{"fn": "FUN_0043ba24", "at": "0043c713", "callee": "aApplication::PuzAddMovToRot", "addr": "00404450", "args": [70410, 70400, {"str": ""}, 0, 420, 640, 464, 1, 55, 0], "purge": 0, "exe_addr": "0040c8e8"}
+{"fn": "FUN_0043ba24", "at": "0043c732", "callee": "PuzSetMovToRot", "addr": "004045c0", "args": [70410, 1, 1132920832, 1050253722, 1118529126], "purge": 0, "exe_addr": "0040ca78"}
+{"fn": "FUN_0043ba24", "at": "0043c761", "callee": "aApplication::PuzAddMovToPuz", "addr": "004046c0", "args": [70411, 70410, {"str": ""}, 0, 420, 640, 464, 1, 55, 0], "purge": 0, "exe_addr": "0040cbf8"}
+{"fn": "FUN_0043ba24", "at": "0043c790", "callee": "aApplication::PuzAddMovToRot", "addr": "00404450", "args": [70500, 70500, {"str": ""}, 0, 420, 640, 464, 1, 55, 0], "purge": 0, "exe_addr": "0040c8e8"}
+{"fn": "FUN_0043ba24", "at": "0043c7af", "callee": "PuzSetMovToRot", "addr": "004045c0", "args": [70500, 0, 1119092736, 1050253722, 1118529126], "purge": 0, "exe_addr": "0040ca78"}
+{"fn": "FUN_0043ba24", "at": "0043c7de", "callee": "aApplication::PuzAddMovToPuz", "addr": "004046c0", "args": [70500, 70501, {"str": ""}, 180, 80, 470, 370, 1, 52, 0], "purge": 0, "exe_addr": "0040cbf8"}
+{"fn": "FUN_0043ba24", "at": "0043c80d", "callee": "aApplication::PuzAddMovToPuz", "addr": "004046c0", "args": [70501, 70500, {"str": ""}, 430, 48, 640, 434, 1, 52, 0], "purge": 0, "exe_addr": "0040cbf8"}
+{"fn": "FUN_0043ba24", "at": "0043c83c", "callee": "aApplication::PuzAddMovToRot", "addr": "00404450", "args": [70510, 70500, {"str": ""}, 0, 420, 640, 464, 1, 55, 0], "purge": 0, "exe_addr": "0040c8e8"}
+{"fn": "FUN_0043ba24", "at": "0043c85b", "callee": "PuzSetMovToRot", "addr": "004045c0", "args": [70510, 0, 1125122048, 1050253722, 1118529126], "purge": 0, "exe_addr": "0040ca78"}
+{"fn": "FUN_0043ba24", "at": "0043c88a", "callee": "aApplication::PuzAddMovToPuz", "addr": "004046c0", "args": [70510, 70511, {"str": ""}, 180, 80, 470, 370, 1, 52, 0], "purge": 0, "exe_addr": "0040cbf8"}
+{"fn": "FUN_0043ba24", "at": "0043c8b9", "callee": "aApplication::PuzAddMovToPuz", "addr": "004046c0", "args": [70511, 70510, {"str": ""}, 430, 48, 640, 434, 1, 52, 0], "purge": 0, "exe_addr": "0040cbf8"}
+{"fn": "FUN_0043ba24", "at": "0043c8e8", "callee": "aApplication::PuzAddMovToRot", "addr": "00404450", "args": [70520, 70500, {"str": ""}, 0, 420, 640, 464, 1, 55, 0], "purge": 0, "exe_addr": "0040c8e8"}
+{"fn": "FUN_0043ba24", "at": "0043c907", "callee": "PuzSetMovToRot", "addr": "004045c0", "args": [70520, 0, 1127743488, 1050253722, 1118529126], "purge": 0, "exe_addr": "0040ca78"}
+{"fn": "FUN_0043ba24", "at": "0043c936", "callee": "aApplication::PuzAddMovToPuz", "addr": "004046c0", "args": [70520, 70521, {"str": ""}, 180, 80, 470, 370, 1, 52, 0], "purge": 0, "exe_addr": "0040cbf8"}
+{"fn": "FUN_0043ba24", "at": "0043c965", "callee": "aApplication::PuzAddMovToPuz", "addr": "004046c0", "args": [70521, 70520, {"str": ""}, 430, 48, 640, 434, 1, 52, 0], "purge": 0, "exe_addr": "0040cbf8"}
+{"fn": "FUN_0043ba24", "at": "0043c97f", "callee": "aApplication::AddObj", "addr": "00402900", "args": [72000, {"str": ""}, {"str": ""}, 1], "purge": 0, "exe_addr": "0040a4ec"}
+{"fn": "FUN_0043ba24", "at": "0043c98d", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [72000], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043c9c3", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [72000, 0, 72001, {"str": "TR_AS_RO_BS"}, 0, 375, 203, 1, 1000, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043c9d1", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [72000], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043ca07", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [72000, 1, 72002, {"str": "TR_AS_RO_CS"}, 0, 281, 154, 1, 1000, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043ca15", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [72000], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043ca4b", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [72000, 2, 72003, {"str": "TR_AS_RO_DS"}, 0, 284, 163, 1, 1000, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043ca59", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [72000], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043ca8f", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [72000, 3, 72004, {"str": "TR_AS_RO_ES"}, 0, 147, 140, 1, 1000, 23, 1095237632, 4], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043ca9d", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [72000], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043cad3", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [72000, 4, 72005, {"str": "TR_AS_RO_FS"}, 0, 388, 244, 1, 1000, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043cae1", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [72000], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043cb17", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [72000, 5, 72006, {"str": "TR_AS_RO_HS"}, 0, 146, 156, 1, 1000, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043cb25", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [72000], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043cb5b", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [72000, 6, 72007, {"str": "TR_AS_RO_IS"}, 0, 308, 221, 1, 1000, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043cb69", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [72000], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043cb9c", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [72000, 7, 72008, {"str": "TR_AS_RO_JS"}, 0, 250, 102, 1, 1000, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043cbaa", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [72000], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043cbe0", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [72000, 8, 72009, {"str": "TR_AS_RO_KS"}, 0, 224, 262, 1, 1000, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043cbee", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [72000], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043cc21", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [72000, 9, 72010, {"str": "TR_AS_RO_MS"}, 0, 173, 127, 1, 1000, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043cc3b", "callee": "aApplication::AddObj", "addr": "00402900", "args": [70001, {"str": "Alberich"}, {"str": ""}, 1], "purge": 0, "exe_addr": "0040a4ec"}
+{"fn": "FUN_0043ba24", "at": "0043cc49", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70001], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043cc7c", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70001, 0, 70000, {"str": "N2EXTRA_1B"}, 0, 1, 153, 1, 1000, 53, 1092616192, 4], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043cc8a", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70001], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043ccba", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70001, 1, 70000, {"str": "N2EXTRA_2B"}, 0, 0, 16, 1, 1000, 37, 1092616192, 4], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043ccc8", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70001], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043ccf8", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70001, 2, 70000, {"str": "N2EXTRA_3B"}, 0, 49, 38, 1, 1000, 53, 1092616192, 4], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043cd06", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70001], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043cd26", "callee": "aApplication::ObjPreAddAniToRot", "addr": "00403660", "args": [70001, 3, 70001, 2, 16, 1095237632, 4], "purge": 0, "exe_addr": "0040b37c"}
+{"fn": "FUN_0043ba24", "at": "0043cd3d", "callee": "aApplication::ObjPreSetAniIdeOnRot", "addr": "00403920", "args": [70001, 3, 0, 70000], "purge": 0, "exe_addr": "0040b6d8"}
+{"fn": "FUN_0043ba24", "at": "0043cd4d", "callee": "ObjPreSho", "addr": "00403c80", "args": [70001, 3], "purge": 0, "exe_addr": "0040c244"}
+{"fn": "FUN_0043ba24", "at": "0043cd67", "callee": "aApplication::AddObj", "addr": "00402900", "args": [70000, {"str": "Fire"}, {"str": "N2_Fire"}, 1], "purge": 0, "exe_addr": "0040a4ec"}
+{"fn": "FUN_0043ba24", "at": "0043cd82", "callee": "aApplication::ObjAddBagAni", "addr": "00402ed0", "args": [70000, 1, 3, 13, 1095237632, 4], "purge": 0, "exe_addr": "0040ab2c"}
+{"fn": "FUN_0043ba24", "at": "0043cda1", "callee": "ObjSetActCur", "addr": "00404030", "args": [70000, 22, 22, 13, 4, 1095237632, 4, 4], "purge": 0, "exe_addr": "0040c5dc"}
+{"fn": "FUN_0043ba24", "at": "0043cdbd", "callee": "ObjSetPasCur", "addr": "00403f80", "args": [70000, 22, 22, 0, 3, 0, 0, 3], "purge": 0, "exe_addr": "0040c538"}
+{"fn": "FUN_0043ba24", "at": "0043cdea", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [70000, 70600, 2413, 4294967040, 2970, 256, 1, 52, 0], "purge": 0, "exe_addr": "0040a9cc"}
+{"fn": "FUN_0043ba24", "at": "0043cdf8", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70000], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043ce18", "callee": "aApplication::ObjPreAddAniToRot", "addr": "00403660", "args": [70000, 0, 70000, 0, 25, 1092616192, 4], "purge": 0, "exe_addr": "0040b37c"}
+{"fn": "FUN_0043ba24", "at": "0043ce38", "callee": "aApplication::ObjPreAddAniToRot", "addr": "00403660", "args": [70000, 0, 70001, 0, 25, 1092616192, 4], "purge": 0, "exe_addr": "0040b37c"}
+{"fn": "FUN_0043ba24", "at": "0043ce58", "callee": "aApplication::ObjPreAddAniToRot", "addr": "00403660", "args": [70000, 0, 70001, 1, 25, 1092616192, 4], "purge": 0, "exe_addr": "0040b37c"}
+{"fn": "FUN_0043ba24", "at": "0043ce68", "callee": "ObjPreSho", "addr": "00403c80", "args": [70000, 0], "purge": 0, "exe_addr": "0040c244"}
+{"fn": "FUN_0043ba24", "at": "0043ce82", "callee": "aApplication::AddObj", "addr": "00402900", "args": [70100, {"str": "Console"}, {"str": ""}, 1], "purge": 0, "exe_addr": "0040a4ec"}
+{"fn": "FUN_0043ba24", "at": "0043cea6", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [70100, 70100, 0, 16, 640, 66, 1, 53, 0], "purge": 0, "exe_addr": "0040a830"}
+{"fn": "FUN_0043ba24", "at": "0043ced0", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [70100, 70100, 0, 414, 640, 464, 1, 53, 0], "purge": 0, "exe_addr": "0040a830"}
+{"fn": "FUN_0043ba24", "at": "0043cef4", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [70100, 70100, 0, 66, 50, 414, 1, 53, 0], "purge": 0, "exe_addr": "0040a830"}
+{"fn": "FUN_0043ba24", "at": "0043cf1e", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [70100, 70100, 610, 66, 640, 414, 1, 53, 0], "purge": 0, "exe_addr": "0040a830"}
+{"fn": "FUN_0043ba24", "at": "0043cf48", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [70100, 70100, 3406, 26, 3541, 155, 1, 52, 1], "purge": 0, "exe_addr": "0040a9cc"}
+{"fn": "FUN_0043ba24", "at": "0043cf56", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70100], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043cf7d", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70100, 0, 70100, {"str": "N2S01N01P01L01.0001.bmp"}, 101, 68, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043cf8b", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70100], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043cfb2", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70100, 1, 70100, {"str": "N2S01N01P01L02.0001.bmp"}, 80, 63, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043cfc0", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70100], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043cfea", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70100, 2, 70100, {"str": "N2S01N01P01L03.0001.bmp"}, 116, 159, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d004", "callee": "aApplication::AddObj", "addr": "00402900", "args": [70101, {"str": "CCButton1"}, {"str": ""}, 2], "purge": 0, "exe_addr": "0040a4ec"}
+{"fn": "FUN_0043ba24", "at": "0043d02e", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [70101, 70100, 3208, 109, 3322, 184, 1, 52, 1], "purge": 0, "exe_addr": "0040a9cc"}
+{"fn": "FUN_0043ba24", "at": "0043d05b", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [70101, 70100, 359, 265, 440, 304, 0, 52, 0], "purge": 0, "exe_addr": "0040a830"}
+{"fn": "FUN_0043ba24", "at": "0043d088", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [70101, 70100, 359, 265, 440, 304, 0, 52, 1], "purge": 0, "exe_addr": "0040a830"}
+{"fn": "FUN_0043ba24", "at": "0043d096", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70101], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d0c3", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70101, 0, 70100, {"str": "N2S01N01P01S03.0001.bmp"}, 361, 259, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d0d1", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70101], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d101", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70101, 1, 70100, {"str": "N2S01N01P01S01"}, 0, 85, 68, 1, 1000, 36, 1095237632, 6], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043d118", "callee": "aApplication::ObjPreSetAniIdeOnPuz", "addr": "004038d0", "args": [70101, 1, 0, 70101], "purge": 0, "exe_addr": "0040b688"}
+{"fn": "FUN_0043ba24", "at": "0043d126", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70101], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d156", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70101, 2, 70100, {"str": "N2S01N01P01L02S01"}, 0, 80, 63, 1, 1000, 36, 1095237632, 10], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043d16d", "callee": "aApplication::ObjPreSetAniIdeOnPuz", "addr": "004038d0", "args": [70101, 2, 0, 70103], "purge": 0, "exe_addr": "0040b688"}
+{"fn": "FUN_0043ba24", "at": "0043d17b", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70101], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d1ab", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70101, 3, 70100, {"str": "N2S01N01P01S01"}, 0, 85, 68, 1, 1000, 36, 1095237632, 10], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043d1c2", "callee": "aApplication::ObjPreSetAniIdeOnPuz", "addr": "004038d0", "args": [70101, 3, 0, 70100], "purge": 0, "exe_addr": "0040b688"}
+{"fn": "FUN_0043ba24", "at": "0043d1d0", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70101], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d200", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70101, 4, 70100, {"str": "N2S01N01P01L02S01"}, 0, 80, 63, 1, 1000, 36, 1095237632, 6], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043d217", "callee": "aApplication::ObjPreSetAniIdeOnPuz", "addr": "004038d0", "args": [70101, 4, 0, 70102], "purge": 0, "exe_addr": "0040b688"}
+{"fn": "FUN_0043ba24", "at": "0043d225", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70101], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d252", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70101, 5, 70100, {"str": "N2S01N01P01S03.0003.bmp"}, 361, 259, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d260", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70101], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d277", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [70101, 6, 70100, 0], "purge": 0, "exe_addr": "0040b24c"}
+{"fn": "FUN_0043ba24", "at": "0043d28e", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [70101, 6, 70101, 0], "purge": 0, "exe_addr": "0040b24c"}
+{"fn": "FUN_0043ba24", "at": "0043d29e", "callee": "ObjPreSho", "addr": "00403c80", "args": [70101, 6], "purge": 0, "exe_addr": "0040c244"}
+{"fn": "FUN_0043ba24", "at": "0043d2b8", "callee": "aApplication::AddObj", "addr": "00402900", "args": [70102, {"str": "CCButton2"}, {"str": ""}, 2], "purge": 0, "exe_addr": "0040a4ec"}
+{"fn": "FUN_0043ba24", "at": "0043d2e5", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [70102, 70100, 3250, 195, 3357, 245, 1, 52, 1], "purge": 0, "exe_addr": "0040a9cc"}
+{"fn": "FUN_0043ba24", "at": "0043d312", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [70102, 70100, 382, 308, 472, 352, 1, 52, 0], "purge": 0, "exe_addr": "0040a830"}
+{"fn": "FUN_0043ba24", "at": "0043d33f", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [70102, 70100, 382, 308, 472, 352, 1, 52, 1], "purge": 0, "exe_addr": "0040a830"}
+{"fn": "FUN_0043ba24", "at": "0043d34d", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70102], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d37a", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70102, 0, 70100, {"str": "N2S01N01P01S03.0004.bmp"}, 385, 299, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d388", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70102], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d3b8", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70102, 1, 70100, {"str": "N2S01N01P01S02"}, 0, 40, 65, 1, 1000, 46, 1095237632, 6], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043d3cf", "callee": "aApplication::ObjPreSetAniIdeOnPuz", "addr": "004038d0", "args": [70102, 1, 0, 70105], "purge": 0, "exe_addr": "0040b688"}
+{"fn": "FUN_0043ba24", "at": "0043d3dd", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70102], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d40d", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70102, 2, 70100, {"str": "N2S01N01P01S02"}, 0, 40, 65, 1, 1000, 23, 1095237632, 6], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043d424", "callee": "aApplication::ObjPreSetAniIdeOnPuz", "addr": "004038d0", "args": [70102, 2, 0, 70104], "purge": 0, "exe_addr": "0040b688"}
+{"fn": "FUN_0043ba24", "at": "0043d432", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70102], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d462", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70102, 3, 70100, {"str": "N2S01N01P01S02"}, 0, 40, 65, 1, 1000, 23, 1095237632, 10], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043d479", "callee": "aApplication::ObjPreSetAniIdeOnPuz", "addr": "004038d0", "args": [70102, 3, 0, 70106], "purge": 0, "exe_addr": "0040b688"}
+{"fn": "FUN_0043ba24", "at": "0043d487", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70102], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d4b4", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70102, 4, 70100, {"str": "N2S01N01P01S03.0002.bmp"}, 385, 299, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d4ce", "callee": "aApplication::AddObj", "addr": "00402900", "args": [70103, {"str": "CCHandle"}, {"str": "NI_HandSel"}, 4], "purge": 0, "exe_addr": "0040a4ec"}
+{"fn": "FUN_0043ba24", "at": "0043d4f8", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [70103, 70100, 3406, 26, 3541, 155, 1, 52, 0], "purge": 0, "exe_addr": "0040a9cc"}
+{"fn": "FUN_0043ba24", "at": "0043d528", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [70103, 70100, 497, 192, 543, 249, 1, 10000, 1], "purge": 0, "exe_addr": "0040a830"}
+{"fn": "FUN_0043ba24", "at": "0043d544", "callee": "ObjSetActDraCur", "addr": "00404190", "args": [70103, 5, 5, 0, 3, 0, 0, 3], "purge": 0, "exe_addr": "0040c724"}
+{"fn": "FUN_0043ba24", "at": "0043d560", "callee": "ObjSetPasDraCur", "addr": "004040e0", "args": [70103, 5, 5, 0, 3, 0, 0, 3], "purge": 0, "exe_addr": "0040c680"}
+{"fn": "FUN_0043ba24", "at": "0043d587", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70103], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d5b2", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70103, 0, 70100, {"str": "N2S01N01P02S01.0001.bmp"}, 504, 194, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d587", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70103], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d5b2", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70103, 1, 70100, {"str": "N2S01N01P02S01.0002.bmp"}, 504, 194, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d587", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70103], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d5b2", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70103, 2, 70100, {"str": "N2S01N01P02S01.0003.bmp"}, 504, 194, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d587", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70103], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d5b2", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70103, 3, 70100, {"str": "N2S01N01P02S01.0004.bmp"}, 504, 194, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d587", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70103], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d5b2", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70103, 4, 70100, {"str": "N2S01N01P02S01.0005.bmp"}, 504, 194, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d587", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70103], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d5b2", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70103, 5, 70100, {"str": "N2S01N01P02S01.0006.bmp"}, 504, 194, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d587", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70103], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d5b2", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70103, 6, 70100, {"str": "N2S01N01P02S01.0007.bmp"}, 504, 194, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d587", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70103], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d5b2", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70103, 7, 70100, {"str": "N2S01N01P02S01.0008.bmp"}, 504, 194, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d587", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70103], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d5b2", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70103, 8, 70100, {"str": "N2S01N01P02S01.0009.bmp"}, 504, 194, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d587", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70103], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d5b2", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70103, 9, 70100, {"str": "N2S01N01P02S01.0010.bmp"}, 504, 194, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d587", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70103], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d5b2", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70103, 10, 70100, {"str": "N2S01N01P02S01.0011.bmp"}, 504, 194, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d587", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70103], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d5b2", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70103, 11, 70100, {"str": "N2S01N01P02S01.0012.bmp"}, 504, 194, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d587", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70103], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d5b2", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70103, 12, 70100, {"str": "N2S01N01P02S01.0013.bmp"}, 504, 194, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d5d5", "callee": "aApplication::AddObj", "addr": "00402900", "args": [70105, {"str": "CCHolo"}, {"str": ""}, 1], "purge": 0, "exe_addr": "0040a4ec"}
+{"fn": "FUN_0043ba24", "at": "0043d5ff", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [70105, 70100, 77, 132, 340, 298, 0, 52, 0], "purge": 0, "exe_addr": "0040a830"}
+{"fn": "FUN_0043ba24", "at": "0043d62c", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [70105, 70100, 140, 170, 430, 380, 0, 52, 0], "purge": 0, "exe_addr": "0040a830"}
+{"fn": "FUN_0043ba24", "at": "0043d646", "callee": "aApplication::AddObj", "addr": "00402900", "args": [70106, {"str": "CCHoloCross"}, {"str": "NI_HandSel"}, 4], "purge": 0, "exe_addr": "0040a4ec"}
+{"fn": "FUN_0043ba24", "at": "0043d676", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [70106, 70102, 203, 236, 283, 316, 1, 10000, 0], "purge": 0, "exe_addr": "0040a830"}
+{"fn": "FUN_0043ba24", "at": "0043d692", "callee": "ObjSetActDraCur", "addr": "00404190", "args": [70106, 5, 5, 0, 3, 0, 0, 3], "purge": 0, "exe_addr": "0040c724"}
+{"fn": "FUN_0043ba24", "at": "0043d6ae", "callee": "ObjSetPasDraCur", "addr": "004040e0", "args": [70106, 5, 5, 0, 3, 0, 0, 3], "purge": 0, "exe_addr": "0040c680"}
+{"fn": "FUN_0043ba24", "at": "0043d6d2", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70106], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d6fd", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70106, 0, 70102, {"str": "N2S01N01P03L01S01.0000.bmp"}, 213, 254, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d6d2", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70106], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d6fd", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70106, 1, 70102, {"str": "N2S01N01P03L01S01.0001.bmp"}, 213, 254, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d6d2", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70106], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d6fd", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70106, 2, 70102, {"str": "N2S01N01P03L01S01.0002.bmp"}, 213, 254, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d6d2", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70106], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d6fd", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70106, 3, 70102, {"str": "N2S01N01P03L01S01.0003.bmp"}, 213, 254, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d6d2", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70106], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d6fd", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70106, 4, 70102, {"str": "N2S01N01P03L01S01.0004.bmp"}, 213, 254, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d6d2", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70106], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d6fd", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70106, 5, 70102, {"str": "N2S01N01P03L01S01.0005.bmp"}, 213, 254, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d6d2", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70106], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d6fd", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70106, 6, 70102, {"str": "N2S01N01P03L01S01.0006.bmp"}, 213, 254, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d6d2", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70106], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d6fd", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70106, 7, 70102, {"str": "N2S01N01P03L01S01.0007.bmp"}, 213, 254, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d6d2", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70106], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d6fd", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70106, 8, 70102, {"str": "N2S01N01P03L01S01.0008.bmp"}, 213, 254, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d6d2", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70106], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d6fd", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70106, 9, 70102, {"str": "N2S01N01P03L01S01.0009.bmp"}, 213, 254, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d6d2", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70106], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d6fd", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70106, 10, 70102, {"str": "N2S01N01P03L01S01.0010.bmp"}, 213, 254, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d6d2", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70106], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d6fd", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70106, 11, 70102, {"str": "N2S01N01P03L01S01.0011.bmp"}, 213, 254, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d6d2", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70106], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d6fd", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70106, 12, 70102, {"str": "N2S01N01P03L01S01.0012.bmp"}, 213, 254, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d6d2", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70106], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d6fd", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70106, 13, 70102, {"str": "N2S01N01P03L01S01.0013.bmp"}, 213, 254, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d6d2", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70106], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d6fd", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70106, 14, 70102, {"str": "N2S01N01P03L01S01.0014.bmp"}, 213, 254, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d6d2", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70106], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d6fd", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70106, 15, 70102, {"str": "N2S01N01P03L01S01.0015.bmp"}, 213, 254, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d6d2", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70106], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d6fd", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70106, 16, 70102, {"str": "N2S01N01P03L01S01.0016.bmp"}, 213, 254, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d6d2", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70106], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d6fd", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70106, 17, 70102, {"str": "N2S01N01P03L01S01.0017.bmp"}, 213, 254, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d6d2", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70106], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d6fd", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70106, 18, 70102, {"str": "N2S01N01P03L01S01.0018.bmp"}, 213, 254, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d720", "callee": "aApplication::AddObj", "addr": "00402900", "args": [70107, {"str": "CCHoloDam1"}, {"str": "NI_HandSel"}, 4], "purge": 0, "exe_addr": "0040a4ec"}
+{"fn": "FUN_0043ba24", "at": "0043d73a", "callee": "aApplication::AddObj", "addr": "00402900", "args": [70108, {"str": "CCHoloDam2"}, {"str": "NI_HandSel"}, 4], "purge": 0, "exe_addr": "0040a4ec"}
+{"fn": "FUN_0043ba24", "at": "0043d76a", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [70108, 70102, 389, 270, 434, 330, 1, 10000, 0], "purge": 0, "exe_addr": "0040a830"}
+{"fn": "FUN_0043ba24", "at": "0043d79a", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [70108, 70102, 389, 330, 434, 390, 0, 10000, 1], "purge": 0, "exe_addr": "0040a830"}
+{"fn": "FUN_0043ba24", "at": "0043d7b6", "callee": "ObjSetActDraCur", "addr": "00404190", "args": [70108, 5, 5, 0, 3, 0, 0, 3], "purge": 0, "exe_addr": "0040c724"}
+{"fn": "FUN_0043ba24", "at": "0043d7d2", "callee": "ObjSetPasDraCur", "addr": "004040e0", "args": [70108, 5, 5, 0, 3, 0, 0, 3], "purge": 0, "exe_addr": "0040c680"}
+{"fn": "FUN_0043ba24", "at": "0043d7f9", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70108], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d824", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70108, 0, 70102, {"str": "N2S01N01P03L01S03.0001.bmp"}, 390, 271, 1, 1, 999], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d7f9", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70108], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d824", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70108, 1, 70102, {"str": "N2S01N01P03L01S03.0002.bmp"}, 390, 271, 1, 1, 999], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d7f9", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70108], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d824", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70108, 2, 70102, {"str": "N2S01N01P03L01S03.0003.bmp"}, 390, 271, 1, 1, 999], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d7f9", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70108], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d824", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70108, 3, 70102, {"str": "N2S01N01P03L01S03.0004.bmp"}, 390, 271, 1, 1, 999], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d7f9", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70108], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d824", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70108, 4, 70102, {"str": "N2S01N01P03L01S03.0005.bmp"}, 390, 271, 1, 1, 999], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d7f9", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70108], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d824", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70108, 5, 70102, {"str": "N2S01N01P03L01S03.0006.bmp"}, 390, 271, 1, 1, 999], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d7f9", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70108], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d824", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70108, 6, 70102, {"str": "N2S01N01P03L01S03.0007.bmp"}, 390, 271, 1, 1, 999], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d7f9", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70108], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d824", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70108, 7, 70102, {"str": "N2S01N01P03L01S03.0008.bmp"}, 390, 271, 1, 1, 999], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d7f9", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70108], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d824", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70108, 8, 70102, {"str": "N2S01N01P03L01S03.0009.bmp"}, 390, 271, 1, 1, 999], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d7f9", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70108], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d824", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70108, 9, 70102, {"str": "N2S01N01P03L01S03.0010.bmp"}, 390, 271, 1, 1, 999], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d7f9", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70108], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d824", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70108, 10, 70102, {"str": "N2S01N01P03L01S03.0011.bmp"}, 390, 271, 1, 1, 999], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d7f9", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70108], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d824", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70108, 11, 70102, {"str": "N2S01N01P03L01S03.0012.bmp"}, 390, 271, 1, 1, 999], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d7f9", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70108], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d824", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70108, 12, 70102, {"str": "N2S01N01P03L01S03.0013.bmp"}, 390, 271, 1, 1, 999], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d7f9", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70108], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d824", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70108, 13, 70102, {"str": "N2S01N01P03L01S03.0014.bmp"}, 390, 271, 1, 1, 999], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d83b", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70108], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d868", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70108, 14, 70102, {"str": "N2S01N01P03L01S03A.bmp"}, 340, 237, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d895", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70108, 14, 70102, {"str": "N2S01N01P03L01S03B.bmp"}, 311, 179, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043d8af", "callee": "aApplication::AddObj", "addr": "00402900", "args": [70304, {"str": "Loge's Tear"}, {"str": "NI_Tear"}, 1], "purge": 0, "exe_addr": "0040a4ec"}
+{"fn": "FUN_0043ba24", "at": "0043d8ca", "callee": "aApplication::ObjAddBagAni", "addr": "00402ed0", "args": [70304, 1, 3, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040ab2c"}
+{"fn": "FUN_0043ba24", "at": "0043d8e9", "callee": "ObjSetActCur", "addr": "00404030", "args": [70304, 22, 22, 20, 4, 1095237632, 4, 4], "purge": 0, "exe_addr": "0040c5dc"}
+{"fn": "FUN_0043ba24", "at": "0043d905", "callee": "ObjSetPasCur", "addr": "00403f80", "args": [70304, 22, 22, 0, 3, 0, 0, 3], "purge": 0, "exe_addr": "0040c538"}
+{"fn": "FUN_0043ba24", "at": "0043d91f", "callee": "aApplication::AddObj", "addr": "00402900", "args": [70300, {"str": "Mime"}, {"str": ""}, 1], "purge": 0, "exe_addr": "0040a4ec"}
+{"fn": "FUN_0043ba24", "at": "0043d946", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [70300, 70300, 1937, 4294967270, 2079, 88, 1, 52, 0], "purge": 0, "exe_addr": "0040a9cc"}
+{"fn": "FUN_0043ba24", "at": "0043d954", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70300], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d974", "callee": "aApplication::ObjPreAddAniToRot", "addr": "00403660", "args": [70300, 0, 70300, 0, 25, 1092616192, 4], "purge": 0, "exe_addr": "0040b37c"}
+{"fn": "FUN_0043ba24", "at": "0043d98b", "callee": "aApplication::ObjPreSetAniIdeOnRot", "addr": "00403920", "args": [70300, 0, 0, 70300], "purge": 0, "exe_addr": "0040b6d8"}
+{"fn": "FUN_0043ba24", "at": "0043d99b", "callee": "ObjPreSho", "addr": "00403c80", "args": [70300, 0], "purge": 0, "exe_addr": "0040c244"}
+{"fn": "FUN_0043ba24", "at": "0043d9a9", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70300], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043d9dc", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70300, 1, 70300, {"str": "N2S03N01P01S01"}, 0, 260, 73, 1, 1000, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043d9ea", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70300], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043da1d", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70300, 2, 70301, {"str": "N2S03N01P01S02"}, 0, 289, 79, 1, 1000, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043da2b", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70300], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043da5e", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70300, 3, 70302, {"str": "N2S03N01P01S04"}, 0, 305, 117, 1, 1000, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043da6c", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70300], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043daa2", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70300, 4, 70303, {"str": "N2S02N01P02S02"}, 0, 311, 166, 1, 1000, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043dab0", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70300], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043dae3", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70300, 5, 70304, {"str": "N2S02N01P02S03"}, 0, 97, 185, 1, 1000, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043daf1", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70300], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043daff", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70300], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043db35", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70300, 7, 70306, {"str": "N2S03N01P01S03"}, 0, 270, 135, 1, 1000, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043db4f", "callee": "aApplication::AddObj", "addr": "00402900", "args": [70303, {"str": "Cage"}, {"str": "N2_Cage"}, 1], "purge": 0, "exe_addr": "0040a4ec"}
+{"fn": "FUN_0043ba24", "at": "0043db6a", "callee": "aApplication::ObjAddBagAni", "addr": "00402ed0", "args": [70303, 1, 3, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040ab2c"}
+{"fn": "FUN_0043ba24", "at": "0043db89", "callee": "ObjSetActCur", "addr": "00404030", "args": [70303, 22, 22, 20, 4, 1095237632, 4, 4], "purge": 0, "exe_addr": "0040c5dc"}
+{"fn": "FUN_0043ba24", "at": "0043dba5", "callee": "ObjSetPasCur", "addr": "00403f80", "args": [70303, 22, 22, 0, 3, 0, 0, 3], "purge": 0, "exe_addr": "0040c538"}
+{"fn": "FUN_0043ba24", "at": "0043dbb3", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70303], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043dbca", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [70303, 0, 70300, 1], "purge": 0, "exe_addr": "0040b24c"}
+{"fn": "FUN_0043ba24", "at": "0043dbe4", "callee": "aApplication::AddObj", "addr": "00402900", "args": [70404, {"str": "TearCasing"}, {"str": ""}, 3], "purge": 0, "exe_addr": "0040a4ec"}
+{"fn": "FUN_0043ba24", "at": "0043dc11", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [70404, 70411, 189, 189, 362, 377, 1, 52, 0], "purge": 0, "exe_addr": "0040a830"}
+{"fn": "FUN_0043ba24", "at": "0043dc3b", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [70404, 70411, 224, 90, 362, 209, 0, 52, 1], "purge": 0, "exe_addr": "0040a830"}
+{"fn": "FUN_0043ba24", "at": "0043dc68", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [70404, 70411, 293, 241, 475, 462, 0, 52, 2], "purge": 0, "exe_addr": "0040a830"}
+{"fn": "FUN_0043ba24", "at": "0043dc76", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70404], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043dca3", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70404, 0, 70411, {"str": "N2S04N03P03L01.0001.bmp"}, 214, 173, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043dcb1", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70404], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043dcdb", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70404, 1, 70411, {"str": "N2S04N03P03L02.0001.bmp"}, 270, 116, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043dce9", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70404], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043dd1f", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70404, 2, 70411, {"str": "N2S04N03P03L01S01"}, 0, 217, 171, 1, 1000, 27, 1095237632, 10], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043dd36", "callee": "aApplication::ObjPreSetAniIdeOnPuz", "addr": "004038d0", "args": [70404, 2, 0, 70422], "purge": 0, "exe_addr": "0040b688"}
+{"fn": "FUN_0043ba24", "at": "0043dd44", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70404], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043dd7a", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70404, 3, 70411, {"str": "N2S04N03P03L01S01"}, 0, 217, 171, 1, 1000, 27, 1095237632, 6], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043dd91", "callee": "aApplication::ObjPreSetAniIdeOnPuz", "addr": "004038d0", "args": [70404, 3, 0, 70423], "purge": 0, "exe_addr": "0040b688"}
+{"fn": "FUN_0043ba24", "at": "0043dd9f", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70404], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043ddd2", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70404, 4, 70411, {"str": "N2S04N03P03L02S01"}, 0, 215, 111, 1, 1000, 26, 1095237632, 10], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043dde9", "callee": "aApplication::ObjPreSetAniIdeOnPuz", "addr": "004038d0", "args": [70404, 4, 0, 70424], "purge": 0, "exe_addr": "0040b688"}
+{"fn": "FUN_0043ba24", "at": "0043ddf7", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70404], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043de2a", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70404, 5, 70411, {"str": "N2S04N03P03L02S01"}, 0, 215, 111, 1, 1000, 26, 1095237632, 6], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043de41", "callee": "aApplication::ObjPreSetAniIdeOnPuz", "addr": "004038d0", "args": [70404, 5, 0, 70425], "purge": 0, "exe_addr": "0040b688"}
+{"fn": "FUN_0043ba24", "at": "0043de4f", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70404], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043de82", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70404, 6, 70411, {"str": "N2S04N03P03L02S02"}, 0, 275, 126, 1, 1000, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043de9c", "callee": "aApplication::AddObj", "addr": "00402900", "args": [70406, {"str": ""}, {"str": ""}, 1], "purge": 0, "exe_addr": "0040a4ec"}
+{"fn": "FUN_0043ba24", "at": "0043deaa", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70406], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043dee0", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70406, 0, 70410, {"str": "N2S04N03P01S02"}, 0, 171, 285, 1, 1000, 13, 1092616192, 32], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043df16", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70406, 0, 70410, {"str": "N2S04N03P01S03"}, 0, 244, 268, 1, 1000, 12, 1092616192, 32], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043df4c", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70406, 0, 70410, {"str": "N2S04N03P01S04"}, 0, 317, 261, 1, 1000, 7, 1092616192, 32], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043df5c", "callee": "ObjPreSho", "addr": "00403c80", "args": [70406, 0], "purge": 0, "exe_addr": "0040c244"}
+{"fn": "FUN_0043ba24", "at": "0043df76", "callee": "aApplication::AddObj", "addr": "00402900", "args": [70405, {"str": "Temperat"}, {"str": ""}, 1], "purge": 0, "exe_addr": "0040a4ec"}
+{"fn": "FUN_0043ba24", "at": "0043df84", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70405], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043df96", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70405], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043dfd0", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70405, 1, 70410, {"str": "N2S04N03P01S01.0001.bmp"}, 107, 155, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043df96", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70405], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043dfd0", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70405, 2, 70410, {"str": "N2S04N03P01S01.0002.bmp"}, 107, 155, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043df96", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70405], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043dfd0", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70405, 3, 70410, {"str": "N2S04N03P01S01.0003.bmp"}, 107, 155, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043df96", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70405], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043dfd0", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70405, 4, 70410, {"str": "N2S04N03P01S01.0004.bmp"}, 107, 155, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043df96", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70405], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043dfd0", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70405, 5, 70410, {"str": "N2S04N03P01S01.0005.bmp"}, 107, 155, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043df96", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70405], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043dfd0", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70405, 6, 70410, {"str": "N2S04N03P01S01.0006.bmp"}, 107, 155, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043df96", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70405], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043dfd0", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70405, 7, 70410, {"str": "N2S04N03P01S01.0007.bmp"}, 107, 155, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043df96", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70405], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043dfd0", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70405, 8, 70410, {"str": "N2S04N03P01S01.0008.bmp"}, 107, 155, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043df96", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70405], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043dfd0", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70405, 9, 70410, {"str": "N2S04N03P01S01.0009.bmp"}, 107, 155, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043df96", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70405], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043dfd0", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70405, 10, 70410, {"str": "N2S04N03P01S01.0010.bmp"}, 107, 155, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043df96", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70405], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043dfd0", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70405, 11, 70410, {"str": "N2S04N03P01S01.0011.bmp"}, 107, 155, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043df96", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70405], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043dfd0", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70405, 12, 70410, {"str": "N2S04N03P01S01.0012.bmp"}, 107, 155, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043dff3", "callee": "aApplication::AddObj", "addr": "00402900", "args": [70500, {"str": "Centaur"}, {"str": "N2_Centaur"}, 1], "purge": 0, "exe_addr": "0040a4ec"}
+{"fn": "FUN_0043ba24", "at": "0043e00e", "callee": "aApplication::ObjAddBagAni", "addr": "00402ed0", "args": [70500, 1, 3, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040ab2c"}
+{"fn": "FUN_0043ba24", "at": "0043e02d", "callee": "ObjSetActCur", "addr": "00404030", "args": [70500, 22, 22, 20, 4, 1095237632, 4, 4], "purge": 0, "exe_addr": "0040c5dc"}
+{"fn": "FUN_0043ba24", "at": "0043e049", "callee": "ObjSetPasCur", "addr": "00403f80", "args": [70500, 22, 22, 0, 3, 0, 0, 3], "purge": 0, "exe_addr": "0040c538"}
+{"fn": "FUN_0043ba24", "at": "0043e076", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [70500, 70501, 270, 250, 364, 363, 1, 52, 0], "purge": 0, "exe_addr": "0040a830"}
+{"fn": "FUN_0043ba24", "at": "0043e0a0", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [70500, 70000, 320, 16, 640, 464, 1, 52, 1], "purge": 0, "exe_addr": "0040a830"}
+{"fn": "FUN_0043ba24", "at": "0043e0ae", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70500], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043e0db", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70500, 0, 70501, {"str": "N2S05N01P01L02.0001.bmp"}, 278, 258, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043e0e9", "callee": "ObjPreSho", "addr": "00403e00", "args": [70500], "purge": 0, "exe_addr": "0040c3c4"}
+{"fn": "FUN_0043ba24", "at": "0043e103", "callee": "aApplication::AddObj", "addr": "00402900", "args": [70501, {"str": "Dragon"}, {"str": "N2_Dragon"}, 1], "purge": 0, "exe_addr": "0040a4ec"}
+{"fn": "FUN_0043ba24", "at": "0043e11e", "callee": "aApplication::ObjAddBagAni", "addr": "00402ed0", "args": [70501, 1, 3, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040ab2c"}
+{"fn": "FUN_0043ba24", "at": "0043e13d", "callee": "ObjSetActCur", "addr": "00404030", "args": [70501, 22, 22, 20, 4, 1095237632, 4, 4], "purge": 0, "exe_addr": "0040c5dc"}
+{"fn": "FUN_0043ba24", "at": "0043e159", "callee": "ObjSetPasCur", "addr": "00403f80", "args": [70501, 22, 22, 0, 3, 0, 0, 3], "purge": 0, "exe_addr": "0040c538"}
+{"fn": "FUN_0043ba24", "at": "0043e186", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [70501, 70511, 290, 260, 380, 371, 1, 52, 0], "purge": 0, "exe_addr": "0040a830"}
+{"fn": "FUN_0043ba24", "at": "0043e1b0", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [70501, 70000, 320, 16, 640, 464, 1, 52, 1], "purge": 0, "exe_addr": "0040a830"}
+{"fn": "FUN_0043ba24", "at": "0043e1be", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70501], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043e1eb", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70501, 0, 70511, {"str": "N2S05N01P02L02.0001.bmp"}, 291, 263, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043e1f9", "callee": "ObjPreSho", "addr": "00403e00", "args": [70501], "purge": 0, "exe_addr": "0040c3c4"}
+{"fn": "FUN_0043ba24", "at": "0043e213", "callee": "aApplication::AddObj", "addr": "00402900", "args": [70502, {"str": "Phoenix"}, {"str": "N2_Phoenix"}, 1], "purge": 0, "exe_addr": "0040a4ec"}
+{"fn": "FUN_0043ba24", "at": "0043e22e", "callee": "aApplication::ObjAddBagAni", "addr": "00402ed0", "args": [70502, 1, 3, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040ab2c"}
+{"fn": "FUN_0043ba24", "at": "0043e24d", "callee": "ObjSetActCur", "addr": "00404030", "args": [70502, 22, 22, 20, 4, 1095237632, 4, 4], "purge": 0, "exe_addr": "0040c5dc"}
+{"fn": "FUN_0043ba24", "at": "0043e269", "callee": "ObjSetPasCur", "addr": "00403f80", "args": [70502, 22, 22, 0, 3, 0, 0, 3], "purge": 0, "exe_addr": "0040c538"}
+{"fn": "FUN_0043ba24", "at": "0043e296", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [70502, 70521, 265, 255, 356, 358, 1, 52, 0], "purge": 0, "exe_addr": "0040a830"}
+{"fn": "FUN_0043ba24", "at": "0043e2c0", "callee": "aApplication::ObjAddPuzAcc", "addr": "00402c40", "args": [70502, 70000, 320, 16, 640, 464, 1, 52, 1], "purge": 0, "exe_addr": "0040a830"}
+{"fn": "FUN_0043ba24", "at": "0043e2ce", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70502], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043e2fb", "callee": "aApplication::ObjPreAddImgToPuz", "addr": "00403370", "args": [70502, 0, 70521, {"str": "N2S05N01P03L02.0001.bmp"}, 268, 255, 1, 1, 1000], "purge": 0, "exe_addr": "0040b018"}
+{"fn": "FUN_0043ba24", "at": "0043e309", "callee": "ObjPreSho", "addr": "00403e00", "args": [70502], "purge": 0, "exe_addr": "0040c3c4"}
+{"fn": "FUN_0043ba24", "at": "0043e323", "callee": "aApplication::AddObj", "addr": "00402900", "args": [70503, {"str": "Chrysoberyl"}, {"str": "N2_Beryllium"}, 1], "purge": 0, "exe_addr": "0040a4ec"}
+{"fn": "FUN_0043ba24", "at": "0043e33e", "callee": "aApplication::ObjAddBagAni", "addr": "00402ed0", "args": [70503, 1, 3, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040ab2c"}
+{"fn": "FUN_0043ba24", "at": "0043e35d", "callee": "ObjSetActCur", "addr": "00404030", "args": [70503, 22, 22, 20, 4, 1095237632, 4, 4], "purge": 0, "exe_addr": "0040c5dc"}
+{"fn": "FUN_0043ba24", "at": "0043e379", "callee": "ObjSetPasCur", "addr": "00403f80", "args": [70503, 22, 22, 0, 3, 0, 0, 3], "purge": 0, "exe_addr": "0040c538"}
+{"fn": "FUN_0043ba24", "at": "0043e3a3", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [70503, 70500, 3483, 4294967274, 3600, 155, 1, 52, 0], "purge": 0, "exe_addr": "0040a9cc"}
+{"fn": "FUN_0043ba24", "at": "0043e3c7", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [70503, 70500, 0, 4294967274, 103, 155, 1, 52, 0], "purge": 0, "exe_addr": "0040a9cc"}
+{"fn": "FUN_0043ba24", "at": "0043e3d5", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70503], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043e3ec", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [70503, 0, 70500, 0], "purge": 0, "exe_addr": "0040b24c"}
+{"fn": "FUN_0043ba24", "at": "0043e403", "callee": "aApplication::ObjPreAddImgToRot", "addr": "00403560", "args": [70503, 0, 70500, 1], "purge": 0, "exe_addr": "0040b24c"}
+{"fn": "FUN_0043ba24", "at": "0043e41d", "callee": "aApplication::AddObj", "addr": "00402900", "args": [70700, {"str": "Nib"}, {"str": ""}, 1], "purge": 0, "exe_addr": "0040a4ec"}
+{"fn": "FUN_0043ba24", "at": "0043e444", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [70700, 70200, 3188, 4294967234, 3331, 123, 1, 52, 0], "purge": 0, "exe_addr": "0040a9cc"}
+{"fn": "FUN_0043ba24", "at": "0043e46b", "callee": "aApplication::ObjAddRotAcc", "addr": "00402da0", "args": [70700, 70200, 3188, 4294967234, 3331, 123, 0, 52, 1], "purge": 0, "exe_addr": "0040a9cc"}
+{"fn": "FUN_0043ba24", "at": "0043e479", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70700], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043e499", "callee": "aApplication::ObjPreAddAniToRot", "addr": "00403660", "args": [70700, 0, 70200, 0, 30, 1095237632, 4], "purge": 0, "exe_addr": "0040b37c"}
+{"fn": "FUN_0043ba24", "at": "0043e4a7", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70700], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043e4d7", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70700, 1, 70600, {"str": "N2S07N01P01S01"}, 0, 93, 16, 1, 1000, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043e4e5", "callee": "aApplication::ObjAddPre", "addr": "004032f0", "args": [70700], "purge": 0, "exe_addr": "0040af9c"}
+{"fn": "FUN_0043ba24", "at": "0043e51b", "callee": "aApplication::ObjPreAddAniToPuz", "addr": "00403460", "args": [70700, 2, 70601, {"str": "N2S07N01P01S04"}, 0, 286, 160, 1, 1000, 20, 1095237632, 4], "purge": 0, "exe_addr": "0040b12c"}
+{"fn": "FUN_0043ba24", "at": "0043e52b", "callee": "ObjPreSho", "addr": "00403c80", "args": [70700, 0], "purge": 0, "exe_addr": "0040c244"}
+{"fn": "FUN_0043ba24", "at": "0043e54a", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70000, 1, {"str": "N2_bgr.was"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e569", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70101, 3, {"str": "N2_voda1.wav"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e588", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70300, 3, {"str": "N2_mimes_forge_soft.was"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e5a1", "callee": "aApplication::SouAdd", "addr": "00406970", "args": [70301, 3, {"str": "N2_forging1_deep.wav"}, 0], "purge": 0, "exe_addr": "0040ff94"}
+{"fn": "FUN_0043ba24", "at": "0043e5c0", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70412, 3, {"str": "N2_steam_loop1.wav"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e5df", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70501, 3, {"str": "N2_door_open1.wav"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e5fe", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70502, 3, {"str": "N2_door_open2.wav"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e61d", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70102, 3, {"str": "N2_mosaic_up.wav"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e63c", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70103, 3, {"str": "N2_mosaic_dn.wav"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e65b", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70104, 3, {"str": "N2_holo_up.wav"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e67a", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70105, 3, {"str": "N2_holo_dn.wav"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e699", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70107, 3, {"str": "N2_full_work.was"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e6b8", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70701, 3, {"str": "N2_moaning1.was"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e6d7", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70405, 4, {"str": "N2_furnace_open.wav"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e6f6", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70406, 4, {"str": "N2_furnace_close.wav"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e715", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70407, 4, {"str": "N2_furnace_open_2.wav"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e734", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70408, 4, {"str": "N2_furnace_close_1.wav"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e753", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [72001, 5, {"str": "tr_as_n2.01.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e772", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [72002, 5, {"str": "tr_as_n2.02.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e791", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [72003, 5, {"str": "tr_as_n2.02sp.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e7b0", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [72004, 5, {"str": "tr_as_n2.03.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e7cf", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [72005, 5, {"str": "tr_as_n2.04.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e7ee", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [72006, 5, {"str": "tr_as_n2.05.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e80d", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [72007, 5, {"str": "tr_as_n2.06.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e82c", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [72008, 5, {"str": "tr_as_n2.06sp.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e84b", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [72009, 5, {"str": "tr_as_n2.07.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e86a", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [72010, 5, {"str": "tr_as_n2.08.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e889", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70001, 5, {"str": "n2extn01p01c01.01.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e8a8", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70002, 5, {"str": "n2extn01p01c01.02.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e8c7", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70003, 5, {"str": "n2extn01p01c01.03.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e8e6", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70004, 5, {"str": "n2extn01p01d01.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e905", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70005, 5, {"str": "n2extn01p01d02.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e924", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70006, 5, {"str": "n2extn01p01d03.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e943", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70007, 5, {"str": "n2extn01p01d04.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e962", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70008, 5, {"str": "n2extn01p01d05.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e981", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70009, 5, {"str": "n2extn01p01d06.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e9a0", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70010, 5, {"str": "n2extn01p01d07.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e9bf", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70011, 5, {"str": "n2extn01p01d08.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e9de", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70012, 5, {"str": "n2extn01p01d09.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043e9fd", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70013, 5, {"str": "n2extn01p01d10.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ea1c", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70014, 5, {"str": "n2extn01p01d11.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ea3b", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70015, 5, {"str": "n2extn01p01d12.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ea5a", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70016, 5, {"str": "n2extn01p01d13.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ea79", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70017, 5, {"str": "n2extn01p01d14.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ea98", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70018, 5, {"str": "n2extn01p01d15.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043eab7", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70019, 5, {"str": "n2extn01p01d16.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ead6", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70020, 5, {"str": "n2extn01p01d17.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043eaf5", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70021, 5, {"str": "n2extn01p01d18.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043eb14", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70022, 5, {"str": "n2extn01p01d18sp.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043eb33", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70023, 5, {"str": "n2extn01p01d19.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043eb52", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70024, 5, {"str": "n2extn01p01d20.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043eb71", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70025, 5, {"str": "n2extn01p01d21.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043eb90", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70026, 5, {"str": "n2extn01p01d21sp.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ebaf", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70027, 5, {"str": "n2extn01p01d22.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ebce", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [71001, 5, {"str": "n2extn01p01d23.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ebed", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [71010, 5, {"str": "n2extn01p01d24.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ec0c", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [71002, 5, {"str": "n2extn01p01d25.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ec2b", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [71011, 5, {"str": "n2extn01p01d26.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ec4a", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [71003, 5, {"str": "n2extn01p01d27.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ec69", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [71012, 5, {"str": "n2extn01p01d28.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ec88", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [71100, 5, {"str": "n2extn01p01d29.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043eca7", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [71101, 5, {"str": "n2extn01p01d30.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ecc6", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [71102, 5, {"str": "n2extn01p01d31.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ece5", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [71111, 5, {"str": "n2extn01p01d32.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ed04", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [71110, 5, {"str": "n2extn01p01d33.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ed23", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [71112, 5, {"str": "n2extn01p01d34.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ed42", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [71122, 5, {"str": "n2extn01p01d35.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ed61", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [71120, 5, {"str": "n2extn01p01d36.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ed80", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [71121, 5, {"str": "n2extn01p01d37.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ed9f", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70043, 5, {"str": "n2s02n01p01d01.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043edbe", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70044, 5, {"str": "n2s02n01p01d02.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043eddd", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70045, 5, {"str": "n2s02n01p01d03.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043edfc", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70046, 5, {"str": "n2s02n01p01d04.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ee1b", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70047, 5, {"str": "n2s02n01p01d05.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ee3a", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70048, 5, {"str": "n2s02n01p01d06.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ee59", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70049, 5, {"str": "n2s02n01p01d07.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ee78", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70050, 5, {"str": "n2s02n01p01d08.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ee97", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70051, 5, {"str": "n2s02n01p01d09.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043eeb6", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70052, 5, {"str": "n2s02n01p01d10.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043eed5", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70053, 5, {"str": "n2s02n01p01d11.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043eef4", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70054, 5, {"str": "n2s02n01p01d12.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ef13", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70055, 5, {"str": "n2s02n01p01d13.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ef32", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70056, 5, {"str": "n2s03n01p01d01.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ef51", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70057, 5, {"str": "n2s03n01p01d02.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ef70", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70058, 5, {"str": "n2s03n01p01d03.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043ef8f", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70059, 5, {"str": "n2s03n01p01d04.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043efae", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70060, 5, {"str": "n2s03n01p01d05.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043efcd", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70061, 5, {"str": "n2s03n01p01d06.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043efec", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70062, 5, {"str": "n2s03n01p01d07.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043f00b", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70063, 5, {"str": "n2s03n01p01d08.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043f02a", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70064, 5, {"str": "n2s03n01p01d09.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043f049", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70065, 5, {"str": "n2s03n01p01d10.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043f068", "callee": "aApplication::SouAdd", "addr": "00406ba0", "args": [70066, 5, {"str": "n2s03n01p01d11.wac"}, 0, 2, 0], "purge": 0, "exe_addr": "004101cc"}
+{"fn": "FUN_0043ba24", "at": "0043f08a", "callee": "FUN_00405e80", "addr": "00405e80", "args": [70300, 70301, 1, 1, 20, 100, 1126170624, 20], "purge": 0, "exe_addr": "0040ef9c"}
+{"fn": "FUN_0043ba24", "at": "0043f09d", "callee": "aApplication::RotSet3DSouOff", "addr": "00405f70", "args": [70300, 70301], "purge": 0, "exe_addr": "0040f0e4"}
+{"fn": "FUN_0043ba24", "at": "0043f0bf", "callee": "FUN_00405e80", "addr": "00405e80", "args": [70300, 70300, 1, 1, 20, 100, 1126170624, 5], "purge": 0, "exe_addr": "0040ef9c"}
+{"fn": "FUN_0043ba24", "at": "0043f0e1", "callee": "FUN_00405e80", "addr": "00405e80", "args": [70400, 70412, 1, 1, 20, 90, 1132920832, 10], "purge": 0, "exe_addr": "0040ef9c"}
+{"fn": "FUN_0043ba24", "at": "0043f103", "callee": "aApplication::PuzAdd3DSou", "addr": "00404c30", "args": [70410, 70412, 1, 1, 2, 93, 1133903872, 5], "purge": 0, "exe_addr": "0040d554"}
+{"fn": "FUN_0043ba24", "at": "0043f125", "callee": "aApplication::PuzAdd3DSou", "addr": "00404c30", "args": [70411, 70412, 1, 1, 2, 95, 1133903872, 5], "purge": 0, "exe_addr": "0040d554"}
+{"fn": "FUN_0043ba24", "at": "0043f147", "callee": "FUN_00405e80", "addr": "00405e80", "args": [70000, 70107, 1, 1, 50, 100, 1124532224, 8], "purge": 0, "exe_addr": "0040ef9c"}
+{"fn": "FUN_0043ba24", "at": "0043f169", "callee": "FUN_00405e80", "addr": "00405e80", "args": [70001, 70107, 1, 1, 50, 100, 1134395392, 8], "purge": 0, "exe_addr": "0040ef9c"}
+{"fn": "FUN_0043ba24", "at": "0043f18b", "callee": "FUN_00405e80", "addr": "00405e80", "args": [70400, 70107, 1, 1, 10, 93, 1119092736, 20], "purge": 0, "exe_addr": "0040ef9c"}
+{"fn": "FUN_0043ba24", "at": "0043f1ad", "callee": "FUN_00405e80", "addr": "00405e80", "args": [70100, 70107, 1, 1, 10, 93, 1132920832, 5], "purge": 0, "exe_addr": "0040ef9c"}
+{"fn": "FUN_0043ba24", "at": "0043f1cf", "callee": "FUN_00405e80", "addr": "00405e80", "args": [70101, 70107, 1, 1, 10, 88, 1132920832, 5], "purge": 0, "exe_addr": "0040ef9c"}
+{"fn": "FUN_0043ba24", "at": "0043f1f1", "callee": "aApplication::PuzAdd3DSou", "addr": "00404c30", "args": [70100, 70107, 1, 1, 2, 93, 1104674816, 5], "purge": 0, "exe_addr": "0040d554"}
+{"fn": "FUN_0043ba24", "at": "0043f213", "callee": "aApplication::PuzAdd3DSou", "addr": "00404c30", "args": [70102, 70107, 1, 1, 2, 93, 1104674816, 5], "purge": 0, "exe_addr": "0040d554"}
+{"fn": "FUN_0043ba24", "at": "0043f235", "callee": "FUN_00405e80", "addr": "00405e80", "args": [70200, 70701, 1, 1, 20, 100, 1133412352, 5], "purge": 0, "exe_addr": "0040ef9c"}
+{"fn": "FUN_0043ba24", "at": "0043f245", "callee": "FUN_00406080", "addr": "00406080", "args": [70001, 1], "purge": 0, "exe_addr": "0040f2e0"}
+{"fn": "FUN_0043ba24", "at": "0043f255", "callee": "FUN_00406080", "addr": "00406080", "args": [70005, 1], "purge": 0, "exe_addr": "0040f2e0"}
+{"fn": "FUN_0043ba24", "at": "0043f265", "callee": "FUN_00406080", "addr": "00406080", "args": [70010, 0], "purge": 0, "exe_addr": "0040f2e0"}
+{"fn": "FUN_0043ba24", "at": "0043f275", "callee": "FUN_00406080", "addr": "00406080", "args": [70011, 0], "purge": 0, "exe_addr": "0040f2e0"}
+{"fn": "FUN_0043ba24", "at": "0043f285", "callee": "FUN_00406080", "addr": "00406080", "args": [70012, 0], "purge": 0, "exe_addr": "0040f2e0"}
+{"fn": "FUN_0043ba24", "at": "0043f295", "callee": "FUN_00406080", "addr": "00406080", "args": [70013, 0], "purge": 0, "exe_addr": "0040f2e0"}
+{"fn": "FUN_0043ba24", "at": "0043f2a5", "callee": "FUN_00406080", "addr": "00406080", "args": [70014, 1], "purge": 0, "exe_addr": "0040f2e0"}
+{"fn": "FUN_0043ba24", "at": "0043f2b5", "callee": "FUN_00406080", "addr": "00406080", "args": [70015, 97], "purge": 0, "exe_addr": "0040f2e0"}
+{"fn": "FUN_0043ba24", "at": "0043f2c5", "callee": "FUN_00406100", "addr": "00406100", "args": [70016, 0], "purge": 0, "exe_addr": "0040f378"}
+{"fn": "FUN_0043ba24", "at": "0043f2d8", "callee": "FUN_00406280", "addr": "00406280", "args": [70099, {"str": "3231323131 76766     34        020212121212        776000    "}], "purge": 0, "exe_addr": "0040f548"}
