@@ -1075,3 +1075,13 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** decompilation; corpus listing of the 0x18 fields (`abi.py` grammar); `cmp`.
 - **Confidence:** proven for the fields, playback, speaker and on-end commands; how the
   installer merges `Sounds_` and `Sounds_<lang>` into one `Sounds` folder is Q-0400.
+
+### E-0406 — A sound starts on scene entry if it was saved playing or is marked "on entry" (completes E-0405)
+- **Binary/file:** `CFXSound::DoCommand` `FUN_00448a40`, opcode 0x17 arm (`0x448b0a..0x448b4f`).
+- **Evidence:** on the scene-entry broadcast 0x17 the sound sets its deferred-play flag
+  `[0x1b8]` if `[0x1a0] == 1` (the "playing" field read from the file) while it has no
+  DirectSound buffer yet (`[0x13c] == 0`, true right after loading), and also if
+  `[0x1b0] == 1`; its next Update then plays it. E-0405 named only `[0x1b0]`. In the scenes
+  `(playing, on entry)` is (0, 0) for 274 sounds, (1, 1) for 76, (0, 1) for 11, (1, 0) for 4.
+- **Method:** decompilation; corpus count (`abi.py` grammar).
+- **Confidence:** proven.

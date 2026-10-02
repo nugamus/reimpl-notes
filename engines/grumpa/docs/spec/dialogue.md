@@ -36,7 +36,7 @@ their place (`Sl_pp_L_s_mig_SV.wav`); the engine tries that spelling too.
 | 1, 501 | stop and run the command list (501 also `active = 0`) |
 | 0xb / 0xc | `active = 1 / 0` |
 | 0xd | stop without running the command list, `active = visible = 0`, latched (one-shot) |
-| 0x17 | scene entry: play if `on entry` is set |
+| 0x17 | scene entry: play if `playing` or `on entry` is set (E-0406) |
 
 Playing marks the speaker as talking (Q-0401) until the sound stops. A sound that is not
 looping stops by itself at its end; **stopping runs the sound's command list**, which is how a
