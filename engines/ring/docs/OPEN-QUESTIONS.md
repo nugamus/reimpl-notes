@@ -271,3 +271,33 @@ The sounds part of a save writes the ids of sounds whose virtual +0x24 is true a
 virtual +0x1c on them when loading (E-0254); the streamed sound's +0x24 returns 0 and +0x1c
 does nothing. If every Ring sound is a streamed sound the list is always empty (count 0).
 Check the other sound classes' vtables, if there are any.
+
+### Q-0100 — Does the CD EXE's game logic match the ISO's beyond file names?
+- **Context:** E-0304, E-0314: the CD (Borland) handlers' constants and API calls cannot be
+  compared with the VC6 ones mechanically; strings differ only as listed in E-0314; the
+  set-ups differ in four places (E-0303).
+- **What we checked:** set-up emulation; string scans; coarse handler features
+  (`notes/calls-cd/handlers-vs-iso.md`).
+- **Blocks:** CD-faithful behaviour; the engine runs the DVD logic for the CD meanwhile.
+- **Status:** open
+
+### Q-0101 — Should the engine reproduce the ISO's (and CD's) own handler details?
+- **Context:** E-0313 (WA sound 51006 stop, NI score +5/−3, NI 10450 and N2 70014 flows),
+  E-0303 (CD drag cursors, Sieglinde's rectangle). The DVD is the later build.
+- **What we checked:** the decompiles; the NI 10450 and N2 70014 flows are not analysed.
+- **Blocks:** nothing (the DVD logic plays every edition's data); edition parity.
+- **Status:** open
+
+### Q-0102 — What does the CD's Sieglinde accessibility (30102 #0, (924, 165)–(1207, 406)) do?
+- **Context:** E-0303: the CD gives rotation 30101's accessibility #0 of object 30102 a
+  rectangle; the ISO and DVD give it (0, 0, 0, 0).
+- **What we checked:** the set-up call only; not the CD's FO handler for `unk_19` 0.
+- **Blocks:** CD parity of FO's first room.
+- **Status:** open
+
+### Q-0103 — What does code 17 in the installers' `.lis` files do?
+- **Context:** E-0308: `data\<lan>\sy.at2 17` in the DVD's and ISO's lists, other files 1,
+  18, 19; the EXEs open `<install>DATA\sy.at2` (`spec/resources.md`, Q-0008).
+- **What we checked:** the lists; not the Borland installers.
+- **Blocks:** nothing for ScummVM (the engine opens `DATA/<LAN>/SY.AT2`).
+- **Status:** open

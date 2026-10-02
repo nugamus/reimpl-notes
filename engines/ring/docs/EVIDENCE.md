@@ -1754,3 +1754,214 @@ is02n01p03s01.0001.bmp` … (`parsers/at2.py --file`).
   icon placement), `…__FUN_0046d130.c`; `engines/ring/notes/calls/sy_setup.jsonl`.
 - **Method:** decompiles.
 - **Confidence:** proven for the formulas; equal text heights give line 2 = line 1 + height + 3.
+
+### E-0300 — The DVD's numbered media and the CD/ISO names pair one to one (DVD, CD, ISO)
+- **Binary/file:** `engines/ring/notes/corpus-md5.tsv` (every file under `data/<zone>/<folder>/`
+  of the three editions), `engines/ring/notes/calls-iso/string-pairs.tsv` (E-0304).
+- **Evidence:** `engines/ring/tools/namemap.py` (`--selftest`) writes
+  `engines/ring/notes/media-names.tsv`, 1,420 DVD names that differ on the CD/ISO: 441 videos
+  byte-identical to a CD file (`1001.cnm` = `ass00n01_s00n02.cnm`) and 1 by size (E-0301);
+  469 sounds and 432 dialogue files byte-identical (same zone, folder, language; a number
+  names the same file in all its languages, no conflict); 14 sounds and 13 dialogue files
+  whose bytes several CD names share, decided by the name the ISO's code uses in the
+  number's place (`1359.wav` = `fos06n02_sun.wav`, `md5-code`) or the same-numbered
+  sound's stem (`1061.dia` = `as_drill02.dia`, `md5-stem`); `FO_PLA.WAV` =
+  `fo_planets_show.wav` (`md5-dup`: the bytes of eight CD names, no code names it); 10 AS
+  pictures (`ASV01.BMA` = `ass01n01_v01.bma`, `ASP01L01.BMA` = `ass01n01p01l01.bma`) and
+  8 SY list pictures (`UP_GUN.TGA` = `larup_gun.tga`, `DOWN_*` = `lardown_*`, `LOAD_*` =
+  `larload_*`) byte-identical; 22 videos and 9 subtitle files on no CD/ISO disc, named by
+  their code (`code`, E-0304, E-0305). The CD's and the ISO's video names are the same set
+  (443), and every CD file pairs. The 936 string pairs found at the same place in matched
+  DVD/ISO functions all agree with the table, but for files on no CD/ISO disc (E-0304).
+- **Method:** MD5/size join per (zone, folder, language), checked against the code.
+- **Confidence:** proven.
+
+### E-0301 — CD `logo.cnm` is the DVD's; the CD video without a DVD twin is `1911` with 20 bytes changed (corrects E-0010)
+- **Binary/file:** `games/ring/discs/dvd-edition/DATA/{SY/PLA/LOGO.CNM, WA/PLA/1911.CNM}`,
+  `cd-version/disc1/data/sy/pla/logo.cnm`, `cd-version/disc6/data/WA/pla/WAS03N01_S03N02_VAR2.cnm`.
+- **Evidence:** `logo.cnm` has MD5 `16852d03…` (8,370,541 B) on the DVD and CD disc 1 (E-0010
+  said it differs). The CD video with no DVD twin by MD5 is `was03n01_s03n02_var2.cnm`
+  (5,144,408 B, `80d1eb42…`); DVD `1911.CNM` has the same size, `a627ac85…`, and differs in
+  20 bytes at offsets 845,734..845,823 (inside one frame's video data); `cnm.py --file`
+  decodes both (50 frames, HBR). DVD videos with no CD/ISO file: 9, `1160 1161 1163 1863
+  1864 1873 1874 1876 1877` (E-0010 counted 10 with `1911`).
+- **Method:** MD5 join, byte diff, `engines/ring/tools/parsers/cnm.py --file`.
+- **Confidence:** proven.
+
+### E-0302 — CD and ISO disc layout; the discs merge into one folder without conflicts (CD, ISO)
+- **Binary/file:** `engines/ring/notes/corpus-md5.tsv`, `games/ring/discs/{cd-version/disc1..6,
+  iso-version/disc1..4}`.
+- **Evidence:** folders by disc (lower-cased): CD 1 `data/as/{image,node,pla}`,
+  `data/sy/{dia,image,pla,sound,visual}`, `data/{eng,fra,ger}/sy.at2`, `as.at2`; CD 2
+  `data/<zone>/{dia,sound}/eng` for AS FO N2 NI RH RO WA, `data/ni/{node,pla}`; CD 3 the same
+  in `fra`, `data/rh/{node,pla}`; CD 4 in `ger`, `data/{n2,ro}/{node,pla}`; CD 5
+  `data/fo/{node,pla}`; CD 6 programs, `data/<zone>/sound/` (non-language) for all zones,
+  `data/wa/{node,pla}`. ISO 1 programs, every `dia/<lan>` and `sound[/<lan>]` in eng/fra/ger,
+  `data/as/image`, 13 AS videos, `data/ro/{node,pla}`, `data/sy`, `data/sy.at2`; ISO 2
+  `data/{as,ni}/{image,node,pla}`; ISO 3 `data/{rh,wa}/{node,pla}`; ISO 4
+  `data/{fo,n2}/{node,pla}` (zone archives as in E-0008). Paths on several discs: CD only
+  `data/cd.ini` (contents "1".."6"); ISO `data/cd.ini` ("1".."4") and 29 AS files on discs
+  1 and 2 with the same MD5. No other path repeats.
+- **Method:** grouping of `corpus-md5.tsv` by edition, disc and folder; path × MD5 check.
+- **Confidence:** proven.
+
+### E-0303 — The ISO's and CD's zone set-ups are the DVD's but for names and four CD details (CD, ISO)
+- **Binary/file:** `RING_ISO.EXE` set-ups SY 0x46eaa0, NI 0x467330, RH 0x45e250, FO 0x457be0,
+  RO 0x461290, WA 0x453300, AS 0x46bda0, N2 0x463e10 (called by 0x439780 in the DVD's
+  order); `RING_CD.EXE` SY 0x473b18, NI 0x469244, RH 0x463c20, FO 0x4559f0, RO 0x44a1e4, WA
+  0x441c10, AS 0x450530, N2 0x43ba24 (called from 0x455270).
+- **Evidence:** `engines/ring/tools/ringemu.py --edition iso|cd` (emulation as E-0094; it
+  reproduces `notes/calls/` exactly from the DVD, `--selftest`). ISO: 6,544 calls, the
+  DVD's count in every zone, all callees matched; after renaming per E-0300 every call is
+  the DVD's with the same arguments except SY's `VisAddLisToPuz` (picture names
+  `larup_gun.tga`.. for `up_gun.tga`..). CD (Borland: `this` first on the stack, caller
+  pops): SY 282 calls, no `ObjSetActDraCur`/`ObjSetPasDraCur` for 90105 and 90106; FO
+  `ObjAddRotAcc(30102, 30101, 924, 165, 1207, 406, 1, 52, 0)` where ISO and DVD pass
+  0, 0, 0, 0; AS 381 calls: 0x453548(app, k) stores app+0x5e = k and 0x4190b4/0x4190a8
+  store app+0x59 = `'e'`/`'f'` at the places where the DVD's AS set-up stores app+0x5d and
+  app+0x58 inline (0x4635b1, 0x46379f, 0x4638e1, 0x4638f6, 0x46550a, 0x46551a; the ISO the
+  same stores). `notes/calls-{iso,cd}/diff-vs-dvd.md` list every difference.
+- **Method:** Unicorn emulation, difflib alignment, capstone of the helpers.
+- **Confidence:** proven.
+
+### E-0304 — DVD and ISO functions matched; the zone handlers differ in names and a few places (ISO)
+- **Binary/file:** `RING_DVD.EXE`, `RING_ISO.EXE`, `RING_CD.EXE`; features from
+  `tools/ghidra/scripts/ring_features.py` (`build/ring-features/`).
+- **Evidence:** `engines/ring/tools/handlers.py` (`--selftest`) matches 1,454 of the DVD's
+  1,793 functions in the ISO EXE, every handler of `spec/events.md` included; per handler
+  (with its local helpers) strings, pushed constants 1000..999999 and named API calls are
+  the same but in SY object click (language videos, E-0305), NI object click and
+  after-movability (score, rides; E-0313), WA object click (sound 51006, E-0313; language
+  videos), WA and AS sound-finished (language videos; game-over pictures, E-0307), RH and
+  N2 sound-finished (`sprintf` formats `rh_%d` → `rhs00n0%dp01sa04`, `rh_%d_l0` →
+  `rhs00n0%dp01sa03_l0`, `N2_%d%c`/`N2_%dA` → `N2EXTN01P01A0%d%c`/`N2EXTN01P01A0%dA`)
+  (`notes/calls-iso/handlers-vs-dvd.md`). 936 string pairs at the same place in matched
+  functions (`notes/calls-iso/string-pairs.tsv`) agree with E-0300's table except the 22
+  names of files on no CD/ISO disc and the format strings. CD: 820 functions matched, 67 of
+  the 78 handler entries (not the "on a movability" and "on an accessibility" ones);
+  against the ISO's (`notes/calls-cd/handlers-vs-iso.md`) constants and API counts differ
+  throughout (Borland keeps ids in compare chains and calls small functions VC6 inlines),
+  so only strings are compared (E-0314).
+- **Method:** name seeds, set-up callee map, call-list alignment, unique signatures,
+  callers; feature comparison; decompiles of the differing pairs in
+  `notes/decomp/editions/`.
+- **Confidence:** proven for the ISO's handler list; coarse for the CD (Q-0100).
+
+### E-0305 — The extra-language videos are chosen by language id (DVD, ISO)
+- **Binary/file:** `RING_DVD.EXE` 0x437ba0 (AS entries; ISO 0x4403e0), 0x437d60 (WA object
+  click 0xc5a9; ISO 0x4405a0), 0x43a860 (WA sound finished 0xc365, 0xc366; ISO 0x443030).
+- **Evidence:** entry 998 (0x3e6): `GetLanID` < 4, or > 5 and ≠ 7 → `PlyCinMul(INTROM /
+  1164, GetLanCha)`, else `INTROM_2` / `1163`. Entry 6 and the WA rides: `switch
+  (GetLanID)`: 4, 5, 7 → `<name>_2`, 6 → `<name>_3`, default → `<name>` (`TR_WA_MM` 1162 /
+  `_2` 1160 / `_3` 1161; `tr_wa_a01` 1862 / 1863 / 1864; `tr_wa_a07` 1875 / 1873 / 1874;
+  `tr_wa_a10` 1878 / 1876 / 1877). The ISO's code is the DVD's with names for numbers
+  (normalised decompile diff). Language ids 1..3 (ENG FRA GER) always take the base video.
+- **Method:** decompiles `notes/decomp/editions/RING_{DVD,ISO}.EXE__FUN_*.c`.
+- **Confidence:** proven.
+
+### E-0306 — New Game enters AS at 999 on the DVD and CD, at 998 (the intro) on the ISO (DVD, CD, ISO)
+- **Binary/file:** `games/ring/discs/iso-version/disc1/{ring.exe,Trailer.exe}`,
+  `cd-version/disc6/{ring.exe,Trailer.exe}`, DVD `RING.EXE`/`TRAILER.EXE` (E-0005).
+- **Evidence:** `aApplication::Init` (DVD 0x431140, ISO 0x439900) ends `push n; push 7;
+  call 0x402280` (`GoZone(7, n)`): ISO `ring.exe` at 0x439932 `68 e6 03` (998), its
+  `Trailer.exe` `68 e7 03` (999), the files otherwise differing in the timestamp and the
+  icon (237 bytes, as E-0005). CD `ring.exe` 0x455464 `push 0x3e7` (999), `trailer.exe`
+  `push 0x3e6` (998); the CD pair differs in 782 bytes, one of them in `.text` (0x455465).
+  DVD: `RING.EXE` 999, `TRAILER.EXE` 998 (E-0005). AS entry 998 plays `INTROM` and the
+  intro's chain, 999 the hub at once (`games/ring/docs/as.md`).
+- **Method:** byte diffs, capstone, decompile of the ISO's `Init`.
+- **Confidence:** proven.
+
+### E-0307 — Game over: `End.bmp` on the DVD and CD, one of `End01..08.bmp` per cause on the ISO
+- **Binary/file:** `RING_DVD.EXE` 0x431190, `RING_ISO.EXE` 0x439950, `RING_CD.EXE`.
+- **Evidence:** both switch on zone − 2 (tables DVD 0x431280, ISO 0x439b1c): zones 2 (NI) and
+  3 (RH) by cause 1..4 (tables 0x43129c/0x4312ac, ISO 0x439b38/0x439b48), 8 (N2) causes 1
+  and 2; zone 7 with cause 0 switches to SY, calls 0x402490(1, 1, 1), hides object 7 and
+  plays sound 90001 (no picture); other zones return. Each picture case calls `0x401000(name, 0,
+  0x10, 4000, 2, ART_SY ? 'f' : 'e')`, then `StartMenu(0)`. DVD: `End.bmp` (0x48cf10) for
+  every case. ISO: NI 1..4 → `End01`..`End04`, RH 1 → `End05`, 2 → `End06`, 3 → `End02`
+  (0x439aa9 jumps to the End02 call), 4 → `End07`, N2 1 → `End03`, 2 → `End08`. The CD's
+  EXE has the string `End.bmp` and none of `End01..08` (raw scan).
+- **Method:** disassembly of the functions and their jump tables, string scan.
+- **Confidence:** proven for DVD and ISO; strong for the CD (string only).
+
+### E-0308 — SY's archive per edition (CD, ISO)
+- **Binary/file:** `DATA/<LAN>/SY.AT2` of every edition, ISO `data/sy.at2`,
+  `iso-version/disc1/install/{eng,fra,ger}.lis`, DVD `INSTALL/ENG.LIS`.
+- **Evidence:** members by MD5 (`parsers/at2.py`): CD `eng/sy.at2` equals DVD `ENG/SY.AT2`
+  (1,654 members); CD `ger` differs from DVD `ENG` in the menu pictures (`end.bmp`,
+  `exit.bmp`, `gm_*.bmp`, ...), as DVD `FRA` does. ISO `data/sy.at2` equals DVD `ENG`. ISO
+  `eng/sy.at2` has 1,661 members: `\image\end01.bmp`..`end08.bmp` added, `\list\menu_gun.tga`
+  missing, `end.bmp`, `insertcd.bmp`, the menu pictures and `\ani\kybcur\kybcur.0006.bmp`
+  different; `fra` 1,662 members, the same additions. The install lists of ISO and DVD
+  name `data\<lan>\sy.at2` with code 17 (other files 1, 18, 19).
+- **Method:** `at2.parse` member MD5s; reading the `.lis` files.
+- **Confidence:** proven (the meaning of code 17 is Q-0103).
+
+### E-0309 — `GameZoneOnCD`'s zone → disc tables (DVD, CD, ISO)
+- **Binary/file:** `RING_DVD.EXE` 0x4312c0 (table 0x431328), `RING_ISO.EXE` 0x439b60 (table
+  0x439bb8), `RING_CD.EXE` 0x4555d0 (table 0x4555f6).
+- **Evidence:** returns 1 when the dword at app+0x1d (CD app+0x1e) is 0, else the disc of
+  zone 1..8: DVD and CD SY 0, NI 2, RH 3, FO 5, RO 4, WA 6, AS 1, N2 4 (the CD layout,
+  E-0008); ISO SY 0, NI 2, RH 3, FO 4, RO 1, WA 3, AS 2, N2 4 (the ISO layout).
+- **Method:** disassembly, jump tables read with pefile.
+- **Confidence:** proven.
+
+### E-0310 — `fl.ini` differs only in `CHECKCD` (DVD 0, CD and ISO 1)
+- **Binary/file:** `dvd-edition/FL.INI`, `cd-version/disc6/FL.INI`, `iso-version/disc1/fl.ini`.
+- **Evidence:** the 24 lines are the same text but `CHECKCD:` (0 on the DVD, 1 on the CD and
+  ISO); the CD's and the ISO's files are identical.
+- **Method:** reading the files.
+- **Confidence:** proven.
+
+### E-0311 — Languages per edition (DVD, CD, ISO)
+- **Binary/file:** `RING_ISO.EXE` 0x407bf0, `RING_CD.EXE` 0x4119ec..0x411b77; corpus.
+- **Evidence:** the ISO's `aApplication::Init` registers the DVD's ten languages with the
+  same ids and channels (push sequence at 0x407bf0 = the DVD's). The CD EXE has no language
+  table: `LANGUAGE:` is compared with `ENG FRA GER ITA SPA`, storing 1..5 at app+0x1c (else
+  1, ENG). Voices and subtitles on the CD and ISO discs exist for `eng fra ger` only, as do
+  `data/<lan>/sy.at2` (E-0302, E-0008).
+- **Method:** capstone of the registration code; corpus listing.
+- **Confidence:** proven.
+
+### E-0312 — `aMes.ini` and `aObj.ini` across editions (CD, ISO)
+- **Binary/file:** `AMES.INI`, `AOBJ.INI` (DVD), `ames.ini`, `aobj.ini` (ISO disc 1),
+  `ames.ini`, `aObj.ini`, `aObj.BAK` (CD disc 6).
+- **Evidence:** `aMes.ini`: CD and ISO identical; their ENG, FRA and GER texts equal the
+  DVD's for all 18 messages (the ISO/CD file has one stray line). `aObj.ini`: ENG, FRA, GER
+  texts equal the DVD's except object 40000: missing from the CD's file; ISO FRA `Feu
+  Force`, GER `Vuurkracht` where the DVD has `Force d'feu`, `Feuerkraft`. The CD's
+  `aObj.BAK` is an older list (no 20403, 40000, 70000; 13 ENG names differ).
+- **Method:** parsing the blocks per id and language.
+- **Confidence:** proven.
+
+### E-0313 — The ISO's handler logic that differs from the DVD's besides names (ISO)
+- **Binary/file:** `RING_DVD.EXE` 0x437d60, 0x445c80, 0x449320, 0x435a00; `RING_ISO.EXE`
+  0x4405a0, 0x44e460, 0x451b20, 0x43e230.
+- **Evidence:** WA object 0xc3b4: the DVD calls stop(51006, 0x400) (0x406e00) inside the
+  byte-50012 = 4 and > 4 branches; the ISO once after both tests. NI object 10430 (0x28be):
+  with object 10305 in hand (`unk_19` 1) the score float 90005 rises by [0x47e620] = 3
+  (DVD) / [0x4872e0] = 5 (ISO); taking it back (byte 10430 = 1) lowers it by 3 on the DVD
+  only. NI after-movability: the ISO adds 5 after `TR_NI_RH_Bshort`; the DVD's (0x449320)
+  does not. NI object 10450 (0x28d2) and N2 sound-finished (byte 70014) differ in control
+  flow (normalised decompile diffs).
+- **Method:** decompiles in `notes/decomp/editions/`, normalised diff; constants read with
+  pefile.
+- **Confidence:** proven for the listed differences; the NI 10450 and N2 flows not analysed
+  (Q-0101).
+
+### E-0314 — The CD EXE against the ISO's: string differences (CD)
+- **Binary/file:** `RING_CD.EXE`, `RING_ISO.EXE`.
+- **Evidence:** of the strings the ISO's code references (4+ characters), absent anywhere
+  in the CD EXE: runtime ones, `End01..08.bmp`, `INTROM_2`, `TR_WA_MM_2/_3`,
+  `tr_wa_a01/a07/a10_2/_3`, `%s  %s   %s` (the load list's line), `aCinemaCompression`
+  strings. Of the CD's, absent from the ISO EXE: Borland runtime, `End.bmp`, `%s
+  %02d.%02d.%d  %02d:%02d:%02d`, `Nibelheim`, `Nibelheim II`, `Rock Of Gods`, `Walkirien`,
+  `Asteriod` (0x409a34.., a zone → name switch), `Ring Alpha 1.0` (the window title,
+  0x41a182), `errSystemLog.txt`, `LEVER:%d` (after an unconditional jump at 0x462eab),
+  `CAS 1.10`. All three save as `ArxSav 1.00` with `%sring.exe` (CD 0x91cb4).
+  `ASS01N01P01a01`.. (the hub videos) are in the CD EXE (0x9e81c) though its Ghidra
+  functions do not reference them: the CD's features are incomplete.
+- **Method:** raw case-blind byte search of each EXE for the other's code strings.
+- **Confidence:** proven for the strings; what each CD-only string does beyond the noted
+  uses is not analysed (Q-0100).
