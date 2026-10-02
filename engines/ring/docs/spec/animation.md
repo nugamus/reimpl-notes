@@ -89,7 +89,7 @@ between the current frame and the target in each direction, wrapping over the st
 In `Advancing` step 1's "otherwise" branch, before stepping (0x416720, after the paused
 test): when armed and the current frame is the target and the animation has stepped since
 (+0x60, set by every step, cleared below), the hold starts (+0x4a = the time, 2 if the time
-is 1) and the event 0x40c910(1, id) is raised (only RO handles it); while holding, the
+is 1) and the event 0x40c910(1, id) is raised (only WA handles it, 0x43a6f0; E-0224); while holding, the
 frame stays and nothing is raised until more than `ms` passed, then 0x416c90 restores the
 mode chosen at `Init` (+0x18), disarms (+0x4a = 0), clears +0x60, raises 0x40c910(2, id)
 and the step goes on in the same call.
