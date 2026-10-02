@@ -160,7 +160,14 @@ reverse; 90104 → presentation 2 shown.
 - 90107: the credits (0x431350): 0x406ea0(0x400), `SetZone(6)`, 0x406de0(51002, 2),
   `SetZone(1)`, then `ScrollImage("cre_01.bma", 0, 2, 101)` … `cre_10.bma` and
   `ScrollImage("cre_11.bma", 5000, 2, 101)`, stopping at the first that returns 2;
-  finally 0x406e00(51002, 0x400) (`spec/sound.md`, ScrollImage: to come). Clicks only
+  finally 0x406e00(51002, 0x400). (`SetZone(6)` around the play makes 51002 a WA sound.)
+  `ScrollImage(name, hold_ms, kind, load_from)` (0x401260, E-0096): waits until Escape is
+  released, loads the picture (load-from `'e'`: `DATA\<zone>\IMAGE\<name>`, the zone SY), and
+  for i = 0 .. height − 449 draws its rows i .. i + 447 at (0, 16) (`aVideoDeviceRaw::Display`
+  0x414c20 → `aImage::Display` 0x413c10, then the device's flip): one row per frame; Escape
+  held ends it (after its release) and makes it return 2 (the credits stop); a full scroll is
+  followed by `hold_ms` of waiting (0x402890), returning 1. The `cre_*.bma` pictures are
+  640 × 896 (448 rows each). The frame rate is the device's flip (Q-0080). Clicks only
   reach it at y 448..464 (button events need y < 465).
 
 **The sliders** (drag event 0x4331b0, for 90105 and 90106 alike; `pos` is the slider's

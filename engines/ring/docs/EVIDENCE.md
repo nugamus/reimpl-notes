@@ -1463,3 +1463,18 @@ is02n01p03s01.0001.bmp` … (`parsers/at2.py --file`).
   handler (0x43a6f0) under WA, not RO.
 - **Method:** decompiles, strings read from the EXE.
 - **Confidence:** proven
+
+### E-0096 — The credits: `ScrollImage` (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x431350 (the credits: stop all, `SetZone(6)`, play(51002,
+  2), `SetZone(1)`, `ScrollImage` of `cre_01.bma` .. `cre_10.bma` with 0 and `cre_11.bma` with
+  5000, kind 2, load-from 0x65 'e', stopping at a return of 2, stop(51002)),
+  `aApplication::ScrollImage` 0x401260 (Escape wait, path `%s%s\%s\%s\%s`, the loop to
+  height − 0x1c0, `Display(img, 0, 0x10, 0x280, 0x1d0, 0, i)` at 0x4013d7..0x4013e9, the
+  wait 0x402890(hold) after a full scroll, return 1 + escaped), 0x414c20 (GetDC, 0x413c10,
+  ReleaseDC, the device's vtable +0x30), 0x413c10 (`StretchDIBits` from source row
+  height − h − i of the bottom-up DIB: the window's top is row i).
+- **Evidence:** `engines/ring/notes/decomp/credits/`; disassembly of the call; `bma.py --file`:
+  `CRE_01.BMA` .. `CRE_11.BMA` 640 × 896.
+- **Method:** decompiles, disassembly.
+- **Confidence:** proven; the rate of the device's flip is not traced (Q-0080).
+

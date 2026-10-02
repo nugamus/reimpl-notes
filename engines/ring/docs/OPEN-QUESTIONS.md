@@ -241,3 +241,10 @@ score −2). Kept as coded; not checked against the original. (E-0221)
   and is reset on leaving the pipe room anyway (0x43c290). Harmless as coded.
 - **How to answer:** none needed for the engine (kept as coded); a trace of the original
   would only confirm.
+
+### Q-0080 — How fast do the credits scroll?
+`ScrollImage` (0x401260) draws one row more per loop with no delay of its own; each pass ends
+with the video device's flip (vtable +0x30, E-0096). Whether that flip waits for the
+vertical blank (and so the rate, 60 rows a second on a 60 Hz display) is not traced. The
+engine scrolls one row per 1/60 s.
+
