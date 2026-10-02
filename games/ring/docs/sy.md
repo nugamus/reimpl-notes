@@ -1,6 +1,7 @@
 # Zone SY (1): system screens — menu, dialogues (Ring, DVD)
 
-Evidence: E-0041 (handlers), E-0040 (tracking and clicks), E-0031/E-0032 (set-up calls).
+Evidence: E-0041 (handlers), E-0040 (tracking and clicks), E-0031/E-0032 (set-up calls),
+E-0257..E-0264 (load, save, game status; the files are in `engines/ring/docs/spec/save.md`).
 Addresses are `RING_DVD.EXE`. The set-up (0x4662a0) is listed in
 `engines/ring/notes/zones/sy.md`; object ids below are decimal (the code has them in hex:
 90000 = 0x15f90).
@@ -76,7 +77,8 @@ same with object 3 and one accessibility.
 - 2: `unk_19` 0 → hide presentation 1, show 2 (no lit); 1 → hide 2, show 1 (yes lit).
 - 3: show presentation 1.
 - 4: odd `unk_19` → hide 1, show 2 (cancel lit); even → hide 2, show 1 (OK lit).
-- the preferences objects: "Preferences" below; load, save and status: to come.
+- 90101, 90102, 90104: "Preferences" below; 90207 / 90208, 90309 / 90310: the lit picture of
+  the button under the mouse shown, the other's hidden; 90401: its lit picture shown.
 
 **On nothing (0x433bc0):** hide presentation 0 of every menu entry and of the other SY
 screens' lit pictures (90101, 90102, 90207, 90208, 90309, 90310, 90401, 90912), presentation
@@ -92,10 +94,10 @@ spot and the hot spot's cursor (57, `CUR_MenuActive`) on one.
 |---:|---|
 | 90000 new game | `GetMultiLanMes("DoYouWantToStartNewGame")`, question with kind 2 |
 | 90001 preferences | opens the preferences screen ("Preferences" below) |
-| 90002 load | builds the saved-game list, `PuzSetAct(90002, 1, 1)` |
-| 90003 save | busy cursor (0x33), saves the menu's snapshot as a picture, `PuzSetAct(90003, 1, 1)` |
-| 90004 continue | busy cursor, reloads the zone set-ups (0x408bc0, 0x431040) and loads the `SaveGame` snapshot (`spec/save.md`, to come); when that fails: set-ups reloaded, `aApplication::Init` 0x431140, and the warning `CanNotCountineGame` |
-| 90005 game status | `PuzSetAct(90004, 1, 1)` |
+| 90002 load | builds the saved-game list, `PuzSetAct(90002, 1, 1)` ("Load" below) |
+| 90003 save | busy cursor (0x33), the thumbnail written, `PuzSetAct(90003, 1, 1)` ("Save" below) |
+| 90004 continue | busy cursor, reloads the zone set-ups (0x408bc0, 0x431040) and loads `SaveGame` (`LoadSave("SaveGame", 1)`, `engines/ring/docs/spec/save.md`): the game goes on where F12 left it; when that fails: set-ups reloaded, `aApplication::Init` 0x431140, and the warning `CanNotCountineGame` |
+| 90005 game status | `PuzSetAct(90004, 1, 1)` ("Game status" below) |
 | 90006 exit | posts `WM_CLOSE`: the exit dialogue (`spec/boot.md`, "Input") |
 | 2, `unk_19` 0 (no) | `ObjPreHidDeaPuz(2)`, accessibilities of 2 off, `PuzSetMod(1, 1, 0)` |
 | 2, `unk_19` 1 (yes) | posts `WM_DESTROY`: the game quits |
@@ -103,7 +105,9 @@ spot and the hot spot's cursor (57, `CUR_MenuActive`) on one.
 | 4, `unk_19` 0 or 1 | closes the question (kind 0) |
 | 4, `unk_19` 2 (new game, OK) | busy cursor, set-ups reloaded (0x408bc0, 0x431040), `aApplication::Init` 0x431140 (loads the preferences, then `SetZone(7, 999)`: zone AS, `spec/boot.md`), then closes the question (kind 2) |
 | 4, `unk_19` 3 | closes the question (kind 2) |
-| 4, `unk_19` 4, 5 | delete a saved game / cancel (load screen) |
+| 4, `unk_19` 4 | deletes the selected saved game ("Load" below) |
+| 4, `unk_19` 5 | closes the question (kind 4) |
+| 90207, 90208, 90309, 90310, 90401 | "Load", "Save", "Game status" below |
 
 ## Preferences (puzzle 90001)
 
@@ -183,12 +187,133 @@ x, kept between drags, `delta` the signed horizontal distance of the last move):
   `pos`. `delta` is not reset at a press, so a press and release without a move reuses
   the last drag's `delta`.
 
+## Load (puzzle 90002)
+
+Evidence: E-0260, E-0261, E-0263. Background `Load.bmp`; objects (flag 1, cursor 57):
+
+| Object | Hot spot (x1, y1)–(x2, y2), key | Lit picture |
+|---:|---|---|
+| 90208 OK | (325, 418)–(375, 461), 13 | `g_ok.tga` (328, 421) |
+| 90207 cancel | (416, 418)–(498, 461), 27 | `g_cancel.tga` (407, 421) |
+
+**The list** is visual object 1 of puzzle 90002, an `aVisualObjectList` (`VisAddLisToPuz`
+0x406f90, called at 0x467c7e; init 0x46d130, setters 0x46dcf0..0x46e460, hot spots
+0x46de50). Its values here (the widget's origin is (0, 0)):
+
+- flags 65 (bit 0: rows one under the other; bit 6: the selected entry's picture shown);
+- 4 rows; row r's centre line at y = 127 + 45 / 2 + 45 r (C division); row hot spots
+  (kind 3, index r) x 335..635, y 127 − 35 / 2 + 45 / 2 + 45 r .. 127 + 35 / 2 + 45 / 2 +
+  45 r;
+- each row: an icon at x 311, centred on the row (`load_gun.tga`; the selected row
+  `load_gua.tga`), and two text lines in font 1 at x 335: the entry's name split at its
+  first `#`; line 1 centred on the row's centre line, line 2 three pixels under it; colour
+  (255, 95, 0), the selected row (245, 235, 50); no background;
+- up arrow: picture at (330, 349), hot spot (320, 339)–(360, 379) (kind 1); down arrow:
+  (330, 380), hot spot (320, 370)–(360, 410) (kind 2). The pictures come from the SY
+  zone's `VISUAL` folder: `up_gun.tga` / `down_gun.tga` when the arrow cannot be used (its
+  hot spot disabled), `up_gua.tga` / `down_gua.tga` when it can, `up_gur.tga` /
+  `down_gur.tga` drawn while the mouse is on a usable arrow. Up can be used when the first
+  shown entry is not the first; down when first shown + 4 < the number of entries;
+- the selected entry's picture at (0, 0), draw type 1 (`spec/save.md`, "Thumbnails").
+
+The list is drawn with the puzzle (0x46bf90); row hot spots past the last entry are
+disabled. Hovering (0x46bd80): on a usable arrow or a row the cursor is 57
+(`CUR_MenuActive`), and a usable arrow shows its `_gur` picture. A click (0x46bc50): up
+moves the first shown entry one up (not past 0); down one down (while it is below the
+number of entries, so the list can scroll until one row is left); a row selects its entry:
+the previous selection's picture is freed, and the entry's picture
+`<install>Data\Save\<file>.bmp` is loaded (load-from `'e'`) and drawn from then on (a
+missing file: nothing drawn). Each of these raises the event 0x40d1f0(1, kind), which no
+zone handles.
+
+**Opening** (object click 90002): `Save.aba` is read (a missing or broken file: nothing
+happens). Entry i (in file order) becomes object 90500 + i, named `<description>#<typed
+name>`, its icon name the file name (`ArSa<n>`), and is added to the list. Adding puts an
+object at the top (`aList::Add` 0x46e4a0), so the newest save is on top; it clears the
+selection and, with more than 4 entries, shows from the first. Then `PuzSetAct(90002, 1,
+1)`.
+
+**OK** (90208): busy cursor; without a selection the warning `SelectGame`. Otherwise the
+entry is looked up in `Save.aba` at index count − 1 − the selected row's list index (the
+list is reversed), the list emptied (`VisLisRemAll(1, 90002, 1)`), the zone set-ups rerun
+(0x408bc0, 0x431040) and `LoadSave(<file>, 1)` called. On success each of
+`<file>_ALB.ars`, `_LOG`, `_SIE`, `_BRU` that exists is copied over `alb.ars`, `log.ars`,
+`sie.ars`, `bru.ars` (`SHFileOperation` copy, no confirmation); a failed copy is logged and
+the rest skipped. On failure `LoadSave("SaveGame", 1)` restores the game left with F12
+(failing that, `aApplication::Init`) and the warning `CanNotLoadGame` is shown.
+
+**Cancel** (90207): `PuzSetAct(90000, 1, 1)`, the list emptied.
+
+**Delete** (key Delete, 0x2e, while 90002 is current; SY's key handler 0x433d30): the
+question `DoYouWantToDeleteSavedGame` (kind 4). Its OK (`unk_19` 4): without a selection
+the question closes and the warning `SelectGame` shows; otherwise the entry (same index
+rule) is removed from `Save.aba`, which is written back, the object leaves the list
+(`VisLisRem`), and `<file>.ars`, `.bmp`, `_ALB.ars`, `_LOG.ars`, `_SIE.ars`, `_BRU.ars` are
+deleted (`SHFileOperation`, no confirmation, silent; failures logged). If `Save.aba` cannot
+be read the warning is `CanNotDeleteSavedGame`. The question then closes.
+
+## Save (puzzle 90003)
+
+Evidence: E-0258, E-0259, E-0262. Background `Save.bmp`; objects:
+
+| Object | Hot spot (x1, y1)–(x2, y2), key | Lit picture |
+|---:|---|---|
+| 90309 OK | (325, 418)–(375, 461), 13 | `g_ok.tga` (328, 421) |
+| 90310 cancel | (416, 418)–(498, 461), 27 | `g_cancel.tga` (407, 421) |
+| 90313 (no hot spot) | — | presentation 0, shown: text 0 (the typed name) at (344, 181), text 1 (the description), the caret animation `kybcur` (6 frames, 12.5 fps) at (346, 181), the picture `osc.bmp` at (0, 0) |
+
+**Opening** (object click 90003): busy cursor; the name buffer (0x4a1a68, 260 bytes)
+emptied and set as text 0 at (344, 181), the caret at (346, 181); the description
+`"<character>  <time>   <date>"` (`"%s  %s   %s"`: the character of the zone the menu was
+opened from, 0x4020b0 with app+0x6f; `_strtime`, `HH:MM:SS`; `_strdate`, `MM/DD/YY`) built
+into 0x4a1b6c and set as text 1 at (344, 155); the F12 snapshot scaled to 260 × 480 and
+written as `<install>\data\SY\Image\osc.bmp` (without a snapshot: logged, the old file
+stays); `PuzSetAct(90003, 1, 1)`.
+
+**Typing** (SY's key handler 0x433d30, only while 90003 is current; keys are `WM_CHAR`
+codes, `spec/events.md`): Backspace (8) removes the last character; Escape (27) empties
+the name; Enter (13) does nothing here; any other code is appended as a character, unless
+the name's width in its font is already 280 or more. After each of these text 0 is set
+again at (344, 181) and the caret moved to x = the text's width + 346, y 181. Enter and
+Escape then also reach the accessibilities with their keys (OK, cancel), so Escape both
+empties the name and leaves.
+
+**OK** (90309): busy cursor; `<n>` = the first free `ArSa<n>`; copies `SaveGame.ars` →
+`ArSa<n>.ars`, `DATA\SY\Image\osc.bmp` → `ArSa<n>.bmp`, and each of `alb.ars`, `log.ars`,
+`sie.ars`, `bru.ars` that exists → `ArSa<n>_ALB.ars`, `_LOG`, `_SIE`, `_BRU`, in that
+order (a failed copy shows `CanNotSaveGame` and stops; a failed picture copy shows it and
+goes on); appends (`ArSa<n>`, the description, the typed name) to `Save.aba` and writes it
+(failing: `CanNotSaveGame`). Then the zone set-ups are rerun and `LoadSave("SaveGame", 1)`:
+the game goes on from where F12 left it; if that fails, `aApplication::Init` and
+`CanNotSaveGame`. The name may be empty. The save entry is not disabled when the menu came
+up at start-up: OK then copies whatever `SaveGame.ars` an earlier session left (or fails).
+
+**Cancel** (90310): `PuzSetAct(90000, 1, 1)`.
+
+## Game status (puzzle 90004)
+
+Evidence: E-0264. Background `GameStat.bmp`; object 90401 OK: hot spot (28, 79)–(107, 109),
+key 13, lit `g_ok.tga` (46, 95); a click returns to the main menu (`PuzSetAct(90000, 1,
+1)`). Object 90402 has four texts in font 1, colour (255, 150, 0), at x 600 and y 327, 356,
+384, 410.
+
+The bars are visual object 2 of puzzle 90004 (`VisAddShoToPuz(2, 90004, 1, 4, 295, 343, 28,
+4, 300, 38655)`, 0x4074f0; drawn by 0x46ec60). When the screen is shown (virtual +0x18,
+0x46ed40; once until it is hidden again, 0x46efd0) it reads the four SY floats, the four
+characters' scores: 90005 Alberich (NI, RH), 90006 Loge (N2, RO), 90007 Siegmund (FO),
+90008 Brünnhilde (WA); each clamped to 0..100, writes each as
+`"%3.1f"` into text k of 90402 and sets bar k's length to ceil(300 × value × 0.01). Each
+frame, bar k is a GDI `Rectangle` filled with `RGB(255, 150, 0)` (the outline in the
+device context's current pen) from (295, y_k) to (295 + length, y_k + 4), with y_0 = 343,
+y_1 = 343 + 28 + 1, y_2 = 343 + 56 + 1, y_3 = 343 + 84 − 1.
+
 ## Flow
 
 1. **StartMenu(from_game)** (0x40dc80, `aApplication::StartMenu`; F12 in play calls it
    with 1, the start-up with 0), only when the menu is not already up (app+0x6f = 0):
-   - with 1: busy cursor, the game is saved to the `SaveGame` snapshot and the screen is
-     copied into a 640×480 picture (the save screen's thumbnail);
+   - with 1: busy cursor (0x33), the bag hidden, the game saved as `SaveGame`
+     (`LoadSave("SaveGame", 2)`; when that fails the menu does not open) and the screen
+     copied into a 640×480 24-bit picture (0x49556c, the save screen's thumbnail);
    - app+0x6f = the current zone (so the menu knows where to return);
    - 0x406ea0(4) (`spec/sound.md`), `SetZone(1)`, `PuzSetAct(90000, 1, 1)`,
      `PuzSetMod(1, 1, 0)`;
@@ -200,3 +325,5 @@ x, kept between drags, `delta` the signed horizontal distance of the last move):
    `CUR_MenuIdle`.
 3. A click on an entry runs its action (table above). Exit opens the exit dialogue on
    puzzle 1; yes quits, no closes it. New game asks the question; OK starts the game.
+   Continue reloads `SaveGame`; load and save open their screens, whose OKs both end by
+   loading a game (`engines/ring/docs/spec/save.md`).

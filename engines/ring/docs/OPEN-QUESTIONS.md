@@ -248,3 +248,26 @@ with the video device's flip (vtable +0x30, E-0096). Whether that flip waits for
 vertical blank (and so the rate, 60 rows a second on a 60 Hz display) is not traced. The
 engine scrolls one row per 1/60 s.
 
+
+### Q-0090 — Where does the 260 × 480 thumbnail show?
+The save screen's thumbnail is the F12 screen scaled by 0.40645 × 1.0 (260 × 480) and
+written to `DATA\SY\Image\osc.bmp`; the save screen shows it as object 90313's picture at
+(0, 0) and the load screen as the list's picture at (0, 0) (E-0258, E-0263); `Load.bmp`
+and `Save.bmp` keep a 260-pixel-wide panel on the left. Open: whether puzzle pictures are
+placed 16 pixels down (like the main menu's, Q-0009), so the last 16 rows fall off the
+screen, and which `osc.bmp` the save screen reads with `ART_SY: 1` (SY.AT2 has no
+`osc.bmp` member; the save writes a loose file). A capture of the original's save and load
+screens answers both.
+
+### Q-0091 — Save fields whose meaning is not known
+Written raw by the original and restored as read (E-0251, E-0252): app+0x54 (1 from
+`Init`), rotation +0x28 and 10 of the 13 effect words +0x35..+0x61, text +4..+0x10, +0x1c,
++0x1d, animation +0x1c, +0x2c, +0x2e, +0x32, +0x36..+0x3e, +0x57, +0x5c, +0x65, animation
+image +0x71, +0x75, +0x89, the bag's +0x95. A ScummVM save only needs the
+ones the engine uses; name them when the engine needs them.
+
+### Q-0092 — Does any Ring sound answer virtual +0x24?
+The sounds part of a save writes the ids of sounds whose virtual +0x24 is true and calls
+virtual +0x1c on them when loading (E-0254); the streamed sound's +0x24 returns 0 and +0x1c
+does nothing. If every Ring sound is a streamed sound the list is always empty (count 0).
+Check the other sound classes' vtables, if there are any.

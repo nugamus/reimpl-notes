@@ -1489,3 +1489,243 @@ is02n01p03s01.0001.bmp` … (`parsers/at2.py --file`).
 - **Method:** corpus scan.
 - **Confidence:** proven for the corpus we have.
 
+
+### E-0250 — Game save file: path, header, the ring.exe check (DVD)
+- **Binary/file:** `RING_DVD.EXE` `aApplication::LoadSave` 0x40d6a0: `sprintf(buf,
+  "%s%s\%s\%s.ars", install 0x402480, "DATA" 0x482070, "SAVE" 0x485cc0, name)` at
+  0x40d6c8..0x40d6ec; open with access 0x80000000 for mode 1, else 0x40000000, which
+  0x4295e0 turns into `CreateFileA(OPEN_EXISTING)` / `CREATE_ALWAYS`; `_stat` (0x47bf41) of
+  `"%sring.exe"` (0x485f00); header 0x14 bytes = `"ArxSav 1.00"` (0x485ef4, copied with its
+  NUL into a 12-byte buffer), `st_size`, `st_mtime`; load compares the string (error "CODE is
+  not the same"), then size and time only when app+0x53 is set ("SIZE"/"MTIME is not the
+  same"). app+0x53 is fl.ini's `CHECKLOADSAVE` (`aApplication::Init` 0x407b80, key string
+  0x4858b0, stored after the key compare at 0x408428).
+- **Evidence:** `engines/ring/notes/decomp/save/RING_DVD.EXE__aApplication__LoadSave.c`,
+  `…__FUN_004295e0.c`; `CHECKLOADSAVE: 1` in `games/ring/discs/dvd-edition/FL.INI`,
+  `cd-version/disc6/FL.INI`, `iso-version/disc1/fl.ini`.
+- **Method:** decompile, disassembly of the sprintf arguments, corpus.
+- **Confidence:** proven.
+
+### E-0251 — Game save body order, trailer, and entry 1000 (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x40d6a0 after the header: puzzles (app+0x7d,
+  `aPuzzle::LoadSave` 0x41bb70), rotations (app+0x85, 0x41df30), objects (app+0x79,
+  0x41fcd0), `aVar::LoadSave` (app+0x95), `aList::LoadSave` (app+0x8d), `aTimer::LoadSave`
+  (app+0x91, tick, 1), then 0x1a bytes at 0x495348 (filled at 0x40db21..0x40dbe7 from
+  app+0x66, +0x6a, +0x6e, 0x402700/0x402720, 0x402710/0x402730, 0x495570, app+0x5d, +0x54,
+  (char)app+0x58), then on save 0x469790(file, mode, tick, 0) and close. On load: the trailer
+  read, 0x40b7b0(mode) (`mov [ecx+0x66]`), app+0x6a, `GoZone(zone, 1000)` 0x402280, file left
+  open. 0x40d220 (`GameSetZone`) with entry 1000: no zone dispatch; `PuzSetAct(id, 0, 1)`,
+  `RotSetAct(id, 0, 1)` and rotation +0x67 from 0x495358, app+0x5d/+0x54/+0x58, 0x469790 with
+  the load's mode, close, `aPreFer::Load`, 0x4696f0. The AS exception (zone 7 with puzzle
+  80002..80010 or rotation 80101: no archive reopen, no CD check) in both 0x402280 and
+  0x40d220. app+0x54 = 1 in `Init` (`aApplication::Init`, with app+0x58 = 0x65 and app+0x5d = 1).
+- **Evidence:** `engines/ring/notes/decomp/save/RING_DVD.EXE__aApplication__LoadSave.c`,
+  `…__FUN_00402280.c`, `…__FUN_0040d220.c`, `…__FUN_0040b7b0.c`;
+  `notes/decomp/bag/RING_DVD.EXE__aApplication__Init.c` (app+0x54, +0x58, +0x5d).
+- **Method:** decompiles, data references to 0x49534e..0x49535e.
+- **Confidence:** proven for the layout and the restore; the meaning of app+0x54 is open
+  (Q-0091).
+
+### E-0252 — Per-class save records (DVD)
+- **Binary/file:** `RING_DVD.EXE` `aPuzzle::LoadSave` 0x41bb70 (image +4, movabilities +8,
+  sound items +0x1c, visual objects +0x20 via virtual +0x20, 9 bytes +0x24/+0x28/+0x29);
+  `aRotation::LoadSave` 0x41df30 (image +0x29, movabilities +0x10, per layer
+  `aAnimation::LoadSave` + u32 via 0x4103f0/0x4103d0, sound items +0x24, 0x44 bytes +0x28,
+  +0x31..+0x61, +0x65..+0x67, +0x68..+0x70); `aImageHandle::LoadSave` 0x42d480 (strings
+  +0x4d, +0x51 if set; 13 bytes +0x55, +0x59, +0x65, +0x79, +0x7a, +0x70, +0x7b);
+  `aMovability::LoadSave` 0x423470 (hot spot +8, string +0x10, 0x25 bytes);
+  `aHotSpot::LoadSave` 0x4237c0 (0x21 bytes); `aAccesibility::LoadSave` 0x423120 (hot spot
+  +4); `aSoundItem::LoadSave` 0x41a080 (+8, +0xc, +0x18); `aObject::LoadSave` 0x41fcd0 (0x74
+  bytes +0x15..+0x88, accessibilities +0xd, presentations +0x11, `aAnimationImage` +0x89);
+  `aObjectPresentation::LoadSave` 0x42e020 (images +5, animations +0xd, texts +0x29 and
+  +0x31, u8 +4); `aText::LoadSave` 0x42c340 (string +0, 0x1d bytes +4..+0x1d);
+  `aAnimation::LoadSave` 0x416070 (0xa1 bytes; times +0x28, +0x32, +0x4a converted when
+  above the double 1.0 at 0x47e2a0, +0x4f unless 0); `aAnimationImage::LoadSave` 0x421930
+  (animation, then +0x71, +0x75, +0x89); `aString` record 0x428be0 (u32 strlen + 1, bytes).
+  Both visual object kinds have virtual +0x20 = 0x46efe0 (`mov al, 1; ret 0xc`; vtables
+  0x47e8dc, 0x47e924).
+- **Evidence:** `engines/ring/notes/decomp/save/RING_DVD.EXE__a*__LoadSave.c`,
+  `…__FUN_00428be0.c`; vtable dump and disassembly of 0x46efe0.
+- **Method:** decompiles, disassembly.
+- **Confidence:** proven for the layouts; several fields' meanings open (Q-0091).
+
+### E-0253 — Variables, bag and timers in saves (DVD)
+- **Binary/file:** `RING_DVD.EXE` `aVar::LoadSave` 0x424290 (u32 count + 5/6/8/8-byte
+  entries for byte, word, dword, float lists via `aByte` 0x423980, `aWord` 0x423a70,
+  `aDoubleWord` 0x423b20, `aFloat` 0x423be0; strings via `aVarString::LoadSave` 0x423d20:
+  u32 id, u32 strlen + 1, bytes; load clears with 0x424860 and redefines with `VarDef*`);
+  `aList::LoadSave` 0x4172a0 (u32 count, ids written from the last index down, u32 +0x95;
+  load `add`s in file order); `aTimer::LoadSave` 0x425910 (u32 count, 16 bytes per timer:
+  +0 id 0x423a10, tick − +4 0x423bb0, +8 0x425740, +0xc 0x423660; load `StartTimer(id,
+  period)` when the last argument is set, then 0x423c70(tick − elapsed), 0x425750).
+- **Evidence:** `engines/ring/notes/decomp/save/RING_DVD.EXE__aVar__LoadSave.c`, `…aByte…`,
+  `…aWord…`, `…aDoubleWord…`, `…aFloat…`, `…aVarString…`, `…aList__LoadSave.c`,
+  `…aTimer__LoadSave.c`; disassembly of the timer getters.
+- **Method:** decompiles, disassembly.
+- **Confidence:** proven.
+
+### E-0254 — Sounds in saves (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x469790(file, mode, tick, keep): f32 at 0x4932a8 (1.0);
+  per sound of 0x4a1cfc (count 0x4a1cf4) 12 bytes +0x111, +0x115, +0x119; u32 count + ids
+  where virtual +0x24 is true; u32 count + (id, +0x11d) where virtual +0xc is true (or the
+  kept list 0x4a1f08 when `keep`). The streamed sound's vtable 0x47e86c: +0xc 0x468a90
+  (`GetStatus` & 1), +0x1c 0x468cc0 (`ret`), +0x24 0x468cd0 (`xor eax, eax; ret`). Load:
+  first list → 0x4690c0 (virtual +0x1c), second → 0x4a1f08; 0x4696f0 plays it with
+  `NoiceIdPlay(id, value)` and frees it. Callers: 0x40d38d (entry 1000), 0x40d64f
+  (`LoadSaveTimer`), 0x40dc34 (save); all pass 0.
+- **Evidence:** `engines/ring/notes/decomp/save/RING_DVD.EXE__FUN_00469790.c`,
+  `…__FUN_004696f0.c`; disassembly of the vtable slots; call scan.
+- **Method:** decompile, disassembly.
+- **Confidence:** proven; whether any sound object answers +0x24 is open (Q-0092).
+
+### E-0255 — Animation names in saves carry uninitialised bytes (DVD)
+- **Binary/file:** `RING_DVD.EXE` `aAnimation::LoadSave` 0x416070, save branch: the name
+  (`*(this+4)+4`, or "" 0x49523c) is copied with an inline `strcpy` (`repne scasb`, `rep
+  movsd/movsb`, length strlen + 1) into the 0xa1-byte stack buffer `local_a4`, which is not
+  cleared before; the 0xa1 bytes are written whole. Load passes the buffer to `SetName`
+  0x416cd0, which reads up to the NUL.
+- **Evidence:** `engines/ring/notes/decomp/save/RING_DVD.EXE__aAnimation__LoadSave.c`.
+- **Method:** decompile.
+- **Confidence:** proven from the code (no save file of the original examined).
+
+### E-0256 — `Save.aba` and the shipped save folder (DVD, CD, ISO)
+- **Binary/file:** `RING_DVD.EXE` `aFileList::Init` 0x47a0e0 → `Load` 0x47a1d0 (path
+  `"%s\data\Save\%s"` 0x494d1c, u32 count, records read by 0x479f10 = three `aString`
+  records), `Save` 0x47a470 (`CREATE_ALWAYS`, u32 count, 0x479f80), `Add` 0x47a5e0 (record
+  set by 0x479ff0 from three strings, appended at the list's end), remove 0x47a790, getters
+  0x47a890 (string 0), 0x47a810 (1), 0x47a850 (2). Corpus: `DATA/SAVE/SAVE.ABA` and
+  `ZERO.ABA` are `00 00 00 00` in all three editions; `DUMMYLS.BMP` 104 bytes, 4×4, 24 bpp,
+  black; the EXE names `dummyLS.bmp` (0x493b20, `aList::Add` 0x46e4a0) but not `zero.aba`.
+- **Evidence:** `engines/ring/notes/decomp/save/RING_DVD.EXE__aFileList__*.c`,
+  `…__FUN_00479*.c`, `…__FUN_0047a*.c`; `games/ring/discs/*/…/save/`; string scan.
+- **Method:** decompiles, corpus, string scan.
+- **Confidence:** proven.
+
+### E-0257 — `StartMenu(1)` saves `SaveGame` and takes the snapshot; continue (DVD)
+- **Binary/file:** `RING_DVD.EXE` `aApplication::StartMenu` 0x40dc80: when app+0x6f is 0 and
+  the argument is set: busy cursor 0x402840(0x33), 0x40e610, 0x40f6c0, 0x419350(bag),
+  `LoadSave("SaveGame" 0x486034, 2)` (failure returns without opening the menu), a new
+  `aImage` at 0x49556c, `Create(24, 2, 640, 480)`, `aVideoDeviceRaw::CopyBufferToImage`.
+  Object click 90004 (0x431660 case 0x15f94): 0x408bc0, 0x431040, `LoadSave("SaveGame", 1)`;
+  on failure again 0x408bc0, 0x431040, `aApplication::Init`, `CanNotCountineGame`.
+- **Evidence:** `engines/ring/notes/decomp/save/RING_DVD.EXE__aApplication__StartMenu.c`,
+  `…__FUN_00431660.c`.
+- **Method:** decompiles.
+- **Confidence:** proven.
+
+### E-0258 — Opening the save screen: description, thumbnail (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x431660 case 0x15f93 (90003): busy cursor, name buffer
+  0x4a1a68 emptied, `ObjPreSetTxtToPuz(90313, 0, 0, …)`, `ObjPreSetTxtCooToPuz(…, 344, 181)`,
+  `ObjPreSetAniCooOnPuz(90313, 0, 346, 181)`; 0x470411 (CRT), 0x47036a (`_strtime`) into
+  [esp+0x60], 0x4702e6 (`_strdate`: `GetLocalTime`, the year modulo 100) into [esp+0x564]; 0x4020b0(app+0x6f);
+  `sprintf(0x4a1b6c, "%s  %s   %s" 0x48d4b4, character, time, date)` at 0x4320a1..0x4320c7;
+  text 1 at (344, 155) (0x4320e4: 0x9b, 0x158); `aImage::Zoom(snapshot, 0.40645
+  (0x3ed01a37), 1.0)` at 0x43210a; `aImage::Save` 0x4135a0 to `"%s\data\SY\Image\%s.bmp"`
+  0x48d470 with `"osc"` 0x48d488; `PuzSetAct(90003, 1, 1)`. `aImage::Zoom` 0x413a90: new
+  size = width (+0x29) × first float, height (+0x2d) × second (`fild/fmul` at 0x413b06..),
+  24-bit, rows 0 .. h − 2 filled. Set-up (0x467a25..0x467b19): object 90313's texts, the
+  `kybcur` animation (6, 12.5), `osc.bmp` at (0, 0).
+- **Evidence:** `engines/ring/notes/decomp/save/RING_DVD.EXE__FUN_00431660.c`,
+  `…__aImage__Zoom.c`, `…__aImage__Create.c`; disassembly at 0x432075..0x43218e and of
+  0x413a90; `engines/ring/notes/zones/sy.md`.
+- **Method:** decompiles, disassembly.
+- **Confidence:** proven; how the 480-row picture shows on the screen is open (Q-0090).
+
+### E-0259 — The save screen's OK and cancel (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x431660, ids 0x160c5 (90309) and 0x160c6 (90310): the
+  compare at 0x432893..0x43289b sends 90310 to `PuzSetAct(90000, 1, 1)` (0x4328a1) and 90309
+  to 0x4328b6: busy cursor, `FindTempFileName("%s\data\Save" 0x48d240, "ArSa" 0x48d230,
+  ".ars" 0x48d238)` (0x40e620: `"%s\%s%d%s"` 0x4862a0, n = 1.., `_access` 0x47bd10, up to
+  100000), `sprintf("ArSa%d")`, `SHFileOperationA` (wFunc 2 copy, fFlags 0x214) of
+  `SaveGame.ars` 0x48d1dc, `SY\Image\osc.bmp` 0x48d1a4, `alb/log/sie/bru.ars` (when they
+  exist) to `%s.ars`, `%s.bmp`, `%s_ALB/_LOG/_SIE/_BRU.ars`; `aFileList::Init("Save.aba")`,
+  `Add(name, 0x4a1b6c, 0x4a1a68)`, `Save`; 0x408bc0, 0x431040, `LoadSave("SaveGame", 1)`;
+  errors `CanNotSaveGame` 0x48d220 through 0x40e5b0 + 0x40dfd0.
+- **Evidence:** `engines/ring/notes/decomp/save/RING_DVD.EXE__FUN_00431660.c`,
+  `…__aApplication__FindTempFileName.c`, `…__FUN_0040e5b0.c`, `…__FUN_0040dfd0.c`;
+  disassembly at 0x432886..0x432955.
+- **Method:** decompile, disassembly.
+- **Confidence:** proven.
+
+### E-0260 — Opening the load screen (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x431660 case 0x15f92 (90002): `aFileList::Init("Save.aba"
+  0x48d704)`; for i: `AddObj(0x16184 + i, string 1 + "#" 0x48d534 + string 2, string 0, 1)`
+  (0x431eeb..0x431f6a), `VisLisAdd(1, 90002, 90500 + i)` (0x407280 → `aList::Add` 0x46e4a0,
+  which inserts at index 0 and resets +0xc9 = 0, +0xcd = +0xd1 = −1, and +0xc1 = 0 when the
+  count exceeds +0xbd); `PuzSetAct(90002, 1, 1)` only when the list was read.
+- **Evidence:** `engines/ring/notes/decomp/save/RING_DVD.EXE__FUN_00431660.c`,
+  `…__aApplication__VisLisAdd.c`, `…__aList__Add.c`; disassembly at 0x431ec9..0x431f79.
+- **Method:** decompiles, disassembly.
+- **Confidence:** proven.
+
+### E-0261 — The load screen's OK, cancel and delete (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x431660: 0x16060 (90208): busy cursor,
+  `VisLisGetIndCli(1, 90002)` (+0xcd; −1 → `SelectGame` 0x48d568), `Save.aba` string 0 at
+  `VisLisGetNumIte − index − 1`, `VisLisRemAll(1, 90002, 1)`, 0x408bc0, 0x431040,
+  `LoadSave(name, 1)`, then copies `%s_ALB/_LOG/_SIE/_BRU.ars` → `alb/log/sie/bru.ars` when
+  `_access` finds them; failure: `LoadSave("SaveGame", 1)`, else `Init`; `CanNotLoadGame`
+  0x48d334. 0x1605f (90207): `PuzSetAct(90000)`, `VisLisRemAll`. Question kind 4, `unk_19` 4:
+  `VisLisGetObjCli` (null → close, `SelectGame`), the `.aba` entry removed (0x47a790) and
+  saved (0x47a460), `VisLisRem(1, 90002, object, 1)`, `SHFileOperationA` wFunc 3 (delete),
+  fFlags 0x214 on `%s.ars` 0x48d600, `%s.bmp` 0x48d5d4, `%s_ALB/_LOG/_SIE/_BRU.ars`;
+  `CanNotDeleteSavedGame` 0x48d668; `unk_19` 5 closes kind 4. Hover handler 0x4335a0:
+  0x1605f/0x16060 and 0x160c5/0x160c6 show one lit picture and hide the other, 0x16121 shows
+  its own.
+- **Evidence:** `engines/ring/notes/decomp/save/RING_DVD.EXE__FUN_00431660.c`,
+  `…__FUN_004335a0.c`, `…__aApplication__VisLis*.c`, `…__FUN_0047a790.c`.
+- **Method:** decompiles.
+- **Confidence:** proven.
+
+### E-0262 — SY's key handler: the save name and Delete (DVD)
+- **Binary/file:** `RING_DVD.EXE` 0x433d30 (disassembly): only when a puzzle is current
+  (0x402700); puzzle 0x15f92 and key 0x2e: `GetMultiLanMes("DoYouWantToDeleteSavedGame")`,
+  question 4; puzzle 0x15f93: key 8 removes the last byte of 0x4a1a68 when not empty
+  (0x433e51..0x433e6e), key 13 returns, key 27 copies "" (0x433dce), else
+  `ObjPreGetTxtWid(90313, 0, 0)` ≥ 0x118 returns, otherwise `wsprintfA("%c" 0x48d778, key)`
+  is appended; all three then `ObjPreSetTxtToPuz(90313, 0, 0, buf)`,
+  `ObjPreSetTxtCooToPuz(…, 0x158, 0xb5)`, `ObjPreSetAniCooOnPuz(90313, 0, width + 0x15a,
+  0xb5)` (0x433df3..0x433e46).
+- **Evidence:** disassembly of 0x433d30..0x433e98;
+  `engines/ring/notes/decomp/save/RING_DVD.EXE__FUN_00433d30.c`; `spec/events.md` (E-0045).
+- **Method:** disassembly.
+- **Confidence:** proven.
+
+### E-0263 — The visual object list (`aVisualObjectList`) on the load screen (DVD)
+- **Binary/file:** `RING_DVD.EXE` set-up call 0x467c7e `VisAddLisToPuz(1, 90002, 65, "",
+  <install>"Data\Save\" (0x492f5c, 0x467ba3), "", up_gun, up_gur, "", up_gua, down_gun,
+  down_gur, "", down_gua, load_gun, load_gua, 3, 0,0, 0,0, 335,127,300,35,45,3, 330,349,
+  320,339,40,40, 330,380, 320,370,40,40, 0,0,0,1, 311,137, 4, 255,95,0,245,235,50, -1,-1,-1,
+  1, 101)` (arguments from `notes/calls/sy_setup.jsonl`, names from the strings
+  0x492ee8..0x492f4c). 0x406f90 → 0x46b990 (vtable 0x47e8dc), init 0x46d130 (flags +0xb9,
+  icon dir +0xd, images +0x1d..+0x45 from `Data\<zone>\Visual\` with load-from 0x65, two
+  `aText` +0xd6/+0xda), setters 0x46dcf0 (+0x49), 0x46dd10 (+0x51), 0x46dd30 (+0x59..+0x6d),
+  0x46dd60 (+0x71), 0x46dd80 (+0x79), 0x46dda0 (+0x81..), 0x46ddd0 (+0x91..), 0x46de00
+  (+0xa1..+0xad), 0x46de30 (+0xb1, +0xb5), 0x46e330 (+0xbd = 4), 0x46e340 (colours
+  +0xe2..+0xf6), 0x46e3f0 (background +0xfa.. = −1), 0x46e460 (font +0xde); hot spots
+  0x46de50 (up kind 1, down kind 2, rows kind 3 from +0x59/+0x5d/+0x61/+0x65/+0x69). Draw
+  0x46bf90, click 0x46bc50, hover 0x46bd80 (cursor 0x39), key virtual +0x14 = 0x46f030
+  (`xor eax, eax`). Background pictures decoded from `DATA/ENG/SY.AT2` (`load.bmp`,
+  `save.bmp`, `gamestat.bmp`, 640×448, bottom-up): a 260-pixel-wide panel on the left, the
+  arrows and rows where the values put them.
+- **Evidence:** `engines/ring/notes/decomp/save/RING_DVD.EXE__aApplication__VisAddLisToPuz.c`,
+  `…__FUN_0046d130.c`, `…__FUN_0046bf90.c`, `…__FUN_0046bc50.c`, `…__FUN_0046bd80.c`,
+  `…__FUN_0046d020.c`; disassembly of the setters and of 0x46de50; `bma.py` decode.
+- **Method:** decompiles, disassembly, corpus.
+- **Confidence:** proven for the values and behaviour.
+
+### E-0264 — The game status bars (DVD)
+- **Binary/file:** `RING_DVD.EXE` set-up 0x467ca8 `VisAddShoToPuz(2, 90004, 1, 4, 295, 343,
+  28, 4, 300, 38655)` → 0x4074f0 → 0x46ebb0 (vtable 0x47e924), fields via 0x46eff0 (+0xd ..
+  +0x29); draw 0x46ec60 (4 × 0x415230: `CreateSolidBrush`, `SelectObject`, `Rectangle`);
+  virtual +0x18 0x46ed40 (once per +0x2d: `VarGetFloa` 0x406260 of 0x15f95..0x15f98, clamped
+  with 100.0 0x47e640 and 0.0, `sprintf("%3.1f" 0x493b34)` into object 0x16122's text k,
+  length `__ftol(ceil(300 × v × 0.01 (0x47e408)))`; 0x470abe runs with control word 0x1b3f,
+  rounding up: `ceil`); +0x1c 0x46efd0 clears +0x2d. The floats' owners: `push 0x15f95`
+  occurs in RH's and NI's handlers (0x443b16..0x44a4d4), 0x15f96 in N2's and RO's
+  (0x434324..0x43c7f9), 0x15f97 in FO's (0x43de6b..0x4430b8), 0x15f98 in WA's
+  (0x437de5..0x43addb).
+- **Evidence:** `engines/ring/notes/decomp/save/RING_DVD.EXE__FUN_0046ec60.c`,
+  `…__FUN_0046ed40.c`, `…__FUN_0046eff0.c`, `…__aApplication__VisAddShoToPuz.c`;
+  disassembly of 0x415230, 0x470abe; push scan; `spec/events.md` handler table.
+- **Method:** decompiles, disassembly, scan.
+- **Confidence:** proven.
