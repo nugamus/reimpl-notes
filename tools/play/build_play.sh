@@ -11,7 +11,7 @@ git() { "/c/Program Files/Git/cmd/git.exe" "$@"; } # MSYS2 has no git: Git for W
 SRC=/c/scummvm-play
 OUT=${1:-/c/MonetPlay}
 WIN_OUT=$(cygpath -m "$OUT")
-FLAGS="--disable-all-engines --enable-engine=x3d,peintre,gilbert,grumpa --enable-optimizations --disable-debug"
+FLAGS="--disable-all-engines --enable-engine=x3d,peintre,gilbert,grumpa,ring --enable-optimizations --disable-debug"
 COMMIT=$(git -C /c/scummvm rev-parse monet)
 if [ ! -d "$SRC" ]; then
 	git -C /c/scummvm worktree add --detach "$SRC" monet
