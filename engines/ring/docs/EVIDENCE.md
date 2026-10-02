@@ -1478,3 +1478,14 @@ is02n01p03s01.0001.bmp` … (`parsers/at2.py --file`).
 - **Method:** decompiles, disassembly.
 - **Confidence:** proven; the rate of the device's flip is not traced (Q-0080).
 
+### E-0097 — Ride videos named by the set-ups but on no disc (DVD, CD, ISO)
+- **Binary/file:** the movabilities' ride names in `engines/ring/notes/calls/*_setup.jsonl`
+  (`RotAddMovToRot` / `RotAddMovToPuz` / `PuzAddMovTo*`) against every `.cnm` of the corpus
+  (`games/ring/discs/**`).
+- **Evidence:** absent everywhere: RH `1723`; FO `1232 1239 1241 1243 1245 1250 1256 1258
+  1259 1262`; N2 `1377 1385`. `PlyCin` of a missing file logs and plays nothing (the ride
+  is skipped, `spec/video.md`); the scripted play-throughs of worlds 2 and 3 pass these
+  rides without them.
+- **Method:** corpus scan.
+- **Confidence:** proven for the corpus we have.
+
