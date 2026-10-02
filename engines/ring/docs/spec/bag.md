@@ -216,4 +216,4 @@ installed (0x40b860); app+0x74 is set back to 1.
 
 The bag in saved games (`aApplication::LoadSave`, "Bag"); app mode 3 (draws the bag as the
 view) is never set by the DVD's code (0x40b7b0 is only called with 1, 2, 4 and a loaded
-value), so it only matters after loading a save (`spec/save.md`, to come).
+value), so it only matters after loading a save (`spec/save.md`).
