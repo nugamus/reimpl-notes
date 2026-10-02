@@ -222,14 +222,49 @@ def t_24(c: Cur) -> None:          # 0x24/0x27 (FUN_00431810)
     c.raw(12); ec_vec(c); c.raw(4); cc_vec(c)
 
 
-# Type 0x03 (CFXCharacter, the Actors/*.abi and Scenes/Characters.abi database) is not
-# modelled: its ~37 KB Serialize `FUN_00422f80` decompiles with broken control flow, so the
-# field order is not reliably recoverable. The structure read so far (header, EC vector,
-# ClassD vector, per-state .anb/.wav/.tga string lists, a 6-entry attachment table of
-# {name, texture, 3 u32}, and an opaque binary skeleton blob) is in OPEN-QUESTIONS (Q-0006).
+def names(c: Cur) -> None:         # u32 n; n pascal strings
+    for _ in range(_count(c, "name")):
+        pstr(c)
+
+
+def class_d(c: Cur) -> None:       # ClassD (FUN_00409cf0): EC-vec + CC-vec
+    ec_vec(c); cc_vec(c)
+
+
+def t_03(c: Cur) -> None:          # 0x03 CFXCharacter (FUN_00422f80, mode 1/2/8 arm 0x4231f0)
+    # CreateFromABIFile seeks back over the id (0x40d087), so every Serialize reads it again
+    # into +0x108; parse() has consumed it once already. Type 3 then reads only two more.
+    c.raw(8)                                # +0x10c, +0x110
+    c.raw(4 * _count(c, "03-u32"))          # +0x11c: 6 elements of 1 u32 (0x409107; scene
+    #                                         actors have the same vector with n = 1)
+    c.raw(4)                                # +0x444
+    c.raw(24)                               # +0x16c vec3, +0x160 vec3
+    c.raw(20)                               # +0x28c, +0x5fc, +0x290 floats; +0x48c, +0x490
+    for _ in range(_count(c, "ClassD")):    # 0x423321 -> +0x660: guarded rules
+        class_d(c)
+    cc_vec(c)                               # 0x4234fa -> +0x640
+    cc_vec(c)                               # 0x4236c9 -> +0x650
+    for _ in range(_count(c, "03-msg")):    # 0x423898: messages (none in the corpus)
+        pstr(c)                             #   text -> +0x674 (shown by opcode 0x44)
+        cc_vec(c)                           #   commands -> +0x684
+    cc_vec(c)                               # 0x423ac0 -> +0x630
+    for _ in range(_count(c, "03-react")):  # 0x423c8f: reactions (AddReactCharacter)
+        c.raw(4)                            #   other character's id
+        cc_vec(c)                           #   commands
+    c.raw(4)                                # +0x434
+    names(c)                                # +0x2e8 .anb animations
+    names(c)                                # +0x330 .wav sounds
+    c.raw(4)                                # +0x440
+    names(c)                                # +0x30c .tga textures
+    for _ in range(_count(c, "03-attach")):  # +0x344: carried objects
+        pstr(c); pstr(c)                    # .ANB mesh, .tga texture
+        c.raw(12)                           # +0x36c[i], +0x37c[i], +0x38c[i]
+    c.raw(12)                               # +0x128, +0x13c, +0x140
+    pair_vec(c)                             # +0x12c: count*(u32,u32)
 
 
 TYPES = {
+    0x03: t_03,
     0x05: t_05,
     0x07: t_07,
     0x0d: t_0d,
@@ -281,10 +316,8 @@ def validate(root: Path) -> int:
     types: Counter = Counter()
     for f in files:
         d = f.read_bytes()
-        # The character database is a single 0x03 CFXCharacter record stream (not modelled).
         if len(d) >= 4 and struct.unpack_from("<I", d, 0)[0] == 0x03:
             char += 1
-            continue
         try:
             r = parse(d)
             types.update(r["types"])
@@ -293,11 +326,10 @@ def validate(root: Path) -> int:
         except (ParseError, struct.error) as e:
             bad += 1
             print(f"FAIL {f.name}: {e}")
-    done = len(files) - bad - char
-    print(f"{done}/{len(files) - char} scene/item .abi parsed, every byte consumed; "
+    print(f"{len(files) - bad}/{len(files)} .abi parsed ({char} CFXCharacter databases), "
+          f"every byte consumed; "
           f"{nrec} records ({tail} trailing padding bytes total)")
     print("  record types: " + ", ".join(f"{t:#x}:{n}" for t, n in sorted(types.items())))
-    print(f"  {char} CFXCharacter (type 0x03) database files not modelled (Q-0006)")
     return bad
 
 
@@ -318,6 +350,14 @@ def selftest() -> None:
         parse(body + struct.pack("<II", 0x07, 1)); raise AssertionError("should fail")
     except ParseError:
         pass
+    # a minimal 0x03 CFXCharacter: header, 1 stat, all lists empty but one .anb name
+    z = struct.pack("<i", 0)
+    ch = (struct.pack("<IIII", 0x03, 10, 1, 1) + struct.pack("<iI", 1, 32)  # id, act, vis, n=1
+          + bytes(4 + 24 + 20) + z * 6                     # fixed block; rules, 3 CC, msgs, CC, react
+          + bytes(4) + struct.pack("<ii", 1, 4) + b"a.ab"  # [0x434]; one .anb name
+          + z + bytes(4) + z + z + bytes(12) + z)          # wav, [0x440], tga, attach, tail, pairs
+    r = parse(ch)
+    assert r["records"] == [(0x03, 10, len(ch))], r
     print("selftest ok")
 
 
