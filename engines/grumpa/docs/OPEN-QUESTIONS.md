@@ -211,3 +211,30 @@ navigation, the engine needs to know which view's camera matches the shown backg
 view's camera "handle" is `view[+0x108] - 0x276` (FUN_0043d200); candidates: a background-index
 field in the view record, a handle->background convention, or a link in the `.scn` file
 (Q-0005). Needs the scene-display/camera-select code.
+
+## Q-0200 — Sprite frame rate: the device value R in `R / fps`
+
+A sprite advances one frame every `R / fps` updates (E-0208), R from a device call
+(`+0x15c` object, vtable `0x28`). The engine takes R = 50 (the update rate, so `fps` is
+frames per second). Needs that device function's return value.
+
+## Q-0201 — View index -> background file
+
+Views are numbered from 0 (`actor602+0xdd0`, triggers' `+0x174`, `(185, 30, v)`); the
+backgrounds are `<n>_<k>_IS.jpg` from k = 1. The corpus fits `k = v + 1` (E-0206), but the
+switch code (`FUN_0045ae00`) loads view matrices, not files; the file choice is elsewhere
+(`.scn`, actor 602).
+
+## Q-0202 — The proximity gate without a player character
+
+Click triggers are gated on the player character's sphere overlapping the trigger's
+(E-0207). Until the engine has a player character (type 0x03, Q-0006), it lets clicks pass
+the gate and never fires walk-in triggers. Open: the sphere fields' layout (the trigger's
+`+0x13c` sub-object, the character's position from `FUN_00424e90`).
+
+## Q-0203 — The shipped `Save/Current/*_status.abi`
+
+`Save/Current/` on the disc holds `001_status.abi`, `211_status.abi`, `307_status.abi`,
+`500_status.abi` and `remote.abi`. LoadGameStatus reads `Current/<n>_status.abi` on scene
+entry (E-0202), so these would seed scenes 1, 211, 307 and 500 on a first visit unless a new
+game clears the folder. Who clears or copies `Current/` (new game, load) is not read yet.

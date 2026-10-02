@@ -414,7 +414,7 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Confidence:** strong (JPG frame base and anim parameters proven; per-frame screen
   placement and the depth/alpha mechanism are open, Q-0009).
 
-### E-0107 — Type 0x0d sprite position, animation params and colour key
+### E-0107 — Type 0x0d sprite position, animation params and colour key — the +0x1e0/+0x1e4 reading SUPERSEDED by E-0208
 - **Binary/file:** `FUN_0044ccb0` (0x0d Serialize); scene `.abi`; the `Bitmaps/` sprites.
 - **Evidence:** a 0x0d record's gate field (+0x20c) is 1 for every placed prop seen; when 1
   the Serialize reads two more u32 at +0x190/+0x194 — the sprite's **screen position (x, y)**
@@ -502,7 +502,7 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   (`FUN_0044d7e0`, `FUN_00459640/a40`) and the opcodes on other classes (sound, character,
   scene/navigation) remain to decode.
 
-### E-0112 — Commands are timed and condition-guarded (the puzzle VM)
+### E-0112 — Commands are timed and condition-guarded (the puzzle VM) — timing SUPERSEDED by E-0200
 - **Binary/file:** scene `.abi` trigger command lists (E-0109); the dispatcher `FUN_0040efa0`
   (E-0110).
 - **Evidence:** the first int of a command (the `when` field the dispatcher compares to the
@@ -578,7 +578,7 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Confidence:** strong (look-at model confirmed visually on two angles); exact target/FOV
   and the view→background rule open.
 
-### E-0116 — Navigation: go-to-scene and change-view commands (reserved managers 185/186)
+### E-0116 — Navigation: go-to-scene and change-view commands (reserved managers 185/186) — the 186 part SUPERSEDED by E-0206
 - **Binary/file:** scene `.abi` trigger commands (E-0109); `FUN_0040e980` (scene-manager
   tick), `FUN_0040cb30` (LoadScene), `FUN_00441fb0` (transition); reserved actors
   `DAT_004b9bc4[0xb9]` (185) and `[0xba]` (186).
@@ -612,3 +612,185 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** decompile `FUN_00436aa0`; the `FUN_0040d270(factory, type, id, …)` call.
 - **Confidence:** proven for id 185 = type 0x12; the other reserved ids are created by the
   same mechanism (their exact types/classes are the next step).
+
+### E-0200 — The command queue: conditions checked at push; `when` = a scene number, not a delay
+- **Binary/file:** `FUN_00408760` (push with conditions), `FUN_00408a80` (push without),
+  `FUN_0040f2c0` (run the immediate list), `FUN_0040efa0` (dispatcher), `FUN_00410bf0`
+  (enter scene), `FUN_0040cb30` (LoadScene: `factory+0x130 = scene`), `FUN_00410c60`
+  (returns `actor0+0x130`); `engines/grumpa/tools/events.py` over the 110 scene `.abi`.
+- **Evidence:** a push first evaluates the command's condition list (`FUN_00408c30`); a false
+  guard drops the command. A surviving command with `when == -1` or `when ==` the current
+  scene number (`factory+0x130`, set by LoadScene) goes to an **immediate** vector
+  (`DAT_004b9ba8`); any other `when` is linked into the **deferred** list `DAT_004b9b9c`.
+  `FUN_0040f2c0` copies the immediate vector, empties it, then calls each target's `DoCommand`
+  (`vtable[6]`, target `-1` = every actor id >= 1); commands pushed meanwhile wait for the
+  next run. The dispatcher `FUN_0040efa0` runs only from `FUN_00410bf0` (entering a scene)
+  and fires every deferred command whose `when` equals the scene just loaded. Corpus: of
+  3,693 scene commands, 3,467 have `when = -1` and the other 226 name **another existing
+  scene** (none their own scene, none a non-scene number). So `when` defers a command until
+  the player enters that scene (Scene_061's gate trigger 661 queues work for scene 10, the
+  scene its exit leads to, E-0116: its deferred targets 664, 665, 644 and 731 exist in
+  Scene_010 and not in Scene_061; over the corpus 211 of the 223 deferred commands on scene
+  actors name an actor of the `when` scene; of the other 12, six name id 600, the `.scn`
+  scene actor).
+  SUPERSEDES the "delay in ticks" reading of E-0112.
+- **Method:** decompiled the push, run and dispatch functions; `events.py` statistics.
+- **Confidence:** proven.
+
+### E-0201 — Conditions: `(actor, slot, value, mode, link)` on the actor's state slots
+- **Binary/file:** `FUN_00408c30` (evaluate a list), `FUN_00408f30/f60/f90/fc0` (tests),
+  `FUN_00408350` (base actor ctor), `FUN_00408680`/`FUN_00408690` (`vtable[7]`/`[8]`).
+- **Evidence:** every actor owns a vector of state slots (`+0x118`, begin `+0x11c`, stride
+  0x118, value at `+0x104`); the base ctor creates one slot named "State" with value 0; the
+  `.abi` header's EC vector serializes into the existing slots. `vtable[7]` returns slot 0,
+  `vtable[8](v)` sets it. A condition EC is `(id, slot, value, mode, link)`: it reads
+  `actor[id].slot[slot]` and tests mode 0 `==`, 1 `>`, 2 `<`, 3 `!=` against `value`.
+  `link` chains them: consecutive conditions with `link = 0` are ANDed; `link = 1` closes a
+  group, and a true group makes the whole list true (an OR of AND groups); an empty list is
+  true; a missing actor leaves the running result unchanged. When the list comes out true
+  and the last tested actor is an item (type 5, `+0x104 == 5`), actor 186's target is set to
+  it (`FUN_0043cc70`, E-0206). Corpus: 528 guarded commands, 831 conditions, modes
+  0/1/2/3 = 536/75/75/145, link 0/1 = 639/192; 728 test global actors (ids < 600), the 103
+  on scene actors all test type-0x24 flags.
+- **Method:** decompile; `events.py`.
+- **Confidence:** proven.
+
+### E-0202 — The main loop: 50 updates a second; scene entry and exit broadcasts
+- **Binary/file:** `FUN_0040e980` (factory tick), `FUN_0040e8f0` (update), `FUN_00410bf0`,
+  `FUN_0040cb30`, `FUN_00410390`/`FUN_0040fab0` (Save/LoadGameStatus), `FUN_0040ef40`,
+  `FUN_00417000` (`DAT_004ba730`), `DAT_0049cb28` = 50, float 0.02 at `0x490350`.
+- **Evidence:** the factory accumulates elapsed time and runs one update per 0.02 s (only one
+  when more than 1 s behind), then draws. An update runs the immediate list
+  (`FUN_0040f2c0`), then every actor's `vtable[4]` and then `vtable[5]`, ids 2 upwards.
+  `DAT_004ba730 = 1000 / 50 = 20` ms is the step timers add. Changing scene
+  (`factory+0x134` pending): broadcast opcode 25 (`arg1` = the old scene), run the immediate
+  list, then LoadScene: write the old scene's actors (ids >= 600) to
+  `Current/<n>_status.abi` (SaveGameStatus, Serialize mode 4), delete ids 600..979, load
+  `Scene_<n>.scn` then `Scene_<n>.abi` (`factory+0x130 = n` between them), then
+  `FUN_00410bf0`: read `Current/<n>_status.abi` back if it exists (LoadGameStatus, mode 4,
+  so a revisited scene keeps its state), run the deferred commands for scene n, broadcast 23
+  (`arg1 = n`) and run the immediate list, broadcast 86 and run it, push `(185, 33, 24)`
+  (fade in).
+- **Method:** decompile; disassembly of `0x410bf0` (the enter sequence).
+- **Confidence:** proven.
+
+### E-0203 — What each class keeps in a scene status (Serialize mode 4)
+- **Binary/file:** the `case 4` arms of `FUN_0044ccb0` (0x0d), `FUN_00457ea0` (0x19),
+  `FUN_0042e670` (0x21), `FUN_00428b10` (0x22), `FUN_00417180` (0x23), `FUN_00431810`
+  (0x24), `FUN_00452100` (0x1a), `FUN_004492d0` (0x18).
+- **Evidence:** every class writes `active` (`+0x10c`), `visible` (`+0x110`) and (bar 0x21)
+  its state slots; then 0x0d its latch `+0x210`, playing `+0x1cc`, running `+0x1d0`,
+  direction `+0x1ec`, frame `+0x1c4`, autoplay `+0x1d4`; 0x19 its latch `+0x184`; 0x21 its
+  latch `+0x14c`; 0x22 its count `+0x12c`; 0x23 its elapsed `+0x128`; 0x24 nothing more
+  (its latch is not kept); 0x1a its latch `+0x250` and animation fields; 0x18 `+0x1a0`,
+  `+0x1b4`.
+- **Method:** decompile.
+- **Confidence:** proven.
+
+### E-0204 — Logic classes: 0x21 script, 0x22 counter, 0x23 timer, 0x24 flag
+- **Binary/file:** vtables found by their Serialize pointer (`0x4905bc` 0x21, `0x4904cc`
+  0x22, `0x490418` 0x23, `0x490658` 0x24; CreateActor maps 0x25/0x26/0x27 to the same
+  classes); DoCommand (`vtable[6]`) `FUN_0042eaf0`, `FUN_00428a30`, `FUN_00417e40`,
+  `FUN_00431780`; updates `FUN_0042e650`, `FUN_00417140`; helpers `FUN_00429730/40/90`,
+  `FUN_004297e0`, `FUN_00429800`, `FUN_00417f30/50/80/90`, `FUN_00432330/60`,
+  `FUN_0042ebd0`; Serialize mode-1 field order `FUN_00428b10`, `FUN_00417180`,
+  `FUN_00431810`, `FUN_0042e670`.
+- **Evidence:** all four take 13 (latch: ignore everything else) and 52 (unlatch).
+  **0x21 script** (`+0x128` guarded, conditions `+0x12c`, commands `+0x13c`): 0 runs its
+  commands now; 23 (the scene-entry broadcast) marks it pending if its conditions hold (or
+  it is unguarded) and its update runs the commands. **0x22 counter** (`+0x130` max,
+  `+0x148` fire, commands `+0x134`; count `+0x12c`): 57 adds `arg1` (1 if `arg1 < 1`) while
+  below max; reaching max sets state 1 and, with fire = 1, runs its commands; 58 clears
+  state 1 and subtracts (floor 0); 59 sets max; 62 zeroes count and state. **0x23 timer**
+  (`+0x12c` limit in ms, `+0x130`, `+0x134`, commands `+0x13c`; elapsed `+0x128`): its
+  update adds 20 ms while `active`; past the limit it stops (elapsed 0, inactive) and runs
+  its commands; 64 restarts with limit `arg1`; 65 sets the limit; 66 activates; 67 stops.
+  **0x24 flag** (`+0x12c` fire, commands `+0x134`): 16 and 56 set state = `arg1`, then with
+  state 1 and fire = 1 run its commands. "Run the commands" pushes each through the
+  conditioned push (E-0200); the trigger and script versions skip a command that targets
+  the actor itself with opcode 0.
+- **Method:** decompile.
+- **Confidence:** proven.
+
+### E-0205 — `global.atx`: 80 global counters, timers and flags (ids 200..279)
+- **Binary/file:** `games/grumpa/discs/cab/Actors/global.atx`; `events.py` (`parse_global`).
+- **Evidence:** types 37 (20 counters, ids 200..219), 38 (20 timers, 220..239), 39 (40
+  flags, 240..279) = classes 0x25/0x26/0x27 (E-0204). Text layout: `id, active, visible, n,
+  n state values`, then 37: `max, fire`; 38: `limit, +0x130, +0x134`; 39: `fire`; then a
+  command count and the commands as `when, target, opcode, arg1, arg2, n, n x (id, slot,
+  value, mode, link)`. 80/80 blocks consume every token. Named examples: 269 "Snake Dead",
+  246..249 the island flags, 222 "Dragon-Time" (120,000 ms), 220 "Syretimer" (4,000 ms).
+  They are created at boot and never deleted (ids < 600), so scene conditions read them
+  across scenes.
+- **Method:** `events.py` over the file.
+- **Confidence:** strong (layout from the corpus; consistent with the mode-1 field order of
+  the three classes).
+
+### E-0206 — Actor 185 is the fade/scene manager (30 view, 31 scene); 186 is a forwarding proxy
+- **Binary/file:** CreateActor call sites `0x4377cd` (`FUN_0040d270(0x12, 0xb9)`),
+  `0x4432a6` (`(0x28, 0xba)`), `0x4432cd` (`(0x29, 0xbb)`); 0x12 ctor `FUN_0042ef00`
+  installs vtable `0x4905e0`: DoCommand `FUN_0042f210`, update `FUN_0042f540`; 0x28 ctor
+  `FUN_0043cbb0` installs `0x490798`: DoCommand `FUN_0043cc20`; `FUN_0045ae00` (view switch
+  on actor 602); `events.py`.
+- **Evidence:** 185 (type 0x12): 30 fades out over 20 updates, then switches actor 602's
+  view to `arg1` (`FUN_0045ae00`: `+0xdd0 = view`, loads that view's matrices, broadcasts 26
+  with `arg1` = view) and fades in; 31 fades out (over 20 updates, or at once when
+  `arg2 = -1`) and then asks the factory for scene `arg1`; 32 / 33 fade out / in over `arg1`
+  updates. 186 (type 0x28): 63 sets its target id (`+0x128`) to `arg1`; every other opcode
+  is forwarded to the target's DoCommand. A true condition list on an item points 186 at
+  that item (E-0201), so `(186, 16, x)` acts on the item the guard just tested, not on the
+  view. The 186 part of E-0116 ("186/op16 = change view") is superseded; the view command is
+  `(185, 30, v)`. Corpus: 64 scenes use view indices (trigger gates, 185/30); in all of them
+  the highest index + 1 <= the number of `<n>_<k>_IS.jpg` backgrounds.
+- **Method:** disassembly of the CreateActor call sites, decompile; `events.py`.
+- **Confidence:** proven for the opcodes; the index -> background name (`v` <-> `<n>_<v+1>`)
+  is tentative (Q-0201).
+
+### E-0207 — Triggers (0x19): click, walk-in and their gates
+- **Binary/file:** `FUN_004594e0` (DoCommand), `FUN_00459640` (18), `FUN_00458f50`
+  (update), `FUN_00459a60` (proximity gate), `FUN_00457b80` (ctor), `FUN_00457ea0`
+  (Serialize), `FUN_0044c6e0`; `events.py`.
+- **Evidence:** the 8 u32 after the header EC vector are `+0x170` edge, `+0x174` view
+  (-1 any), `+0x178` click (1) or walk-in (0), `+0x17c` proximity-gated, `+0x180` has
+  conditions (the second EC vector, `+0x190`), `+0x188` gate bits, `+0x14c`, `+0x150`
+  required character id (-1 any). Ctor defaults: `+0x154 = 1`, `+0x174 = -1`,
+  `+0x17c = 1`, `+0x188 = 1`, `+0x170 = 1`. DoCommand: latch `+0x184` (13 sets it and
+  clears active/visible; 52 clears it); 0 activates and runs the commands; 1 deactivates;
+  2/3 show/hide; 11 and 500 set active and visible; 12 and 501 clear both; 14/15 set/clear
+  `+0x154`; 18 = a click at packed `(x, y)`; 22 = the mouse position; 86 reset. A click
+  fires when the trigger is active, the mouse actor's state is not 7, its view gate matches
+  actor 602's view, `+0x178 = 1`, the point is inside the polygon, the proximity gate passes
+  when `+0x17c = 1`, and its conditions hold when `+0x180 = 1`. The update fires a walk-in
+  trigger (`+0x178 = 0`) on each update the gate passes. The proximity gate needs
+  `+0x154 = 1`; bit 1 of `+0x188`: the player character (actor 3's `+0x298`, of id `+0x150`
+  when set) has a sphere overlapping the trigger's (`FUN_0044c6e0`); bits 2 and 4: the same
+  for actor 4's character and for actors 91..94; with `+0x170 = 1` it passes once per
+  entry. Corpus (397 triggers): `+0x178` 0/1 = 235/162, `+0x17c = 1` on 367, `+0x188`
+  bit 1 on 373.
+- **Method:** decompile; `events.py`.
+- **Confidence:** proven (the gate logic); the sphere fields' layout is tentative (Q-0202).
+
+### E-0208 — Sprite (0x0d) animation: modes, frame timing and end hooks
+- **Binary/file:** `FUN_0044e2c0` (DoCommand), `FUN_0044ed10` (play), `FUN_0044ed80`
+  (stop), `FUN_0044da50` (update), `FUN_0044dd80` (advance), `FUN_0044e9a0`/
+  `FUN_0044e3e0`/`FUN_0044e6c0` (hooks), `FUN_0044ccb0` (Serialize); scene `.abi` statistics.
+- **Evidence:** the header fields after the EC vector are `+0x114, +0x314, +0x1e0` fps,
+  `+0x1e4` mode bits, `+0x1c8, +0x1f8, +0x208, [+0x48c]`, then `+0x1d4` autoplay,
+  `+0x20c`; the three command vectors in file order are `+0x14c` (end), `+0x12c` (forward
+  end), `+0x13c` (backward end). Mode bits: 1 loop, 2 ping-pong, 4 forward, 8 backward,
+  0x10 forward-then-backward (corpus `+0x1e4`: 5 x129, 4 x100, 3 x66, 2 x7, 16 x5, 17 x3;
+  fps 15/25/10/1/12/8/20/6 most common). E-0107 read `+0x1e0` as a frame count and
+  `+0x1e4` as a rate: it is the other way round, and the frame count is that of the loaded
+  frames. Play (0, 500; 23 when autoplay = 1): unless playing, rewind (frame 0 for bits
+  2|4, last frame for 8), set playing and running. Stop (1, 501) clears playing only: a
+  looping animation finishes its cycle. While active and running, the update advances one
+  frame every `R / fps` updates (R from a device call, Q-0200). Forward/backward without
+  loop: at the end stop (playing, running 0, frame held) and run the end commands; with
+  loop: wrap while still playing, else hold. Ping-pong: forward, then back to 0; once
+  through unless loop. 0x10: one play runs forward to the last frame, stops and runs the
+  forward-end commands; the next play runs back to 0 and runs the backward-end commands (a
+  door's open/close). Opcodes: 2/3, 11/12, 13 latch (`+0x210`; clears active, visible,
+  playing), 52 unlatch, 86 reset (reload frames), 500 active + visible + play, 501 clear +
+  stop.
+- **Method:** decompile; field statistics over the corpus.
+- **Confidence:** proven (logic); R tentative (Q-0200).
