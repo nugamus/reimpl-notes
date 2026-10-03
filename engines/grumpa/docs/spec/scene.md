@@ -2,7 +2,7 @@
 
 How the engine loads a scene (`.abi` + `.scn`), which pre-rendered view it shows, and how it
 draws the view, its sprites and its 3D actors. Formats: `docs/formats/README.md` (`.abi`,
-`.scn`, `.fxi`, `.anb`). Evidence: E-0100..E-0104, E-0300..E-0305.
+`.scn`, `.fxi`, `.anb`). Evidence: E-0100..E-0104, E-0300..E-0305, E-0600..E-0602.
 
 ## `.abi` load (E-0100, E-0104)
 
@@ -71,8 +71,11 @@ fps), mode bits `+0x1e4` as E-0208.
 
 ## Mesh actors (type 0x1a CFXStaticCharacter, E-0303)
 
-A visible 0x1a actor draws its `.anb` (frame 0 here) in world space (no world transform)
-through the current view's camera, as Direct3D 7's fixed pipeline does:
+A visible 0x1a actor draws its `.anb` at its current frame (below; nothing when the frame is
+outside `0..F-1`) in world space (no world transform) through the current view's camera, as
+Direct3D 7's fixed pipeline does. Each triangle corner is the vertex the loader stored for
+the corner's uv index (the last corner naming that uv index in face order, E-0600), with
+that vertex's stored normal (x, y, z, not normalised):
 
 - **culling**: counter-clockwise triangles on screen are dropped (D3DCULL_CCW);
 - **lighting**, per vertex (Gouraud), material = the texture's (default diffuse and ambient
@@ -81,6 +84,37 @@ through the current view's camera, as Direct3D 7's fixed pipeline does:
 - **texture**: modulated with the lit colour, bilinear filtering, wrap addressing. A 32-bit
   `.tga` keeps its alpha and is blended (SRCALPHA, INVSRCALPHA), any other is RGB555;
 - **depth**: `z16 ≤ z-buffer` passes and writes `z16`.
+
+- **clipping**: triangles are clipped to the near plane (and z beyond the far plane is not
+  drawn), as Direct3D clips in homogeneous space.
+
+### Mesh animation (E-0601, E-0602)
+
+From the record: fps `+0x1b4`, mode `+0x1b8` (bits as sprites: 1 loop, 2 ping-pong, 4
+forward, 8 backward, 0x10 forward on one play and back on the next), playing `+0x1d4`, start
+frame `+0x1c0`, autoplay `+0x1dc`, and a delay timer (on, counting, random, min/max ms, fixed
+ms, ticks left). Running and direction start at 0, so nothing moves until the actor is played
+(or its timer, saved counting, runs out).
+
+- **play** (ops 0, 500, and 23 when autoplay): mode & 6 → frame 0; mode & 8 → frame F; playing
+  on; with the timer on, start the timer (ticks = ms × 50 / 1000, random in [min, max) when
+  random) instead of running; else running on. Always restarts, playing or not.
+- **stop** (ops 1, 501): playing off; a looping animation runs to the end of its cycle.
+- **update** (every 20 ms update, while active): running → after `R / fps` updates (R = 50,
+  Q-0200) advance one frame. Not running with the timer on: while playing and the timer
+  counts, one tick a update; at 0 it stops counting, reloads, and running goes on; not
+  playing → the timer reloads and running stays off.
+- **advance**, by the first of bits 4, 8, 2, 0x10: forward → frame + 1, at F: running off;
+  without loop frame F−1 and run the end list (8th list); with loop, frame F−1 if stopped,
+  else frame 0 and restart. Backward → mirror (frame 0 / F−1, end list). Ping-pong → up to
+  F−1, then down (F−2, …); below 0: running off, frame 1, direction up; without loop the end
+  list, with loop and playing restart. 0x10 → up to F−1, then running off, direction down,
+  forward-end list (1st); on the next play down to 0, then running off, direction up,
+  backward-end list (2nd). Restart = play again when the timer is on, else running on.
+- **ops**: 2/3 visible, 11/12 active, 13 latch (inactive, invisible; ignores all but 52), 52
+  unlatch, 14/15 bubble tests on/off (Q-0600), 86 reload mesh and texture, 92 texture.
+- **scene status**: active, visible, latch, playing, running, direction, frame and autoplay are
+  kept; autoplay is kept as 0, so a revisited scene does not autoplay again (E-0602).
 
 Characters (type 0x03) are drawn the same way, after their own world placement
 (`spec/characters.md`).

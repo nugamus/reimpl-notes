@@ -337,3 +337,25 @@ by it as D3DX's `RotationY` does (x' = x cos + z sin, z' = −x sin + z cos); th
 world-matrix build for characters is not read yet. Dev `grumpa_vm=1;...;snap` shows Grumpa
 standing on the hut floor behind the pitchfork, which fits the position but does not decide
 the sign.
+
+### Q-0007 RESOLVED (2026-10-03, E-0600) — the `.anb` frame count is F
+The loader reads frame 0 with the sections and `F-1` frames after them, then closes the
+file: the extra stored frame of 521 files and the boat's 4,456 bytes are never read. Frame 0
+is the first frame of the clip (the rest pose is not a separate frame).
+
+### Q-0600 — The 0x1a fields that are not animation
+- **Context:** E-0601. `+0x1bc` bubble flags (1, 2, 8, 0x10) with `+0x1e4`, `+0x220..+0x228`
+  and the 3rd..7th command lists drive collision tests of bubbles that follow mesh vertices
+  (`FUN_004539a0`, on by `+0x1e0`, ops 14/15); `+0x1d0` = 1 (14 records) registers the actor
+  with the object at `DAT_004b9bc4 + 0x960` on op 23; `+0x29c` = 1 (16) takes the texture of a
+  character's current skin on op 23 (`+0x2a0` = the character, or 3/4/0x5b..0x5d for
+  manager slots); `+0x27c..+0x290`; the two `0x401bb0` sub-objects.
+- **Blocks:** nothing of the drawing; the bubble hits are combat/interaction (with Q-0403).
+- **Status:** open
+
+### Q-0601 — The per-frame vector table on a character clip (`mesh + 0x150`)
+- **Context:** E-0603. The character update reads 12 bytes per frame from a table at
+  `+0x150` of the current clip's mesh and adds to the character's position / heading; the
+  `.anb` has no such block (E-0600), so it is built at load or comes from another file.
+- **Blocks:** walking (Q-0403).
+- **Status:** open

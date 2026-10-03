@@ -64,4 +64,8 @@ moves that character to the point, turns it, sets `active = visible = 1` and sen
 A present character draws its current animation's mesh (`Meshes/<anim>`) with its texture at
 `position`, turned by `yaw` about +Y, through the view camera against the `_IZ.fxi` depth, like
 a type-0x1a mesh actor (`scene.md`; the yaw sign is Q-0404). Until the animation state machine is specced (Q-0403) the
-engine shows entry 0, the idle.
+engine shows entry 0, the idle. The animation clock (E-0603): while the character is active
+and at home, every update adds 0.46 to an accumulator; past 1.0 it loses 1.0 and the frame
+steps; at the clip's last frame the frame goes to 0 and the next queued clip (if any) starts,
+so the idle loops at 23 frames a second. The per-frame motion table the update also applies
+is Q-0601.

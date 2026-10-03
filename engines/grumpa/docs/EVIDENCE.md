@@ -1227,3 +1227,90 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   61 after (1), new game, load: the 8 deferred commands are back and reach scene 10.
 - **Method:** `grumpa_vm` runs off-screen (SDL offscreen, surfacesdl).
 - **Confidence:** proven (for these paths).
+
+### E-0600 — The `.anb` loader reads exactly F frames; the rest of a file is never read; normals are x, y, z
+- **Binary/file:** `FUN_004157d0` (`CFXAMeshEx` load), `FUN_004166e0` (draw), `FUN_004154b0`
+  (per-frame bounding boxes); `Meshes/*.anb` (939).
+- **Evidence:** after the sections the loader makes one read of `(F-1)·ΣA·24` bytes (frames
+  1..F-1, each the vertices of every section in section order, frame after frame) and closes
+  the file, so a stored frame beyond F is never read: 521 files store one (the `X2Y` and
+  `N2N` clips, Q-0007), `012_D2D_Grumpa_In_Boat.ANB` 4,456 stray bytes. It then builds the
+  Direct3D vertex buffer: per frame, one `D3DVERTEX` (FVF 0x112) per **uv index**, filled by
+  walking the faces in order, corner by corner, with the corner's vertex (24 bytes copied as
+  they are: pos x, y, z, normal x, y, z) and its uv; a uv index used by corners with different
+  vertices keeps the last one written (105 files have such indices). The index buffer is the
+  face uv-index triples (offset by the section's uv base). The draw is
+  `DrawIndexedPrimitive(TRIANGLELIST, 0x112, buffer + frame·ΣB·32, ΣB, indices, ΣC·3)`, the
+  frame being the mesh's `+0x11c`. The normal order is the stored one: averaged face normals
+  ((b−a)×(c−a)) agree with the stored (x, y, z) at mean cosine 0.92 over 6,987 vertices of 30
+  files, with the reversed order at 0.27 (this corrects E-0014's "stored z, y, x"). Normals
+  are not unit length and Direct3D uses them as they are. `parsers/anb.py`: 939/939 parse,
+  17,867 frames read, every byte accounted for (frames read + unread tail).
+- **Method:** decompile; `python engines/grumpa/tools/parsers/anb.py`; a face-normal check
+  over the parser output.
+- **Confidence:** proven
+
+### E-0601 — 0x1a `CFXStaticCharacter` animation: fields, play, stop, advance, delay timer
+- **Binary/file:** vtable 0x490910: `FUN_00452100` Serialize [1], `FUN_004503e0` Initialize
+  [2], `FUN_00450da0` render [3], `FUN_00450cc0` update [4], `FUN_00450f30` DoCommand [6];
+  ctor `FUN_0044fc60`; `FUN_00454680` play, `FUN_004546e0` stop, `FUN_00453760` advance,
+  `FUN_00451e20`/`FUN_004540c0`/`FUN_004543a0` the end lists; the delay timer (ctor
+  `0x456cf0`, Serialize `FUN_00456d70`, `FUN_004578d0` start, `FUN_00457960` reload,
+  `FUN_004578b0` tick, `FUN_00457850` expired, `FUN_00457750`/`FUN_004577f0`); scene `.abi`.
+- **Evidence:** the 18 u32 after the state slots are `+0x1b4` fps, `+0x1b8` mode, `+0x1bc`
+  bubble flags, `+0x1e4`, `+0x21c`, `+0x228`, `+0x1d0`, `+0x27c..+0x290` (6), `+0x1d4`
+  playing, `+0x1c0` frame, `+0x1dc` autoplay, `+0x29c`, `+0x2a0`; then the delay timer's 14
+  u32 (`+0x108` on, `+0x104`, `+0x10c`, `+0x110` counting, `+0x114`, `+0x118` random,
+  `+0x11c`, `+0x120`, `+0x124` min ms, `+0x128` max ms, `+0x12c`, `+0x130` fixed ms, `+0x134`,
+  `+0x138` ticks left); then two sub-objects, the bubbles, eight command lists (1st `+0x12c`
+  forward end, 2nd `+0x13c` backward end, 8th `+0x19c` end; 3rd..7th belong to the bubble
+  tests, `FUN_004539a0`), the `.anb` and `.tga` names. The ctor leaves running `+0x1d8`,
+  direction `+0x1cc` and the tick counter `+0x1e8` at 0. **Render** draws mesh 0 at frame
+  `+0x1c0` only when visible and `0 ≤ frame < F` (nothing is drawn otherwise). **Update**
+  (when active `+0x10c`): if running, `counter + 1`; when `R / fps ≤ counter` (R from the
+  device, Q-0200) counter = 0 and advance. Not running, with the timer on: playing → if the
+  timer counts, tick it (`ticks − 1`) and when `ticks < 1` stop counting, reload it and set
+  running; if it does not count, return; not playing → reload the timer, running = 0.
+  **Advance** by mode bit, first match of 4, 8, 2, 0x10: 4 forward: frame + 1; at F running
+  = 0 and: no loop (bit 1) → frame F−1, end list; loop, not playing → frame F−1; loop,
+  playing → frame 0 and restart (below). 8 backward: frame − 1; below 0 running = 0 and: no
+  loop → frame 0, end list; loop, not playing → 0; loop, playing → frame F−1, restart. 2
+  ping-pong: direction 0: frame + 1, at F direction 1 and frame F−2; direction 1: frame − 1,
+  below 0 running = 0, direction 0, frame 1 and: no loop → end list; loop and playing →
+  restart. 0x10: direction 0: frame + 1, at F running = 0, frame F−1, direction 1, forward-end
+  list; direction 1: frame − 1, below 0 direction 0, running = 0, frame 0, backward-end list
+  (playing is left set). Restart: with the timer on, play (below); else running = 1. **Play**
+  (op 0, 500, and 23 when autoplay): mode & 6 → frame 0, mode & 8 → frame F (one update with
+  nothing drawn, then F−1); playing = 1; timer on → start it (counting, ticks = fixed ms · 50
+  · 0.001, or with random a random value in [min, max) ms the same way; `DAT_0049f1e8` = 50,
+  the float at 0x490aa8 = 0.001), else running = 1. It does not test "already playing".
+  **Stop** (op 1, 501) clears playing only. Op 14/15 set/clear `+0x1e0` (bubble tests, on
+  from the ctor). Op 86 reloads mesh and texture; op 92 the texture. Corpus (260 records):
+  fps 15 ×166, 25 ×15, 12 ×13, 14 ×10, 8 ×8, 60 ×8; mode 4 ×95, 5 ×92, 3 ×31, 0x14 ×17, 2
+  ×10, 0x10 ×7; playing 1 ×136; autoplay 1 ×104; frame 0 ×99; timer on 13; 237 meshes have
+  F > 1; `Scene_027` `myra_1` starts at frame 56 = F (not drawn until played).
+- **Method:** decompile; field census over the 110 scene `.abi`.
+- **Confidence:** proven (logic); R as for sprites (Q-0200).
+
+### E-0602 — A 0x1a scene status keeps the animation, and saving it clears autoplay
+- **Binary/file:** `FUN_00452100` `case 4` / `case 5`.
+- **Evidence:** mode 5 writes id, active, visible, latch `+0x250`, the state slots, playing
+  `+0x1d4`, running `+0x1d8`, direction `+0x1cc`, frame `+0x1c0`, and autoplay `+0x1dc` after
+  setting it to 0; mode 4 reads the same back. A revisited scene's meshes go on from where
+  they were and do not autoplay again. The delay timer is not in the status.
+- **Method:** decompile.
+- **Confidence:** proven
+
+### E-0603 — A character's animation clock: 0.46 frame per update, the clip looping
+- **Binary/file:** CFXCharacter vtable 0x49046c ([3] render `FUN_004226a0`, [4] update
+  `FUN_00421a60`, split out of `0x421a50` in the working copy).
+- **Evidence:** the update returns unless active (`+0x10c`) and at home (`+0x444` = `+0x448`);
+  it adds 0.46 (float at 0x4904a0) to `+0x4a4` and returns unless the sum exceeds 1.0 (0x49034c),
+  then subtracts 1.0 and steps the frame `+0x494`; when frame + 1 reaches the clip's F the frame
+  is 0 and the next clip is taken from the queue at `+0x404` (`+0x434` = the clip index into
+  the mesh table `+0x2dc`, `+0x498` = its F). The render draws clip `+0x434` with the mesh's
+  frame `+0x11c` set to `+0x494` by the update. So with nothing queued the clip loops at 0.46 ×
+  50 = 23 frames a second. The update also moves the character by a per-frame vector table on
+  the clip's mesh (`+0x150`, 12 bytes a frame; Q-0601).
+- **Method:** decompile, disassembly at 0x421bf4..0x42206e.
+- **Confidence:** proven (clock and wrap); the queue is part of Q-0403.

@@ -25,7 +25,25 @@ at `CFXActorFactory`, which loads `.atx`/`.abi` actors, `.scn` scenes, `.fxi` su
 | `.scn` | 110 | binary (3 actor records) | `CFXActorFactory::CreateFromABIFile` | `scn.py` | E-0500 | done (110/110; walk mesh, scene links, view list) |
 | `.abi` | 118 | binary scene graph | `CFXActorFactory::CreateFromABIFile` | `abi.py` | E-0100..E-0103, E-0400, E-0401 | done: 113/113 byte-exact (scenes, items, both character databases), 15 types |
 | `.amb` | 588 | binary mesh | `CFXAMeshEx::CreateFromFile` | `amb.py` | E-0013 | done (`u32 count` + count×(pos+normal)) |
-| `.anb` | 939 | binary mesh | `CFXAMeshEx` / `FUN_004157d0` | `anb.py` | E-0014 | done (938/939: geometry, UVs, anim); frame-count Q-0007 |
+| `.anb` | 939 | binary mesh | `CFXAMeshEx` / `FUN_004157d0` | `anb.py` | E-0014, E-0600 | done (939/939: geometry, UVs, F frames; unread tail in 522) |
+
+## `.anb` — animated mesh (E-0014, E-0600)
+
+```
+u32 F                       frames
+u32 S                       sections
+S × { u32 A, u32 B, u32 C   vertices, uvs, faces
+      A × (f32 x, y, z, nx, ny, nz)     frame 0
+      C × u16[3]            vertex index triples
+      B × f32[2]            u, v
+      C × u16[3]            uv index triples }
+(F-1) × ΣA × 24             frames 1..F-1: every section's vertices, section after section
+tail                        never read by the loader
+```
+
+The original draws one vertex per uv index (the last face corner naming it wins) and the uv
+triples as the index list; frame `k` swaps in that frame's positions and normals. The tail is
+one stored frame more in 521 files and 4,456 bytes in `012_D2D_Grumpa_In_Boat.ANB`.
 
 ## `.atx` — actor/object definitions (E-0005)
 
