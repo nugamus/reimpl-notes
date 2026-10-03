@@ -1475,3 +1475,18 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   `+0x158`, `+0x15c`, `+0x160..+0x16c`, cleared while it is outside). Refines E-0207.
 - **Method:** decompile.
 - **Confidence:** proven.
+
+### E-0706 — Fades, score and ambience run in the engine (dev checks)
+- **Binary/file:** `../scummvm/engines/grumpa/events.cpp`, `score.cpp`, `grumpa.cpp` (commit
+  `db3577a1`); dev `grumpa_vm` (`snap` draws the whole frame, commit `3c7c0d11`).
+- **Evidence:** dev runs off-screen, logs at `-d2`: (1) scene 1: 2 updates after entry the
+  frame is black (mean luminance 0), 22 updates later 15.9, at rest 27.0; clicking (597, 140)
+  fires trigger 663, 10 updates later 16.1, 30 updates later black with scene 211 entered,
+  70 updates later scene 211 at full brightness ("fade ended at 0/255" in the log at the
+  expected updates). (2) Score: `(8, 9, 5)`, `(8, 9, 7)` show "12" beside the coin; `(10, 51,
+  30)` lowers the heart and plays the scare star at (687, 0), hidden 20 updates later;
+  `(8, 78)`, `(8, 77, 40)` show the lowered air bar left of Grumpa's icon. (3) `(180, 73, 4)`
+  switches from the jungle to the desert ambience; save, `(8, 10, 12)`, load: the coins are
+  12 again and the desert ambience plays.
+- **Method:** `grumpa_vm` runs (SDL offscreen, surfacesdl), PNG snapshots.
+- **Confidence:** proven (for these paths).
