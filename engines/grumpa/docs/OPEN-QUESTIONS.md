@@ -228,8 +228,9 @@ switch code (`FUN_0045ae00`) loads view matrices, not files; the file choice is 
 ## Q-0202 — The proximity gate without a player character
 
 Click triggers are gated on the player character's sphere overlapping the trigger's
-(E-0207). Until the engine has a player character (type 0x03, Q-0006), it lets clicks pass
-the gate and never fires walk-in triggers. Open: the sphere fields' layout (the trigger's
+(E-0207). Until the engine has a moving player character (type 0x03, Q-0006), a click
+stands in for walking there: it passes the gate and also fires walk-in triggers inside
+their polygon. Open: the sphere fields' layout (the trigger's
 `+0x13c` sub-object, the character's position from `FUN_00424e90`).
 
 ## Q-0203 — The shipped `Save/Current/*_status.abi`
