@@ -301,3 +301,7 @@ The original's own Serialize, run under Unicorn on both `Characters.abi` files
 `t_03` implements it and now parses 113/113 `.abi` files. The "binary skeleton blob" was the
 ClassD rule vector and CC command lists; the decompiler's broken control flow no longer matters.
 Field meanings: E-0402; the shared actor header (`id` read twice) is E-0400.
+
+### Q-0402 narrowed (2026-10-03, E-0407)
+The six values are the character's state slots (slot 0 "State"); which opcodes change slots
+1..5 and what they mean is still open.

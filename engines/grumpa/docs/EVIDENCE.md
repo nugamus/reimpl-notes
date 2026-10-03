@@ -1085,3 +1085,15 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   `(playing, on entry)` is (0, 0) for 274 sounds, (1, 1) for 76, (0, 1) for 11, (1, 0) for 4.
 - **Method:** decompilation; corpus count (`abi.py` grammar).
 - **Confidence:** proven.
+
+### E-0407 — A character's six header values are its state slots
+- **Binary/file:** `CFXCharacter` ctor `0x41c9b0` (six inserts into `+0x118`), Serialize
+  `0x423235..0x423277`; E-0201 (the state-slot vector).
+- **Evidence:** the `n × u32` vector after `visible` (E-0400) is the actor's state-slot vector
+  of E-0201 (`+0x118`, stride 0x118, value at `+0x104`): the constructor builds six slots, and
+  Serialize loops over the existing slots, reading one u32 into each. Conditions read them as
+  `(character id, slot, value, mode)` — e.g. `(13, 4, 1, !=)` on the bear rider (grumpa-events,
+  E-0201). Slot 0 is the base class's "State"; the per-slot meaning of 1..5 is not read
+  (Q-0402 narrowed).
+- **Method:** disassembly (E-0401 trace: caller `0x409119` per slot).
+- **Confidence:** proven for the mechanism.
