@@ -240,7 +240,7 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** orthographic front-view render of `anb.parse()` output.
 - **Confidence:** proven
 
-### E-0016 — The 3D device: a software rasteriser on an 800×600×16 DirectDraw surface
+### E-0016 — The 3D device: a software rasteriser on an 800×600×16 DirectDraw surface — SUPERSEDED by E-0303 (it is Direct3D 7)
 - **Binary/file:** decrypted `Grumpa.exe`; `FUN_00436aa0` (init), `FUN_0042db40` (device factory)
 - **Evidence:** `FUN_00436aa0` creates the `IFXDirectFX` device via `FUN_0042db40`
   (`&DAT_00490538`, the "CreateFXDirectX" object) and initialises it through the device
@@ -348,7 +348,7 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Confidence:** proven for the 14 listed types (byte-exact over the whole scene corpus);
   type 0x03 open (Q-0006).
 
-### E-0103 — The per-view camera block (Q-0008)
+### E-0103 — The per-view camera block (Q-0008) — SUPERSEDED by E-0300 (a light, not a camera)
 - **Binary/file:** decrypted `Grumpa.exe`; `CFX*View::Serialize` `FUN_0043d200`; the corpus
   scene views.
 - **Evidence:** at the end of a type-0x11 view record (after its two `ClassC` vectors) the
@@ -382,7 +382,7 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** read `FUN_0040cef0` and `FUN_0040d2f0` (in `notes/decomp/`).
 - **Confidence:** proven (the record loop and the device-injection call are explicit).
 
-### E-0105 — Per-view camera block field values across the corpus
+### E-0105 — Per-view camera block field values across the corpus — SUPERSEDED by E-0300
 - **Binary/file:** the scene `.abi` camera blocks (E-0103), extracted with `abi.py`.
 - **Evidence:** the 0x68 block is 26 little-endian floats; across every scene view the only
   non-zero entries (0-based index) are: `[1]=1.0` and `[21]=1.0` (constants), `[2]` and `[3]`
@@ -557,7 +557,7 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Confidence:** strong (mesh/texture names proven); the transform offset and the eight
   command hooks' roles remain to pin down.
 
-### E-0115 — The per-view camera is a look-at camera (eye -> scene target ~origin)
+### E-0115 — The per-view camera is a look-at camera (eye -> scene target ~origin) — SUPERSEDED by E-0301
 - **Binary/file:** the scene view camera blocks (E-0105); the 0x1a meshes (E-0114); the
   pre-rendered backgrounds.
 - **Evidence:** the camera block stores an eye position (`block[13..15]`) but no orientation
@@ -1097,3 +1097,133 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   (Q-0402 narrowed).
 - **Method:** disassembly (E-0401 trace: caller `0x409119` per slot).
 - **Confidence:** proven for the mechanism.
+
+### E-0300 — Type 0x11 is `CFXLight`: its 0x68-byte block is a `D3DLIGHT7` (a point light)
+- **Binary/file:** decrypted `Grumpa.exe`: device ctor `0x42c4f0` (vtable `0x490548`),
+  `FUN_0042de80` (device creation), `FUN_0043d200` (0x11 Serialize), `FUN_0043d080` (0x11
+  update), `FUN_0043ce90`; scene `.abi`.
+- **Evidence:** the render device's `vtable[0x38]` (`0x42d8d0`) returns `this+0x18`, which
+  `FUN_0042de80` fills with `IDirect3D7::CreateDevice` (IID_IDirect3DHALDevice or
+  IID_IDirect3DRGBDevice, strings `0x49d774`/`0x49d748`) on the `IDirect3D7` it queried from
+  DirectDraw 7 (`0x49d810`); `vtable[0x34]` of that object is "SetViewport" in the error at
+  `0x49d734`, as in `IDirect3DDevice7` (index 13). So the 0x11 call
+  `dev->vtable[0x38]()->vtable[0x48](id-0x276, block)` (E-0103) is `IDirect3DDevice7::SetLight`
+  (index 18), followed by `vtable[0xb0]` = `LightEnable(index, TRUE)`; the u32 read before
+  the block is overwritten by it. The 0x68 bytes are a `D3DLIGHT7`: `[0]` type = 1
+  (D3DLIGHT_POINT) in all 180 lights of the corpus, `[1..4]` diffuse rgba (1.0, 0.75–1,
+  0.70–1, 0), `[5..12]` specular/ambient 0, `[13..15]` **position**, `[16..18]` direction 0,
+  `[19]` range, `[21]` attenuation0 = 1.0, the rest 0. The string `CFXLight::Initialize` is
+  used at `0x43ce98`, inside the 0x11 class. Update `FUN_0043d080`: mode `+0x1b8` = 1 flickers
+  the light on/off at random, mode 2 sets diffuse = (1, 0.70 + r·0.01, 0.65 + r·0.01),
+  r ∈ [0,30), and calls SetLight again (fire). Opcodes 2/3 of its DoCommand switch it on/off
+  (`LightEnable`). So the "camera" of E-0103/E-0105/E-0115 is a light; the camera is E-0301.
+- **Method:** decompile of the functions above; corpus count with `abi.py` (180 records).
+- **Confidence:** proven
+
+### E-0301 — The views and their cameras are the `CFXView` record (type 9, id 602) of `Scene_<NNN>.scn`
+- **Binary/file:** `FUN_0045a750` (type 9 Serialize, vtable `0x490ae0`), `FUN_0045ae00`
+  (SetView), `FUN_0040cef0`, `FUN_0040cb30`; `Scenes/*.scn`.
+- **Evidence:** `LoadScene` reads `Scene_<N>.scn` with the same `CreateFromABIFile` as the
+  `.abi` (which seeks back over the id, so Serialize reads it again as `+0x108`). Type 9's
+  ctor `FUN_0045a410` sets class 9; its Serialize reads the id, `u32 n` (`+0xdd8`), n × (pstr
+  `<v>_IS.jpg`, pstr `<v>_IZ.fxi`) into the background and z-buffer surfaces, then n×64 bytes
+  to `+0x13c` and n×64 bytes to `+0x27c`. `FUN_0045ae00(v)` (v ≤ n and not the current one)
+  stores `+0xdd0 = v` and calls `IDirect3DDevice7::SetTransform(2 = VIEW, this+0x13c+v*0x40)`
+  and `SetTransform(3 = PROJECTION, this+0x27c+v*0x40)`, then broadcasts opcode 26 with v.
+  So the first matrices are the Direct3D **view** matrices and the second the **projection**
+  matrices (row vectors, left-handed; e.g. Scene_007: x scale 2.4142 = cot 22.5°, y 3.2189 =
+  ×4/3, Q = 1.0802, −Q·zn = −387.6, so near 358.9 and far ≈ 4833). The record ends the file
+  in 110/110 `.scn` (n = 1: 78, 2: 14, 3: 13, 4: 4, 5: 1). Projecting the 0x1a meshes through
+  view 0 lands them on their features: `boulder B_at ground` in Scene_061 view 0 covers
+  x 270..317, y 462..512, and its z/w·65535 is a median 598 below the `_IZ.fxi` under it,
+  so it rests on the floor. Format side: `parsers/scn.py` (E-0500).
+- **Method:** decompile; `python engines/grumpa/tools/viewcheck.py --selftest` (110/110,
+  the boulder); engine dev `grumpa_actors=61` (meshes on the platform, behind the floor
+  edges), `grumpa_actors=1` (the dead father under the table, hidden by its legs).
+- **Confidence:** proven
+
+### E-0302 — CFXSprite (0x0d) drawing: layer, view, colour key, depth frames, frame timing
+- **Binary/file:** `FUN_0044ccb0` (Serialize), `FUN_0044db20` (render, vtable[3]),
+  `FUN_0044da50`/`FUN_0044dd80` (update), `FUN_0044ed90` (frame files), `FUN_0044e100`/
+  `FUN_0044e1b0` (colour key), `FUN_00436aa0`; `Scenes/*.abi`, `Bitmaps/`.
+- **Evidence:** the fields in Serialize order after the EC vector are: `+0x114` layer,
+  `+0x314`, `+0x1e0` fps, `+0x1e4` animation flags, `+0x1c8` view, `+0x1f8` key on, `+0x208`
+  key colour. Render draws nothing unless the sprite is visible (`+0x110`) and has frames,
+  and `+0x1c8` is −1 or the CFXView's current view (`DAT_004b9bc4[602]+0xdd0`). The rectangle
+  is the position `+0x190` plus the frame size, clipped to 800×600. If depth frames exist,
+  it first `BltFast`s the frame's depth surface into the z-buffer without a key (device
+  `vtable[0x40]` = `this+0x10`, the Z_Buffer surface). Then it `BltFast`s the colour frame
+  to the back buffer (`vtable[0x48]` = `this+0xc`), with `DDBLTFAST_SRCCOLORKEY` when
+  `+0x1f8` = 1, else `NOCOLORKEY`. The key is set with `SetColorKey(DDCKEY_SRCBLT)` on every
+  frame. It is the COLORREF `+0x208`, converted through a GetDC/SetPixel/Lock round trip, or
+  frame 0's pixel (0,0) when `+0x208` = −1. Frame files: a name `<stem>0000<ext>` animates,
+  and frame i is `<stem>%04d<ext>` as long as the file exists. Depth frames are
+  `<stem>_Z%04d.fxi`, or `<name>_Z.fxi` for a still (format strings `0x49ed08`, `0x49ecf0`,
+  `0x49ece4`, ...). The update steps one frame every `50/fps` game ticks: `FUN_00436aa0`
+  sets the device frame rate to 50 with `vtable[0x24](0x32)`. The flags are as in E-0208.
+  Corpus: layers 1 (223) and 4 (87); view −1 or 0..4. The key is on in 202 of 310 sprites,
+  with key colour 0xFF0000 (blue) in 14 of them and −1 in the rest. All 44 opaque view-bound
+  sprites in multi-view scenes match their own view's background best (mean difference
+  ≈ 1–8, against 20–70 on the other views).
+- **Method:** decompile; `viewcheck.py sprites <scene>` over all scenes.
+- **Confidence:** proven
+
+### E-0303 — The 3D device is Direct3D 7; how a 0x1a mesh actor is drawn and lit
+- **Binary/file:** `FUN_0042de80`, `FUN_00436aa0`, `FUN_00450da0` (0x1a render),
+  `FUN_004166e0` (mesh draw), `FUN_00456920`/`FUN_004569f0`, `0x455e30` (CFXTexture ctor),
+  `FUN_00455ff0`, `FUN_00456400`; `Bitmaps/*.tma`.
+- **Evidence:** the device is an `IDirect3DDevice7` (HAL, or the RGB software device) on a
+  DirectDraw 7 surface with an attached 16-bit Z_Buffer (`FUN_0042de80`). There is no
+  `d3d*.dll` import because IDirect3D7 comes from DirectDraw (this corrects E-0016). Boot
+  sets `D3DRENDERSTATE_AMBIENT = 0x1e1e1e` and, on texture stage 0, MAG/MINFILTER = LINEAR,
+  COLORARG1 = TEXTURE and COLORARG2 = DIFFUSE (modulate). The 0x1a render (vtable[3]) runs
+  only when visible (`+0x110`): BeginScene, `SetMaterial` and `SetTexture` from its
+  CFXTexture, the mesh's `DrawIndexedPrimitive(TRIANGLELIST, FVF 0x112 = XYZ|NORMAL|TEX1)`,
+  EndScene. It sets no world transform (the meshes are in world space) and no cull mode
+  (default D3DCULL_CCW). Lighting is on by default, so the scene's lights (E-0300) light the
+  vertices. CFXTexture's material defaults to diffuse and ambient (1,1,1,1), specular and
+  emissive 0, power 0, unless `<texture>.tma` exists (17 floats in that order; two such files
+  in the corpus). A 32-bit .tga becomes an ARGB8888 texture with alpha blending (`+0x154`:
+  SRCBLEND SRCALPHA, DESTBLEND INVSRCALPHA, alpha from the texture); any other .tga becomes
+  RGB555. The class's layer `+0x114` is 3 (ctor, `0x4500de`).
+- **Method:** decompile.
+- **Confidence:** proven
+
+### E-0304 — The shown view: view 0 on scene entry, 185 op 30, and the player's floor cell
+- **Binary/file:** `FUN_00447270` and `0x446f70` (CFXPlayer, type 0x16); `FUN_0042f210`,
+  `FUN_0042f410` and `FUN_0042f540` (type 0x12, id 185); `FUN_00433010` (CFXFloor); corpus.
+- **Evidence:** placing the player at a scene entry calls `SetView(0)` (or, the first time
+  after a load, the saved view). The player's tick switches to the view number its character
+  stands on when that number is 0..4. The number is `+0x450`, set from the floor cell's u16
+  table `+0x134` by `FUN_00433010`. 185's opcode 30 fades out (20 steps), calls
+  `SetView(arg1)` and fades in. In the corpus its arg is always below the scene's view count
+  (5 commands). 186/op16 is not a view change (grumpa-events, E-0206).
+- **Method:** decompile; corpus scan of `(185, 30, arg)` against the `.scn` view counts.
+- **Confidence:** proven (where the floor cell's value sits in the `.scn` is E-0500/Q-0500)
+
+### E-0305 — Render order: actors by layer, ascending
+- **Binary/file:** `FUN_0040ec20` (render list), `0x40eab0` (factory render).
+- **Evidence:** after a scene loads, the factory collects every actor (id ≥ 2) whose layer
+  `+0x114` is 0..8 as (actor, layer) pairs and sorts them by layer. Each frame it calls each
+  actor's render (vtable[3]) in that order. Layers: 0 the base default (CFXView, the
+  background), 1 and 4 the sprites (E-0302), 3 the 0x1a mesh actors (E-0303), 8 the 185
+  manager (fades). So the layer-1 sprites draw before the meshes, and their depth frames hide
+  parts of the meshes; the layer-4 sprites draw over them.
+- **Method:** decompile.
+- **Confidence:** proven (the order inside one layer comes from std::sort and is not pinned)
+
+### E-0209 — The event VM runs in the engine (dev checks)
+- **Binary/file:** `../scummvm/engines/grumpa/events.cpp` (commit `871171bb`), dev
+  `grumpa_vm` (`dev.cpp`); `Actors/Items.abi` (66 records, all type 5, ids 100..179).
+- **Evidence:** dev runs, logs at `-d2`: (1) Scene_061, view 1 (`185, 30, 1`), click
+  (254,157): trigger 661 fires, sprite 730 (`doorclosed`) hides, 661 deactivates; its 8
+  commands for scene 10 wait (flag 269 = 0 keeps the five guarded `== 0` and drops the two
+  `== 1`); entering scene 10 delivers them (664/665 → 12, 644 → 0, 710 → 500, 730 → 2,
+  731 → 3). With `(269, 56, 1)` first, 664/665 → 11 instead and 644/710 are dropped.
+  (2) Timer 222 started by `(222, 64, 1000)`: its commands `(12, 51, 200)`, `(222, 13)`
+  are delivered on the 52nd update (elapsed 1,020 ms > 1,000 on the 51st, run the next).
+  (3) Scene 1, click (597,140): trigger 663 fires, `(185, 31, 211)` loads Scene_211.
+  (4) Sprites animate by updates (two snapshots 7 updates apart differ). (5) Save in scene
+  61 after (1), new game, load: the 8 deferred commands are back and reach scene 10.
+- **Method:** `grumpa_vm` runs off-screen (SDL offscreen, surfacesdl).
+- **Confidence:** proven (for these paths).

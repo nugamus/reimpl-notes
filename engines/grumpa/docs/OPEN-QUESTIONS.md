@@ -310,3 +310,21 @@ The six values are the character's state slots (slot 0 "State"); which opcodes c
 `FUN_0045ae00` (SetView, 185 op 30) passes `this+0x13c+v*0x40` to
 `IDirect3DDevice7::SetTransform(VIEW)` and `this+0x27c+v*0x40` to `SetTransform(PROJECTION)`
 (grumpa-render, E-0301); the format stays in E-0500 / `scn.py`.
+
+### Q-0008 RESOLVED again (2026-10-03, E-0300, E-0301) — the 0x11 block is a light; the camera is in the `.scn`
+The 0x68 block of E-0103 is a `D3DLIGHT7` (`IDirect3DDevice7::SetLight`, E-0300), not a camera.
+The cameras are the Direct3D view and projection matrices of the `.scn`'s CFXView record,
+set with `SetTransform` on a view switch (E-0301); the z-buffer value is the projection's
+z/w × 65535 and is compared less-or-equal against the `_IZ.fxi` loaded into it.
+
+### Q-0009 RESOLVED (2026-10-03, E-0302, E-0305) — sprite placement, key and depth
+Position `+0x190/+0x194`, its view `+0x1c8`, its layer `+0x114` (1 behind the 3D actors,
+4 in front). The colour key is on when `+0x1f8` = 1: the COLORREF `+0x208`, or frame 0's
+pixel (0,0). Otherwise the sprite is opaque: no blend modes, the smoke and water sprites are
+opaque patches of their background. Depth frames `_Z####.fxi` are copied into the z-buffer.
+
+### Q-0011 RESOLVED (2026-10-03, E-0301, E-0304) — view k is entry k of the `.scn` view list
+Each view carries its own background, depth and camera. View 0 is shown on scene entry.
+185 op 30 switches the view, and so does the player's floor cell.
+
+### Q-0501 RESOLVED (2026-10-03, E-0301) — matrix A is the Direct3D VIEW, B the PROJECTION
