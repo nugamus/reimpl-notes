@@ -374,3 +374,16 @@ not move in the engine (Q-0403), so a click keeps standing in for walking into t
   whether the menu silences it.
 - **Blocks:** nothing in play: the engine starts the ambience with the first scene of a game.
 - **Status:** open
+
+### Q-0502 RESOLVED (2026-10-03, E-0901) — the weapon slot and the two buttons
+
+### Q-0700 RESOLVED (2026-10-03, E-0902) — the ambience plays from boot, under the main menu
+
+### Q-0900 — Which picture is cursor kind 2 (and 1, 7)?
+- **Context:** E-0900: hovering an item (and a hotspot) sets the cursor's kind 2
+  (`FUN_004461a0`); the panel buttons need kind 1. `002_Cursor.atx` lists nine pictures
+  (`default`, `grabing`, `pointpush`, `pull`, `push`, `stop`, `attack`, `itemglitter`,
+  `arrow1_`).
+- **What we checked:** the setter; not the cursor's draw, which maps the kind to a picture.
+- **Blocks:** nothing: the engine shows `grabing` over hotspots and items, `default` else.
+- **Status:** open

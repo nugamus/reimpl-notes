@@ -1490,3 +1490,83 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   12 again and the desert ambience plays.
 - **Method:** `grumpa_vm` runs (SDL offscreen, surfacesdl), PNG snapshots.
 - **Confidence:** proven (for these paths).
+
+### E-0900 — Items in the world: drawn spinning at their place, hovered and picked up within 160 units of the player
+- **Binary/file:** CFXItem (vtable `0x49076c`, ctor `FUN_0043af70`): draw `FUN_0043baf0`,
+  update `FUN_0043b850`, DoCommand `FUN_0043bd30` (op 18 at `0x43bf3a..0x43c043`), load
+  `FUN_0043b3e0`, drop `FUN_0043c340`, `FUN_0043c2d0` (step forward), `FUN_0043d8c0`
+  (`D3DXMatrixRotationYawPitchRoll` `0x473e71` with yaw = rot.y, pitch = rot.x, roll =
+  rot.z); mesh class: draw `FUN_004166e0`, bounding boxes `FUN_004154b0`, screen rectangle
+  `FUN_00415350`; global item effects loaded by `FUN_00435a00` (`Meshes\effect_item.ANB`,
+  `Bitmaps\effect_item.tga`, `Sounds\effect_item.wav` into `DAT_004c01a0/a4/9c`); cursor
+  `FUN_004461a0` (set kind); constants `0x490790` 160.0, `0x490794` 0.05, `0x490768` 2π,
+  `0x4904c0` 30.0, `0x49049c` 20.0.
+- **Evidence:** layer 3 (ctor `+0x114 = 3`), like the 0x1a meshes. **Draw** when visible, its
+  scene (`+0x288`) is the current scene (`+0x4f8`, set by the entry broadcast 23) and State
+  is 4: load the mesh (`Meshes\IO_*.ANB`), texture (`Bitmaps\IT_*.tga`) and name sound
+  (`Sounds\IS_*.wav`) on first use; when the rotation changed, world = RotationYawPitchRoll
+  (yaw rot.y, pitch rot.x, roll rot.z) with the translation = position `+0x28c`; draw the
+  mesh's current frame (always 0 for items) with that world matrix through the view camera,
+  as the 0x1a meshes are drawn (E-0303). The mesh object transforms the 8 corners of that
+  frame's axis-aligned bounding box with the same matrices (`ProcessVertices`) and keeps
+  their screen bounding rectangle (min/max x and y); the item copies it to `+0x4dc`. While
+  the glow flag `+0x500` is set it also draws `effect_item.ANB` with `effect_item.tga` at the
+  same matrix with z writes off. **Update** when active, in the current scene and State 4:
+  every 50/25 = 2 updates the yaw rot.y grows by 0.05 rad (wrapping at 2π), and while the
+  glow flag is set the glow mesh steps one frame and a counter `+0x504` counts up; past 10
+  steps the glow ends. Then, unless the cursor's state is 7 or the inventory panel (actor
+  90) is shown: the rectangle `+0x4dc`, widened to centre ± 30 px in each dimension that is
+  narrower than 40, contains the mouse, and the player's character (actor 3's) is within
+  160 units of the item's position (3D distance): the cursor takes kind 2 (the same as a
+  hotspot under the mouse, trigger update `0x4591ec`), the item speaks its name (DoCommand
+  0) once per entry (`+0x4f4`), and the hovered flag `+0x4fc` is set; otherwise `+0x4f4 = 1`,
+  `+0x4fc = 0`. **Pick-up** (op 18, a click `x | y << 16`): State 4, in the current scene,
+  hovered, the click inside the widened rectangle, the cursor holding nothing → the panel's
+  add (`FUN_004387d0`; success → State 3) and `effect_item.wav` plays. **Placing:** op 71
+  `a`: position = actor `a`'s position with y + 30, rotation = actor `a`'s orientation
+  (`+0x160..`), active, visible, State 4, scene = current, the glow restarts at frame 0,
+  `effect_item.wav` plays; op 54 `n`: scene = `n`, State 4 (position kept). **Drop beside
+  Grumpa** (panel full): position = the player's character's position with y + 20, rotation =
+  its orientation, then 30 units forward (x += sin yaw · 30, z += cos yaw · 30); if that point
+  is off the walk mesh (actor 600, `FUN_00433830`) 30 units back instead; if that fails too,
+  the player's position; State 4, scene current, active, visible, glow, sound.
+- **Method:** decompile; disassembly where the decompiler stops at SafeDisc's two-byte traps
+  (`int3 int3` / `ud2` after `PtInRect`, read as `test eax, eax`: the next instruction is a
+  conditional jump on its result).
+- **Confidence:** proven (logic); the cursor kinds' pictures are Q-0900.
+
+### E-0901 — The panel's weapon slot and its two buttons (resolves Q-0502)
+- **Binary/file:** panel DoCommand `FUN_00437d00` op 18 (`0x437d97..0x438446`), layout
+  `FUN_00438660`, `FUN_00410c60` (an actor's `+0x130`; on the cursor = its kind),
+  `FUN_00421780` (a character wears / takes off an attachment), jump tables `0x43848c`/
+  `0x4384a0` and `0x4384b0`/`0x4384c4`; `Actors/Items.abi`.
+- **Evidence:** op 18 tests, in this order: the door button `+0x248` (x+200..x+232,
+  y+96..y+132): with the cursor of kind 1 (the plain pointer) push `(1, 60)` (actor 1, the
+  menu: the main menu, as Escape); the diskette button `+0x258` (x+70..x+100): with kind 1,
+  push `(1, 61)` (the saved games); the nine slots (E-0504); the shield slot `+0x238`
+  (x+210, y); the weapon slot `+0x228` (x, y, 96×96). The trap after the weapon slot's
+  `PtInRect` (`0x43811e`) is the `test eax, eax` before `je`. **Weapon slot:** nothing on the
+  cursor and a weapon in the slot (`+0x220`): actor 10 takes off the weapon's attachment
+  (`FUN_00421780(kind, 0)`), the weapon goes on the cursor (State 6), push `(weapon, 0)` (its
+  name), the slot empties (`+0x218 = 0`). An item on the cursor: if it is a weapon, a weapon
+  already in the slot goes back to the inventory (add), the slot takes the held one
+  (`+0x218 = 1`, State 3), the cursor empties and actor 10 wears it (`FUN_00421780(kind,
+  1)`); any other item is added to the inventory and the cursor empties. Weapons and their
+  attachment kinds: 100 Father's Sword (broken) 4, 101 Father's Sword 1, 110 Sword of Might
+  3, 113 Hammer 2. The shield slot is the same with 138 (Shield of Protection, kind 0) and
+  134 (Shield, kind 5). SUPERSEDES the "second button only when the scene is not 1" of
+  E-0504/Q-0502: the test is the cursor's kind, not the scene.
+- **Method:** disassembly.
+- **Confidence:** proven; what actor 1 shows on 60/61 is the menu actor's code (type 0x1f,
+  not read), named here from Help.txt (diskette = saved games, door = main menu).
+
+### E-0902 — The ambience starts at boot, before the main menu (answers Q-0700)
+- **Binary/file:** boot `0x437600..0x4377f7` (inside `FUN_00436aa0`): loads
+  `UI\001_Menu\001_Menu.atx` (`0x43769d`), then `FUN_00435a00` (`0x4376ec`), which loads
+  `Actors\global2.atx` (`CreateFromATXFile`), so actor 180 is created and plays its start
+  sound (E-0702); then the inventory, cursor and 185 (fade in over 10). The menu class
+  (type 0x1f, `0x43db00..0x441fb0`) has no push of actor 180 or of opcodes 73/74.
+- **Evidence:** the jungle ambience (index 0) plays from boot under the main menu, at −5 dB;
+  nothing in the menu stops it.
+- **Method:** disassembly of the boot sequence; byte scan of the menu class for the pushes.
+- **Confidence:** strong (static; whether the intro film's playback mutes it is not read).

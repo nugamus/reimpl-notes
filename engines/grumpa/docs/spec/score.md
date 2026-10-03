@@ -66,5 +66,6 @@ underwater, 4 desert, 5 indoor, 6 surface, 7 swamp, 8 undersea, 9 alternative. V
 | 73 | play `arg1` (out of range: nothing). The same one: restarted only if it stopped. Another: it becomes the current one and fades in from −50 dB to −5 dB over 100 updates (sound 0, the start one, starts at −5 dB at once); the old one fades out from 0 dB to −50 dB over 100 updates and stops |
 | 74 | stop the current and the fading one |
 
-Loading the global actors plays sound 0 (Q-0700 for the main menu). Kept in a save: the
+Loading the global actors plays sound 0; the boot loads them before the main menu, so the
+jungle plays under the menu (E-0902). Kept in a save: the
 current index, played again on load.

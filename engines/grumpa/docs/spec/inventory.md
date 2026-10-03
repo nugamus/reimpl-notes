@@ -1,7 +1,7 @@
 # Items, the cursor and the inventory (engine behaviour)
 
 How Grumpa carries and uses objects. Formats: `docs/formats/README.md` (`.abi`, `.atx`).
-Evidence: E-0503, E-0504; command routing and conditions: `events.md` (E-0200, E-0201).
+Evidence: E-0503, E-0504, E-0900, E-0901; command routing and conditions: `events.md` (E-0200, E-0201).
 
 ## Items (E-0503)
 
@@ -18,9 +18,29 @@ The 66 items are global actors, ids 100..179, loaded once per game from `Actors/
 | `IS_<name>.wav` | its spoken name |
 | latch | set by 13; while set only 52 is obeyed |
 
-An item lying in the current scene (State 4) is drawn as a 3D actor. Clicking inside its
-screen rectangle (widened to 60 px if narrower than 40) with nothing on the cursor adds it
-to the inventory and plays the pick-up sound.
+## Items in the world (E-0900)
+
+An item lies in a scene when its State is 4 and its scene is the current one.
+
+- **Drawn** (when visible; layer 3, with the mesh actors): its `IO_*.ANB` frame 0 with
+  `IT_*.tga`, lit, textured and depth-tested like a 0x1a mesh (`scene.md`), placed by
+  world = rotation (roll `rot.z` about Z, then pitch `rot.x` about X, then yaw `rot.y`
+  about Y, Direct3D's yaw-pitch-roll) then translation to `position`.
+- **Spinning** (when active): every 2 updates `rot.y` += 0.05 rad, wrapping at 2π.
+- **Screen rectangle**: the bounding rectangle of the 8 projected corners of the mesh's
+  bounding box under the same matrices, recomputed each draw; for hovering and clicking each
+  dimension narrower than 40 px becomes centre ± 30 px.
+- **Hovering** (when active, the panel hidden): the mouse in the rectangle and the player's
+  character within 160 units of the item → the hotspot cursor, and the item says its name
+  (`IS_*.wav`) once each time the mouse comes onto it.
+- **Picking up** (a left click): a hovered item under the click with nothing on the cursor
+  goes into the inventory (State 3; full: dropped beside Grumpa) and `Sounds\effect_item.wav`
+  plays.
+- **Placed** by op 71 `a` (at actor `a`, 30 units higher, turned as it) or dropped beside
+  Grumpa (at the player's character, 20 higher, 30 units ahead on the walk mesh, else 30
+  behind, else on the spot): State 4 in the current scene, shown, `effect_item.wav`, and a
+  short glow: `Meshes\effect_item.ANB` with `Bitmaps\effect_item.tga` drawn over it (no z
+  writes), one frame every 2 updates for 10 frames.
 
 Commands to an item (`DoCommand`):
 
@@ -83,13 +103,21 @@ A left click on a slot:
 - an item on the cursor, the slot empty → the item goes in that slot (State 3);
 - an item on the cursor and in the slot → the held item goes to the first free slot.
 
+The panel tests a click in this order: the door button, the diskette button, the nine
+slots, the shield slot, the weapon slot (E-0901). The buttons work only with the plain
+cursor: the door sends `(1, 60)` (the main menu), the diskette `(1, 61)` (the saved games).
+
 Adding an item (op 42, a pick-up, or the case above): an item already in a slot is not added
 again; otherwise the first empty slot takes it (State 3). With all nine full, the "inventory
 full" voice plays and the item drops beside Grumpa.
 
-The shield slot takes only 134 (Shield) and 138 (Shield of Protection) and tells actor 10 to
-wear it. The weapon slot and the two buttons are Q-0502; the engine leaves both buttons to
-ScummVM's own save/load and menu.
+The two equipment slots (E-0901): with nothing on the cursor, the item in the slot goes on
+the cursor, says its name, and Grumpa (actor 10) stops wearing it; with an item on the
+cursor that fits the slot, the slot's old item goes back to the inventory, the held one goes
+in (State 3) and Grumpa wears it; any other held item goes to the inventory. The weapon slot
+(left) takes 100, 101, 110 and 113 (Father's Sword broken / whole, Sword of Might, Hammer;
+attachments 4, 1, 3, 2), the shield slot (right) 138 and 134 (attachments 0 and 5). The
+engine maps the door to its main menu and the diskette to ScummVM's save dialog.
 
 ## Persisted state
 
