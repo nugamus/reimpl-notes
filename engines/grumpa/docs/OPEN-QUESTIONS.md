@@ -329,3 +329,11 @@ Each view carries its own background, depth and camera. View 0 is shown on scene
 185 op 30 switches the view, and so does the player's floor cell.
 
 ### Q-0501 RESOLVED (2026-10-03, E-0301) — matrix A is the Direct3D VIEW, B the PROJECTION
+
+## Q-0404 — The sign of a character's yaw
+
+A character's orientation `+0x160` has only `y` set (E-0402). The engine turns the idle mesh
+by it as D3DX's `RotationY` does (x' = x cos + z sin, z' = −x sin + z cos); the original's
+world-matrix build for characters is not read yet. Dev `grumpa_vm=1;...;snap` shows Grumpa
+standing on the hut floor behind the pitchfork, which fits the position but does not decide
+the sign.

@@ -63,5 +63,5 @@ moves that character to the point, turns it, sets `active = visible = 1` and sen
 
 A present character draws its current animation's mesh (`Meshes/<anim>`) with its texture at
 `position`, turned by `yaw` about +Y, through the view camera against the `_IZ.fxi` depth, like
-a type-0x1a mesh actor (`scene.md`). Until the animation state machine is specced (Q-0403) the
+a type-0x1a mesh actor (`scene.md`; the yaw sign is Q-0404). Until the animation state machine is specced (Q-0403) the
 engine shows entry 0, the idle.
