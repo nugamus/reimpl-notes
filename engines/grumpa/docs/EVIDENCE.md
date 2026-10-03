@@ -1314,3 +1314,164 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   the clip's mesh (`+0x150`, 12 bytes a frame; Q-0601).
 - **Method:** decompile, disassembly at 0x421bf4..0x42206e.
 - **Confidence:** proven (clock and wrap); the queue is part of Q-0403.
+
+### E-0700 — Actor 185 is `CFXFadeEffect`: a fade to black by gamma ramp, its timing, and how view and scene changes wait for it
+- **Binary/file:** type 0x12 ctor `FUN_0042ef00` (vtable `0x4905e0`), `FUN_0042f350` (base
+  ramp), SetDevice `FUN_0042f040` (error string `CFXFadeEffect::Initialize(IFXDi…`), DoCommand
+  `FUN_0042f210`, update `FUN_0042f540`, render `FUN_0042f730`, helpers `FUN_0042f290`
+  (fade in), `FUN_0042f310` (fade out), `FUN_0042f410` (fade out, then a view),
+  `FUN_0042f450` (fade out, then a scene), `0x42f4e0` (fade out, then a film); window
+  procedure `FUN_00410cb0`; constants `0x49034c` (1.0), `0x490610` (1/255), `0x490608` (255.0).
+- **Evidence:** the state is a level L (`+0x7bc`, 0..255), a step S (`+0x7c0`), a running flag
+  (`+0x7b4`), a hold counter H (`+0x7c8`), a "black" flag (`+0x7b8`), a pending view
+  (`+0x7d0`, −1 none), a pending scene (`+0x7cc`, −1 none) and a pending film name (`+0xbd4`).
+  **Output:** with `DDCAPS2_PRIMARYGAMMA` the primary surface's gamma ramp is set to
+  `base[i]·L` for red, green and blue, `base[i] = 255·(i/255)^(1/1.0) = i`, so every colour
+  channel is scaled by L/255 (the whole screen); without it the render (layer 8, E-0305) draws
+  an 800×600 quad of colour (L, L, L) blended ZERO·src + SRCCOLOR·dest, the same
+  multiplication. **Update** (each 20 ms, while running): if H > 0, H −= 1 and the ramp is
+  re-applied at the current L (a hold); else L += S; L ≥ 255 → L = 255, stopped, black = 0;
+  L ≤ 0 → L = 0, stopped, black = 1. When it stops: a pending view is shown (`FUN_0045ae00`:
+  view switch and broadcast 26) and a fade in over 20 starts; a pending film is handed to
+  actor 187 (`FUN_0042bf80`) and L jumps back to 255 (`FUN_0042f290(0)`); a pending scene is
+  requested from the factory (`FUN_0040cb20`). **Starts** (each sets H = 4 and running):
+  fade out over n = L 255, S = −255/n (integer division); fade in over n = L 0, S = 255/n;
+  fade in over 0 = L 255, S = 1, update and render at once. **DoCommand:** 30 → fade out over
+  20, pending view `arg1`; 31 → `arg2 ≠ −1`: fade out over 20, pending scene `arg1`;
+  `arg2 = −1`: L = 0 at once (S = −1, H = 4, update and render now), pending scene — the
+  screen goes black at once and the scene changes after the 4-update hold; 32 → fade out over
+  `arg1`; 33 → fade in over `arg1`. Timings: fade out over 20 = 4 held updates + 22 steps of
+  12 (255 − 12·21 = 3, then ≤ 0); fade in over 20 the same; the scene entry's fade in over 24
+  (E-0202) = 4 + 26 steps of 10. **Escape:** the window procedure broadcasts opcode 60 on
+  Escape only when actor 185 exists, L ≠ 0 and it is not running; mouse input is not gated by
+  the fade. **Films:** `0x42f4e0(n, name, arg)` (fade out over n, then the film) has one
+  caller, `CFXCharacter::DoCommand` opcode 0x44 (`0x41e97a`: n = 16, the character's list
+  `+0x678`/`+0x688` at index `arg1`); actor 187 (type 0x29) plays it through DirectShow
+  (`FUN_0042b7b0`, `CoCreateInstance`). Those lists are the message block of E-0401, empty in
+  all 44 characters, so no scene command reaches a film this way.
+  SUPERSEDES the "31: none if `arg2 = −1`" reading of E-0206.
+- **Method:** decompile; disassembly of the ramp loop at `0x42f350`; byte scan of `.text` for
+  the fade fields (only `0x410f60`/`0x410f78` use them outside the class).
+- **Confidence:** proven.
+
+### E-0701 — The sprite rate R is 50: the device's frame-rate field (resolves Q-0200)
+- **Binary/file:** device vtable `0x490548` (ctor `0x42c4f0`, made by `FUN_0042db40`): slot
+  `0x24` `0x42d7e0`, slot `0x28` `0x42d800`; device ctor `0x42c58f`; `0x437591`;
+  sprite update `FUN_0044da50`, SetDevice `FUN_0044d710`, ctor `FUN_0044c800`.
+- **Evidence:** the sprite reads R from `+0x15c` (the device, stored by its SetDevice) through
+  vtable `0x28` = `0x42d800`, which returns the device field `+0x58`. Slot `0x24`
+  (`0x42d7e0`, set frame rate r) writes `+0x58 = r` and `+0x64 = 1000 / r`; the device ctor
+  writes `+0x58 = 0x32`, and device init calls slot `0x24` with `push 0x32` at `0x437591`. Of
+  the 23 indirect `call [reg+0x24]` in `.text`, the others are thiscall or pass a pointer
+  (other interfaces). So a sprite steps one frame when its counter (incremented first)
+  reaches `50 / fps` (unsigned division): every max(1, 50/fps) updates. The sprite ctor
+  defaults fps (`+0x1e0`) to 50 and the mode (`+0x1e4`) to 4. Confirms E-0302's note.
+- **Method:** disassembly.
+- **Confidence:** proven.
+
+### E-0702 — Actor 180 (type 6) is the ambience: ten looping `ambient_*.wav`, cross-faded by opcode 73
+- **Binary/file:** `Actors/global2.atx` (block `<6>`), type 6 ctor `FUN_00413a60` (vtable
+  `0x4903dc`), Serialize `FUN_00414090`, DoCommand `FUN_00413bd0`, update `FUN_00413fe0`,
+  play `FUN_00413c00`, stop `FUN_00413f90`; CFXSound (vtable `0x49089c`): `FUN_004491b0`
+  (loop flag `+0x1a4`), `FUN_00448f70` (play), `FUN_00449040` (stop), `FUN_00449180`
+  (volume), `FUN_004490b0` (fade in), `FUN_004490f0` (fade out), update `FUN_00448db0`;
+  `FUN_004491f0` (`"Sounds"`), `DAT_0049c81c` (−500); scene `.abi` commands.
+- **Evidence:** mode 6 reads id 180, active, visible, `+0x148` the start index (0), a count
+  (10) and the names (`ambient_jungle2.wav`, `ambient_monkey2.wav`, `ambient_ship2.wav`,
+  `ambient_ShipUnderwater2.wav`, `ambient_desert2.wav`, `ambient_Indoor2.wav`,
+  `ambient_surface2.wav`, `ambient_swamp2.wav`, `ambient_undersea2.wav`,
+  `ambient_alternativ2.wav`); one CFXSound per name, set to loop; then, unless the start index
+  is −1, Play(start). **Play(i)** (opcode 73, `arg1 = i`; ignored when out of range): if i is
+  the current sound (`+0x140`), restart it only if it is not playing; else load
+  `Sounds\<name i>`, and on success the old current becomes the previous (`+0x144`), i the
+  current, its target volume −500 (hundredths of a dB: −5 dB); if i is the start index its
+  volume is set to −500 at once, else it fades in from −5000 by 50 every update (100 updates,
+  2 s); it plays looping; the previous one (if any) fades out: its volume counter starts at
+  0 and falls by 50 every update (so it first jumps to 0 dB), and below −5000 it is stopped.
+  **Stop** (opcode 74): stop the current and the previous. **Update** (every update, `active`
+  not tested): the previous sound's update and, once it no longer plays, it is released
+  (previous = −1); then the current sound's update. Status (mode 4/5, `Current\global.abi`):
+  active, visible and the current index, played again on load (−1 none). Corpus: 59
+  `(180, 73, i)` commands (i 0..9), 1 `(180, 74)` (scene 96). The files are in the cabinet's
+  `Sounds_/`.
+- **Method:** decompile; `events.py` walker.
+- **Confidence:** proven.
+
+### E-0703 — Actor 8 (type 0x1b) is `CFXGrumpaScore`: the HUD of coins, life, air and the current form
+- **Binary/file:** `UI/008_Score/008_Score.atx` (block `<27><Score>`), ctor `FUN_00438da0`
+  (vtable `0x490740`), Serialize `FUN_004393d0`, SetDevice `FUN_004396b0`, render
+  `FUN_004396e0`, update `FUN_00439730`, DoCommand `FUN_004397a0`, layout `FUN_00439b80`,
+  add `FUN_0043a2d0`, subtract `FUN_0043a430`, form `FUN_0043a590`, number `FUN_0043a100`,
+  form lookup `FUN_0043a630`; CFXSprite setters `FUN_0044d9d0` (`+0x1d8`), `FUN_0044d9e0`
+  (`+0x110`), `FUN_0044da00` (`+0x190/+0x194`), `FUN_0044da40` (`+0x1e4`), `FUN_0044e0b0`
+  (frame, ignored out of range), `FUN_0044e100` (`+0x1f8`), `FUN_0044e1a0` (`+0x208`),
+  `FUN_0044ecb0` (width `+0x1f0`), `FUN_00453990` (frame count `+0x1c0`), advance
+  `FUN_0044dd80`; strings at `0x49e0f8` (`Air`, `Life`, `Coins`).
+- **Evidence:** layer 6. **Slots:** 0 State, 1 "Coins" = 0, 2 "Life" = 99, 3 "Air" = 99
+  (ctor). Mode 6 reads id 8, active 1, visible 1, the coin position (10, 10), the heart
+  position (758, 10), the digit gap 10 and the digit spacing 2, 13 image names and 6 sound
+  names (all under `UI/008_Score/`). Elements are CFXSprites (the 0x0d class, its frame-file
+  rule E-0302): 0 `curage_star`, 1 `scare_star`, 2 `coin`, 3 `heart`, 4 `air`, 5
+  `scorefont`, 6 `poison_icon`, 7 `strength_icon`, 8..12 the form icons (`grumpa`, `bear`,
+  `boat`, `seahorse`, `dragonfly`); sounds 0 `SX_currage`, 1 `SX_scare`, 2 `coin`, 3
+  `SX_addair`, 4 `SX_subair`, 5 `coin`. Every element: visible, active, colour key on with the
+  key = frame 0's pixel (0, 0), view −1. Layout: coin at (10, 10); heart at (758, 10); the
+  form icons at (758 − width − 8, 10), hidden; the air bar left of the form icon (x − 8 − its
+  width), then poison and strength further left the same way, all three hidden; the two stars
+  at (687, 0), ping-pong (mode 2), hide when done (`+0x1d8 = 1`: the advance clears active
+  and visible at the end), hidden; then the current form's icon shown. Form map (`+0x2e0`,
+  index `+0x2ec`, initially 0): character 10 → icon 8, 13 → 9, 11 → 10, 88 → 11, 12 → 12.
+  **Add(k, n)** (k = 2 coins, 3 life, 4 air; slot k − 1): value += n, at most 99; coins: sound
+  2; life and air: the bar's frame = frame count − value/9 − 1 (99 → frame 0), and when n ≠ 0
+  and the value is not 99: life plays star 0 (play, show, active) and sound 0, air sound 3.
+  **Sub(k, n):** value −= n, at least 0; life and air: frame = count − value/9 − 1 (99 →
+  count − 1); if the old value was not 0: life plays star 1 and sound 1, air sound 4; coins
+  silent. **DoCommand:** 2/3 visible on/off, 11/12 active on/off; 9/10 coins add/sub `arg1`;
+  76/77 air add/sub; 78/79 show/hide the air bar, 80/81 the poison icon, 82/83 the strength
+  icon; 85 the form: the score's Life = character `arg1`'s slot 1, hide icons 8..12, show the
+  form's icon, Add(3, 0) (refresh the heart); 50/51 life add/sub `arg1` with `arg2`: 0 → the
+  score's Life, then the current form character's slot 1 = Life; > 0 → character `arg2`'s
+  slot 1 ± `arg1` (on 51, if it stays above 0 the character plays animation 0x17) and, if
+  `arg2` is the current form, the score's Life too; −10 / −11 → forwarded as
+  `(50|51, arg1, −10|−11)` to actor 3 / 4. **Render** (visible): every element but the font
+  draws itself; then the coin count at x = coin x + coin width + 10, y = coin y: a value above
+  9 draws two digit frames (the second at x + digit width + 2), else one. **Update** (active):
+  the elements' animation (not the font's) and the sounds' updates. Status (mode 4/5): active,
+  visible, form index, air/poison/strength shown, Coins and Air (not Life: re-read from the
+  character on op 85). Files: `heart`/`air` have 11 frames, the stars 5, `scorefont` 10.
+  Corpus: commands to 8: 9 ×2, 10 ×11, 50 ×25, 51 ×25, 76 ×29, 78 ×14, 79 ×12; the 129
+  conditions on actor 8 all test slot 1 (Coins).
+- **Method:** decompile, disassembly of the setters; corpus (`events.py` walker).
+- **Confidence:** proven (logic); what the character's animation 0x17 is belongs to Q-0403.
+
+### E-0704 — Character opcodes that reach the score, and the life/air slots
+- **Binary/file:** `CFXCharacter::DoCommand` `FUN_0041e0d0`.
+- **Evidence:** 0x32/0x33 (50/51) forward `(op, arg1, own id)` to actor 8 (E-0703), so a
+  scene's `(10, 51, 11)` takes 11 life from Grumpa. 0x2c (44, make it the player's character
+  through actor 3) also sends `(8, 85, id)`. On the character's own slots (`+0x11c` vector,
+  value at `+0x104`, stride `0x118`): 0x58 / 0x59 add / subtract `arg1` on slot 2 (floor 0),
+  0x5a / 0x5b the same on slot 3, 0x5d / 0x5e / 0x5f set slot 2 / 3 / 1. Corpus to characters
+  10/12/13: 88 ×2 and 90 ×2; 50/51 via the forward; 44, 70 (0x46, split a rider form) and 72
+  (0x48) belong to the role code (Q-0403).
+- **Method:** decompile.
+- **Confidence:** proven.
+
+### E-0705 — The proximity gate's spheres: the trigger's from its record, the character's from Characters.abi
+- **Binary/file:** `FUN_00457ea0` (trigger Serialize), `FUN_0045a0b0`, `FUN_00459a60` (gate),
+  `FUN_0044c6e0` (sphere test), `FUN_00424e90` (character sphere), `FUN_00446a00`/
+  `FUN_00446b10`/`FUN_00447790` (actor 3), `FUN_004354d0` (actor 4), `FUN_00430b40`/
+  `FUN_0042fb50`/`FUN_0042fc20` (type 0x1c actors 91..95), `FUN_00422670`.
+- **Evidence:** the four u32 after a trigger's polygon (`parsers/abi.py` "358,370,36c,368")
+  are floats `x, y, z, r`: `FUN_0045a0b0` makes the sphere object `+0x13c` with centre
+  `+0x104..+0x10c` = (x, y, z) and radius `+0x110` = r. Two spheres overlap when the centre
+  distance < r1 + r2 (`FUN_0044c6e0`). A character's sphere: centre = its position `+0x16c`
+  with y raised by its radius, radius `+0x290`, the third float of the `f32 [0x28c],
+  f32 [0x5fc], f32 [0x290]` group of Characters.abi (E-0401). Gate (with `+0x154 = 1`): bit 1
+  of `+0x188`: actor 3 (type 0x16) holds a character (`+0x298` ≥ 0) that is present
+  (`visible` and at home, `FUN_00422670`), its sphere overlaps, and `+0x150` is −1 or that
+  character's id; bit 2: the same for actor 4's character (`+0x290`; if actor 4 is absent,
+  actor 95's `+0x2a0`) against `+0x14c`; bit 4: the characters of actors 91, 92, 93, 94
+  (`+0x2a0`), no id test. With `+0x170 = 1` each source passes once per entry (its own latch
+  `+0x158`, `+0x15c`, `+0x160..+0x16c`, cleared while it is outside). Refines E-0207.
+- **Method:** decompile.
+- **Confidence:** proven.

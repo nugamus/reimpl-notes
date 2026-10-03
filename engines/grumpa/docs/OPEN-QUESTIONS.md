@@ -359,3 +359,18 @@ is the first frame of the clip (the rest pose is not a separate frame).
   `.anb` has no such block (E-0600), so it is built at load or comes from another file.
 - **Blocks:** walking (Q-0403).
 - **Status:** open
+
+### Q-0200 RESOLVED (2026-10-03, E-0701) — R = 50, the device's frame rate
+
+### Q-0202 PARTLY RESOLVED (2026-10-03, E-0705) — the sphere fields
+The trigger's sphere is the four floats after its polygon; the character's is its position
+raised by its radius `[0x290]` from Characters.abi. Still open: the player's character does
+not move in the engine (Q-0403), so a click keeps standing in for walking into the sphere.
+
+### Q-0700 — Does the ambience already play under the main menu?
+- **Context:** E-0702: loading `global2.atx` plays the start index (0, the jungle). The
+  global actors are loaded at boot and again by a new game (E-0501, E-0402).
+- **What we checked:** the ambience class; not whether the boot load runs before the menu or
+  whether the menu silences it.
+- **Blocks:** nothing in play: the engine starts the ambience with the first scene of a game.
+- **Status:** open

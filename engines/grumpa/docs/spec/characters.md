@@ -47,7 +47,10 @@ is that scene, or when a command brings it there:
 | 0x29 | place at another actor's position and orientation, show, `home = current scene` |
 | 0x35 | texture index = `arg1` (clamped to the texture count) |
 | 0x36 | `home = arg1` |
-| 0x44 | show message `arg1` (none in the data; `dialogue.md`) |
+| 0x32 / 0x33 | Life + / − `arg1`: passed to the score as `(op, arg1, own id)` (`score.md`, E-0704) |
+| 0x44 | film `arg1` of the character's list after a fade out over 16 (E-0700); the lists are empty in the data |
+| 0x58 / 0x59, 0x5a / 0x5b | slot 2 / slot 3 + / − `arg1` (floor 0) |
+| 0x5d / 0x5e / 0x5f | slot 2 / 3 / 1 = `arg1` |
 | 0x47 | place at actor `arg1`'s position |
 
 Roles (0x2c..0x30, 0x54: player control, follower, mount) are Q-0403.

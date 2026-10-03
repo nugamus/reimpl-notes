@@ -1,7 +1,7 @@
 # The event system (engine behaviour)
 
 How Grumpa runs scene logic: navigation, puzzles, interactions. Evidence: E-0109..E-0117,
-E-0200..E-0208.
+E-0200..E-0208, E-0700..E-0705.
 
 ## Actors
 
@@ -56,15 +56,43 @@ deactivate, 13 latch (and off), 52 unlatch, 86 reset, 500 on (active + visible +
 
 | class | opcodes and behaviour |
 |---|---|
-| 0x0d sprite (E-0208) | play 0/500 (and 23 if autoplay), stop 1/501, 2/3, 11/12, 13 (off, not playing), 52, 86. Update: while active and running, one frame every `50 / fps` updates (Q-0200); mode bits 1 loop, 2 ping-pong, 4 forward, 8 backward, 0x10 forward-then-back. An animation that ends runs its end list; 0x10 runs its forward-end / backward-end lists. Frame count = the frames on disc. |
-| 0x19 trigger (E-0207) | 0 activate + run, 1 deactivate, 2/3, 11/500 active + visible, 12/501 neither, 13 latch + off, 14/15 proximity on/off, 18 click `(x, y)`, 22 mouse position, 86. A click fires it when: active, view gate (`+0x174`) = current view or −1, click type (`+0x178 = 1`), inside the polygon, the proximity gate when `+0x17c = 1` (Q-0202), its conditions when `+0x180 = 1`. Walk-in triggers (`+0x178 = 0`) fire from the update whenever the gate passes (the engine, without a moving player yet, fires them on a click: Q-0202). |
+| 0x0d sprite (E-0208) | play 0/500 (and 23 if autoplay), stop 1/501, 2/3, 11/12, 13 (off, not playing), 52, 86. Update: while active and running, one frame every max(1, 50 / fps) updates (E-0701); mode bits 1 loop, 2 ping-pong, 4 forward, 8 backward, 0x10 forward-then-back. An animation that ends runs its end list; 0x10 runs its forward-end / backward-end lists. Frame count = the frames on disc. |
+| 0x19 trigger (E-0207) | 0 activate + run, 1 deactivate, 2/3, 11/500 active + visible, 12/501 neither, 13 latch + off, 14/15 proximity on/off, 18 click `(x, y)`, 22 mouse position, 86. A click fires it when: active, view gate (`+0x174`) = current view or −1, click type (`+0x178 = 1`), inside the polygon, the proximity gate when `+0x17c = 1` (spheres below), its conditions when `+0x180 = 1`. Walk-in triggers (`+0x178 = 0`) fire from the update whenever the gate passes (the engine, without a moving player yet, fires them on a click: Q-0202). |
 | 0x1a mesh (E-0601) | 0 play (always restarts), 1 stop, 2/3, 11/12, 13 latch + off, 14/15 bubble tests, 23 play if autoplay, 52, 86/92 reload, 500/501 (active + visible + play / neither + stop). Animation and its delay timer: `scene.md`. |
 | 0x21 script (E-0204) | 0 run now; 23 run on the next update if unguarded or its conditions hold; 13/52. |
 | 0x22/0x25 counter | 57 add (`arg1`, at least 1) below max → at max state = 1 and, with fire, run; 58 state 1 → 0, subtract, floor 0; 59 max = `arg1`; 62 count = state = 0; 13/52. |
 | 0x23/0x26 timer | update: while active, elapsed += 20 ms; past the limit: stop, run. 64 start with limit `arg1`; 65 limit = `arg1`; 66 activate; 67 stop; 13/52. |
 | 0x24/0x27 flag | 16/56: state = `arg1`; then state 1 with fire → run; 13/52. |
-| 185 manager (E-0206) | 30 fade out, view = `arg1`, broadcast 26 (`arg1` = view), fade in; 31 fade out (none if `arg2 = −1`), go to scene `arg1`; 32/33 fade out/in over `arg1` updates. |
+| 185 fade (E-0700) | 30 fade out over 20, then view `arg1`, broadcast 26 (`arg1` = view), fade in over 20; 31 fade out over 20 (`arg2 = −1`: black at once), then go to scene `arg1`; 32/33 fade out/in over `arg1` updates. See Fades. |
 | 186 proxy (E-0206) | 63 target = `arg1`; anything else is delivered to the target. |
+| 8 score, 180 ambience | `score.md` (E-0702, E-0703). |
+
+## Fades (actor 185, E-0700)
+
+A level L from 0 (black) to 255 (normal) scales every colour channel of the whole screen by
+L/255. A fade has a step S and a hold H: each update while it runs, a held update (H > 0)
+only counts H down; otherwise L += S, and it ends at L ≥ 255 (L = 255) or L ≤ 0 (L = 0).
+Every start sets H = 4.
+
+- fade out over n: L = 255, S = −255/n (integer division);
+- fade in over n: L = 0, S = 255/n; over 0: L = 255 at once;
+- 31 with `arg2 = −1`: L = 0 at once, S = −1 (it ends after the hold).
+
+When a fade ends: a pending view (30) is shown, broadcast 26, and a fade in over 20 starts; a
+pending scene (31) is requested and the scene changes on the next loop (E-0202), whose entry
+pushes `(185, 33, 24)`: the new scene stays black for the hold, then fades in. L stays where
+the fade left it, so a scene left black stays black until a fade in. Escape (opcode 60 to
+every actor) is taken only while no fade runs and L ≠ 0; clicks are not blocked.
+
+## The proximity gate (E-0705)
+
+A trigger's sphere is the `x, y, z, r` after its polygon; a character's is its position
+raised by its radius `[0x290]` (Characters.abi). Spheres overlap when the centre distance is
+below the sum of the radii. With `+0x154 = 1` the gate passes for: bit 1 of `+0x188`, the
+player's character (actor 3's, present in the scene, `+0x150` −1 or its id); bit 2, actor
+4's character (`+0x14c` −1 or its id); bit 4, the characters of actors 91..94. With
+`+0x170 = 1` each of them passes once per entry into the sphere. The engine has no moving
+player character yet (Q-0202, Q-0403): a click stands in for walking there.
 
 ### Worked examples
 
