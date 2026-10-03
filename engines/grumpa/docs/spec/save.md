@@ -32,7 +32,7 @@ and view — plus ScummVM's header and thumbnail. The player name of `Player.sts
 description. The panel's diskette and door buttons are not drawn as save/load (Q-0502):
 ScummVM's menu (Ctrl+F5) and the launcher replace them.
 
-Layout of the save stream (`Common::Serializer`, version 1, little-endian):
+Layout of the save stream (`Common::Serializer`, version 2, little-endian):
 
     u32 version, i32 current scene
     per item of Items.abi in file order:
