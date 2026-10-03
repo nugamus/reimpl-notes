@@ -305,3 +305,8 @@ Field meanings: E-0402; the shared actor header (`id` read twice) is E-0400.
 ### Q-0402 narrowed (2026-10-03, E-0407)
 The six values are the character's state slots (slot 0 "State"); which opcodes change slots
 1..5 and what they mean is still open.
+
+### Q-0501 RESOLVED (2026-10-03, E-0301) — the view list's matrices are the D3D view and projection
+`FUN_0045ae00` (SetView, 185 op 30) passes `this+0x13c+v*0x40` to
+`IDirect3DDevice7::SetTransform(VIEW)` and `this+0x27c+v*0x40` to `SetTransform(PROJECTION)`
+(grumpa-render, E-0301); the format stays in E-0500 / `scn.py`.
