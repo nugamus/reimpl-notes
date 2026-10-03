@@ -1,7 +1,8 @@
-# Scene load and per-view camera (engine behaviour)
+# Scene load, views and drawing (engine behaviour)
 
-How the engine loads a `.abi` scene graph and sets up the camera for a pre-rendered view.
-Formats: see `docs/formats/README.md` (`.abi`, `.fxi`). Evidence: E-0100..E-0105.
+How the engine loads a scene (`.abi` + `.scn`), which pre-rendered view it shows, and how it
+draws the view, its sprites and its 3D actors. Formats: `docs/formats/README.md` (`.abi`,
+`.scn`, `.fxi`, `.anb`). Evidence: E-0100..E-0104, E-0300..E-0305.
 
 ## `.abi` load (E-0100, E-0104)
 
@@ -20,47 +21,66 @@ members: `EC` (20 bytes), `CC` (= 5 u32 + count + n·EC), pascal strings (u32 le
 and two inline sub-objects (56 and 24 bytes). Type 0x03 `CFXCharacter` (the `Characters.abi`
 / `Actors/*.abi` database) is not yet modelled (Q-0006).
 
-A scene is `Scenes/Scene_<NNN>.abi`; its views are the type-0x11 records. The colour
-background and depth of a view are the paired files `<view>_IS.jpg` + `<view>_IZ.fxi`
-(E-0011); the `.fxi` holds the render device's own 16-bit z-buffer, so an actor composites
-into the view by the per-pixel depth test `actor_z16 < fxi_z16` (E-0010).
+A scene is `Scenes/Scene_<NNN>.scn` (walk mesh, exits, views; E-0500) then
+`Scenes/Scene_<NNN>.abi` (its actors), both read by the same loader (E-0301).
 
-## Per-view camera (E-0103, E-0105)
+## Views (E-0301, E-0304)
 
-A type-0x11 view ends with `u32 cam_id` then a 0x68-byte block of 26 little-endian floats,
-which the original hands straight to the render device
-(`dev->vtable[0x38]()->vtable[0x48](handle, block)`). Across the whole corpus only these
-indices (0-based) are non-zero:
+The `.scn`'s last record is the CFXView (type 9, id 602):
+`u32 9, u32 602, u32 n, n × (pstr "<v>_IS.jpg", pstr "<v>_IZ.fxi"), n × view matrix,
+n × projection matrix` (4×4 little-endian floats each). View k is entry k: its colour
+background, its depth buffer and its camera, the Direct3D 7 VIEW and PROJECTION transforms
+(row vectors, left-handed):
 
-| index | meaning |
-|---|---|
-| 1, 21 | constants (1.0) |
-| 2, 3 | projection scale x, y (1.0 ⇒ 90° FOV; smaller ⇒ wider) |
-| 13, 14, 15 | camera eye position x, y, z |
-| 19 | far / range (scene-sized) |
+    clip   = (x, y, z, 1) · View_k · Proj_k
+    screen = ((clip.x/clip.w + 1) · 400,  (1 − clip.y/clip.w) · 300)
+    z16    = clip.z/clip.w · 65535          // the z-buffer value
 
-The nine orientation slots are 0 in every view, so the views are orientation-identity: the
-eye sits above and in front of the geometry (which lies toward −Z), so the camera looks along
-**−Z**, up **+Y**. Engine camera:
+On scene entry view 0 is shown. 185 op 30 fades to view `arg1`. While the player walks, the
+view follows the floor cell the character stands on (E-0304). Showing view k loads its
+`_IS.jpg` as the background and its `_IZ.fxi` into the 16-bit z-buffer.
 
-    eye     = (block[13], block[14], block[15])
-    forward = (0, 0, -1),  up = (0, 1, 0),  right = (1, 0, 0)
-    NDC     = (block[2] * vx/vz,  block[3] * vy/vz)        // vz = -(view-space Z)
-    screen  = ((0.5 + 0.5*NDC.x) * W,  (0.5 - 0.5*NDC.y) * H)
-    far     = block[19]
+## Lights (E-0300)
 
-Open (Q-0008 sub-point): the exact device projection — whether `block[2]/[3]` are
-`cot(fov/2)` diagonal terms (assumed here) and how view-space Z maps to the `.fxi` 16-bit
-depth (linear vs 1/z) — awaits the device `vtable[0x48]` decompile. The model above is
-calibrated against the pre-rendered backgrounds; when static and runtime disagree, the
-rendered result wins.
+A type-0x11 record (`CFXLight`) ends with `u32` (unused) and a `D3DLIGHT7` (26 floats): `[0]`
+type (1 = point), `[1..4]` diffuse rgba, `[13..15]` position, `[19]` range, `[21..23]`
+attenuation. Light index = id − 630. It is set and enabled at load; opcodes 2/3 switch it
+on/off; update mode `+0x1b8` 1 flickers it, mode 2 varies its colour like fire.
 
-## 2D sprite props (type 0x0d, E-0106, E-0107)
+## Drawing order (E-0305)
 
-Most moving scene content is animated 2D sprites, not 3D meshes. A type-0x0d record carries:
-a JPG frame-base name (`cannons_0000.jpg`, `butterfly3_0000.jpg`), an 8-u32 animation block
-(frame count, rate, loop flags), two leading flag ints `h[0],h[1]` (blend/key mode), and —
-when its gate field (+0x20c) is 1 — a screen position `(x, y)` in 800×600 pixels at
-+0x190/+0x194. The engine draws the sprite's current frame at `(x, y)` over the background
-with a blue colour key (pixels near `(0,0,255)` are transparent). Open (Q-0009): the exact
-blend modes (smoke sprites differ), and per-frame depth occlusion against the `_IZ.fxi`.
+Each frame: the view's background and depth, then every visible actor by layer `+0x114`,
+ascending: layer-1 sprites, layer-3 mesh actors (0x1a), layer-4 sprites (layer 8: the
+fades of 185).
+
+## Sprites (type 0x0d CFXSprite, E-0106, E-0302)
+
+A visible sprite is drawn when its view `+0x1c8` is −1 or the current view, at `+0x190,
++0x194`, clipped to 800×600:
+
+1. if it has depth frames, the frame's depth is copied into the z-buffer over its
+   rectangle (no key);
+2. the colour frame is copied to the page, skipping the key colour when `+0x1f8` = 1 (key =
+   COLORREF `+0x208` = 0x00BBGGRR, or frame 0's pixel (0,0) when −1; an exact 16-bit match),
+   else opaque.
+
+Frame files: a name `<stem>0000.<ext>` animates; frame i is `<stem>%04d.<ext>` while it
+exists; depth frames `<stem>_Z%04d.fxi`. Any other name is a still with depth
+`<name without ext>_Z.fxi`. Animation: one frame every `50/fps` game ticks of 20 ms (`+0x1e0`
+fps), mode bits `+0x1e4` as E-0208.
+
+## Mesh actors (type 0x1a CFXStaticCharacter, E-0303)
+
+A visible 0x1a actor draws its `.anb` (frame 0 here) in world space (no world transform)
+through the current view's camera, as Direct3D 7's fixed pipeline does:
+
+- **culling**: counter-clockwise triangles on screen are dropped (D3DCULL_CCW);
+- **lighting**, per vertex (Gouraud), material = the texture's (default diffuse and ambient
+  white; a `<texture>.tma` overrides it): `colour = ambient 0x1e1e1e + Σ lights on, within
+  range: diffuse · max(0, N·L) / (a0 + a1·d + a2·d²)`, clamped to 1;
+- **texture**: modulated with the lit colour, bilinear filtering, wrap addressing. A 32-bit
+  `.tga` keeps its alpha and is blended (SRCALPHA, INVSRCALPHA), any other is RGB555;
+- **depth**: `z16 ≤ z-buffer` passes and writes `z16`.
+
+Characters (type 0x03) are drawn the same way, after their own world placement
+(`spec/characters.md`).
