@@ -21,7 +21,7 @@ doc: |
 
   Key names are not guessed: they are the literal ASCII labels the writer emits. The
   parser's REQUIRED_KEYS tuple mirrors the sample layout. Field meanings not exposed
-  by a name follow CLAUDE.md rule 5 and stay labelled by key.
+  by a name stay labelled by key.
 
 seq:
   - id: header

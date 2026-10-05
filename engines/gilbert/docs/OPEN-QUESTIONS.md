@@ -244,7 +244,7 @@ end, Q-0100.. `default.dat` and `ge.dll`).
 - **Blocks:** the engine's choice: keep the original's behaviour (room shown, room anims
   frozen, silent menu) or treat it as a bug (return to mode 2).
 - **Status:** open for the original; the engine treats it as a bug and fixes it always
-  (bug fixes are not options, CLAUDE.md): Menu in a close-up plays the menu music like
+  (bug fixes are not options): Menu in a close-up plays the menu music like
   Menu in a room, and Continue returns to the close-up ge.dll still has open.
 
 ### Q-0302 — Does a dialogue opened in a room get the press, or does the room take it?
@@ -279,6 +279,6 @@ end, Q-0100.. `default.dat` and `ge.dll`).
 - **Observed range:** —
 - **Blocks:** the engine's choice. Candidate repairs from the data itself: treat v35 == 6
   like 5 in 6081 (bridge down while the queen waits for the bucket), and run 1080 instead of
-  1083 for the crevice's state 3. Bug fixes are always on (CLAUDE.md), but these change
+  1083 for the crevice's state 3. Bug fixes are always on, but these change
   the game's data flow, so the user decides.
 - **Status:** RESOLVED (see E-0609): the engine repairs both, always on

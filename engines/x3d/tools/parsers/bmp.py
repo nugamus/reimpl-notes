@@ -2,7 +2,7 @@
 
 Standard Windows `BITMAPINFOHEADER` (BMP3) — 381 files / 125 MB in the corpus. The
 format is third-party and well documented; the parser exists because every spec in
-this project must pass `engines/x3d/tools/parsers/`'s 100%-corpus rule (CLAUDE.md rule 2).
+this project must pass `engines/x3d/tools/parsers/`'s 100%-corpus rule.
 
 Layout (every field is little-endian):
 

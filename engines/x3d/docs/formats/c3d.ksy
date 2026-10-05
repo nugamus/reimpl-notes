@@ -24,7 +24,7 @@ doc: |
   Validated by `engines/x3d/tools/parsers/c3d.py` against all 6 `.C3D` files in the corpus: every
   file parses, every byte is consumed. Totals: 6 cameras, 648 bytes.
 
-  The 10 f32s are flagged `params` rather than guessed at (CLAUDE.md rule 5). The most
+  The 10 f32s are flagged `params` rather than guessed at. The most
   likely split into position / target / up triples at `+0x2C`, `+0x3C`, `+0x4C` is
   recorded as Q-0014; the other four remain opaque.
 

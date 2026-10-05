@@ -1,5 +1,4 @@
-"""Scripted play-through of Ring's third world, FO (the Forest), for the engine's dev_input
-(CLAUDE.md, Ring "Test"): FO entered by `zone 4 0`, the wolves' hall scrolls and the dial,
+"""Scripted play-through of Ring's third world, FO (the Forest), for the engine's dev_input: FO entered by `zone 4 0`, the wolves' hall scrolls and the dial,
 the smithy (hunter's wall, mine, furnace, mold), the poison berries, the tree, the press and
 the golem's panel, the fire arrow, worms and fishing, the hare, the wolf statue, Sieglinde's
 door, story, cup and medallion, the sword Notung and the ending back to the hub

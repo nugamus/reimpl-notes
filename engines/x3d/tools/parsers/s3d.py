@@ -15,7 +15,7 @@ The signature and counts in the individual `.O3D`/`.A3D`/`.L3D`/`.C3D` files are
 superfluous here because each section uses the same shape as the standalone format but
 without its 32-byte prefix.
 
-Per CLAUDE.md rule 2 the validator must consume every byte of every `.S3D` file with
+The validator must consume every byte of every `.S3D` file with
 no out-of-range indices. `parse` insists on `expect_eof()` at the end.
 
     python engines/x3d/tools/parsers/s3d.py                 # validate the corpus

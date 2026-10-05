@@ -1,6 +1,6 @@
 """Binary parsing helpers for X3D format specs.
 
-Two things this exists for, both from CLAUDE.md rule 2:
+Two things this exists for:
 
   * every read is bounds-checked, so a bad spec fails loudly at a known offset instead of
     silently returning garbage;
@@ -206,7 +206,7 @@ class CorpusResult:
 
     @property
     def complete(self) -> bool:
-        """CLAUDE.md rule 2: anything short of 100% means the spec is not done."""
+        """Anything short of 100% means the spec is not done."""
         return self.total > 0 and not self.failed
 
 
@@ -284,7 +284,7 @@ def default_root() -> Path:
     """Data root, overridable with --root or MONET_DATA_ROOT.
 
     Repo-relative default so parsers run with no arguments; the extracted CD image is
-    checked in next to the tools. Treat it as read-only (CLAUDE.md rule 7).
+    checked in next to the tools. Treat it as read-only.
     """
     env = os.environ.get("MONET_DATA_ROOT")
     if env:

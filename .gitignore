@@ -1,5 +1,5 @@
-# Game data: disc images and their extracted files. Read-only source material (CLAUDE.md,
-# Rules), tens of GB and not ours to redistribute. Keep it on disk, out of the repo.
+# Game data: disc images and their extracted files. Read-only source material, tens of GB
+# and not ours to redistribute. Keep it on disk, out of the repo.
 games/*/discs/
 games/*/images/
 
@@ -57,3 +57,22 @@ engines/*/traces/*.png
 # Save files copied from runs of the original (binary, machine-specific).
 engines/x3d/traces/save/
 engines/x3d/traces/inv/
+
+# Decompiler output and disassembly of the original executables. Reference material for
+# the analysis, but it is the publisher's code: never commit it.
+**/notes/decomp/
+
+# Downloaded game files, patches and archives
+*.zip
+*.7z
+*.rar
+*.iso
+*.cue
+*.bin
+*.exe
+*.dll
+
+# Local assistant and tool configuration
+CLAUDE.md
+.claude/
+.mcp.json

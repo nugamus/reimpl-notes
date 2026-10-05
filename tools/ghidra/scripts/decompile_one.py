@@ -1,6 +1,6 @@
 """Decompile one named function to disk, with its callee list.
 
-CLAUDE.md rule 4: one function at a time, never bulk. The output lands in `engines/x3d/notes/decomp/`
+One function at a time, never bulk. The output lands in `engines/x3d/notes/decomp/`
 so it can be read selectively instead of being dragged through context, and the callee
 list is what drives the next hop.
 
@@ -67,7 +67,7 @@ def decompile(program, func, out_dir: Path, timeout: int = 120) -> dict:
         % (program.getName(), func.getName(True), entry, func.getBody().getNumAddresses()),
         " *",
         " * Ghidra decompiler output. Reference only — never paste into engine/",
-        " * (CLAUDE.md rule 3). Regenerate with tools/ghidra/scripts/decompile_one.py.",
+        " *. Regenerate with tools/ghidra/scripts/decompile_one.py.",
         " *",
         " * Calls:",
     ]

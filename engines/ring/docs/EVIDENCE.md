@@ -168,7 +168,7 @@ An entry at `tentative` confidence must also have a matching line in `OPEN-QUEST
   `ring.exe`, CD disc 6 `ring.exe`, Prophet cd1 `Legend.ex_`; MD5s as E-0002..E-0004)
 - **Evidence:** auto-analysis succeeded for all four (`logs/ring-import.log`); function
   counts 1,940 / 1,954 / 3,111 / 2,079.
-- **Method:** PyGhidra headless `-import … -overwrite` (the command is in CLAUDE.md, Ring).
+- **Method:** PyGhidra headless `-import … -overwrite`.
 - **Confidence:** proven
 
 ### E-0013 — ~370 functions per EXE are named from the method names in their error strings

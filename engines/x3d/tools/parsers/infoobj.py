@@ -34,7 +34,7 @@ savegame's `OBJECTS` chunk (`FUN_0041d6f0`) has the same layout:
     +0x3C u32 anim_fps    animation frame rate
     +0x40 u32 anim_loop   loop flag
 
-Per CLAUDE.md rule 2 the validator must consume every byte of every INFOOBJ.BIN file
+The validator must consume every byte of every INFOOBJ.BIN file
 with no out-of-range indices. `parse` insists on `expect_eof()` at the end.
 
     python engines/x3d/tools/parsers/infoobj.py                 # validate the corpus

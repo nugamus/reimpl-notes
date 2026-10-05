@@ -35,8 +35,8 @@ An entry at `tentative` confidence must also have a matching line in
 
 ### E-0002 — `MSVCRTD.DLL` is redistributed alongside the game binaries
 - **Binary/file:** `Original Game Files/INSTALL/02_PR/MSVCRTD.DLL`
-- **Evidence:** file present in the shipping payload. Consistent with the CLAUDE.md ground
-  truth that both EXEs are MSVC 6 debug builds — a release build would link `MSVCRT.DLL`.
+- **Evidence:** file present in the shipping payload. Consistent with both EXEs
+  being are MSVC 6 debug builds — a release build would link `MSVCRT.DLL`.
 - **Method:** directory listing.
 - **Confidence:** strong
 
@@ -61,8 +61,8 @@ An entry at `tentative` confidence must also have a matching line in
 
 ### E-0004 — `AviPlay.dll` exports by name, not by ordinal
 - **Binary/file:** `INSTALL/02_PR/AviPlay.dll`
-- **Evidence:** export table contains the five names listed in E-0003. CLAUDE.md
-  previously described it as "ordinal-only".
+- **Evidence:** export table contains the five names listed in E-0003. An earlier note
+  described it as "ordinal-only".
 - **Method:** same `pefile` sweep.
 - **Confidence:** proven
 

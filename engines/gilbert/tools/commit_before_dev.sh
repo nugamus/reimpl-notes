@@ -1,6 +1,6 @@
 #!/bin/sh
 # Commit what is staged in ../scummvm, then move the new commit below the DEV: commits at
-# the tip of the branch (the development harnesses stay last, CLAUDE.md).
+# the tip of the branch (the development harnesses stay last).
 #   engines/gilbert/tools/commit_before_dev.sh <message-file>
 # Stops (and leaves the cherry-pick for you) if a DEV commit does not apply on top.
 set -e

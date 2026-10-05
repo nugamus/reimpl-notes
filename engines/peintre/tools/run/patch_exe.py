@@ -1,6 +1,6 @@
 r"""Patch the run-folder copy of Mission Sunlight so it runs without an installation.
 
-Never point this at games/mission-sunlight/discs (CLAUDE.md rule 5). It edits the copy in
+Never point this at games/mission-sunlight/discs. It edits the copy in
 the run folder (default C:\SunlightRun\mission.exe), checks the original bytes before
 writing, and is idempotent.
 

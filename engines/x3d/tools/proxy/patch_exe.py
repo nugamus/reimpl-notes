@@ -1,6 +1,6 @@
 """Patch the run-folder copy of the game so it can run windowed on a 32-bit desktop.
 
-Never point this at `games/monet/discs/cd/` (CLAUDE.md rule 7). It edits the copy in the run
+Never point this at `games/monet/discs/cd/`. It edits the copy in the run
 folder (default C:\\MonetRun), checks the original bytes before writing, and is idempotent.
 
     python engines/x3d/tools/proxy/patch_exe.py [--run C:\\MonetRun]

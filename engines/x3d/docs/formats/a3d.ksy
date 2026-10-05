@@ -22,7 +22,7 @@ doc: |
   has hide or morph keys; their layout is the loader's. Playback semantics:
   `engines/x3d/docs/spec/animation.md`.
 
-  Fields marked "unknown" are opaque on purpose (CLAUDE.md rule 5).
+  Fields marked "unknown" are opaque on purpose.
 
 seq:
   - id: signature

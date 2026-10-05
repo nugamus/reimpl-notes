@@ -6,7 +6,7 @@
 #   cmake --build build/proxy --config Release
 #
 # Then copy the game install, rename x3d.dll to x3d_orig.dll, and drop the built x3d.dll
-# in beside it. Never edit the originals in place (CLAUDE.md rule 7).
+# in beside it. Never edit the originals in place.
 
 cmake_minimum_required(VERSION 3.20)
 project(monet_proxy C)

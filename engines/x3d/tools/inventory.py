@@ -1,6 +1,6 @@
 """Walk the game data root and write engines/x3d/notes/corpus-inventory.md.
 
-Read-only over the corpus (CLAUDE.md rule 7). The point is to answer, before any
+Read-only over the corpus. The point is to answer, before any
 decompilation: what file types exist, how many, how big, and does each extension have one
 container format or several? A single magic prefix across every .O3D means one loader; six
 distinct prefixes means the extension is a lie and the real discriminator is elsewhere.

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Build (or refresh) C:\SunlightRun, a runnable copy of Mission Sunlight for answering
-# precise questions (CLAUDE.md rule 7). Idempotent.
+# precise questions. Idempotent.
 #   bash engines/peintre/tools/run/setup_run.sh [run-dir]
 # - copies Data/ from the CD folder (never modifies games/mission-sunlight/discs) and
 #   Data/mission.___ as mission.exe;

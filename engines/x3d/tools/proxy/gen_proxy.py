@@ -2,7 +2,7 @@
 
 The proxy exports every symbol the original DLL does, logs each call, and tail-jumps to
 the real implementation. It is the behavioural oracle: when static analysis and a trace
-disagree, the trace wins (CLAUDE.md).
+disagree, the trace wins.
 
 Signatures are unknown at this stage, so the thunks are `__declspec(naked)` and never
 touch the argument area. Each one saves all registers and flags, calls the logger,
@@ -19,7 +19,7 @@ which joins straight back to `engines/x3d/notes/function-map.csv`.
     python engines/x3d/tools/proxy/gen_proxy.py --selftest
 
 Deployment: build, rename the game's `x3d.dll` to `x3d_orig.dll`, drop the proxy in as
-`x3d.dll`. Never modify the originals in place (CLAUDE.md rule 7) — copy the install
+`x3d.dll`. Never modify the originals in place — copy the install
 directory first.
 """
 

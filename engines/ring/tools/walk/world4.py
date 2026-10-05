@@ -1,5 +1,4 @@
-"""Scripted play-through of Ring's world 4, WA (Walhalla), for the engine's dev_input
-(CLAUDE.md, Ring "Test"): from WA's entry 0 (the first step is `zone 6 0`) through the four
+"""Scripted play-through of Ring's world 4, WA (Walhalla), for the engine's dev_input: from WA's entry 0 (the first step is `zone 6 0`) through the four
 tasks (50300 with the Beam, the golem and its grid, the Conch and the leaf, the tree), the desk
 and the letter burnt, the switches aligning the beam, the Rope and the ending back to the hub
 (games/ring/docs/wa.md "Flow"). Prints the dev_input line; on stderr a timeout in seconds for

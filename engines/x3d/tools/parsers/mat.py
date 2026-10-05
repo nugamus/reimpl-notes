@@ -36,7 +36,7 @@ never zero in line 17 when line 19 is non-zero, etc. The parser captures both in
 under `reflection` rather than picking one, since the loader's behaviour on the duplicate
 is unverified (the handoff skips the loader decompile for `.MAT`).
 
-Per CLAUDE.md rule 2 the validator must consume every byte of every `.MAT` file with no
+The validator must consume every byte of every `.MAT` file with no
 unparsed trailing matter.
 
     python engines/x3d/tools/parsers/mat.py                 # validate the corpus

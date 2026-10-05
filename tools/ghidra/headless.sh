@@ -3,7 +3,7 @@
 # already running. Safe to call repeatedly: an already-listening port is a
 # success, not an error, which is what makes it usable from a SessionStart hook.
 #
-# The MCP bridge (`claude mcp list`, local scope for this repo) discovers this
+# The Ghidra MCP bridge discovers this
 # server by scanning 127.0.0.1:8089..8104, so nothing here needs to tell it where
 # the server is.
 #

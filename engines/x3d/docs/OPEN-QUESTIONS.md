@@ -1,7 +1,7 @@
 # Open questions
 
 Things we could not determine after checking the loader, the corpus, and the traces.
-Per CLAUDE.md rule 5: an unresolved field goes here and gets marked as an opaque blob in
+An unresolved field goes here and gets marked as an opaque blob in
 the format spec. It does not get a guessed meaning.
 
 Append only. When a question is answered, keep the entry, mark it `RESOLVED`, and link the
@@ -33,7 +33,7 @@ Append only. When a question is answered, keep the entry, mark it `RESOLVED`, an
   modules while tracing (engines/x3d/tools/proxy/README.md).
 
 ### Q-0002 — Which data root does the shipping build actually use?
-- **Context:** CLAUDE.md says `<drive>:/Data/`. The repo has an extracted CD image at
+- **Context:** The working assumption was `<drive>:/Data/`. The repo has an extracted CD image at
   `games/monet/discs/cd/Data/`, which may differ from an installed game's `Data` directory
   (installers commonly copy a subset, or decompress packed files).
 - **What we checked:** nothing yet — noted at bootstrap.

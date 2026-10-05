@@ -2,7 +2,7 @@
 
 `x3d.dll` and `h3d.dll` replacements that log every call and forward it to the real
 implementation. This is the behavioural oracle: when static analysis and a trace
-disagree, the trace wins (CLAUDE.md).
+disagree, the trace wins.
 
 ## Build
 
@@ -24,7 +24,7 @@ being transparent, that is where it shows.
 
 ## Capturing traces: step-by-step
 
-Commands are Git Bash from the repo root; `!` in front runs them from the Claude Code prompt.
+Commands are Git Bash from the repo root.
 
 ### 1. Set up the run folder (once; already done on the capture machine)
 

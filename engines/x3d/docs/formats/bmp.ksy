@@ -9,7 +9,7 @@ doc: |
   (131 MB total, all `BM` magic) are uniformly BMP3: 14-byte file header, 40-byte info
   header, no compression (`BI_RGB` only), bpp in {8, 16, 24}. Format is third-party and
   documented; this spec exists because every format in the project must ship with a
-  `.ksy` and a validator that parses 100% of the corpus (CLAUDE.md rule 2).
+  `.ksy` and a validator that parses 100% of the corpus.
 
   The declared `file_size` field in the file header is informational. Three of 381
   corpus files (`SaveRetourD.BMP`, `SaveSommaireD.BMP`, `U01_04P.BMP`) record it short

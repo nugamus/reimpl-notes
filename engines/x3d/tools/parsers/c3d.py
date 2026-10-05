@@ -27,7 +27,7 @@ The 10 f32s are stored under the same key for every camera; their meaning is opa
 this point (see OPEN-QUESTIONS.md for likely groupings — three camera slots at +0x2c,
 +0x3c, +0x4c are the best guesses for position, target, and up).
 
-Per CLAUDE.md rule 2 the validator must consume every byte of every `.C3D` file with no
+The validator must consume every byte of every `.C3D` file with no
 out-of-range indices. `parse` insists on `expect_eof()` at the end.
 
     python engines/x3d/tools/parsers/c3d.py                 # validate the corpus

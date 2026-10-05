@@ -18,7 +18,7 @@ doc: |
   file parses, every byte is consumed, and no index falls out of range. Totals: 2,133
   materials, 13,950 objects, 130,797 faces, 140,129 vertices, 14,700,676 bytes.
 
-  Fields named "unknown" are opaque on purpose (CLAUDE.md rule 5). They are read and
+  Fields named "unknown" are opaque on purpose. They are read and
   their width is proven; their meaning is not, and no name is guessed at.
 
 seq:

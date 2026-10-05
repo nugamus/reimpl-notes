@@ -5,7 +5,7 @@ Input: engines/ring/notes/names/<PROGRAM>.csv (tools/ghidra/scripts/ring_string_
 and reference/templier-scummvm-ring/engines/ring. Output: engines/ring/notes/reference-map.md.
 
 The class table below is a map, not evidence: it says where in Templier's tree to read, and
-a row becomes a fact only once the binary confirms it (CLAUDE.md, Ring). Method names are
+a row becomes a fact only once the binary confirms it. Method names are
 matched mechanically: the original abbreviations (`ObjPreAddAniToPuz`) are expanded word by
 word (`objectPresentationAddAnimationToPuzzle`) and compared case-insensitively with every
 method name declared in the reference headers.

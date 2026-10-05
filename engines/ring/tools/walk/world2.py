@@ -1,5 +1,4 @@
-"""Scripted play-through of Ring's second world, N2 and RO, for the engine's dev_input
-(CLAUDE.md, Ring "Test"; games/ring/docs/n2.md, ro.md "Flow"). Prints the dev_input line;
+"""Scripted play-through of Ring's second world, N2 and RO, for the engine's dev_input. Prints the dev_input line;
 on stderr a timeout in seconds for the run. Snapshots go to C:/tmp/w2-*.png.
 
     python world2.py n2                 # N2 from its entry 0 to its end (GoZone(5, 0))

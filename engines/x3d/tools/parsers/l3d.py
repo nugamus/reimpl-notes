@@ -25,7 +25,7 @@ The `if is_spot` block then reads another 5 f32s — three for the spot target x
 cone angles. None of the five corpus files carries a spot light, so that branch is parsed
 but never cross-validated (no sample).
 
-Per CLAUDE.md rule 2 the validator must consume every byte of every `.L3D` file with no
+The validator must consume every byte of every `.L3D` file with no
 out-of-range indices. `parse` insists on `expect_eof()` at the end.
 
     python engines/x3d/tools/parsers/l3d.py                 # validate the corpus

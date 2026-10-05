@@ -1,4 +1,4 @@
-"""Scripted play-through steps for the Ring engine's dev_input (CLAUDE.md, Ring "Test"):
+"""Scripted play-through steps for the Ring engine's dev_input:
 prints the dev_input line, and on stderr a timeout in seconds for the run."""
 import sys
 steps=[]; T=[0]

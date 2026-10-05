@@ -84,7 +84,7 @@ radius, f32 sphere Z offset, f32 `unk_speed` (read, then overwritten with 2.0).
 ## `.O3D` — what the corpus proves so far
 
 Working notes, not a spec. `engines/x3d/docs/formats/` stays empty until a validator consumes every
-byte of all 596 files (CLAUDE.md rule 2). Two structural hypotheses were tested here and
+byte of all 596 files. Two structural hypotheses were tested here and
 **refuted**; they are written down so nobody re-derives them.
 
 Corpus: 596 `.O3D` files, 14.0 M, one distinct magic (E-0008).
@@ -129,7 +129,7 @@ Two fixed-stride readings looked right on the first few files and both failed th
    +0 and +36 of each record as name fields fails 18,259 times across 10,253 candidate
    object slots.
 
-The lesson is the one CLAUDE.md rule 2 already states: "no overrun" is not evidence of a
+The lesson: "no overrun" is not evidence of a
 correct layout. A field-level check refuted in minutes what a length check had endorsed.
 
 ### Next step
@@ -142,7 +142,7 @@ is imported by both EXEs and reached from `U99.cpp` `0x00464ead` in `MissionD.ex
 ## `.L3D` — what the corpus proves
 
 Working notes, not a spec. `engines/x3d/docs/formats/l3d.ksy` is the canonical artefact once a validator
-consumes every byte of every file (CLAUDE.md rule 2).
+consumes every byte of every file.
 
 Corpus: 5 `.L3D` files, 5,718 bytes, one distinct signature.
 
@@ -197,7 +197,7 @@ this is a simpler shape than `.O3D` and the "stride hypothesis" trap doesn't app
 The `extra_floats` slot is almost always `(104.8, 125.2, ±1.0)` — three values, the third
 nearing `±1`. Consistent with one being intensity (the `X3d_Light_Set_Multiplier` export
 covers that), the others not named. The `extra_u32s` slot is almost always `(0, 1)`. Both
-slots are flagged `extra_*` in `engines/x3d/tools/parsers/l3d.py` per CLAUDE.md rule 5.
+slots are flagged `extra_*` in `engines/x3d/tools/parsers/l3d.py`.
 E-0140 names them: inner and outer radius, multiplier, hidden, attenuate (`l3d.ksy`).
 
 ### Spot branch — no corpus sample
@@ -217,7 +217,7 @@ after `.L3D`.
 ## `.C3D` — what the corpus proves
 
 Working notes, not a spec. `engines/x3d/docs/formats/c3d.ksy` is the canonical artefact once a
-validator consumes every byte of every file (CLAUDE.md rule 2).
+validator consumes every byte of every file.
 
 Corpus: 6 `.C3D` files, 648 bytes, one distinct signature.
 
@@ -283,7 +283,7 @@ even simpler shape than `.L3D`.
 All six files are version 0.95; all carry exactly one camera; all are 108 bytes
 (32-byte signature + u32 count + 72-byte record).
 
-The 10 f32s are flagged `params` and given no semantic names per CLAUDE.md rule 5.
+The 10 f32s are flagged `params` and given no semantic names.
 The plausible split into three vec3s at `+0x2C`, `+0x3C`, `+0x4C` (position, target,
 up) is recorded as Q-0014 with no engine-side evidence yet.
 
@@ -299,7 +299,7 @@ follow.
 ## `.S3D` — what the corpus proves
 
 Working notes, not a spec. `engines/x3d/docs/formats/s3d.ksy` is the canonical artefact once a
-validator consumes every byte of every file (CLAUDE.md rule 2).
+validator consumes every byte of every file.
 
 Corpus: 1 `.S3D` file (`U02/anim/U02_02/U02_02.S3D`), 73,916 bytes, version 0.95.
 
@@ -361,7 +361,7 @@ remaining engine format, 518 files / 48.4 M / 8 magics). `.BMP`, `.BIN`, `.FRA`,
 ## `.MAT` — what the corpus proves
 
 Working notes, not a spec. `engines/x3d/docs/formats/mat.ksy` is the canonical artefact once a
-validator consumes every byte of every file (CLAUDE.md rule 2).
+validator consumes every byte of every file.
 
 Corpus: 5 `.MAT` files, 4,858 bytes, no magic (plain ASCII).
 
@@ -442,7 +442,7 @@ the family claim is locked in across the smaller ones; that order is preserved h
 ## `.BMP` — what the corpus proves
 
 Working notes, not a spec. `engines/x3d/docs/formats/bmp.ksy` is the canonical artefact once a
-validator consumes every byte of every file (CLAUDE.md rule 2).
+validator consumes every byte of every file.
 
 Corpus: 381 `.BMP` files, 131 MB, all `BM` magic, all BITMAPINFOHEADER (BMP3).
 
@@ -517,7 +517,7 @@ stride are self-consistent, so the parser reads every byte correctly.
 
 ### Why this matters for the corpus claim
 
-BMP is a third-party format; CLAUDE.md rule 2 still applies (every format needs a
+BMP is a third-party format; the same rule still applies (every format needs a
 spec and a 100%-corpus validator), but the loader decompile step is unnecessary —
 Microsoft's published format is sufficient. The EVIDENCE entry cites the parser run
 and the sample-byte survey (all `BM`, all `BITMAPINFOHEADER`, all BI_RGB) rather than

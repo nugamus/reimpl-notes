@@ -1,5 +1,4 @@
-"""Scripted play-through of Ring's first world, NI and RH, for the engine's dev_input
-(CLAUDE.md, Ring "Test"): from AS's puzzle 80007 (dev_place=p80007) into NI, through the
+"""Scripted play-through of Ring's first world, NI and RH, for the engine's dev_input: from AS's puzzle 80007 (dev_place=p80007) into NI, through the
 Mime, Glug and the car, the console, the tiles and Erda's room, the speaker, the console
 again (dam and cross), the valves, the door and the water to RH, RH from the tunnels to the
 Rhine Gold, back in NI the tear in its casing, the heater, and NI's end to the hub
