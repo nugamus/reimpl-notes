@@ -2,7 +2,7 @@
 
 Grumpa has no dialogue screens, choices or subtitles. Characters talk through voice lines:
 `CFXSound` actors (types 0x18 and 0x2a) in the scene files, started by commands and chained by
-the commands they run when they end. Evidence: E-0405. Open: Q-0400, Q-0401.
+the commands they run when they end. Evidence: E-0405, E-1620. Open: Q-0400.
 
 ## The sound actor
 
@@ -38,7 +38,21 @@ their place (`Sl_pp_L_s_mig_SV.wav`); the engine tries that spelling too.
 | 0xd | stop without running the command list, `active = visible = 0`, latched (one-shot) |
 | 0x17 | scene entry: play if `playing` or `on entry` is set (E-0406) |
 
-Playing marks the speaker as talking (Q-0401) until the sound stops. A sound that is not
+Playing marks the speaker as talking until the sound stops (E-1620). "Talking" is the
+speaker character's **state slot 5**: play sets it to 1 (speaker id > 0), stop sets it to 0.
+Nothing in the animation, mesh, render or input code reads it: no talk clip, no mouth or head
+motion, no block on walking or on other sounds. Only event conditions read it; in the data
+these are 31 conditions `c16[4] == 2 & c16[5] == 0` on the companion's hint lines and walk-in
+triggers, so a new companion hint starts only while he is silent. Before setting the flag,
+play flushes the speaker's speech queue if the speaker is not in the current scene (stop the
+line at its front, empty the queue). The speech queue (character op 0x48, slots ≥ 60 or 32;
+E-1223) uses the same slot: the first queued line plays at once only if slot 5 is 0 and then
+sets it; on each animation step of the active, present character, a front line whose sound has
+stopped is popped, slot 5 = 0, and the next queued line (if any) plays with slot 5 = 1.
+Character op 0x60 stops all 100 of the character's sound slots (each clears its speaker's
+slot 5) without running their command lists.
+
+A sound that is not
 looping stops by itself at its end; **stopping runs the sound's command list**, which is how a
 conversation goes on: the end of one line starts the next (or opens a door, moves a character).
 

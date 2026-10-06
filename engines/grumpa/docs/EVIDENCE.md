@@ -1995,3 +1995,69 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   then given request 0 with turn π·0.5 and request 2 (a shuffle aside).
 - **Method:** decompile.
 - **Confidence:** proven for the branches; `FUN_0044c6e0`'s exact test not read.
+
+### E-1600 — Platforms: the 0x1a meshes `CFXFloor::Move` walks on (resolves Q-0810)
+- **Binary/file:** `FUN_00433bb0` (Move, platform loop), `FUN_00433250` (face test on given
+  arrays), `FUN_00433490` (height, platform branch), `FUN_004536e0` (0x1a → mesh `+0x1b0`),
+  `FUN_00453990` (0x1a frame `+0x1c0`), `FUN_004157d0` (`.anb` load: `+0x108` vertex buffer,
+  `+0x10c` indices, `+0x110` ΣB, `+0x114` ΣC), `FUN_00450f30` (0x1a DoCommand, opcode 0x17),
+  `FUN_00432aa0` (vector push_back), `FUN_0040efa0` (broadcast loop), `FUN_00421a60` (call at
+  `0x4220cb`), `FUN_00433010`, `FUN_0041fd70`, `FUN_004250a0`; `Meshes/*.anb`.
+- **Evidence:** 1) The platform loop walks the floor's list `+0x148` by list index i; an entry
+  counts when its actor exists and is **active** (`+0x10c` == 1); visibility (`+0x110`) is not
+  tested. For each of the mesh's ΣC faces (`+0x114`, all sections together) it runs
+  `0x433250` with the mesh's index array `+0x10c` (the face **uv-index** triples, offset by the
+  section uv base) and its Direct3D vertex buffer `+0x108` (32-byte vertices, position first)
+  with **no frame offset**: frame 0, raw model coordinates (no transform; the meshes are in
+  world space). The point is pos + delta (x, z). `0x433250` is the floor's own face test
+  (E-0800): inclusive x/z box, then edges (v1,v0), (v2,v1), (v0,v2) strictly > 0.0. The first
+  hit (list order, then face order) stores the face in the floor's `+0x140` and in the
+  caller's face, the **list index** i in the caller's platform, does pos += delta (all three
+  axes), y = 0.4·y + 0.6·height, returns 1 (no wall slide on a platform). 2) The height on a
+  platform is the y (byte 4) of buffer vertex `index[3·face + 0] + frame · ΣB`, frame = the
+  0x1a's `+0x1c0` (current animation frame, unchecked against F): the face's first corner
+  in the current frame, no blend. So the hit uses frame 0's footprint and the height follows
+  the animation. 3) No hit: if a platform was set it becomes −1 and the face −1 (forcing the
+  full face search of the static mesh). 4) The list: the 0x1a DoCommand on opcode 0x17 (the
+  scene-entry broadcast, E-0202), when `+0x1d0` == 1 and actor 600 exists, pushes its own id
+  (`+0x108`) onto `+0x148` (this corrects E-0803's "at device init"); the floor's own 0x17
+  empties it. The broadcast walks the actor table from id 1 upward (`0x40efa0`), so the floor
+  (600) clears before the 0x1a actors (711..715) add: after entry the list holds that scene's
+  flagged 0x1a ids in ascending order. 5) The character (`0x421a60`) calls Move every update
+  with platform `+0x454` and does nothing else with it but: the step check uses +80 instead of
+  +20 when on a platform (y above old y + 80 → back to the old position and `0x4219f0(−2.0)`),
+  and `0x433010` returns floor type 15 on a platform (≤ 18: never blocked; no other reader of
+  15 there). No riding along in x/z: a moving platform only changes y (standing still, delta
+  0 still runs the test and eases y toward the current frame's height). `0x41fd70` and
+  `0x4250a0` (placement) reset face, platform and type to −1. Corpus: the 11 flagged meshes
+  found (back1..3_hugg_IO, plattform, plattform_up, boardMesh, 117_Tunna_still_A..C,
+  117_Walk_stigande_A..C) are one section each, and no uv index is shared by two vertices,
+  so the uv-index triples equal the face vertex triples there.
+- **Method:** decompile; corpus check with `tools/parsers/anb.py` (sections, faces, uv
+  sharing); `ground.ANB`/`down.ANB` (scene 61) not found under `Meshes/` by those names.
+- **Confidence:** proven
+
+### E-1620 — The "talking flag" is the speaker's state slot 5; only conditions read it (Q-0401)
+- **Binary/file:** CFXSound play `FUN_00448f70` / stop `FUN_00449040`; character speech queue:
+  push `FUN_00425cc0` (op 0x48), pump `FUN_00425780` (last call of the character update
+  `FUN_00421a60`), flush `FUN_00425980`, stop-all `FUN_00425950` (character op 0x60,
+  `FUN_0041e0d0`); `FUN_00408ff0` returns `actor + 0x118` (the state-slot vector); sound
+  is-playing `FUN_00449f80`.
+- **Evidence:** the written address is `[slotvec.begin] + 0x67c` with begin = `actor+0x11c`
+  (stride 0x118, value at +0x104, E-0201): 5 × 0x118 + 0x104 = 0x67c, so it is the value of
+  **state slot 5** of the speaker character, not a mesh field (corrects E-0405's wording).
+  A grep of the whole dump for `0x67c` finds only these four writers/one test (`FUN_00425cc0`
+  tests it == 0 before starting a queued line); no animation, mesh, render or input code reads
+  it. Play: if `[0x3ac]` speaker > 0 and the actor exists, `FUN_00425980(speaker)` runs (only
+  when the speaker is not in the current scene, `+0x444 != +0x448`: stop the sound at the
+  front of its speech queue `+0x3d0` and empty the queue), then slot 5 = 1. Stop
+  (`FUN_00449040`, also used by op 0x60 on all 100 slots) sets slot 5 = 0 for a speaker > 0.
+  Pump, each frame step of an active at-home character (after the 0.46 accumulator, E-1312):
+  if the queue is non-empty and the front slot's sound has stopped (`FUN_00449f80` = 0: buffer
+  not playing or `[0x1a0]` = 0), pop it, slot 5 = 0, and if another entry remains, play it
+  and slot 5 = 1. Corpus (`tools/logic.py`): slot 5 is read by 31 conditions, all
+  `c16 Sharlakanskraken[5]==0`, always together with `[4]==2`, on companion hint sounds
+  (`so645 003_sch_beware_cannonbal`, `010_sch_snake`, ...) and walk-in proximity triggers
+  660..673: a new companion line starts only when he is not already talking.
+- **Method:** decompile, grep of `notes/decomp/all` for `0x67c`; corpus condition listing.
+- **Confidence:** proven

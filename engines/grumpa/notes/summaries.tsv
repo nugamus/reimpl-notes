@@ -1,4 +1,6 @@
 program	address	name	summary	evidence
+GRUMPA.EXE	00408ff0	CFXActor::GetSlots	Returns the actor's state-slot vector (actor+0x118)	E-1620
+GRUMPA.EXE	0040efa0	CFXActorFactory::DispatchCommands	Command dispatcher: runs due commands; target -1 broadcasts to actor ids 1..n ascending	E-1600
 GRUMPA.EXE	0040fdb0	CFXActorFactory::LoadGlobalGameStatus	LoadGlobalGameStatus: reads u32 id + actor Serialize records from Current\global.abi to EOF	E-1300
 GRUMPA.EXE	004100c0	CFXActorFactory::SaveGlobalGameStatus	SaveGlobalGameStatus: writes every actor 0..599 to Current\global.abi via Serialize	E-1300
 GRUMPA_NOCD.EXE	004106c0	CFXActorFactory::CreateFromATXFile	Creates an actor from its .atx file	E-0504
@@ -6,14 +8,21 @@ GRUMPA.EXE	00416a90	CFXAMeshEx::CreateFromFile	reads .amb per-frame root motion 
 GRUMPA.EXE	0041fde0	CFXCharacter::Request	character request: clip-queue table per request, turn smoothing	E-0813
 GRUMPA.EXE	00421780	CFXCharacter::SetWorn	Equip/unequip carried object i: one worn per group {0,5}/{1..4}; flag [0x39c][i]; bonus [0x38c+4i] to slot 3 or [0x37c+4i] to slot 2	E-1300
 GRUMPA.EXE	00422f80	CFXCharacter::Serialize	CFXCharacter Serialize: modes 1/2/8 read the .abi record; mode 4 reads the status (active, visible, slots, home, pos, orientation, texture, worn flags, disable latch), mode 5 writes id + the same	E-1300
-GRUMPA.EXE	00425cc0	CFXCharacter::PlayVoice	sound slot n: <60 plays now, else queued speech	E-1223
+GRUMPA.EXE	004250a0	CFXCharacter::SetPosition	Character: set position, reset face/platform/floor type to -1	E-1600
+GRUMPA.EXE	00425780	CFXCharacter::PumpSpeechQueue	Speech queue pump, end of the character update: front line stopped -> pop, slot 5 = 0, play next and slot 5 = 1	E-1620
+GRUMPA.EXE	00425950	CFXCharacter::StopAllSounds	Op 0x60: stop all 100 character sound slots (no command lists)	E-1620
+GRUMPA.EXE	00425980	CFXCharacter::FlushSpeechQueue	If the character is away from the current scene, stop the voice at the front of its speech queue (+0x3d0) and empty the queue	E-1620
+GRUMPA.EXE	00425cc0	CFXCharacter::QueueSound	Op 0x48: play character sound slot n (n<60, n!=32 at once) or append to the speech queue, starting it if slot 5 == 0	E-1620
 GRUMPA.EXE	004327c0	CFXFloor::HandleEvent	floor opcodes 5/6 set/clear blocking flags, 23 clears platforms	E-0803
+GRUMPA.EXE	00432aa0	CFXFloor::AddPlatform	Floor: append an actor id to the platform list +0x148 (vector push_back)	E-1600
+GRUMPA.EXE	00433010	CFXFloor::FloorType	Floor type of the character's face: 15 on a platform, else the face's u16	E-1600
 GRUMPA.EXE	00433040	CFXFloor::PointInFace	point in walk-mesh face: x/z box then 3 strict edge tests	E-0800
-GRUMPA.EXE	00433490	CFXFloor::Height	floor height: inverse-distance blend of edge projections, or platform vertex y	E-0801
+GRUMPA.EXE	00433250	CFXFloor::FaceContains	Point-in-face test on given index/vertex arrays (x/z box inclusive, three strict edge functions)	E-1600
+GRUMPA.EXE	00433490	CFXFloor::Height	Floor height: static = inverse-distance blend of edge projections; platform = y of face corner 0 in the 0x1a's current frame	E-1600
 GRUMPA.EXE	00433830	CFXFloor::FindFace	linear search for face under point	E-0800
 GRUMPA.EXE	00433880	CFXFloor::FindFaceNear	face under point: hint, its neighbours, then full scan	E-0800
 GRUMPA.EXE	00433950	CFXFloor::CollectWalls	flood faces within radius, collect boundary-edge contacts	E-0802
-GRUMPA.EXE	00433bb0	CFXFloor::Move	move a sphere over the floor: platforms, wall slide (100 iter), y smoothing 0.4/0.6	E-0802
+GRUMPA.EXE	00433bb0	CFXFloor::Move	Floor move: platforms first (active list entries, frame-0 faces, hit -> move, y ease to platform height), else static mesh with 100-step wall slide	E-1600
 GRUMPA.EXE	004349a0	CFXFollower::CFXFollower	ctor: type 0x17, character -1, place-on-entry 1, state -1	E-1220
 GRUMPA.EXE	00434af0	CFXFollower::Initialize	stores the device pointer at +0x128	E-1220
 GRUMPA.EXE	00434b20	CFXFollower::GetOrientation	copies the character's orientation into +0x144	E-1221
@@ -36,3 +45,8 @@ GRUMPA.EXE	00446f70	PlayerControl::Update	player controller update: steer angle,
 GRUMPA.EXE	004473c0	PlayerControl::RequestFromButtons	player controller: buttons to walk/stop/attack request	E-0811
 GRUMPA.EXE	00448250	CFXToScene::FindEntry	find entry for previous scene (pos, rot); -2 keeps place; default first	E-0804
 GRUMPA.EXE	00448360	CFXToScene::TestExits	exit sphere test with latch, returns exit scene	E-0804
+GRUMPA.EXE	00448f70	CFXSound::Play	Play: flush speaker queue if away, speaker state slot 5 = 1, start the buffer (loop iff [0x1a4]), [0x1a0] = 1	E-1620
+GRUMPA.EXE	00449040	CFXSound::StopRaw	Stop without commands: speaker slot 5 = 0, stop and rewind the buffer, [0x1a0] = 0	E-1620
+GRUMPA.EXE	00449f80	CFXSound::IsPlaying	Is playing: buffer status nonzero and [0x1a0]	E-1620
+GRUMPA.EXE	004536e0	CFXStaticCharacter::GetMesh	0x1a static character: returns its mesh object (+0x1b0)	E-1600
+GRUMPA.EXE	00453990	CFXStaticCharacter::GetFrame	0x1a static character: returns current frame (+0x1c0)	E-1600

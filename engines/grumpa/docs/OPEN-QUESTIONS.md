@@ -473,3 +473,15 @@ with the hover RECT `+0x148`).
 - **Blocks:** nothing yet: the engine's player is Grumpa (10) from the start, and sets his
   home on an entry only after the first one.
 - **Status:** open
+
+### Q-0401 RESOLVED (2026-10-06, E-1620)
+The "talking flag" is the speaker character's state slot 5 (1 while one of its lines plays).
+No animation, mouth or input code reads it; event conditions do (31, all on the companion
+c16, `[5]==0`), so a companion hint line or trigger waits until he stops talking.
+
+### Q-0810 RESOLVED
+- E-1600: the platform list is filled on scene entry (op 0x17) by flagged 0x1a actors after
+  the floor clears it; Move tests pos+delta against each active platform's frame-0 faces
+  (uv-index triples into the vertex buffer, all sections, the floor's face test), takes the
+  current frame's y of the face's first corner as height (y = 0.4·y + 0.6·h), no x/z riding;
+  the character allows +80 steps and floor type 15 on a platform.

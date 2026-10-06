@@ -88,13 +88,24 @@ face, and the neighbour across each edge (built at load from shared edges).
   neighbours, then every face.
 - **Height**: per edge, the point projected in x/z on the edge's line (unclamped) gives a
   height; the three are blended by inverse x/z distance (weight 1e15 under 1e−7).
-- **Move**: (platforms first, Q-0810) up to 100 times: the face under the target (none: move,
+- **Move**: (platforms first, below) up to 100 times: the face under the target (none: move,
   face −1); collect the boundary edges within `radius` of the target by flooding the faces
   whose edges are within `radius`; push the target out from the nearest to exactly `radius`.
   Then move and set `y = 0.4·y + 0.6·height`.
 - **Floor types**: 0..4 view numbers (above), 12/13 water cases (with the mode `[0x48c]`,
   Q-0800), 15 a platform, 19..21 walls closed until the floor's opcode 6 opens them (opcode 5
   closes; both take type + 1, 0 = all); opcode 23 empties the platform list.
+
+**Platforms (E-1600).** On the scene-entry broadcast (23, ids ascending) the floor (600)
+empties its platform list, then every 0x1a mesh actor with `+0x1d0` = 1 appends its id. Move
+first walks that list: for each **active** entry (visibility not tested), every face of its
+mesh (all sections, corners by the uv-index triples into the vertex buffer, **frame 0**,
+model = world coordinates) gets the floor's face test at pos + delta. The first hit sets the
+character's face and platform (the list index), moves by delta, sets y = 0.4·y + 0.6·h with
+h = y of the face's first corner in the actor's **current** frame (`+0x1c0`), floor type 15,
+and skips the wall slide. No hit clears platform and face (full static search). Nothing
+carries the character in x/z; a rising platform lifts him only through h, every update.
+The character's step limit is +80 on a platform (+20 otherwise).
 
 ## Scene links, `CFXToScene` (E-0804)
 
