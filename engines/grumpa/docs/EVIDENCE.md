@@ -2430,6 +2430,42 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   global2.atx read; Characters.abi through `parsers/abi.py`.
 - **Confidence:** proven (the two mode-6 fields inferred from the file, as E-1220).
 
+### E-1460 — Character reactions: storage, trigger test, once per approach, re-armed on scene entry
+- **Binary/file:** `CFXCharacter::AddReactCharacter` `0x4254c0`, `CFXCharacter::FindReaction`
+  `0x425300`, `CFXCharacter::PostReaction` `0x4250f0`, `CFXCharacter::GetReactionCommands`
+  `0x4258f0`, `CFXCharacter::ResetReactions` `0x41fd70`, the update `0x421a60` (call at
+  `0x421afa`), `FUN_0044c6e0` (sphere overlap), `FUN_00422670` (present), Serialize `0x422f80`.
+- **Evidence:** AddReactCharacter appends a fresh command vector to `+0x614` (begin `+0x618`)
+  and an 8-byte entry {u32 other id, u32 fired = 0} to `+0x608..+0x610`, same index; the
+  file's CC-vec (E-0401) fills that vector. The update (only when active `+0x10c` and at home
+  `+0x444 == +0x448`, and only on the frames where its `+0x4a4` accumulator passes 1.0, E-1307)
+  calls `0x425300`; if it returns 1 with an id ≠ −1, `0x4250f0` looks up that id's vector
+  (`0x4258f0`, first entry with the id) and pushes every command, in order, onto the global
+  queue with its conditions (`0x408760` at `0x4252b4`, E-0617). `0x425300` returns 0 at once
+  if the character's state slot 4 (role, `+0x11c → +0x564`) is 7, its life (slot 1,
+  `+0x21c`) < 1, or a dying countdown `+0x480`/`+0x47c` is > 0. Otherwise it walks the entries
+  in file order and returns the first that fires. For each: the other actor is
+  `DAT_004b9bc4[id]`; if its type (`+0x104`) is 3 it must be present (`0x422670`: visible
+  `+0x110 == 1` and at home `+0x444 == +0x448`); if 5 (item) its scene `+0x288` must equal this
+  character's `+0x448` and its state (vtable +0x1c) be 4. Then the spheres must overlap
+  (`0x44c6e0`: centre distance < r1 + r2): this one centred on its position `+0x16c` with y
+  raised by `[0x290]`, the other on its position with y raised by `[0x600]` (Serialize copies
+  `[0x290]` there, `0x422f80`), both radius `[0x5fc]` (the 2nd float of E-0401's
+  `[0x28c],[0x5fc],[0x290]` group). `+0x624` is 1 from the constructor and never written
+  again, so the "once" path always runs: an entry fires (fired = 1, id also stored in `+0x62c`)
+  only when fired was 0; an entry whose other is absent, not overlapping or of another type
+  gets fired = 0 (re-armed). `0x41fd70` (from DoCommand 0x17 scene change `0x41e6ff` and the
+  follower's scene entry `0x4351cf`): when the character's home is the new scene and actor 600
+  (walk mesh, `DAT_004b9bc4+0x960`) exists, it sets `+0x44c/+0x450/+0x454 = −1`, clears every
+  fired flag and requests idle (5).
+- **Corpus:** Characters.abi (script over `parsers/abi.py`): 40 reacts to 10, 13, 88 each with
+  one command (−1, 40, 0x2f, 0, 0), radius 450; 44 to 10, 13, 88 with (−1, 44, 0x30, 0, 0),
+  450; 82 to 10, 13, 88 with (−1, 82, 0x2f, 0, 0), 450. Also 39/41/43/81/83/85 (ops 0x2e..0x30,
+  radius 450). Many others react with 0x48 (sound 61/65/66/67), 0x4b or 0x2d. Radii of the
+  reacted-to: 10 → 125, 13 → 150, 88 → 125 (so 40 engages Grumpa 10 at < 575).
+- **Method:** decompile (dump), disassembly of `0x4251f0..0x4252d0` (the push the decompiler
+  dropped), byte scan for call sites, corpus script.
+- **Confidence:** proven (static); not traced.
 
 ### E-1800 — Actor 2's State (slot 0) mirrors the cursor kind; `2[0]==2` = the grab hand
 - **Binary/file:** CFXMouse update `0x445440` (the write, after the hover-timer restore and
@@ -2515,3 +2551,33 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** corpus (`tools/logic.py`, 0x07 names).
 - **Confidence:** proven from data.
 
+### E-1404 — Requests from a clip with no row keep the queue; a dying character takes none (corrects E-0813)
+- **Binary/file:** `FUN_0041fde0` (character request), the inner `default:` arms of requests 0,
+  1 and 3 and the outer `default:`; guards before the switch.
+- **Evidence:** for requests 0 (walk), 1 (run) and 3 (jump) the inner switch on the clip
+  playing (`+0x434`) has `default: return` (to `0x420fc7`'s return label): from a clip with no
+  row the queue `+0x404` is **not** cleared and nothing is pushed (E-0813's "every other request
+  clears the queue" holds only for the rows). The outer `default` (requests outside 0..4,
+  0x12..0x15, 0x17, 0x1f..0x28, e.g. 5) clears the queue and pushes 0. Before the turn aim and
+  the switch (after the request-5 reset block): return when the character has no clip in slot
+  0, and when its death timer `+0x47c` > 0 (dying characters take no request and no turn).
+  Consequence: a fighter waking from S02 (0x20 → 0x21 queued) is not stuck re-clearing its
+  queue by the run/walk requests it repeats every tick.
+- **Method:** decompile.
+- **Confidence:** proven
+
+### E-1531 — The engine follows, mounts and splits (scenario `follow`)
+- **Binary/file:** engine `character.cpp`, `events.cpp`, `score.cpp`, `walk.cpp` (branch
+  grumpa-a2); scenario `engines/grumpa/tests/follow.toml`; scene data through `tools/events.py`.
+- **Evidence:** scenario `follow` (-d1 `who`): scene 6 entered from 1, the companion 16 placed
+  at (−95.4, −700.0), 20 behind Grumpa (−95.5, −677.1, yaw 0); after Grumpa walks to
+  (−44.0, −536.8) it follows and stops 77 away (clip 0). Scene 40, trigger 661 (as the scene
+  does: `(10,0xc)(10,3)(13,0xb)(13,2)(13,0x2c)`): 13 is the player (role 1) at its
+  Characters.abi place, 10 inactive and hidden; Backspace: 13 inactive and hidden, the bear 28
+  at (561.1, 1054.6) and Grumpa 10 at (638.2, 1072.8) beside it, Grumpa the player (role 1),
+  the companion running to him. Commands to actor 3 now reach Grumpa, so scene data that stops
+  him through actor 3 takes effect: scene 211's entry script 781 sends (3, 0xc) and (4, 0xc)
+  and the end list of sound 656 (3, 0xb), (4, 0xb); scene 1's walk-in triggers 664/665 the
+  same with sounds 644/646 (player control returns when the companion's line ends).
+- **Method:** scripted dev runs; corpus sweep.
+- **Confidence:** verified (engine)

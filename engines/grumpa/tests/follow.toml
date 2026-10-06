@@ -1,0 +1,7 @@
+description = "Roles (docs/spec/characters.md): scene 6 entered from 1: the Scharlakanskraken (16, actor 4's companion) is placed 20 behind Grumpa and steps out of his way; Grumpa walks up to the arena and the companion follows him, stopping near him; scene 40: the bear trigger 661 mounts Grumpa (10 off and hidden, the bear rider form 13 the player, the score shows the bear); Backspace splits the form: Grumpa and the bear 28 side by side, Grumpa the player again"
+snaps = ["follow_entry.png", "follow_walked.png", "follow_mounted.png", "follow_split.png"]
+timeout = 90
+args = ["-d1"]
+
+[keys]
+grumpa_vm = "1;ticks 5;go 6;ticks 30;where;who 16;snap {out}/follow_entry.png;hold 400 250;ticks 150;release;ticks 150;where;who 16;snap {out}/follow_walked.png;go 40;ticks 20;op 661 0 0 0;ticks 30;who 13;who 10;snap {out}/follow_mounted.png;backspace;ticks 40;who 13;who 10;who 28;who 16;snap {out}/follow_split.png"

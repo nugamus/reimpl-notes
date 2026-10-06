@@ -1,7 +1,7 @@
-description = "Walking (docs/spec/walking.md): scene 1, hold the left button below Grumpa: he turns and walks (N2W, W2W) on the hut's walk mesh, stops (W2N, idle) on release; then from scene 211 (placed at the entry from scene 1) he walks out of the exit sphere he arrived in and back into it: the exit takes him to scene 1, at its entry from 211; he walks on, is saved, taken to scene 211 and loaded back: he stands where he was saved and walks again"
+description = "Walking (docs/spec/walking.md): scene 1, hold the left button below Grumpa: he turns and walks (N2W, W2W) on the hut's walk mesh, stops (W2N, idle) on release; then from scene 211 (placed at the entry from scene 1; its entry script stops him through actor 3 until the companion's line ends, which (3, 11) stands in for) he walks out of the exit sphere he arrived in and back into it: the exit takes him to scene 1, at its entry from 211; he walks on, is saved, taken to scene 211 and loaded back: he stands where he was saved and walks again"
 snaps = ["walk_start.png", "walk_moved.png", "walk_exit.png", "walk_loaded.png"]
 timeout = 60
 args = ["-d1"]
 
 [keys]
-grumpa_vm = "1;ticks 20;where;snap {out}/walk_start.png;hold 560 520;ticks 100;where;release;ticks 60;where;snap {out}/walk_moved.png;go 211;ticks 10;where;hold 600 300;ticks 60;where;hold 760 10;ticks 200;where;snap {out}/walk_exit.png;release;ticks 2;hold 560 520;ticks 60;release;ticks 40;where;save 3;go 211;where;load 3;ticks 30;where;snap {out}/walk_loaded.png;hold 700 300;ticks 40;where"
+grumpa_vm = "1;ticks 20;where;snap {out}/walk_start.png;hold 560 520;ticks 100;where;release;ticks 60;where;snap {out}/walk_moved.png;go 211;ticks 10;op 3 11 0 0;where;hold 600 300;ticks 60;where;hold 760 10;ticks 200;where;snap {out}/walk_exit.png;release;ticks 2;hold 560 520;ticks 60;release;ticks 40;where;save 3;go 211;where;load 3;ticks 30;where;snap {out}/walk_loaded.png;hold 700 300;ticks 40;where"
