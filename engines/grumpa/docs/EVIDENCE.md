@@ -1863,3 +1863,18 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   30.
 - **Method:** corpus script; scripted dev run.
 - **Confidence:** proven (corpus); verified (engine)
+
+### E-0832 — Save version 4 keeps the characters; older saves place the player at the first entry
+- **Binary/file:** engine `saveload.cpp`, `character.cpp` (`Characters::syncState`, `enter`);
+  scenario `engines/grumpa/tests/walk.toml`; `tools/savecompat.py`.
+- **Evidence:** the original keeps the characters with the global actors in `global.abi`
+  (docs/spec/save.md, mode 4), and the first entry after a load does no entry placement
+  (E-0804, E-0830), so the player's place must come from the save. Version 4 appends per
+  character position, yaw, home, active, visible. Dev run `walk.toml`: Grumpa walked to
+  (228.5, 141.0) in scene 1, saved, taken to scene 211, loaded: back in scene 1 at
+  (228.5, 141.0), then walks on (clip 2). `savecompat.py grumpa`: the archived version-3
+  saves (generations d432d9f6, 63dc2d19, scene 61) load without error; Grumpa now stands at
+  scene 61's first entry, and his floor type selects that view, so their snaps differ from
+  the version-3 references (46 %), as intended.
+- **Method:** scripted dev runs.
+- **Confidence:** verified (engine)

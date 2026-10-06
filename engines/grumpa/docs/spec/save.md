@@ -1,6 +1,6 @@
 # Game state, saving and loading (engine behaviour)
 
-Evidence: E-0202, E-0203 (scene status), E-0501, E-0502.
+Evidence: E-0202, E-0203 (scene status), E-0501, E-0502, E-0832.
 
 ## The original
 
@@ -32,7 +32,7 @@ and view — plus ScummVM's header and thumbnail. The player name of `Player.sts
 description. The panel's diskette and door buttons are not drawn as save/load (Q-0502):
 ScummVM's menu (Ctrl+F5) and the launcher replace them.
 
-Layout of the save stream (`Common::Serializer`, version 2, little-endian):
+Layout of the save stream (`Common::Serializer`, version 4, little-endian):
 
     u32 version, i32 current scene
     per item of Items.abi in file order:
@@ -40,5 +40,10 @@ Layout of the save stream (`Common::Serializer`, version 2, little-endian):
     9 × i32 slot item id (−1 empty), 2 × i32 equipment item id, i32 held item,
     u8 panel shown, u8 panel locked
     the event VM's block (global actors, kept scene statuses, command lists; events.md)
+    version 4: per character of Characters.abi in file order:
+        f32 pos[3], f32 yaw, i32 home scene, u8 active, u8 visible
 
-Loading reloads the items from the data, applies the stream, and enters the saved scene.
+Loading reloads the items from the data, applies the stream, and enters the saved scene. The
+entry after a load is a first entry: the player is not placed at an entry point (E-0804),
+he stands where the save has him. A save older than version 4 has no characters: the player
+is put at the loaded scene's first entry, at home there (E-0832).
