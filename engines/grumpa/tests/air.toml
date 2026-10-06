@@ -1,7 +1,7 @@
-description = "Air under water (games/grumpa/docs/walkthrough.md 'Water, air and drowning'; E-1661, E-1680..E-1682): sea scene 56, its entry script starts timer 220 and shows the air bar; every 4 s Air -6; Grumpa walks into the rising bubbles (0x1a 713..715, a contact sphere on vertex 0): Air +10, once per touch"
+description = "Air under water (games/grumpa/docs/walkthrough.md 'Water, air and drowning'; E-1661, E-1680..E-1682): sea scene 56, its entry script starts timer 220 and shows the air bar; every 4 s Air -6; Grumpa stops in the bubbles' column (0x1a 713..715, a contact sphere on vertex 0): each rising bubble gives Air +10, once per touch"
 snaps = ["air_bar.png", "air_bubble.png"]
 timeout = 90
 args = ["-d1"]
 
 [keys]
-grumpa_vm = "1;ticks 5;go 56;ticks 40;where;slot 8 3;snap {out}/air_bar.png;ticks 180;slot 8 3;hold 99 405;ticks 160;where;slot 8 3;hold 200 570;ticks 40;where;slot 8 3;ticks 40;where;slot 8 3;release;ticks 40;where;slot 8 3;snap {out}/air_bubble.png"
+grumpa_vm = "1;ticks 5;go 56;ticks 40;where;slot 8 3;snap {out}/air_bar.png;ticks 180;slot 8 3;hold 99 405;ticks 160;where;slot 8 3;hold 200 570;ticks 50;release;ticks 30;where;slot 8 3;ticks 100;slot 8 3;ticks 100;slot 8 3;ticks 100;where;slot 8 3;snap {out}/air_bubble.png"
