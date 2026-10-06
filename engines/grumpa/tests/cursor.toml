@@ -1,0 +1,7 @@
+description = "The cursor's picture (docs/spec/inventory.md, E-1720/E-1721): scene 1, the mouse below, right of and above Grumpa shows the walk arrows arrow8_ (south-south-east: the original truncates, E-1720), arrow4_ and arrow16_ or arrow1_ (kind 9 + trunc(angle * 2.6 - 0.3925)); the inventory panel shown gives the pointer (default); an item taken onto the cursor gives its icon (*id). The picture names are in run.log (`cursor`); the snap shows the panel."
+snaps = ["cursor_panel.png"]
+timeout = 60
+args = ["-d1"]
+
+[keys]
+grumpa_vm = "1;ticks 20;where;move 555 580;ticks 2;cursor;move 790 245;ticks 2;cursor;move 555 30;ticks 2;cursor;op 90 19 0 0;op 134 42 0 0;ticks 2;cursor;click 540 350;cursor;snap {out}/cursor_panel.png"

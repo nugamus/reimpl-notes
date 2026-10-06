@@ -2581,3 +2581,61 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   same with sounds 644/646 (player control returns when the companion's line ends).
 - **Method:** scripted dev runs; corpus sweep.
 - **Confidence:** verified (engine)
+
+### E-1640 — Character sound slots and the speech queue (ops 0x48, 0x60; completes E-1223, E-1620)
+- **Binary/file:** `CFXCharacter::LoadResources` `FUN_0041f2b0` (sound loop after the clips),
+  `CFXSound` ctor `FUN_004484d0`, load `FUN_00449900`, play `FUN_00448f70`, stop `FUN_00449040`;
+  `QueueSound` `FUN_00425cc0`, `PumpSpeechQueue` `FUN_00425780`, `StopAllSounds`
+  `FUN_00425950`, `FlushSpeechQueue` `FUN_00425980`; callers: update `FUN_00421a60` (clip-start
+  hook, last call = pump), `DoCommand` `FUN_0041e0d0` (0x17 → flush, 0x48, 0x60);
+  `Actors/Characters.abi` (the file the game loads, characters.md), `notes/logic.txt`.
+- **Evidence:** LoadResources runs once (guard: clip slot 0 of `+0x2dc` empty) and puts each
+  `.wav` of the list `+0x330`/`+0x338` at slot `atoi(name)` (`FUN_0047c0ce`) of the 100-slot
+  table `+0x324`, like clips (E-0815): a new `CFXSound` (fresh ctor: speaker `[0x3ac]` = 0, loop
+  `[0x1a4]` = 0, volume/pan flags 0, no command list), SetDevice, then loaded from
+  `"%s%s"` = `<data>\Sounds\` + name; on load failure the slot stays 0. So a character sound has
+  speaker 0: playing or stopping it never touches any slot 5; only the queue code writes the
+  owner's slot 5. QueueSound(n): n outside 0..99 ignored; if slot n is empty, LoadResources
+  (no-op once loaded); n already anywhere in the queue → ignored; n < 60 and n ≠ 32 → play slot n
+  (if loaded) and return: no stop first, and play only sets `[0x10c]`/`[0x1a0]` and calls the
+  DirectSound buffer's Play without rewinding, so a slot already playing just continues. Else n
+  is appended to the `std::deque<uint>` at `+0x3d0` (count `+0x3fc`; no capacity limit, the
+  deque grows) even when the slot is empty; if the count is now 1, the slot is loaded and the
+  owner's slot 5 is 0, it plays and slot 5 = 1. Pump (end of the update, which returns earlier
+  unless active `+0x10c` and home `+0x444` == current scene `+0x448` and the animation step is
+  due): front slot loaded and not playing → pop, slot 5 = 0, play the new front if any (and
+  loaded) with slot 5 = 1. An empty front slot is never popped. Flush (scene entry op 0x17 for
+  every character, and play of a speaker-tagged scene sound): only when home ≠ current scene:
+  stop the front's sound (no commands) and empty the queue; slot 5 is left as it was. Op 0x60:
+  stop (no commands) each of the 100 slots; the queue is not touched, so the next pump pops the
+  stopped front and starts the next line. Corpus: op 0x60 (96) is sent nowhere; op 0x48 (72) is
+  sent 204 times (178 to characters, 26 via actors 3/4), every n ≥ 60 (so scripts always queue): to characters directly n 60..67, to
+  actor 4/actor 3 (forwarded to the held character) n 63 (9) / 64 (17). Slots below 60 come
+  from the clip-start hook (clip number n, the character's slot-4 value ≠ 0; else a global
+  sound `DAT_004ba764[n]`): 001/004 walk, 018 attack, 023 hit, 032 tired (queued: n = 32).
+  Pairs sent but with no file in `Actors/Characters.abi`: (16,61), (21,61), (28,60),
+  (30..32,60): these entries sit at the queue front unplayed and block that character's queue
+  until a flush. Example: scene 7 trigger 662 (walk-in, once, sphere (19,−57,495) r405) sends
+  actor4.72(64), and player.72(64) when riding c12/c13: the companion's
+  `064_CS_*_rightway_VO.wav`.
+- **Method:** decompile (`notes/decomp/all/`), `tools/logic.py` + a list of the `.wav` names
+  per record of both Characters.abi files.
+- **Confidence:** proven
+
+### E-1750 — Engine runs: worn attachments, cursor pictures, the fidget, save version 5
+- **Binary/file:** engine `scene.cpp` (`drawAttachments`, `setCursorImage`,
+  `updateHoverCursor`), `walk.cpp`, `character.cpp` (`wear`, `update`, `syncState`),
+  `saveload.cpp`; scenarios `engines/grumpa/tests/items.toml`, `cursor.toml`, `fidget.toml`,
+  `equip_save.toml`; `tools/savecompat.py`.
+- **Evidence:** `items`/`equip_save`: the panel puts 100 (Father's Sword, broken) and 134
+  (Wooden Shield) in the equipment slots: worn bits 0x30, slots 2/3 go 5 → 11 and 2 → 7
+  (the bonuses 6 and 5 of E-1700); the shield is drawn on his left arm, the blade by his right
+  hand, as the tutorial card shows him. Saved, a new game, loaded: the same position, worn
+  0x30, slots 11/7, both drawn. `cursor`: with Grumpa at screen (555, 215) the mouse below
+  gives `arrow8_`, right `arrow4_`, above `arrow1_`; the panel shown `default`; an item taken
+  `*134` (its icon). `fidget`: idle in scene 1, Grumpa is in slot 0x20 (S02) looping by update
+  320, and a hold walks him out (clip 2). `savecompat.py grumpa`: the four archived
+  generations (versions 3 and 4) load.
+- **Method:** scripted dev runs (`grumpa_vm`, `where`, `cursor`).
+- **Confidence:** proven for the engine; the attachment placement against the original's
+  pixels is not compared (no capture of the original).

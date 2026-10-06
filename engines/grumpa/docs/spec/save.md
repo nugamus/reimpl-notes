@@ -1,6 +1,6 @@
 # Game state, saving and loading (engine behaviour)
 
-Evidence: E-0202, E-0203 (scene status), E-0501, E-0502, E-0832.
+Evidence: E-0202, E-0203 (scene status), E-0501, E-0502, E-0832, E-1300, E-1750.
 
 ## The original
 
@@ -32,7 +32,7 @@ and view — plus ScummVM's header and thumbnail. The player name of `Player.sts
 description. The panel's diskette and door buttons are not drawn as save/load (Q-0502):
 ScummVM's menu (Ctrl+F5) and the launcher replace them.
 
-Layout of the save stream (`Common::Serializer`, version 4, little-endian):
+Layout of the save stream (`Common::Serializer`, version 5, little-endian):
 
     u32 version, i32 current scene
     per item of Items.abi in file order:
@@ -42,8 +42,15 @@ Layout of the save stream (`Common::Serializer`, version 4, little-endian):
     the event VM's block (global actors, kept scene statuses, command lists; events.md)
     version 4: per character of Characters.abi in file order:
         f32 pos[3], f32 yaw, i32 home scene, u8 active, u8 visible
+        version 5: u32 n, n × i32 state slot, i32 texture, u32 worn attachments (bit k),
+        u8 disable latch
 
-Loading reloads the items from the data, applies the stream, and enters the saved scene. The
+Version 5 completes the original's character status (E-1300): the state slots (with the
+equipment bonuses), the texture, the worn flags and the latch. The clip, the frame and the
+request queue are not kept, as in the original: the entry after a load starts the idle.
+
+Loading reloads the items and the characters from the data, applies the stream, and enters the saved scene. The
 entry after a load is a first entry: the player is not placed at an entry point (E-0804),
 he stands where the save has him. A save older than version 4 has no characters: the player
-is put at the loaded scene's first entry, at home there (E-0832).
+is put at the loaded scene's first entry, at home there (E-0832); one older than version 5
+has no worn flags: Grumpa puts on what the equipment slots hold (E-1750).

@@ -1,0 +1,7 @@
+description = "Save version 5 (docs/spec/save.md, E-1300): scene 1, Grumpa picks up the sword and shield and equips them (as items.toml), the panel closes, the game is saved, a new game starts and the save is loaded: he stands where he was, wearing both again (worn flags), with his state slots kept (`where` in run.log; the floor snap lays out the items for the clicks)."
+snaps = ["equip_floor.png", "equip_saved.png", "equip_loaded.png"]
+timeout = 60
+args = ["-d1"]
+
+[keys]
+grumpa_vm = "1;ticks 20;where;hold 450 560;ticks 90;where;hold 150 400;ticks 120;release;ticks 30;where;snap {out}/equip_floor.png;move 163 356;ticks 4;click 163 356;move 232 317;ticks 4;click 232 317;op 90 19 0 0;click 630 350;click 520 210;click 540 350;click 740 210;op 90 19 0 0;ticks 2;where;snap {out}/equip_saved.png;save 4;go 211;load 4;ticks 40;where;snap {out}/equip_loaded.png"

@@ -1,0 +1,7 @@
+description = "The idle fidget (docs/spec/walking.md, E-1740): Grumpa stands idle in scene 1; on the 11th idle loop in a row S01 (slot 0x1f) plays once, then S02 (0x20) loops; holding the left button walks him out of it (0x21, then the walk). `where` in run.log gives the clips."
+snaps = ["fidget_s02.png"]
+timeout = 60
+args = ["-d1"]
+
+[keys]
+grumpa_vm = "1;move 555 30;ticks 20;where;ticks 100;where;ticks 100;where;ticks 100;where;ticks 100;where;ticks 100;where;snap {out}/fidget_s02.png;hold 555 580;ticks 30;where;ticks 60;where"
