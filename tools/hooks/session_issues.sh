@@ -1,12 +1,24 @@
 #!/bin/bash
-# SessionStart hook: the user's decisions waiting to be acted on (ENHANCEMENTS.md approvals,
-# POSSIBLE-BUGS.md verdicts), then one line of open issues per engine, so no session starts
-# without seeing them (github.com/nugamus/reimpl-notes/issues). Silent when gh is offline.
-cd "$(dirname "$0")/../.." || exit 0
-todo=$(awk '/^### /{h=substr($0,5)} /\*\*Decision:\*\* approved/{print "  implement " h} /\*\*Verdict:\*\* (bug|option)/{print "  act on verdict: " h}' ENHANCEMENTS.md POSSIBLE-BUGS.md 2>/dev/null)
-[ -z "$todo" ] || { echo "The user decided (do these first):"; echo "$todo"; }
-out=$(gh issue list -R nugamus/reimpl-notes --state open --limit 200 --search "-label:needs-decision" \
-	--json number,title,labels --jq '.[] | "\(.labels | map(.name) | map(select(. == "x3d" or . == "peintre" or . == "ring" or . == "gilbert" or . == "grumpa")) | first // "other")\t#\(.number) \(.title)"' 2>/dev/null) || exit 0
-[ -n "$out" ] || { echo "Open issues: none."; exit 0; }
-echo "Open issues (fix these before new Next items; gh issue view <n> -R nugamus/reimpl-notes):"
-echo "$out" | sort | awk -F'\t' '{ a[$1] = a[$1] (a[$1] ? "; " : "") $2 } END { for (e in a) print "  " e ": " a[e] }'
+# SessionStart hook: what the user approved (do first), the open bugs per engine, and how
+# many issues wait for the user's decision (agents leave those alone), so no session
+# starts without seeing them. Issues: github.com/nugamus/reimpl-notes. Silent when offline.
+R=nugamus/reimpl-notes
+ENGINES='map(.name) | map(select(. == "x3d" or . == "peintre" or . == "ring" or . == "gilbert" or . == "grumpa")) | first // "other"'
+list() { # <search> -> "engine<TAB>#n title" lines
+	gh issue list -R "$R" --state open --limit 200 --search "$1" --json number,title,labels \
+		--jq ".[] | \"\(.labels | $ENGINES)\t#\(.number) \(.title)\"" 2>/dev/null
+}
+show() { sort | awk -F'\t' '{ a[$1] = a[$1] (a[$1] ? "; " : "") $2 } END { for (e in a) print "  " e ": " a[e] }'; }
+
+approved=$(list "label:approved") || exit 0
+bugs=$(list "label:bug -label:approved -label:needs-decision")
+waiting=$(gh issue list -R "$R" --state open --search "label:needs-decision" --json number --jq length 2>/dev/null)
+
+[ -z "$approved" ] || { echo "Approved by the user (do these first; enhancements become game options):"; echo "$approved" | show; }
+if [ -n "$bugs" ]; then
+	echo "Open bugs (before new Next items; gh issue view <n> -R $R):"
+	echo "$bugs" | show
+fi
+[ -z "$approved$bugs" ] && echo "Open bugs: none."
+[ "${waiting:-0}" -gt 0 ] && echo "$waiting issue(s) wait for the user's decision (label needs-decision): leave them be."
+exit 0

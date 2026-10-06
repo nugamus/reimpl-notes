@@ -1,0 +1,37 @@
+name: Enhancement
+description: An improvement the original game never had, offered as an option in ScummVM's game settings.
+labels: [enhancement, needs-decision]
+body:
+  - type: dropdown
+    id: engine
+    attributes:
+      label: Game
+      options:
+        - Monet (x3d)
+        - Mission Sunlight (peintre)
+        - Ring (ring)
+        - Gilbert (gilbert)
+        - Grumpa (grumpa)
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What the option does
+      description: What the player sees with the option on.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      description: The annoyance or limitation in the original it removes.
+  - type: dropdown
+    id: default
+    attributes:
+      label: Default
+      options:
+        - "Off: the original's behaviour unless ticked"
+        - "On: pure quality of life, no effect on how the game plays"
+    validations:
+      required: true
