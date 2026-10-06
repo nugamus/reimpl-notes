@@ -591,3 +591,12 @@ Stance, attacks, block, the hit timer and hit test, damage through the score, de
 fighters 91..95 and the reactions that engage them. Q-1400's death callback is E-1433 (the
 death list and the release); Q-1420's hit clip is the score's (E-1402). Still open there:
 actor 301, clips 35..37 by meaning, `+0x474/+0x478`, the trigger gate's bit 4 (Q-0811).
+
+### Q-1803 — What does a film's "full brightness" do to a pending faded view or scene change?
+- **Known:** `CFXCutScene` play calls `FUN_0042f290(185, 0)` before the film (E-1806); the
+  engine sets the fade level to 255 and stops the fade, leaving a pending view (op 30) or scene
+  (op 31) to happen at the next fade's end. In the data films start on scene entry (the
+  119 film, deferred) or from scene 96's entry script, when no change is pending.
+- **Next lead:** decompile `FUN_0042f290` and the fade's DoCommand for that call.
+- **Blocks:** nothing in the data.
+- **Status:** open

@@ -139,7 +139,8 @@ steps need. "Steps" counts the steps that cannot be played without it.
 | Swimming (floor types 12/13, mode `[0x48c]`, the air timer and bubbles) | missing | 7: 8, 10..13, 21, 22 | Q-0800, E-0703 |
 | Cursor State in conditions (actor 2 slot 0 = cursor kind) | missing | 1: step 2, so everything after it | E-1800, E-1801 |
 | Mounts (form change op 0x2c/44, dismount) | specced, not built | 2: 11, 13 | E-1530, Q-0403 |
-| In-scene films (type 0x07: `unplug.mpg`, the outro, the death film) | missing (the intro plays at boot only) | 2: 20, 23 | E-1805 |
+| In-scene films (type 0x07: `unplug.mpg`, the outro, the death film) | done (branch grumpa-a5; scenario `film`) | 0 | E-1805, E-1806 |
+| Mesh animation end lists (the 7th list: lock, cork, ...) | fixed (grumpa-a5) | 0 (2 and 20 need it) | E-1807 |
 | Platforms (moving 0x1a floors) | done | 0 (16, 22 rely on it) | E-1600 |
 | Walking, running, exits, views | done | 0 | E-0810..E-0818 |
 | Items: take, panel, use by condition | done (reach Q-0202 restored) | 0 | E-0900, E-0901 |
@@ -147,8 +148,8 @@ steps need. "Steps" counts the steps that cannot be played without it.
 | Jump | missing | 0 on this path (swamp entry from 4, desert 41) | Q-0806 |
 | Followers | specced | 0 on this path | E-1530 |
 
-Ranked by steps blocked: swimming (7), combat (4), mounts (2), films (2), the cursor State (1,
-but it is step 2 and stops everything).
+Ranked by steps blocked: swimming (7), combat (4), mounts (2), the cursor State (1, but it
+is step 2 and stops everything).
 
 ## Scenarios
 
@@ -159,3 +160,4 @@ The chain plays the path from a new game, each scenario starting from the previo
 |---|---|---|
 | `path1_hut` | 1 | in 211, saved in slot 1 |
 | `path2_gatekey` | 2 | at the gate with the key held: the lock click does not fire (cursor State, E-1800) |
+| `film` (not chained) | 20 | the cork pulled in 109 (strength given by op), `unplug.mpg` plays, the flooded hull 119 runs on |

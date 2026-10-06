@@ -105,7 +105,7 @@ ms, ticks left). Running and direction start at 0, so nothing moves until the ac
   counts, one tick a update; at 0 it stops counting, reloads, and running goes on; not
   playing → the timer reloads and running stays off.
 - **advance**, by the first of bits 4, 8, 2, 0x10: forward → frame + 1, at F: running off;
-  without loop frame F−1 and run the end list (8th list); with loop, frame F−1 if stopped,
+  without loop frame F−1 and run the end list (the 7th in the file, `+0x19c`; E-1807 corrects E-0601); with loop, frame F−1 if stopped,
   else frame 0 and restart. Backward → mirror (frame 0 / F−1, end list). Ping-pong → up to
   F−1, then down (F−2, …); below 0: running off, frame 1, direction up; without loop the end
   list, with loop and playing restart. 0x10 → up to F−1, then running off, direction down,

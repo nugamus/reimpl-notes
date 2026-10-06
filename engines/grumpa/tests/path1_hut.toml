@@ -1,6 +1,7 @@
 description = "Critical path step 1 (games/grumpa/docs/walkthrough.md): new game in the hut (scene 1); Grumpa walks to the broken sword and the shield and picks them up, then to the flying dust and picks it up, each tutorial voice line (triggers 664, 665) holding him until it ends; then to the door and clicks it: the hut door (trigger 663) takes him to the plaza, scene 211. Saved to slot 1 for path2."
 snaps = ["path1_items.png", "path1_plaza.png"]
 timeout = 90
+max_diff = 0.01  # the real-time waits for the voice lines let the props animate a few frames more or less
 args = ["-d1"]
 export_saves = true
 

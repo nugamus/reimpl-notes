@@ -84,6 +84,29 @@ pushes `(185, 33, 24)`: the new scene stays black for the hold, then fades in. L
 the fade left it, so a scene left black stays black until a fade in. Escape (opcode 60 to
 every actor) is taken only while no fade runs and L ≠ 0; clicks are not blocked.
 
+## Films (type 0x07 `CFXCutScene`, E-1806, E-1805)
+
+A scene actor naming one `.mpg` under `Movies\` (no language folder): scene 500's
+`grumpa_intro.mpg`, scene 96's `grumpa_outro.mpg` (620) and `grumpa_death.mpg` (621), scene
+119's `unplug.mpg` (620). Fields: the header (id, active, visible, state slots), the name,
+autoplay `+0x13c`, the command list `+0x248`; the rest is unused.
+
+- **Opcodes:** 0 play; 1 stop; 23 (scene entry) play when autoplay is 1 (only the intro);
+  13 disables (0, 1 and 23 are then ignored), 52 enables; nothing else.
+- **Play:** broadcast 96 (characters stop their voice lines) and run the immediate list; the
+  fade level goes to 255 at once (no fade before); the film fills the 800×600 screen and the
+  game stops: no updates, no drawing, no timers. Space skips it; Escape and the mouse do
+  nothing. Scene sounds already playing are not stopped (Q-1802).
+- **End** (the film's end or Space): the screen black, the game runs again, the film's list
+  is pushed (it runs on the next update), opcode 1 to actor 3 (the held character stops) and a
+  full redraw. No fade after unless the list sends one.
+
+The lists in the data: the intro goes to scene 1 at once on black (`185, 31, 1, −1`); the
+outro and the death film send `(1, 60, 1)`: actor 1 (the game) opcode 60 opens the main menu,
+as the inventory's door button does (E-0901); `unplug.mpg` shows the player (`3, 2`).
+Character opcode 0x44 plays films through actor 187 from lists that are empty in the data
+(E-0700): nothing to do.
+
 ## The proximity gate (E-0705)
 
 A trigger's sphere is the `x, y, z, r` after its polygon; a character's is its position

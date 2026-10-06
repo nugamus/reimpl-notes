@@ -1,0 +1,8 @@
+description = "In-scene film (docs/spec/events.md Films, E-1806): scene 109 entered from 108, Grumpa given the gauntlets' +11 strength (op 10 88 11, as scene 18's trigger 665 does), walks to the cork and pulls it (trigger 661, strength > 15): the cork's end list defers film 620 to scene 119 and goes there; on entry unplug.mpg plays full screen with the game stopped, then its list shows the player and the flooded hull runs on. Runs from the CD (the films are only in its Movies folder). The log has the film line (frames played)."
+snaps = ["film_cork.png", "film_after.png"]
+timeout = 150
+args = ["-d1"]
+
+[keys]
+path = "C:/Users/Nugamus/Desktop/Code Projects/Game Reimplementations/games/grumpa/discs/cd"
+grumpa_vm = "108;go 109;ticks 60;op 10 88 11 0;hold 302 267;ticks 103;where;hold 301 288;ticks 109;where;hold 355 332;ticks 96;where;hold 456 389;ticks 102;where;release;ticks 60;where;hold 394 527;ticks 86;where;hold 372 489;ticks 95;where;release;ticks 10;where;move 423 464;ticks 4;snap {out}/film_cork.png;click 423 464;ticks 3000;where;ticks 100;where;snap {out}/film_after.png"
