@@ -1,4 +1,4 @@
-description = "Critical path steps 6-8 (games/grumpa/docs/walkthrough.md): from path3's save in scene 12 Grumpa walks back across the jungle (12, 8, 7, 309, 212, 308, 3, 303, past the turtle in 14, 301) to the piranha pool in 17 and heads for the gauntlets cave (exit to 18). The cave is reachable only across the pool's type-13 water: the engine has no swimming yet, so he stops in the water; path4_pool.png is that state. When swimming lands he should reach scene 18 (then add the gauntlets click, trigger 665, and save)."
+description = "Critical path steps 6-8 (games/grumpa/docs/walkthrough.md): from path3's save in scene 12 Grumpa walks back across the jungle (12, 8, 7, 309, 212, 308, 3, 303, past the turtle in 14, 301) to the piranha pool in 17 and heads for the gauntlets cave (exit to 18). The cave is reached by jumping the stepping stones (y 27..43) over the pool; this run walks into the type-13 water instead, where (as in the original, E-1660) there is no way out: path4_pool.png is that state. Next: legs over the stones with Space (the jump cannot yet land on them: asked of combat)."
 snaps = ["path4_pool.png"]
 timeout = 300
 args = ["-d1"]

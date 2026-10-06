@@ -49,7 +49,7 @@ lines, **view** view change, **timer**.
 | 5 | 12 | Take the Fishing Net (and the Empty Jar); the Sleepy Rat c35 wakes on `tr660` | i121 at (−559, 39, −193) | walk, take, fight (avoidable) |
 | 6 | 12 → 8 → 7 → 309 → 212 → 308 → 3 → 303 → 14 | Walk back across the island to the turtle's beach | exits only | walk |
 | 7 | 14 | The Turtle pirate boss talks (`tr660`), then fights; the exits are not walled | `so640` end: c36 on, `OPENWALL(21)` | talk, fight (avoidable) |
-| 8 | 14 → 301 → 17 | Cross the piranha pool (bites `tr662/665..667`, life −4) and walk up into the cave | `tr663` (on foot) → `GOTO 18`; floor type 13 | walk, swim, timer |
+| 8 | 14 → 301 → 17 | Jump from the shore over the piranha pool from stone to stone (stones at y 27..43, water at −45: once in the water there is no way up, E-1660) and walk into the cave | dry faces: stone A 1466.., stone B 1514.., bank 1041.. with the exit to 18; `tr663` (on foot) → `GOTO 18` | walk, jump |
 | 9 | 18 | Click the Gauntlets of Power: strength 5 → 16 (E-1803) | `tr665`: g240, `c10.88(11)`, `c10.90(2)` | take |
 | 10 | 18 → 17 → 300 → 16 | Walk to the beach and into the water | 16 `tr665` (not in boat/on dragonfly) → `GOTO 73` | walk, swim |
 | 11 | 73 | Hold the Fishing Net and click the seahorse: Grumpa rides it, the air timer stops | `tr660 IF c10[4]==1 & i121==6`: i121 used, c88 `44` | use, mount, swim |
@@ -158,7 +158,8 @@ steps need. "Steps" counts the steps that cannot be played without it.
 | Mechanic | Engine | Steps blocked | Evidence |
 |---|---|---:|---|
 | Combat (attacks, damage, death lists) | missing (in progress) | 4: 12, 16, 19, 23 (5 and 7 can be fled) | Q-0806, E-1404 |
-| Swimming (floor types 12/13, mode `[0x48c]`, the air timer and bubbles) | missing | 7: 8, 10..13, 21, 22 | Q-0800, E-0703 |
+| Swimming: none in the original (E-1660); water floors, the air timer and bubbles | water floors done | 0 | E-1660, E-0703 |
+| Jumping onto higher stones (scene 17: the jump does not raise y, stones are 40 up) | open (asked of combat) | 1: 8 | E-0803 |
 | Cursor State in conditions (actor 2 slot 0 = cursor kind) | missing | 1: step 2, so everything after it | E-1800, E-1801 |
 | Mounts (form change op 0x2c/44, dismount) | specced, not built | 2: 11, 13 | E-1530, Q-0403 |
 | In-scene films (type 0x07: `unplug.mpg`, the outro, the death film) | done (branch grumpa-a5; scenario `film`) | 0 | E-1805, E-1806 |
@@ -170,7 +171,7 @@ steps need. "Steps" counts the steps that cannot be played without it.
 | Jump | missing | 0 on this path (swamp entry from 4, desert 41) | Q-0806 |
 | Followers | specced | 0 on this path | E-1530 |
 
-Ranked by steps blocked: swimming (7), combat (4), mounts (2), the cursor State (1, but it
+Ranked by steps blocked: combat (4), the jump onto stones (1, step 8), mounts (2), the cursor State (1, but it
 is step 2 and stops everything).
 
 ## Scenarios
@@ -183,6 +184,6 @@ The chain plays the path from a new game, each scenario starting from the previo
 | `path1_hut` | 1 | in 211, saved in slot 1 |
 | `path2_gatekey` | 2 | at the gate with the key held: the lock click does not fire (cursor State, E-1800) |
 | `path3_jungle` | 3..5 | in scene 12 with the Fishing Net, saved in slot 3 |
-| `path4_gauntlets` | 6..8 | in 17's pool: the cave (exit to 18) lies across type-13 water, no swimming yet |
+| `path4_gauntlets` | 6..8 | in 17's pool: walked into the water instead of jumping the stones; stays there (the original too) |
 | `path5_ship` (teleport to 101) | 14, 15 | on 102's deck the Captain's fight starts at once and kills base Grumpa (E-1808): scene 96 |
 | `film` (not chained) | 20 | the cork pulled in 109 (strength given by op), `unplug.mpg` plays, the flooded hull 119 runs on |

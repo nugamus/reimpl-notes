@@ -122,9 +122,20 @@ def proj(scene: int, view: int, x, y, z):
     return round((c[0] / c[3] + 1) * 400), round((1 - c[1] / c[3]) * 300)
 
 
-def plan(scene: int, s, g, opened=(), stop_within: float = 0.0) -> str:
+def aim(scene: int, view: int, frm, to, reach: float = 250.0):
+    """The cursor for heading from `frm` to `to`: the screen vector between their projections,
+    stretched to `reach` pixels from `frm`'s, so an error in where the engine puts the
+    character's screen point (Q-0805) turns the heading little."""
+    fx, fy = proj(scene, view, *frm)
+    tx, ty = proj(scene, view, *to)
+    d = math.hypot(tx - fx, ty - fy) or 1.0
+    x, y = fx + (tx - fx) * reach / d, fy + (ty - fy) * reach / d
+    return max(1, min(799, round(x))), max(1, min(599, round(y)))
+
+
+def plan(scene: int, s, g, opened=(), stop_within: float = 0.0, avoid=()) -> str:
     V, F, T, adj, _ = load(scene)
-    closed = CLOSED - set(opened)
+    closed = (CLOSED - set(opened)) | set(avoid)   # avoid: e.g. 13, to stay out of water
     cen = [tuple(sum(V[k][i] for k in f) / 3 for i in range(3)) for f in F]
     a = face_at(V, F, *s)
     b = face_at(V, F, *g)
@@ -167,13 +178,13 @@ def plan(scene: int, s, g, opened=(), stop_within: float = 0.0) -> str:
         while j < len(pts) - 1 and views[min(j, len(views) - 1)] == vk and run < LOOKAHEAD:
             run += math.dist(pts[j], pts[j + 1])
             j += 1
-        sx, sy = proj(scene, vk, *pts[j])
-        cmds.append("hold %d %d;ticks %d;where" % (max(1, min(799, sx)), max(1, min(599, sy)),
+        sx, sy = aim(scene, vk, cur, pts[j])
+        cmds.append("hold %d %d;ticks %d;where" % (sx, sy,
                                                    int(math.dist(cur, pts[j]) / SPEED) + 5))
         cur, k = pts[j], j
     if stop_within > 0:   # then straight at the exit's centre, with time to spare
-        sx, sy = proj(scene, last, *g)
-        cmds.append("hold %d %d;ticks %d;where" % (max(1, min(799, sx)), max(1, min(599, sy)),
+        sx, sy = aim(scene, last, cur, g)
+        cmds.append("hold %d %d;ticks %d;where" % (sx, sy,
                                                    int(math.dist(cur, g) / SPEED) + 60))
     cmds.append("release;ticks 10;where")
     return ";".join(cmds)
