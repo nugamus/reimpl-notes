@@ -1,0 +1,7 @@
+description = "Under the characters (walking.md 'Water and swimming', E-1660, E-1612): in the hut (scene 1) Grumpa and the Kraken stand on their shadows; on the beach (scene 16, view 0, walk-in trigger 665 latched) Grumpa placed in the water (type 13, y -49) wades with the animated ripple (Virvel.tga) around him"
+snaps = ["shadow.png", "ripple.png"]
+timeout = 60
+args = ["-d1"]
+
+[keys]
+grumpa_vm = "1;ticks 30;snap {out}/shadow.png;go 16;ticks 30;op 665 13 0 0;place 132 -49 -611;op 185 30 0 0;ticks 60;where;snap {out}/ripple.png"

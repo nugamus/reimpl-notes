@@ -664,3 +664,8 @@ actor 301, clips 35..37 by meaning, `+0x474/+0x478`, the trigger gate's bit 4 (Q
 ### Q-0811 RESOLVED (2026-10-06, E-0705, E-1405) — bit 4 is implemented: the characters of fighters 91..94, each with its own latch
 Corpus: only scene 14's triggers 664 (gate 5) and 668 (gate 4) use it. The spheres are the body
 spheres of E-1405 (radius `[0x28c]`, centre `[0x290]` up).
+
+### Q-1660 RESOLVED (2026-10-06, E-1612) — the ripple and the shadow
+`watersplasch.ANB` / `Splasch.tga` are loaded but never drawn. The ripple (`Virvel.tga`) and the
+shadow (`Shadow.tga`) are drawn by CFXCharacter::Draw as `walking.md` says; `+0x13c` is the
+ripple's frames per second (one frame every 50 / fps draws, shared, looping).
