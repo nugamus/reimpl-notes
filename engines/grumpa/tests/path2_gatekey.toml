@@ -1,4 +1,4 @@
-description = "Critical path step 2 (games/grumpa/docs/walkthrough.md): from path1's save in the plaza (scene 211) the run tutorial line ends, Grumpa walks (walkplan.py legs) to the Gate Key and picks it up, walks to the gate (view 3), takes the key from the panel and clicks the lock (trigger 663). The original then plays the lock animation and goes to scene 307; the engine stops here: actor 2's State (the cursor kind, E-1800) is not modelled, so the trigger's condition list fails (E-1801). path2_gate.png is that stopped state; refresh it (--update) once the cursor State lands. Saved to slot 2."
+description = "Critical path step 2 (games/grumpa/docs/walkthrough.md): from path1's save in the plaza (scene 211) the run tutorial line ends, Grumpa walks (walkplan.py legs) to the Gate Key and picks it up, walks to the gate (view 3), takes the key from the panel and clicks the lock (trigger 663). The lock opens (actor 2's State is the grab hand or the key is held, E-1800) and the game goes to scene 307; path2_gate.png is scene 307. Saved to slot 2."
 snaps = ["path2_key.png", "path2_gate.png"]
 timeout = 120
 args = ["-d1"]

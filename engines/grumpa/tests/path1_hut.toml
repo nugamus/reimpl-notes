@@ -1,8 +1,8 @@
-description = "Critical path step 1 (games/grumpa/docs/walkthrough.md): new game in the hut (scene 1); Grumpa walks to the broken sword and the shield and picks them up, then to the flying dust and picks it up, then to the door and clicks it: the hut door (trigger 663) takes him to the plaza, scene 211. Saved to slot 1 for path2."
+description = "Critical path step 1 (games/grumpa/docs/walkthrough.md): new game in the hut (scene 1); Grumpa walks to the broken sword and the shield and picks them up, then to the flying dust and picks it up, each tutorial voice line (triggers 664, 665) holding him until it ends; then to the door and clicks it: the hut door (trigger 663) takes him to the plaza, scene 211. Saved to slot 1 for path2."
 snaps = ["path1_items.png", "path1_plaza.png"]
 timeout = 90
 args = ["-d1"]
 export_saves = true
 
 [keys]
-grumpa_vm = "1;ticks 20;where;hold 450 560;ticks 90;hold 150 400;ticks 120;release;ticks 30;where;snap {out}/d1.png;move 163 356;ticks 4;click 163 356;move 232 317;ticks 4;click 232 317;hold 639 460;ticks 150;release;ticks 30;where;snap {out}/d2.png;items;move 639 460;ticks 4;click 639 460;ticks 5;items;snap {out}/path1_items.png;hold 556 235;ticks 150;release;ticks 20;where;click 597 141;ticks 120;where;snap {out}/path1_plaza.png;save 1"
+grumpa_vm = "1;ticks 20;where;hold 450 560;ticks 90;hold 150 400;ticks 120;release;ticks 30;where;wait 800;where;snap {out}/d1.png;move 163 356;ticks 4;click 163 356;move 232 317;ticks 4;click 232 317;hold 639 460;ticks 150;release;ticks 30;where;snap {out}/d2.png;items;move 639 460;ticks 4;click 639 460;ticks 5;wait 300;items;snap {out}/path1_items.png;hold 556 235;ticks 150;release;ticks 20;where;click 597 141;ticks 120;where;snap {out}/path1_plaza.png;wait 1200;where;save 1"
