@@ -71,13 +71,19 @@ def check(engine: str) -> int:
           + "".join(f"\n      {n}:{i}: {l[:100]}" for n, i, l in keys[:5]))
     # Our own test tooling (not an upstream requirement, but how we keep the engine right).
     tests = Path(__file__).resolve().parents[1] / "engines" / engine / "tests"
-    scenarios = len(list(tests.glob("*.toml")))
+    scenarios = len([p for p in tests.glob("*.toml") if not p.name.startswith(("save_", "_"))])
     dev_all = "\n".join(git("show", f"{engine}:{n}") for n in fs if n.endswith(".cpp"))
     print("  testing (ours):")
     for name, ok, why in [
         (f"scenarios ({scenarios})", scenarios >= 3, "at least boot, a scene, a save/load round trip (new-scenario skill)"),
         ("coverage debug channel", '"cov ' in dev_all, 'debugC(1, kDebugCoverage, "cov <kind> %d", ...) at the script/event dispatch'),
         ("coverage universe", (tests / "coverage.txt").exists(), "tests/coverage.txt: every opcode and room the spec defines"),
+        ("debugger console", "registerCmd" in dev_all,
+         "a GUI::Debugger console with goto/give/var/save/load commands (model: engines/x3d/console.cpp)"),
+        ("save-compat templates", (tests / "save_make.toml").exists() and (tests / "save_load.toml").exists(),
+         "tests/save_make.toml + save_load.toml for tools/savecompat.py (model: grumpa)"),
+        ("route graph", (tests.parent / "notes" / "graph.json").exists(),
+         "notes/graph.json from the game data for tools/route.py (model: grumpa scenegraph.py --graph)"),
     ]:
         print(f"    {'ok  ' if ok else 'TODO'} {name.ljust(width - 2)}  {'' if ok else why}")
     todo = sum(not r[1] for r in rows)
