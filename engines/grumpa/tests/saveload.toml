@@ -1,0 +1,6 @@
+description = "Save/load round trip: scene 61 with the gate opened, two items taken and the inventory shown, saved; then scene 1 with the item dropped and the panel hidden, then loaded back: the restored screen must match the saved one"
+snaps = ["changed.png", "away.png", "restored.png"]
+timeout = 90
+
+[keys]
+grumpa_vm = "61;ticks 80;click 254 157;ticks 50;op 101 42;op 102 42;op 90 19;ticks 5;snap {out}/changed.png;save 2;go 1;op 101 13;op 90 19;ticks 80;snap {out}/away.png;load 2;ticks 80;snap {out}/restored.png"
