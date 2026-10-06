@@ -2695,3 +2695,147 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   at (−89.7, 351.0), the player.
 - **Method:** scripted dev run; `.abi` read through `tools/parsers/abi.py`.
 - **Confidence:** verified (engine)
+
+### E-1807 — 0x1a mesh: file order of the eight command lists (corrects E-0601)
+- **Binary/file:** `CFXStaticCharacter` Serialize `FUN_00452100` (load case 1/2), advance
+  `FUN_00453760`, contact tests `FUN_004539a0` (called from update `FUN_00450cc0`), list
+  runners `FUN_004540c0`, `FUN_004543a0`, `FUN_004512a0`, `FUN_00451580`, `FUN_00451b40`,
+  `FUN_00451860`, `FUN_00451e20`; corpus `notes/logic.txt`.
+- **Evidence:** the load reads the eight lists (count, then 0x128-byte commands) in the field
+  order `+0x12c`, `+0x13c`, `+0x14c`, `+0x15c`, `+0x17c`, `+0x18c`, `+0x19c`, `+0x16c`, so
+  `+0x19c` is the 7th and `+0x16c` the 8th (E-0601's "8th +0x19c" is wrong). Runners: file
+  1 `+0x12c` by `FUN_004540c0` (mode 0x10 forward end); 2 `+0x13c` by `FUN_004543a0` (mode
+  0x10 backward end); 3 `+0x14c` by `FUN_004512a0` (bubble flag `+0x1bc` bit 1: actor 3,
+  the player, touches); 4 `+0x15c` by `FUN_00451580` (bit 2: actor 4, or the character
+  held by actor 95 via `FUN_00430b40`); 5 `+0x17c`: no reader found in the class (loaded
+  only); 6 `+0x18c` by `FUN_00451860` (bit 8: the actor whose id is in `+0x228`); 7 `+0x19c`
+  by `FUN_00451e20` (end of animation, modes 4/8/2 without loop); 8 `+0x16c` by
+  `FUN_00451b40` (bit 0x10: any of the combat-role actors 91..94, `DAT_004b9bc4 +
+  0x16c..0x178`, E-1500). Each contact test runs its list on entering contact, latched by
+  `+0x1e4` and per-test flags `+0x234`/`+0x238`/`+0x23c`/`+0x240..`; op 14/15 `+0x1e0`
+  gates all tests. Matches the corpus: L6 (7th) holds the end-of-animation scripts
+  (Scene_211 lock_IO, Scene_109 Cork_Animated), L2 player damage/air, L7 enemy hits.
+- **Confidence:** proven (static), agrees with corpus
+
+### E-1660 — Water in code: floor types 12/13 with mode `[0x48c]`, the ripple, and no reader of types 1/2/3/8
+- **Binary/file:** character update `0x421a60` (after the floor Move, `0x4220cb..0x42225x`),
+  actor 3 update `0x446f70`, `CFXCharacter::Draw` `0x4226a0` (water branch `~0x422ab0..0x422c9f`),
+  shared-mesh loader `FUN_00435a00`, `FUN_0041fd70`, `FUN_004250a0`; `.scn` corpus via
+  `tools/walkplan.py` `load()`; `Meshes/*Grumpa*.ANB` listing.
+- **Evidence:** after Move, in this order: face −1 / step limit as E-0803; floor type = the
+  face's u16; **mode 1** (boat): y = −0.5 and the old y `+0x2a4` = 0; type > 18 and closed →
+  back to old; **mode 1 and type ≠ 13** → back to the old position (y then 0): a boat moves on
+  type 13 only; **type 13 and mode 2** (dragonfly): y = −0.5, old y = 0; then **on type 12 or
+  13**: if the current clip `+0x434` is 0xf, 0x10 or 0x11 (N2J2N, W2J2N, R2J2N: the jumps, not
+  swim clips) y = old y; on type 12 with mode 2 y = old y. Nothing else depends on 12/13 or
+  the mode: no clip, request, root motion, turn or speed change (`FUN_0041fde0` reads neither
+  `+0x450` nor `+0x48c`). Actor 3: Space (request 3, jump) is refused when the floor type is
+  13; Shift, Ctrl and Backspace ignore the floor; types 0..4 select the view unless mode 1
+  (E-0812). Draw (not dying, `+0x474` ≠ 1): on type 13, if y < −4.0 (`0x4904b4`) or mode 1, and
+  the shared mesh 0 exists, it draws `Meshes/waterripple.ANB` at (x, 4.0, z) with uniform scale
+  min(|y|·0.03 + 0.2, 1.0) (`0x4904b0`, `0x4904ac`, `0x49034c`), 1.5 for mode 1 (`0x4904a8`),
+  its playback value `+0x13c` = 5 while the clip is 0 (idle), else 8; on any other type it
+  draws the shadow (shared mesh 2, `Shadow.ANB`); type 13 with y ≥ −4 draws neither. Shared
+  meshes (`FUN_00435a00`): 0 `waterripple.ANB`, 1 `watersplasch.ANB` (no user found in the
+  dumps), 2 `Shadow.ANB`, 3 `effect.ANB`. Grumpa has no swim clip (none of its `.anb` names, slots 0..0x25,
+  is one). Floor type readers: only `0x421a60` (12, 13, > 18, writes 15),
+  `0x446f70` (0..4, 13), `0x4226a0` (13); `FUN_0041fd70`/`FUN_004250a0` only reset it to −1.
+  So types 1, 2, 3 matter only as view numbers and **type 8 has no reader** (46 faces, scene 5,
+  y 0.5..8.4). Corpus vertex y: type 13 −8179.7..67.2 (scenes 4, 12, 16, 17, 20, 30, 32, 35,
+  50, 80..87, 100, 101), type 12 −606.6..233.9 (scenes 9, 114).
+- **Method:** decompile (dumps `notes/decomp/`, `build/grumpa-anim-decomp/`); floats read from
+  `GRUMPA_NOCD.EXE` with pefile; corpus script.
+- **Confidence:** proven (static); `watersplasch` use and the ripple's `+0x13c` meaning open.
+
+### E-1661 — Air and drowning are scripts; Life 0 kills in code
+- **Binary/file:** `Actors/global.atx` timers 220 "Syretimer" and 221 "Slut Luft" (both 4,000
+  ms); `Scenes/Characters.abi` char 88 (Grumpa on the seahorse); `notes/logic.txt`
+  (`tools/logic.py`); score update `FUN_00439730`, DoCommand `FUN_004397a0`; `0x421a60`.
+- **Evidence:** no code drains or refills Air: the score's update only animates its sprites
+  and sounds, actor 3's update sends nothing to actor 8, and the character update tests only
+  Life (slot 1 < 1 → request 4 die, E-1403). Scripts: char 88's list L1 (becoming the form)
+  starts timer 220 and shows the air bar (score 78) unless Scene_ID is 12, 16, 20, 30, 50 or
+  80; char 87's list L0 hides the bar (79) and stops 220 and 221. Timer 220 on expiry: Air
+  > 0 → score 77 (Air −6) and restart 220; Air < 1 → stop 220, start 221. Timer 221 on expiry:
+  Air < 1 → score 51 with (8, 0): Life −8 on the current form, restart 221; Air > 0 → restart
+  220, stop 221. Refills are scene scripts: score 76 with 2, 10 or 100 (100 with 79 and stopping
+  220 on surfacing). So underwater the seahorse loses 6 Air every 4 s (99 → 0 in 68 s), then 8
+  Life every 4 s until Life < 1 runs the character's death (E-1403). Score ops: 76/77 Air ±,
+  78/79 bar shown/hidden (E-0703).
+- **Method:** corpus (`logic.py` dump, `global.atx` text); decompile of the score functions.
+- **Confidence:** proven
+
+### E-1680 — Which scenes run the air timer: entry scripts start, stop and refill it
+- **Binary/file:** `Scenes/Scene_*.abi` scripts 780..782 (type 0x21, run on the entry broadcast
+  23, E-0204); `Scenes/Characters.abi` c10 list 7, c87 list 0, c88 list 1; `notes/logic.txt`.
+- **Evidence:** **start** (`220.66`, score 78 shows the air bar): 51, 53, 55, 56, 57, 58,
+  70..74, 117, 118, 119. **Surface** (`220.67`, score 76(100), 79 hides the bar, `221.67`):
+  12, 16 (script 781), 20, 80, 101, 114; the same **without `221.67`**: 30, 32 (782), 50,
+  54 (782). **Stop only** (79, 221.67, 220.67, no refill): 1 (782), and 96 (220/221.67). No
+  air command in 14, 301, 17 (the piranha pool is bites, `hud.51(4)`), nor in any other scene.
+  Scene 73 trigger 660 (mounting the seahorse) and c87 list 0 hide the bar and stop 220/221
+  without a refill. Conditions are evaluated when a command is pushed (E-0200), so a firing
+  of 220 or 221 tests Air as it was before that firing's 77/51 is delivered: 220 at Air 6
+  subtracts to 0 and restarts itself; the next firing (Air 0) stops 220 and starts 221. With
+  Air 99: 17 firings of 220 (68 s) to Air 0, 4 s more to the first `Life −8`. Grumpa's death
+  (c10 list 7) defers `941.56(1)` to scene 96 and goes there (E-1804: `grumpa_death.mpg`).
+  Consequence of the four surface scripts without `221.67` (30, 32, 50, 54; 50 is entered
+  from underwater 70, 54 from 53): entering one while drowning refills Air to 100 but leaves
+  221 running; its next firing sees Air > 0 and restarts 220, so Air drains on dry land with
+  the bar hidden (Q-1680).
+- **Method:** corpus (`tools/logic.py` over all scenes, filtered on g220/g221/hud 76..79/51).
+- **Confidence:** proven from data
+
+### E-1681 — Air bubbles are 0x1a meshes whose contact spheres ride a vertex; player contact runs file list 3
+- **Binary/file:** `CFXStaticCharacter` contact test `FUN_004539a0`, `CFXSphere::Overlaps`
+  `FUN_0044c6e0`, ctor `FUN_0044fc60`; `Scenes/Scene_{051,055..058,071,118}.abi` (parsed by
+  `tools/parsers/abi.py` `t_1a`).
+- **Evidence:** the `+0x25c` vector the file stores as `count × (u32, u32)` holds the contact
+  spheres (0x118 bytes each in memory): first u32 = vertex index (`+0x114`), second = radius
+  as a float (`+0x110`; the corpus values 0x41500000/0x41a00000/0x41d80000 = 13, 20, 27).
+  Every update the test sets each sphere's centre (`+0x104..+0x10c`) to that vertex of the
+  mesh's current frame (32-byte vertices, x y z first) when the vertex and frame are in range;
+  then, if `+0x1e0` = 1 (the ctor sets it to 1, ops 14/15 set/clear it), for flag bit 1
+  (`+0x1bc`) it tests the player's sphere (actor 3's character, E-0705) against each sphere
+  with the centre-distance-below-sum-of-radii test; on a hit, unless `+0x220` ≠ −1 and the held
+  character differs, it runs file list 3 (`+0x14c`), once per contact when `+0x1e4` = 1
+  (latch `+0x234`, cleared when not touching), and stops testing for that update. All 19
+  bubble meshes (bubbla51_1..3, 55_1..3, 56_1..3, 58_1..3, 71_1..3, 118_1..3, bubblor_IO in 57)
+  have flags 1, `+0x1e4` 1, `+0x220` −1, one sphere on vertex 0 (bubblor_IO: vertices 8 r13
+  and 64 r20), and list 3 = `hud.76(n)`: +10 (51: +2; 71_3: +2). The bubble scenes 119 and
+  117 have none; 53, 70, 72, 73, 74 none either.
+- **Method:** decompile (dump `notes/decomp/all/004539a0_*.c`, `0044c6e0`, `0044fc60` line
+  `[0x78] = 1`); corpus script over `t_1a`.
+- **Confidence:** proven (static + corpus)
+
+### E-1682 — Actor 601's slot 1 is "Scene ID", set by the entry broadcast
+- **Binary/file:** `CFXToScene` ctor `FUN_00447920` (adds a slot named `"Scene ID"`,
+  `s_Scene_ID_0049e604`), DoCommand `FUN_00447ba0`.
+- **Evidence:** DoCommand handles only 0x17 and writes `arg1` to the value of state slot 1
+  (`[+0x11c] + 0x21c` = `0x104 + 1·0x118`, the E-1532 slot stride). 0x17 = 23 is the scene
+  entry broadcast with `arg1` = the scene number (events.md), so `601[1]` is the current scene.
+  c88 list 1's conditions `601[1] != 12, 16, 20, 30, 50, 80` mean "not a surface scene".
+- **Method:** decompile.
+- **Confidence:** proven
+
+### E-1533 — The follower's step ignores the walk mesh; gate bit 2 in the engine
+- **Binary/file:** follower rule `FUN_00434dd0`, update `FUN_00435080`, position setter
+  `FUN_004250a0` (decompiled read-only into a private folder); floats `0x4906f0` = 1.0
+  (scale on 170/100/70), `0x490718` 170, `0x4904a4` 100, `0x49063c` 70, `0x490494` 4;
+  `Scenes/Scene_211.scn`, `.abi` triggers 669..675; engine `follower.cpp`, `events.cpp`;
+  scenario `engines/grumpa/tests/companion_gate.toml`.
+- **Evidence:** the update runs the rule whenever actor 4 holds an existing character; nothing
+  tests the character's active flag. The setter stores the position and sets face `+0x44c`,
+  platform `+0x454` and floor type `+0x450` to −1, no floor test. Scene 211's entry script
+  stops the companion (op 0xc through actor 4) for its opening line; the rule keeps stepping it
+  4 away while it is within 70 of Grumpa: placed at (1028.0, 1735.1) (face 331), it ends at
+  (1021.0, 1782.5), off the mesh (no face by the E-0800 test, `scn.py` vertices). The floor
+  result face −1 is undone (E-0803), so from there every move is undone: the companion runs in
+  place for good (engine run before the fix). Gate bit 2 (E-0705): corpus `+0x188` bit 2 on 19
+  triggers (`+0x14c` = 16 on 17: the companion's hint triggers, conditions `c16[4] == 2 &
+  c16[5] == 0`). Engine run after the fix: the companion stays on the mesh, follows Grumpa west
+  across the plaza and walks into trigger 675 ((881, 8, 1377) r 165): "walk-in trigger 675
+  fired", its hint sound starts (c16[5] = 1).
+- **Method:** decompile; corpus; scripted dev run.
+- **Confidence:** proven (code); the stuck companion is the engine running the original's
+  rule, not observed in the original.

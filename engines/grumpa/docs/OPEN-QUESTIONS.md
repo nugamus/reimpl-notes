@@ -526,6 +526,12 @@ c16, `[5]==0`), so a companion hint line or trigger waits until he stops talking
 
 ### Q-0812 RESOLVED (2026-10-06, E-1530) — `global2.atx` `<22>` makes actor 3 hold Grumpa 10
 
+### Q-1440 — Who evaluates the CFXCharacter rule list `+0x660` (ClassD)?
+- **Known:** reactions (E-1460) do not touch it; `+0x640` is posted by `0x425fc0` (from the
+  follower release `0x434c50`), `+0x650` by `0x4261c0` (end of DoCommand case 0x60). No reader
+  of `+0x660` in the dump besides Serialize and unwinds.
+- **Next lead:** byte-scan for `[reg+0x660]` / `lea reg,[reg+0x660]` outside 0x422f80.
+- **Status:** open
 
 ### Q-1800 — Is Captain c69 meant to be fought on the first boarding of scene 102?
 - **Known:** 102's walk-in trigger 660 is active in the file and starts the captain's line,
@@ -545,3 +551,35 @@ c16, `[5]==0`), so a companion hint line or trigger waits until he stops talking
 - **Blocks:** the surface route to the ship (the walkthrough uses the underwater one).
 - **Status:** open
 
+### Q-1802 — Do scene sounds keep playing while a `CFXCutScene` film runs?
+- **Known:** play broadcasts opcode 96, which characters handle (stop voice slots) but
+  `CFXSound` ignores; the game loop then sleeps without updates, so already-playing
+  DirectSound buffers (ambience loops, scene 96's `end_succesful_VS.wav` started in the same
+  script) are not stopped by code (E-1806). Whether they are audible depends on DirectSound /
+  DirectShow sharing the device; not traced.
+- **Blocks:** nothing essential; the safest reading is to leave scene sounds playing.
+- **Status:** open
+
+### Q-0800 RESOLVED (2026-10-06, E-1660, E-1661) — no reader of types 1/2/3 beyond views, none of 8
+Floor types are read only by the character update (12, 13, > 18), actor 3 (0..4 views, 13 no
+jump) and Draw (13: water ripple instead of shadow). Type 8 is never read. Mode `[0x48c]`: 1
+boat (y −0.5, type 13 only, no view change, bigger ripple), 2 dragonfly (y −0.5 on 13, y kept
+on 12). No swim clips; air and drowning are global timers 220/221 in scripts.
+
+### Q-1660 — Who uses `watersplasch.ANB` (shared mesh 1)
+- **Context:** E-1660: `FUN_00435a00` loads it into the shared-mesh table slot 1; no use was
+  found in the decompile dumps (Draw uses slots 0 and 2), nor what the ripple's `+0x13c` (5
+  idle, 8 moving) controls (likely the frame rate).
+- **Blocks:** a splash effect when entering water, if any; cosmetic.
+- **Status:** open
+
+### Q-1680 — Surface scripts 30, 32, 50, 54 leave the drowning timer 221 running
+- **Context:** E-1680. Entering 30/32/50/54 while Air is 0 refills Air but does not stop 221;
+  its next firing restarts the air timer 220 on dry land with the bar hidden, until a scene
+  with a full surface script (12, 16, 20, 80, 101, 114) or a stop is entered. Looks like a
+  slip (the other surface scripts all stop 221), but nothing in code covers it.
+- **Blocks:** whether the engine marks it `// Original bug` and stops 221 there (a
+  `possible-bug` issue), or keeps the data as is.
+- **Status:** open
+
+### Q-0811 PARTLY RESOLVED (2026-10-06, E-1533) — bit 2 (the companion) is implemented; bit 4 (fighters) belongs to combat
