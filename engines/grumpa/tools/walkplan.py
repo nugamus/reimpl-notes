@@ -143,10 +143,18 @@ def aim(scene: int, view: int, frm, to, reach: float = 250.0):
     return max(1, min(799, round(fx + ux * r))), max(1, min(599, round(fy + uy * r)))
 
 
-def plan(scene: int, s, g, opened=(), stop_within: float = 0.0, avoid=(), walkto: bool = False) -> str:
-    V, F, T, adj, _ = load(scene)
+def plan(scene: int, s, g, opened=(), stop_within: float = 0.0, avoid=(), walkto: bool = False,
+         spare_exits: bool = True) -> str:
+    V, F, T, adj, links = load(scene)
     closed = (CLOSED - set(opened)) | set(avoid)   # avoid: e.g. 13, to stay out of water
     cen = [tuple(sum(V[k][i] for k in f) / 3 for i in range(3)) for f in F]
+    if spare_exits:   # keep out of the other exits' spheres (a path through one changes scene)
+        T = list(T)
+        for ex in links["exits"]:
+            if math.dist(ex[:3], g) > 1 and math.dist(ex[:3], s) > ex[3] + 30:
+                for i, c in enumerate(cen):
+                    if math.dist(c, ex[:3]) < ex[3] + 30:
+                        T[i] = 19
     a = face_at(V, F, *s)
     b = face_at(V, F, *g)
     if b is None:   # a goal off the mesh (a trigger sphere behind a gate): the nearest open face
@@ -164,6 +172,8 @@ def plan(scene: int, s, g, opened=(), stop_within: float = 0.0, avoid=(), walkto
                 dist[j], prev[j] = nd, i
                 heapq.heappush(pq, (nd, j))
     if b not in dist:
+        if spare_exits:   # the other exits' spheres cut the way: plan through them after all
+            return plan(scene, s, g, opened, stop_within, avoid, walkto, spare_exits=False)
         raise SystemExit("no path on the open walk mesh")
     path = [b]
     while path[-1] != a:
@@ -209,7 +219,7 @@ def plan(scene: int, s, g, opened=(), stop_within: float = 0.0, avoid=(), walkto
     return ";".join(cmds)
 
 
-def route(scenes: list[int], start=None, walkto: bool = False) -> str:
+def route(scenes: list[int], start=None, walkto: bool = False, opened=None) -> str:
     """Walk through scenes[0] -> scenes[1] -> ...: in each scene from the entry of the scene
     left (or `start`) to the exit sphere leading to the next; `ticks 120` for the fade."""
     out = []
@@ -219,7 +229,7 @@ def route(scenes: list[int], start=None, walkto: bool = False) -> str:
         if s is None:
             s = next(e[:3] for e in links["entries"] if e[6] == prev)
         ex = next(e for e in links["exits"] if e[4] == b)
-        leg = plan(a, s, ex[:3], stop_within=ex[3] * 0.8, walkto=walkto)
+        leg = plan(a, s, ex[:3], (opened or {}).get(a, ()), stop_within=ex[3] * 0.8, walkto=walkto)
         out.append(leg + ";ticks 120;where" if walkto else leg.replace("release;ticks 10;where", "release;ticks 120;where"))
         prev, start = a, None
     return ";".join(out)
