@@ -2979,3 +2979,30 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** file comparison; scripted dev runs.
 - **Confidence:** proven for the files; where the installer copies `Local_*` (presumably
   over `UI/001_Menu/`) is not read from the setup script.
+
+### E-1809 — Worn weapons and shields add attack and defence (supersedes E-1808's "no weapon")
+- **Binary/file:** `Actors/Characters.abi` c10 attachments (`[0x37c]` weapon bonus to slot 2,
+  `[0x38c]` shield bonus to slot 3, E-1700); engine `Characters::wear`.
+- **Evidence:** c10's six attachments: 0 Shield (of Protection) defence +20, 1 Father's Sword
+  attack +10, 2 Hammer +8, 3 Sword of Might +20, 4 Father's Sword Broken +6, 5 the wooden
+  Shield defence +5. Worn, they add to slots 2/3, which the damage rule and the cork's
+  `c10[2] > 15` read. So base Grumpa with the broken sword has attack 11 (beats the Octopus'
+  defence 7), with the gauntlets too 22 (beats the rats' and the Captain's 18; the cork needs
+  > 15). Defence: 2, +5 wooden shield, +2 gauntlets = 9; the Octopus (31) then hits for 22,
+  the rats (47) 38, the Captain (40) 31. `path6_sea` (attack 22, defence 2): the Octopus kills
+  Grumpa in four hits after one hit of his; the fights need the shield, blocks or more Life.
+- **Method:** corpus, scenario run.
+- **Confidence:** proven from data and E-1700.
+
+### E-1405 — A character's body sphere: radius `[0x28c]`, centre `[0x290]` above the position (corrects E-0705)
+- **Binary/file:** `FUN_00424e90` (`CFXCharacter::GetBodySphere`), the sphere layout of
+  `FUN_0045a0b0` (E-0705: centre at sphere `+0x104..+0x10c`, radius at sphere `+0x110`),
+  `FUN_0044c6e0` (overlap); `Actors/Characters.abi`.
+- **Evidence:** `0x424e90` copies the position `+0x16c..+0x174` into `+0x280..+0x288`, adds
+  `[0x290]` to the y `+0x284` and returns `this + 0x17c`, a sphere object: its centre is
+  `0x17c + 0x104 = +0x280` and its radius `0x17c + 0x110 = +0x28c`. So the body sphere's
+  radius is `[0x28c]` (Grumpa 25, the same field the walk mesh keeps off the walls) and
+  `[0x290]` (30 for every character) only raises the centre. E-0705 read `[0x290]` as both.
+  Used by the proximity gate, the scene exits, the fighters' and the follower's push-apart.
+- **Method:** decompile (one function) against the sphere layout of E-0705.
+- **Confidence:** proven

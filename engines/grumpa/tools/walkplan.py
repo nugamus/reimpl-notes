@@ -123,17 +123,27 @@ def proj(scene: int, view: int, x, y, z):
 
 
 def aim(scene: int, view: int, frm, to, reach: float = 250.0):
-    """The cursor for heading from `frm` to `to`: the screen vector between their projections,
-    stretched to `reach` pixels from `frm`'s, so an error in where the engine puts the
-    character's screen point (Q-0805) turns the heading little."""
+    """The cursor that heads the character at `frm` towards `to`, by inverting actor 3's
+    steering (walking.md, E-0812): yaw = view yaw + atan2(dx, -dy), (dx, dy) the screen vector
+    from the character's screen point to the cursor, the view yaw that of the camera's forward
+    in x/z; the character's forward is (sin yaw, cos yaw). Screen angles are not floor angles
+    under a pitched camera, so aiming at the target's projection drifts; this does not."""
+    vm = vc.views((SCENES / f"Scene_{scene:03d}.scn").read_bytes())[view][2]
+    psi = math.atan2(to[0] - frm[0], to[2] - frm[2])
+    phi = psi - math.atan2(vm[2], vm[10])
     fx, fy = proj(scene, view, *frm)
-    tx, ty = proj(scene, view, *to)
-    d = math.hypot(tx - fx, ty - fy) or 1.0
-    x, y = fx + (tx - fx) * reach / d, fy + (ty - fy) * reach / d
-    return max(1, min(799, round(x))), max(1, min(599, round(y)))
+    ux, uy = math.sin(phi), -math.cos(phi)
+    r = reach      # as far as the screen allows, the direction kept exact
+    for lim, u, f in ((799, ux, fx), (599, uy, fy)):
+        if u > 1e-6:
+            r = min(r, (lim - f) / u)
+        elif u < -1e-6:
+            r = min(r, (1 - f) / u)
+    r = max(r, 30.0)
+    return max(1, min(799, round(fx + ux * r))), max(1, min(599, round(fy + uy * r)))
 
 
-def plan(scene: int, s, g, opened=(), stop_within: float = 0.0, avoid=()) -> str:
+def plan(scene: int, s, g, opened=(), stop_within: float = 0.0, avoid=(), walkto: bool = False) -> str:
     V, F, T, adj, _ = load(scene)
     closed = (CLOSED - set(opened)) | set(avoid)   # avoid: e.g. 13, to stay out of water
     cen = [tuple(sum(V[k][i] for k in f) / 3 for i in range(3)) for f in F]
@@ -164,6 +174,15 @@ def plan(scene: int, s, g, opened=(), stop_within: float = 0.0, avoid=()) -> str
         k = next((i for i, q in enumerate(pts) if math.dist(q, g) < stop_within), len(pts) - 1)
         pts = pts[:max(k, 1) + 1]     # is left over to run in the next scene
         path = path[:len(pts)]
+    if walkto:   # the dev harness's closed-loop "walkto x z r n" through points ~120 apart
+        cmds, last = [], s
+        for q in pts[1:-1]:
+            if math.dist(q, last) >= 120:
+                cmds.append("walkto %d %d 40 %d;where" % (q[0], q[2], int(math.dist(q, last) / SPEED) + 40))
+                last = q
+        r = 20 if stop_within <= 0 else 1   # an exit: walk on until the scene changes
+        cmds.append("walkto %d %d %d %d;where" % (g[0], g[2], r, int(math.dist(g, last) / SPEED) + 80))
+        return ";".join(cmds)
     views, v = [], T[a] if T[a] <= 4 else 0
     for i in path:
         v = T[i] if T[i] <= 4 else v
@@ -190,7 +209,7 @@ def plan(scene: int, s, g, opened=(), stop_within: float = 0.0, avoid=()) -> str
     return ";".join(cmds)
 
 
-def route(scenes: list[int], start=None) -> str:
+def route(scenes: list[int], start=None, walkto: bool = False) -> str:
     """Walk through scenes[0] -> scenes[1] -> ...: in each scene from the entry of the scene
     left (or `start`) to the exit sphere leading to the next; `ticks 120` for the fade."""
     out = []
@@ -200,7 +219,7 @@ def route(scenes: list[int], start=None) -> str:
         if s is None:
             s = next(e[:3] for e in links["entries"] if e[6] == prev)
         ex = next(e for e in links["exits"] if e[4] == b)
-        out.append(plan(a, s, ex[:3], stop_within=ex[3] * 0.8).replace("release;ticks 10;where", "release;ticks 120;where"))
+        out.append(plan(a, s, ex[:3], stop_within=ex[3] * 0.8, walkto=walkto).replace("release;ticks 10;where", "release;ticks 120;where"))
         prev, start = a, None
     return ";".join(out)
 

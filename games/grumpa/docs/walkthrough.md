@@ -69,16 +69,17 @@ lines, **view** view change, **timer**.
 Losing all life takes the other branch of the same scene: Grumpa's list 7 sets 96's flag 941
 and goes there: `grumpa_death.mpg` (E-1804).
 
-## What the fights add to the path (E-1808)
+## What the fights add to the path (E-1808, E-1809)
 
 Damage is attack − defence and only counts when positive (combat.md). Grumpa starts at
-attack 5, defence 2; the Octopus has defence 7, the two rat leaders and the Captain 18. So the
-gauntlets (step 9, attack 16) win the Octopus but not the ship: the rats and the Captain need
-attack 19 or more. The data offers, besides the gauntlets: the **Belt of Strength** (+11,
-desert scene 37, trigger 664), the **Jungle Mixture** (+11 for 3 minutes, the Ape King's
-cauldron with honey, scene 6) and the **Grandfather** (+20, scene 26, which needs gauntlets and
-belt first). No weapon changes the attack in the data. The robust order therefore adds,
-before step 11, the desert:
+attack 5, defence 2; the Octopus has defence 7, the two rat leaders and the Captain 18. Worn
+weapons and shields add to them (E-1809): the broken sword +6 (attack 11: enough for the
+Octopus), with the gauntlets 22 (enough for the rats, the Captain and the cork's > 15); the
+wooden shield +5 defence, the Shield of Protection +20, the Sword of Might +20 attack. Other
+raises: the Belt of Strength (+11, desert 37), the Jungle Mixture (+11 for 3 minutes, scene 6),
+the Grandfather (+20, scene 26). With attack 22 and defence 2 the Octopus still wins
+(`path6_sea`), so the better kit (Sword of Might from 61/9, Shield of Protection from 75, the
+belt) is what makes the fights comfortable; the desert gives the belt:
 
 - 9a. Jungle: kill the snake (scene 10 trigger 663, or the boulder from the rope in 11 → 9):
   global 269 Snake Dead, which the desert gate tests.
@@ -186,4 +187,5 @@ The chain plays the path from a new game, each scenario starting from the previo
 | `path3_jungle` | 3..5 | in scene 12 with the Fishing Net, saved in slot 3 |
 | `path4_gauntlets` | 6..8 | in 17's pool: walked into the water instead of jumping the stones; stays there (the original too) |
 | `path5_ship` (teleport to 101) | 14, 15 | on 102's deck the Captain's fight starts at once and kills base Grumpa (E-1808): scene 96 |
+| `path6_sea` (teleport to 16) | 10..12 | dive, seahorse, ride to 58, walk round the ship (dev `walkto`), the Octopus fight lost at defence 2: scene 96 |
 | `film` (not chained) | 20 | the cork pulled in 109 (strength given by op), `unplug.mpg` plays, the flooded hull 119 runs on |
