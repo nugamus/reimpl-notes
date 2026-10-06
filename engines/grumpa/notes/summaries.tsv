@@ -1,7 +1,22 @@
 program	address	name	summary	evidence
 GRUMPA_NOCD.EXE	004106c0	CFXActorFactory::CreateFromATXFile	Creates an actor from its .atx file	E-0504
+GRUMPA.EXE	00416a90	CFXAMeshEx::CreateFromFile	reads .amb per-frame root motion then the .anb	E-0815
+GRUMPA.EXE	0041fde0	CFXCharacter::Request	character request: clip-queue table per request, turn smoothing	E-0813
+GRUMPA.EXE	004327c0	CFXFloor::HandleEvent	floor opcodes 5/6 set/clear blocking flags, 23 clears platforms	E-0803
+GRUMPA.EXE	00433040	CFXFloor::PointInFace	point in walk-mesh face: x/z box then 3 strict edge tests	E-0800
+GRUMPA.EXE	00433490	CFXFloor::Height	floor height: inverse-distance blend of edge projections, or platform vertex y	E-0801
+GRUMPA.EXE	00433830	CFXFloor::FindFace	linear search for face under point	E-0800
+GRUMPA.EXE	00433880	CFXFloor::FindFaceNear	face under point: hint, its neighbours, then full scan	E-0800
+GRUMPA.EXE	00433950	CFXFloor::CollectWalls	flood faces within radius, collect boundary-edge contacts	E-0802
+GRUMPA.EXE	00433bb0	CFXFloor::Move	move a sphere over the floor: platforms, wall slide (100 iter), y smoothing 0.4/0.6	E-0802
 GRUMPA_NOCD.EXE	00437d00	CFXInventory::DoCommand	Inventory panel: handles commands sent to actor 90 (open/close on right click, take, give)	E-0504
 GRUMPA_NOCD.EXE	00438500	CFXInventory::Draw	Inventory panel: draws the nine slots and two equipment slots	E-0504
 GRUMPA_NOCD.EXE	00438660	CFXInventory::Layout	Inventory panel: lays out slot rectangles	E-0504
 GRUMPA_NOCD.EXE	004387d0	CFXInventory::Add	Adds an item to the inventory: counters for coins and drops, no duplicates, first free slot, else inventory full	E-0504
 GRUMPA_NOCD.EXE	004388e0	CFXInventory::Serialize	Inventory panel (actor type 4): reads and writes its state (Serialize)	E-0504
+GRUMPA.EXE	00445360	CFXMouse::UpdateAngle	mouse actor: cursor distance and angle from the player's screen point	E-0812
+GRUMPA.EXE	00446ba0	PlayerControl::DoCommand	player controller DoCommand: mouse button flags, clip requests, forwards to character	E-0811
+GRUMPA.EXE	00446f70	PlayerControl::Update	player controller update: steer angle, keys Ctrl/Space/Shift/Backspace, view by floor type	E-0812
+GRUMPA.EXE	004473c0	PlayerControl::RequestFromButtons	player controller: buttons to walk/stop/attack request	E-0811
+GRUMPA.EXE	00448250	CFXToScene::FindEntry	find entry for previous scene (pos, rot); -2 keeps place; default first	E-0804
+GRUMPA.EXE	00448360	CFXToScene::TestExits	exit sphere test with latch, returns exit scene	E-0804

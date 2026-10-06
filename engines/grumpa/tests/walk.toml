@@ -1,0 +1,7 @@
+description = "Walking (docs/spec/walking.md): scene 1, hold the left button below Grumpa: he turns and walks (N2W, W2W) on the hut's walk mesh, stops (W2N, idle) on release; then from scene 211 (placed at the entry from scene 1) he walks out of the exit sphere he arrived in and back into it: the exit takes him to scene 1, at its entry from 211"
+snaps = ["walk_start.png", "walk_moved.png", "walk_exit.png"]
+timeout = 60
+args = ["-d1"]
+
+[keys]
+grumpa_vm = "1;ticks 20;where;snap {out}/walk_start.png;hold 560 520;ticks 100;where;release;ticks 60;where;snap {out}/walk_moved.png;go 211;ticks 10;where;hold 600 300;ticks 60;where;hold 760 10;ticks 200;where;snap {out}/walk_exit.png"

@@ -1571,6 +1571,221 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** disassembly of the boot sequence; byte scan of the menu class for the pushes.
 - **Confidence:** strong (static; whether the intro film's playback mutes it is not read).
 
+### E-0800 — CFXFloor (type 0x08, id 600): layout and point-in-face test
+- **Binary/file:** ctor `0x432600` (vtable `0x49067c`: [1] Serialize `0x432880`, [2] Initialize
+  `0x432790`, [6] event handler `0x4327c0`), CreateBuffers `0x432e10`, `FUN_00432c60`,
+  `FUN_00433040`/`FUN_00433250`/`FUN_00433450`, `FUN_00433830`, `FUN_00433880`.
+- **Evidence:** fields: `+0x12c` vertices (32 B each; only bytes 0..11, x y z, are ever read by
+  the floor code), `+0x130` faces (3×u16), `+0x134` per-face u16 "floor type", `+0x138`
+  neighbours (3×s16, −1 = boundary; slot i = edge v[i]→v[(i+1)%3]), `+0x13c` nv, `+0x13e` nf,
+  `+0x140` last face, `+0x148` vector of platform actor ids, `+0x164` wall-contact triples,
+  `+0x3044` their float count, `+0x3048` 29 floor-type blocking flags (ctor sets all to 1).
+  Face test (`0x433040`): reject by the triangle's x and z min/max box (inclusive), then three
+  2D edge functions in x/z for edges (v1,v0), (v2,v1), (v0,v2) must all be > 0.0 (strict; one
+  winding only). Face search `0x433830` = linear scan 0..nf−1, first hit, stored in `+0x140`,
+  else −1. `0x433880` = try the hint face, then its three neighbours in slot order, then the
+  linear scan.
+- **Method:** decompile + byte scan of call sites; constants read from `.rdata`
+  (`0x49045c` = 0.0f).
+- **Confidence:** proven
+
+### E-0801 — Floor height: inverse-distance blend of the three edges' closest points
+- **Binary/file:** `FUN_00433490` (called from `0x433cf0`, `0x433f0c`).
+- **Evidence:** on the static mesh (platform == −1) for each edge (v0v1, v1v2, v2v0) the
+  point is projected in x/z onto the edge's infinite line (parameter t, not clamped), y is
+  lerped along the edge at t, and weighted by 1/d (d = x/z distance to that projection; if
+  |d| < 1e−7 the weight is 1e15). Height = Σ w·y / Σ w. On a platform the height is the y of
+  the face's first vertex in the platform mesh's current frame (vertex index +
+  frame×verts-per-frame).
+- **Method:** decompile; doubles at `0x4906a0..0x4906b8` = 1.0, 1e15, −1e−7, 1e−7.
+- **Confidence:** proven
+
+### E-0802 — CFXFloor::Move (`0x433bb0`): platforms, wall slide, height smoothing
+- **Binary/file:** `FUN_00433bb0(pos*, delta*, radius, platform*, face*)`, `FUN_00433950`;
+  one caller, the character update `0x421a60` (call at `0x4220cb`; Ghidra had no function
+  there, decompiled read-only).
+- **Evidence:** 1) Platforms: for each id in `+0x148` whose actor is active (`+0x10c` == 1),
+  test pos+delta against every face of that mesh's (frame-0) vertices; on a hit store face
+  and platform index, pos += delta, y = 0.4·y + 0.6·height, return 1. 2) Else platform = −1
+  and, if face is −1, a full face search at pos. 3) Up to 100 iterations: find the face under
+  pos+delta (`0x433880`); none → pos += delta, face = −1, return 1 (unconstrained). Else
+  flood from that face (`0x433950`): per edge, the x/z closest point on the segment (t clamped
+  0..1); if its distance < radius then a boundary edge (−1) records (dist, cx−px, cz−pz),
+  an interior edge recurses into the unvisited neighbour. If contacts exist, take the
+  nearest (start 999999) and add (d/dist)·(dist−radius) to delta's x and z (pushes the target
+  out to exactly `radius` from that wall); repeat until no contact. 4) pos += delta,
+  y = 0.4·y + 0.6·height (E-0801), return 0.
+- **Method:** decompile; floats `0x4906c4` = 0.4, `0x490640` = 0.6, `0x4906c0` = 999999,
+  `0x49034c` = 1.0.
+- **Confidence:** proven
+
+### E-0803 — How the character uses the floor result (floor types)
+- **Binary/file:** `0x421a60` (character update, after `0x4220cb`), `FUN_00433010`,
+  `FUN_00432a80`, `FUN_004327c0`, `FUN_00450f30` (`0x451156`).
+- **Evidence:** the character keeps pos `+0x16c`, move delta `+0x294` (zeroed after the
+  call), radius `+0x28c`, old pos `+0x2a0`, face `+0x44c`, platform `+0x454`, floor type
+  `+0x450`, mode `+0x48c`. After Move: face −1 → back to the old position (the mesh is a hard
+  boundary). New y above old y + 20 (static) or + 80 (platform) → back to old and
+  `FUN_004219f0(−2.0)`. Floor type = the face's u16 (15 on a platform, `0x433010`). Type > 18
+  and flag `+0x3048+4·type` == 1 → back to old (types 19, 20, 21 are walls until opened).
+  Mode 1 → y = −0.5 and only type 13 faces walkable; type 13 with mode 2 → y = −0.5;
+  on types 12/13 animation states 15..17 (and type 12 with mode 2) keep the old y. Floor
+  opcodes (vtable[6]): 5 arg → flag[arg−1] = 1 (arg 0: all 29), 6 → flag = 0, 23 (scene
+  entry) clears the platform list; the setter only accepts arg−1 in 1..28, the reader
+  type in 1..28. 0x1a mesh actors with `+0x1d0` == 1 add their id to the platform list at
+  device init (`0x451156`).
+- **Method:** decompile; floats `0x49049c` = 20, `0x490498` = 80, `0x490460` = 1.0.
+- **Confidence:** proven (types 1, 2, 3, 8: no reader found, Q-0800)
+
+### E-0804 — Scene links (0x14 id 601): exits fire scene change, entries place the player
+- **Binary/file:** `CFXToScene` vtable `0x490878` ([4] update `0x448210`, [6] `0x447ba0`),
+  `FUN_00448360`, `FUN_00448250`, `FUN_00447270`, `FUN_0044c6e0`, `FUN_00446b10`.
+- **Evidence:** exits (vector `+0x130`) / entries (`+0x144`). Each update the player sphere
+  (holder actor 3, `0x446b10`) is tested against each exit sphere (`0x44c6e0`); the first
+  hit while the latch `+0x15c` is clear sets the latch, remembers the exit's scene
+  (`+0x168`) and pushes (now, actor 185, opcode 31, arg1 = exit scene): a scene change with
+  the fade. The latch clears when the player is out of the sphere of the remembered scene.
+  On scene entry the player holder (`0x447270`) calls `0x448250` with the previous scene:
+  the entry whose scene equals it gives position (`+0x104`) and rotation (`+0x110`); if
+  none, an entry with scene −2 means keep the current place; else the first entry. This is
+  skipped on the first entry after a load/new game (holder `+0x2c8` == 0, the saved view is
+  used).
+- **Method:** decompile (vtable from `.rdata`).
+- **Confidence:** proven
+
+### E-0810 — Player input: mouse buttons as broadcasts, four keys polled
+- **Binary/file:** window procedure `FUN_00410cb0`; mouse actor 2 handlers `FUN_00445660`
+  (WM_LBUTTONDOWN), `FUN_00445bf0` (UP), `FUN_00445920` (WM_RBUTTONDOWN), `FUN_00445e90` (UP),
+  `FUN_00446350` (WM_MOUSEMOVE); actor 3 update `0x446f70` (decompiled read-only; its
+  `GetAsyncKeyState` is the SafeDisc IAT slot `sd_004901dc`).
+- **Evidence:** the window procedure passes mouse messages (when no message box `DAT_004ba724`
+  and no menu) to actor 2, which queues a command with packed `(x | y << 16)`: 0x12 left
+  down, 0x14 left up, 0x13 right down, 0x15 right up, 0x16 move; target −1 (broadcast), or 90
+  (the inventory panel) while actor 2's `+0x148` is 1. Right down without Ctrl toggles that
+  `+0x148` first. WM_KEYDOWN handles only Escape (0x1b: the fade/menu path) and Space (closes
+  a message box). Character control keys are polled by actor 3 every animation tick: Ctrl
+  (0x11) combat stance, Space (0x20) jump, Shift (0x10) run while the left button is held,
+  Backspace (0x08) leave/dismount (opcode 0x46 or 0x37 to actor 4's character). No arrow or
+  WASD keys and no DirectInput exist in the program.
+- **Method:** decompile.
+- **Confidence:** proven
+
+### E-0811 — Actor 3 (type 0x16) is the player controller
+- **Binary/file:** ctor `FUN_00446850` (0x2d0 B, `CreateActor` case 0x16), vtable `0x490854`:
+  [1] Serialize `0x4474e0`, [4] Update `0x446f70`, [6] DoCommand `0x446ba0`; `FUN_004473c0`,
+  `FUN_00447270`, `FUN_00446db0`, `FUN_00446a30`/`a70`/`ac0`/`b10`.
+- **Evidence:** DoCommand: 0x12/0x14 set/clear left-held `+0x2bc`, 0x13/0x15 set/clear
+  right-held `+0x2c0`, each stores the cursor in `+0x29c/+0x2a0` and `+0x2a4/+0x2a8` and
+  calls `FUN_004473c0`; 0x16 is ignored. 0x17 (scene entry) stores the scene and runs
+  `FUN_00447270` (entry placement, E-0804, then the character's request 5 = reset to idle).
+  0x23 sets/clears `+0x2c8`; 0x37 forwards 1 to the character and releases it; 0..3, 0xb..0xd,
+  0x32..0x36, 0x48, 500, 501 are forwarded to the character `+0x298`. `FUN_004473c0` turns
+  buttons into a request (`FUN_0041fde0(req, turn)`, E-0813): in combat stance (`+0x2c4`):
+  left held while the clip is 0 or 0x20 → a random attack slot 0x12 + rand()%3; right held →
+  slot 0x15; stance with no button while the clip is 2 or 5 → 2 (stop). Otherwise: if
+  actor 2's cursor kind (`FUN_00410c60`) is not 9..25 the left flag is cleared (clicks on
+  hotspots do not walk); left held → request 0 (walk) with the turn `+0x2b8`, else request 2
+  (stop). Accessors copy the character's position `+0x16c` (`ac0` → `+0x150`), orientation
+  (`a70` → `+0x144`), screen point `+0x158/+0x15c` (`a30`) and sphere (`b10`).
+- **Method:** decompile (vtable read from memory).
+- **Confidence:** proven
+
+### E-0812 — Actor 3's update: the steer angle from the cursor, keys, view by floor type
+- **Binary/file:** `0x446f70`, mouse actor `FUN_00445360` (via `FUN_00445440`), view list 602
+  `FUN_0045ae00` (`+0xdf4`).
+- **Evidence:** runs on the 0.46/update clock (`+0x28c`, as E-0603). Order: copy the
+  character's position and orientation; if the character's floor type `+0x450` is 0..4 and
+  its mode `+0x48c` != 1, that type is a **view index**: the first time it selects the view
+  (`FUN_0045ae00`), later a change queues (185, 30, type) (view change with fade); then the
+  turn `+0x2b8` = mouse angle (actor 2 `+0x154`) − (yaw `+0x164` − view yaw (602 `+0xdf4`)) − π;
+  attack hit timer `+0x2b4` → `FUN_00446db0`; Ctrl polled (stance only if clip slot 0x12
+  exists; cursor kind 7); Space (floor type not 13, not in stance, `DAT_004c04b4` == 0) →
+  request 3; Shift with left held → request 1; Backspace as E-0810; last, unless the clip is
+  0xf/0x10/0x11 or `DAT_004c04b0` is set, if the cursor is more than 20 px from the
+  character on screen (actor 2 `+0x150`) → request −1 (turn only). The mouse actor's angle:
+  d = cursor − character's screen point, `+0x150` = |d|, `+0x154` = π ± acos(a component of
+  normalized d), negated when d.x > 0 (component: Q-0805). View yaw `+0xdf4` comes from the
+  view matrix's forward vector the same way.
+- **Method:** decompile; floats `0x4904a0` 0.46, `0x490850` π, `0x49084c` 1, `0x49049c` 20,
+  `0x49081c` π.
+- **Confidence:** proven (the acos operand not read)
+
+### E-0813 — Character requests: the clip-queue table and the turn smoothing
+- **Binary/file:** `FUN_0041fde0(char, req, turn)`; clip queue (deque) `+0x404`, count `+0x430`.
+- **Evidence:** turn (when the countdown lock `+0x4dc` is 0): wrap yaw `+0x164` and `turn` into
+  [−π, π], then `+0x4ac` = 10 steps of `+0x4b8` = turn × 0.1; each animation tick of the
+  character update adds one step to yaw (not in clips 8, 0xc, 0x12..0x14). It is re-aimed on
+  every call, so while walking the yaw closes 10% of the error per tick. req −1 stops there.
+  Every other request clears the queue, then pushes (current clip → queued slots; "cut" =
+  frame set to the clip's F, so the queue advances on the next tick): **0 walk**: 0/0xb →
+  cut, 1, 2; 1, 2, 3 → 2; 0xd → cut, 1, 2; 0x20 → cut, 0x21, 1, 2; others nothing. **1 run**
+  (one burst, re-requested while Shift is held): 0/0xb → 1, 4, 5, 6, 2; 1/2 → 4, 5, 6, 2;
+  3 → 1, 4, 5, 6, 2; 5 → 5, 6, 2; 0x20 → 0x21, 1, 4, 5, 6, 2. **2 stop**: 1 or 2 → 3, 0;
+  5 → 7, 0; else → 0. **3 jump** (needs slot 0x10): 0/0xb → 0xf, 0; 1/3 → 0x10, 0; 2 → switch
+  now to 0x10 frame 0, then 0; 5 → now 0x11, then 0; 0x20 → 0x21, 0xf, 0. **4 die**: 8, 0xc.
+  **5 reset**: clip 0 frame 0, queue 0, clock 0.6. **0x12..0x15, 0x17, 0x1f..0x28**: that
+  slot, then 0. Slots are the `.anb` file numbers (E-0815): 0 N2N idle, 1 N2W, 2 W2W walk
+  loop, 3 W2N, 4 W2R, 5 R2R run loop, 6 R2W, 7 R2N, 8 N2D, 0xc D2D, 0xf N2J2N, 0x10 W2J2N,
+  0x11 R2J2N, 0x12..0x14 attacks, 0x15 N2D2N, 0x17 N2H2N (hit), 0x1f..0x21 S01..S03. The
+  update (`0x421a60`) also queues 0x1f, 0x20 after 11 idle cycles in a row if slot 0x1f exists
+  (the fidget; walking from 0x20 plays 0x21 first).
+- **Method:** decompile (`FUN_00426d40` clear, `FUN_00426a40` push in the jump arm).
+- **Confidence:** proven for the table; the idle variants 0xb/0xd not traced.
+
+### E-0814 — Character motion per animation tick: root motion from the clip, yaw sign
+- **Binary/file:** character update `0x421a60` (`0x421bf4..0x4220cb`).
+- **Evidence:** on each animation tick (0.46/update, E-0603), after the frame step and the yaw
+  step: if the clip is not 0, take the clip mesh's table `+0x150` at the current frame
+  (x, y, z) and add to the move delta `+0x294`: dx = z·sin(yaw) + x·cos(yaw), dz = z·cos(yaw) −
+  x·sin(yaw); y is added to `+0x178`, not the position. The delta then goes to the floor's
+  Move (E-0802, radius `+0x28c`) and is zeroed. No speed constant: the speed is authored per
+  frame in the `.amb` (Grumpa W2W ≈ 5.1, R2R ≈ 8.5..9.7 units a tick, ≈ 118 and ≈ 210 units/s
+  at 23 ticks/s). Local +z is forward = (sin yaw, 0, cos yaw), the D3DX RotationY convention
+  the engine already uses (Q-0404).
+- **Method:** decompile; corpus values from `Meshes/002_W2W_Grumpa.amb`, `005_R2R_Grumpa.amb`.
+- **Confidence:** proven
+
+### E-0815 — `.amb` is a clip's per-frame root motion; the clip slot is the name's number
+- **Binary/file:** `CFXAMeshEx::CreateFromFile` `FUN_00416a90`, `CFXCharacter::LoadResources`
+  `FUN_0041f2b0`; `Meshes/*.amb`, `*.anb`.
+- **Evidence:** the `.amb` count is the clip's frame count and each 24-byte record is a
+  frame: a translation (x, y, z) into `+0x150` and a rotation triple into `+0x154` (stored
+  reversed). Not vertices and normals (supersedes E-0013's reading; the byte layout stands).
+  Corpus: count == `.anb` F for 580 of 586 pairs (6 differ, Q-0807). Grumpa: idle all zero,
+  N2W x only, W2W/R2R z ≈ 5/9 a frame, the rotation triple almost always zero.
+  LoadResources puts each listed `.anb` at slot `atoi(name)` (`FUN_0047c0ce`) of the 44-slot
+  table `+0x2dc` (SetDevice sizes it to 0x2c): `004_W2R` is slot 4, `031_S01` slot 0x1f.
+- **Method:** decompile; corpus script over `Meshes/`.
+- **Confidence:** proven
+
+### E-0816 — Who is the player's character: opcode 0x2c; the scene follows the player
+- **Binary/file:** `CFXCharacter::DoCommand` `FUN_0041e0d0` (case 0x2c), actor 3
+  `FUN_00447780` (setter of `+0x298`), `FUN_00447270` (actor 3 op 0x17), `FUN_004250e0`.
+- **Evidence:** character opcode 0x2c: if actor 3 already holds a character, that one is sent
+  opcode 1 (deactivate) and its role mesh `+0x564` set to 0; then actor 3's `+0x298` = this
+  character's id (`+0x108`), the character becomes active and visible, home `+0x444` = the
+  current scene `+0x448`, and its role `+0x564` = 1. Actor 3's `+0x298` is written only by
+  this setter (and released to −1 by actor 3's op 0x37). On each scene entry, actor 3's
+  op 0x17 places the held character at the entry point (E-0804) and, if that character is
+  active (`+0x10c` == 1), sets its home `+0x444` to the new scene (`FUN_004250e0` stores its
+  argument there); visible is untouched (stays 1). So the held character is present in every
+  scene it walks into.
+- **Method:** decompile.
+- **Confidence:** proven (which command list sends 0x2c to character 10 on a new game not
+  located)
+
+### E-0817 — The cursor angle: acos of the normalized screen y; the cursor arrow follows it
+- **Binary/file:** mouse actor `FUN_00445360` (`0x44537b..0x445430`).
+- **Evidence:** d = cursor (`+0x158`, `+0x15c`, ints) − the held character's screen point
+  (actor 3 `FUN_00446a30`); `+0x150` = |d|; d is normalized (D3DXVec2Normalize `0x473ddd`)
+  and acos (`0x47c9f0`) is taken of the **normalized y** (screen y, down positive); the result
+  is negated when the raw d.x > 0; `+0x154` = π + that. When the cursor kind `+0x130` is in
+  9..24 it is replaced by 9 + int(angle × k1 − k2) (`0x490848`, `0x490844`, via
+  `FUN_00446130`): the 16 walk-arrow cursors point toward the walk direction. Resolves Q-0805's
+  operand.
+- **Method:** disassembly.
+- **Confidence:** proven
+
 ### E-1000 — The CD's cabinet names files by file group; the game runs from the CD as is
 - **Binary/file:** `games/grumpa/discs/cd/data1.hdr` (685,933 B), `data1.cab` (4,206,704 B),
   `data2.cab` (282,887,848 B); `Movies/`; `Setup.ini`.
@@ -1600,3 +1815,51 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   Detection md5s by `tools/detection_entry.py`: `data1.hdr` `0fb9940d…`, `Actors/Items.abi`
   `293eee0f…` (named alone in the cabinet).
 - **Confidence:** proven
+
+### E-0818 — Scene exits are armed only after the player has been outside them
+- **Binary/file:** `CFXToScene` ctor `FUN_00447920` (`CreateActor` case 0x14, 0x170 B),
+  update `0x448210` (decompiled read-only), exit test `FUN_00448360`, DoCommand `0x447ba0`.
+- **Evidence:** the constructor sets latch `+0x15c` = 1, first-update flag `+0x160` = 1 and
+  remembered scene `+0x168` = 0; the object comes with the scene's `.scn` (record 601), so
+  every scene entry starts latched. The update tests the player sphere (actor 3) against each
+  exit with no other gate (no clip, movement, fade or actor 185 test; DoCommand handles only
+  0x17, which stores the scene number in its sub-object). Per exit: a hit remembers that
+  exit's scene in `+0x168` and fires (185, 31, scene) only if the latch is clear, then sets
+  it; a miss clears the latch when that exit's scene equals `+0x168`. After the loop, if
+  `+0x160` is still 1 and no exit was hit, both `+0x160` and the latch clear. So a player
+  placed inside an exit on arrival does not bounce back: the latch stays set until the
+  player leaves that exit's sphere, then re-entering it fires.
+- **Method:** decompile.
+- **Confidence:** proven
+
+### E-0830 — The floor Move runs every animation tick; actor 3's entry resets the clip every entry
+- **Binary/file:** character update `0x421a60`, actor 3 op 0x17 `FUN_00447270`.
+- **Evidence:** in the update the root-motion block is the only part conditioned on the clip
+  being non-zero; the call to `CFXFloor::Move` (`0x4220cb`) follows it unconditionally (it
+  returns only when the floor object `DAT_004b9bc4 + 0x960` is absent), so every active
+  character at home is moved through the floor on each animation tick, with a zero delta when
+  idle (pushed out to its radius from walls, y smoothed onto the floor). `FUN_00447270`, when
+  actor 3 holds a character: the entry placement (`FUN_00448250`) only when `+0x2c8` is 1;
+  then, when the character's `+0x2d4` is 0, its position and orientation from actor 3's copy
+  and the request 5 (reset to clip 0) on every entry; home = the scene if active; the view is
+  the saved `+0x280` on the first entry (`+0x2c8` 0), else 0; then `+0x2c8` = 1. So a new
+  game's start clip `[0x434]` (Grumpa 0x20) is reset to the idle on entry.
+- **Method:** decompile (control-flow outline of the read-only listings).
+- **Confidence:** proven (the meaning of the character's `+0x2d4` not read)
+
+### E-0831 — The engine walks (dev checks); the face test's sign holds for every entry point
+- **Binary/file:** `games/grumpa/discs/cab/Scenes/*.scn` (`tools/parsers/scn.py`); engine
+  `walk.cpp`, `character.cpp`; scenario `engines/grumpa/tests/walk.toml`.
+- **Evidence:** corpus: with the edge function `(q.x − p.x)(z − p.z) − (q.z − p.z)(x − p.x)` over
+  (v1, v0), (v2, v1), (v0, v2) all > 0 (E-0800), all 268 entry points of the 110 `.scn` files
+  lie on a face of their scene's floor; the opposite sign finds none. Of 205 entry/return-exit
+  pairs, 22 put the player's sphere inside the exit on arrival (scene 211 from 1: 204 units
+  from an exit of radius 197, Grumpa's sphere 30), which E-0818's entry latch covers. Dev run
+  `walk.toml` (-d1 `where`): scene 1, left held below Grumpa: N2W then W2W (clip 2), he moves
+  (116.9, 206.3) → (244.1, 115.0) along the hut's back wall, release → W2N, idle at
+  (253.6, 93.4); scene 211 entered from 1: placed at the entry (1031.4, 1712.4), floor type 1
+  selects view 1, no bounce; walked out of the exit sphere and back: "exit to scene 1", scene
+  1 entered, Grumpa at its entry from 211. Grumpa's `[0x28c]`, `[0x5fc]`, `[0x290]` = 25, 125,
+  30.
+- **Method:** corpus script; scripted dev run.
+- **Confidence:** proven (corpus); verified (engine)

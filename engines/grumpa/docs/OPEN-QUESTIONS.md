@@ -408,3 +408,68 @@ player (E-0804). Still open: Q-0800.
 Items lying in a scene (E-0900) are hovered and picked up only with the player's character
 within 160 units. Until the character walks, the engine skips that reach test, as the click
 stands in for walking to the item (`inventory.cpp` update). Restore it with the trigger sphere.
+
+### Q-0805 — The cursor angle's exact formula
+- **Context:** E-0812: mouse actor `+0x154` = π ± acos(one component of the normalized
+  cursor-minus-character screen vector), negated when d.x > 0; view yaw `+0xdf4` the same
+  from the view matrix. Which component goes to acos (`FUN_0047c9f0` after `FUN_00473ddd`
+  at `0x445360`) is not read; nor the setter of the turn lock `+0x4dc` and what
+  `FUN_004219f0(−2.0)` does (the bump on a too-high step).
+- **Blocks:** the exact steering direction toward the cursor.
+- **Status:** open
+
+### Q-0806 — Combat: the stance, attacks and the hit test
+- **Context:** E-0811/E-0812: Ctrl = stance; left = random attack slot 0x12..0x14, right =
+  0x15 (adds 5 to `+0x44c` of the role mesh while it plays); the hit timer `+0x2b4` runs
+  `FUN_00446db0`: characters of actors 91..94 within 140 units and in front (dot < −0.8)
+  get `FUN_00425730(attacker, damage from mesh +0x334)`.
+- **Blocks:** combat.
+- **Status:** open
+
+### Q-0807 — Six `.amb`/`.anb` frame-count mismatches
+- **Context:** E-0815: e.g. `008_N2D_Grumpa_On_Dragonfly` 22 vs 40, `008_N2D_PirateRat1` 22
+  vs 23. The update indexes the table by frame with no bound, so the original reads past it.
+- **Blocks:** nothing for walking; clamp in the engine.
+- **Status:** open
+
+### Q-0601 RESOLVED (2026-10-06, E-0814, E-0815) — the table is the clip's `.amb`
+Per frame an (x, y, z) root motion in the character's frame plus an unused rotation triple.
+
+### Q-0404 RESOLVED (2026-10-06, E-0814) — yaw follows D3DX RotationY
+Local +z moves along (sin yaw, 0, cos yaw), as the engine already turns the mesh.
+
+### Q-0403 / Q-0202 update (2026-10-06, E-0810..E-0814) — the player walks by the mouse
+Hold the left button: the character walks toward the cursor (turning 10% of the error per
+tick), Shift runs, Space jumps, release stops; actor 3 is the controller. Still open:
+combat (Q-0806), followers and mounts (roles 2..7).
+
+### Q-0800 note (2026-10-06, E-0812) — floor types 0..4 are views
+Actor 3's update reads the character's `+0x450`: types 0..4 select the camera view.
+
+### Q-0805 PARTLY RESOLVED (2026-10-06, E-0817) — acos of the normalized screen y
+Still open: the turn lock `+0x4dc` setter, `FUN_004219f0(-2.0)`, and where the character's
+screen point `+0x158/+0x15c` is written (not in Draw `0x4226a0`; likely through a pointer
+with the hover RECT `+0x148`).
+
+### Q-0810 — Walking on platforms
+- **Context:** E-0802/E-0803: `CFXFloor::Move` first tests the active 0x1a actors of its
+  platform list (those with `+0x1d0` = 1, 14 records) on their frame-0 vertices, rides their
+  current frame's height (floor type 15, a step limit of 80).
+- **What we checked:** the Move code; not which scenes need it (bridges, rafts?).
+- **Blocks:** walking onto moving meshes. The engine walks the static mesh only.
+- **Status:** open
+
+### Q-0811 — The proximity gate's bits 2 and 4
+- **Context:** E-0705: bit 2 of a trigger's `+0x188` tests actor 4's character (or actor 95's)
+  against `+0x14c`, bit 4 the characters of actors 91..94. Actors 4 and 91..95 (followers,
+  enemies) are not modelled, so the engine's gate passes on bit 1 only.
+- **Blocks:** triggers walked into by a companion or an enemy.
+- **Status:** open
+
+### Q-0812 — Who makes Grumpa the player on a new game
+- **Context:** E-0816: actor 3's character is set only by character opcode 0x2c; actor 3's
+  entry handling (E-0830) works on that character. Which command list sends 0x2c to
+  character 10 on a new game is not located.
+- **Blocks:** nothing yet: the engine's player is Grumpa (10) from the start, and sets his
+  home on an entry only after the first one.
+- **Status:** open
