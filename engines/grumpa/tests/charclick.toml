@@ -1,0 +1,7 @@
+description = "Character click rules (characters.md 'Command lists', E-1610): scene 1, Life lowered by 30; Grumpa holds a Life item (108) and the left button clicks on Grumpa: his rule 2 (Life < 99, item 108 on the cursor) pushes Life +100 and his voice slot 65"
+snaps = ["before.png", "charclick.png"]
+timeout = 60
+args = ["-d1"]
+
+[keys]
+grumpa_vm = "1;ticks 30;op 10 51 30 0;ticks 5;slot 8 2;op 108 42 0 0;op 108 16 6 0;ticks 5;snap {out}/before.png;where;click 549 210;ticks 5;slot 8 2;ticks 20;snap {out}/charclick.png"

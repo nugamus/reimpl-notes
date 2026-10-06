@@ -64,7 +64,7 @@ defence is 5 higher (added at that clip's start, removed at the next clip's star
 On a character's animation tick, when Life < 1 and no death is running: its turn stops,
 request 4, and with a slot 8 the death timer = F(8), the hide timer = F(8) + 20, both counted
 down a tick. The death timer reaching 0 posts the character's **death list** (the record's
-`+0x630` commands, E-0401) and releases its fighter. The hide timer reaching 0: inactive,
+`+0x630` commands, E-0401; also posted on leaving the scene (0x19) while the timer still runs, E-1610) and releases its fighter. The hide timer reaching 0: inactive,
 invisible, home −1; characters 0x13, 0x38, 0x40, 0x45 and 0x50 keep their body (visible, at
 home in the current scene).
 

@@ -631,3 +631,12 @@ actor 301, clips 35..37 by meaning, `+0x474/+0x478`, the trigger gate's bit 4 (Q
 - Worn weapons and shields add their bonuses to Grumpa's slots 2/3, which the damage rule
   reads; the Sword of Might gives attack 25 > 18. Left open: the captain's first-boarding
   design question itself.
+
+### Q-1611 — A character's click rectangle `+0x148`, and when the click broadcast goes out
+- **Context:** E-1610: the click rules test the mouse against the character's screen rect
+  `+0x148`, whose writer is not read (Q-0805). The engine uses the bounding rectangle of the
+  drawn mesh (as items, E-0900), cleared when the character is not drawn. The engine also
+  sends the click broadcast (0x12) on the button's release and to the scene actors before the
+  characters, where the original sends it on the press (E-0810) in ascending ids (E-0202).
+- **Blocks:** nothing seen: no rule and trigger fire on the same click in the data checked.
+- **Status:** open
