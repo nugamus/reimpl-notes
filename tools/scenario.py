@@ -141,6 +141,9 @@ def run(engine: str, path: Path, update: bool) -> bool:
         except subprocess.TimeoutExpired:
             status = "timed out"
         took = time.time() - start
+        if not OPTS["asan"] and not OPTS["coverage"] and status == "exit 0":  # timings of normal runs only
+            with (REPO / "logs" / "perf.tsv").open("a", encoding="utf-8") as f:
+                f.write(f"{time.strftime('%Y-%m-%d %H:%M')}\t{engine}\t{name}\t{took:.2f}\n")
         if sc.get("export_saves"):
             kept = REPO / "engines" / engine / "tests" / "saves" / name
             shutil.rmtree(kept, ignore_errors=True)
