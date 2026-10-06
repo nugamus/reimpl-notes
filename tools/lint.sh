@@ -9,7 +9,7 @@
 set -o pipefail
 ENGINE=${1:?usage: lint.sh <engine>}
 if [ "$MSYSTEM" != UCRT64 ]; then
-	exec /c/msys64/usr/bin/env MSYSTEM=UCRT64 CHERE_INVOKING=1 /c/msys64/usr/bin/bash -lc \
+	exec /c/msys64/usr/bin/env MSYSTEM=UCRT64 CHERE_INVOKING=1 DEVROOT="$DEVROOT" /c/msys64/usr/bin/bash -lc \
 		"bash '$(cygpath -u "$0")' $ENGINE"
 fi
 git() { "/c/Program Files/Git/cmd/git.exe" "$@"; }
