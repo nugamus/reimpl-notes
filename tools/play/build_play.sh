@@ -1,23 +1,25 @@
 #!/bin/bash
-# Builds the latest committed engines (branch monet) in their own worktree and installs them,
-# with their DLLs and data files, in a play folder (argument, default C:\MonetPlay) for
-# playing like a normal user. Runs inside MSYS2 UCRT64 (_play.bat starts it). Development
+# build_play.sh <engine> <play folder>: builds the latest commit of the engine's dev branch
+# (<engine>-dev) in its own worktree and installs it, with its DLLs and data files, in the play
+# folder for playing like a normal user. Runs inside MSYS2 UCRT64 (_play.bat starts it). Development
 # builds in C:\scummvm are never touched, so a running game does not lock them and half-done
 # work never ships.
-# One worktree builds every played engine, without debug symbols, so a commit is compiled
-# once for all play folders, and nothing is built or copied when monet has not moved.
+# Each engine has its own worktree, built without debug symbols; nothing is built or copied
+# when the branch has not moved.
 set -e
 git() { "/c/Program Files/Git/cmd/git.exe" "$@"; } # MSYS2 has no git: Git for Windows
-SRC=/c/scummvm-play
-OUT=${1:-/c/MonetPlay}
+ENGINE=$1
+BRANCH=$ENGINE-dev
+SRC=/c/scummvm-play-$ENGINE
+OUT=$2
 WIN_OUT=$(cygpath -m "$OUT")
-FLAGS="--disable-all-engines --enable-engine=x3d,peintre,gilbert,grumpa,ring --enable-optimizations --disable-debug"
-COMMIT=$(git -C /c/scummvm rev-parse monet)
+FLAGS="--disable-all-engines --enable-engine=$ENGINE --enable-optimizations --disable-debug"
+COMMIT=$(git -C /c/scummvm rev-parse "$BRANCH")
 if [ ! -d "$SRC" ]; then
-	git -C /c/scummvm worktree add --detach "$SRC" monet
+	git -C /c/scummvm worktree add --detach "$SRC" "$BRANCH"
 fi
 if [ "$(cat "$SRC/.play-built" 2>/dev/null)" != "$COMMIT" ]; then
-	git -C "$SRC" checkout -q --detach monet
+	git -C "$SRC" checkout -q --detach "$BRANCH"
 	echo "Building: $(git -C "$SRC" log --oneline -1)"
 	# Configure when unconfigured (fresh, or an interrupted create) or configured otherwise.
 	grep -q "^SAVED_CONFIGFLAGS *:= $FLAGS\$" "$SRC/config.mk" 2>/dev/null ||
