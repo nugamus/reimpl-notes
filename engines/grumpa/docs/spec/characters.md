@@ -90,7 +90,9 @@ is 0 and the count drops by one. dist = |F − P| (3D):
 
 Then, if dist < 70: the companion steps 4 units straight away from the player in x/z (no floor
 test), gets walk (0) with turn + π/2, and the turn is frozen for 20 rule runs (so it walks
-round out of the player's way).
+round out of the player's way). The step runs even while the companion is stopped by a
+script and takes no floor test, so it can leave the walk mesh and be stuck; the engine does
+not take a step off the mesh (original bug, E-1533).
 
 **Scene entry** (actor 4 on 0x17): unless 0x23 asked otherwise, the companion takes the
 player character's position and orientation and steps 20 back along that yaw (x −= 20·sin yaw,

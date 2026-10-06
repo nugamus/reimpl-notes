@@ -99,8 +99,7 @@ face, and the neighbour across each edge (built at load from shared edges).
   face −1); collect the boundary edges within `radius` of the target by flooding the faces
   whose edges are within `radius`; push the target out from the nearest to exactly `radius`.
   Then move and set `y = 0.4·y + 0.6·height`.
-- **Floor types**: 0..4 view numbers (above), 12/13 water cases (with the mode `[0x48c]`,
-  Q-0800), 15 a platform, 19..21 walls closed until the floor's opcode 6 opens them (opcode 5
+- **Floor types**: 0..4 view numbers (above), 12/13 water (below, E-1660), 15 a platform, 19..21 walls closed until the floor's opcode 6 opens them (opcode 5
   closes; both take type + 1, 0 = all); opcode 23 empties the platform list.
 
 **Platforms (E-1600).** On the scene-entry broadcast (23, ids ascending) the floor (600)
@@ -113,6 +112,30 @@ h = y of the face's first corner in the actor's **current** frame (`+0x1c0`), fl
 and skips the wall slide. No hit clears platform and face (full static search). Nothing
 carries the character in x/z; a rising platform lifts him only through h, every update.
 The character's step limit is +80 on a platform (+20 otherwise).
+
+## Water and swimming (E-1660, E-1661)
+
+There is no swimming state: no swim clip, request, speed, turn or root-motion change. Water is
+two floor types read after the floor Move, in this order (mode = Characters.abi `[0x48c]`):
+
+1. Mode 1 (boat): y = −0.5 and the remembered old y = 0. If the face's type is not 13, the
+   character goes back to its old x/z (y 0): a boat moves only on type-13 faces.
+2. Type 13 with mode 2 (dragonfly): y = −0.5, old y = 0.
+3. On type 12 or 13, while the clip is a jump (0xf, 0x10, 0x11) y stays the old y (the floor
+   height is not followed); on type 12 with mode 2 y always stays the old y.
+
+Anything else on 12/13 follows the floor like ground (type-13 faces go down to y −8180, so a
+walker wades or sinks with the mesh). Actor 3 refuses Space (jump) on type 13; Shift, Ctrl and
+Backspace do not look at the floor. Draw: on type 13, when y < −4 or in mode 1, the shared
+`Meshes/waterripple.ANB` is drawn at (x, 4, z), uniform scale min(|y|·0.03 + 0.2, 1) (1.5 in
+mode 1), playback value 5 while idle (clip 0) else 8; on every other type the shared
+`Shadow.ANB`; on type 13 above −4 neither. Floor types 1..3 are only view numbers, 8 is never
+read.
+
+**Air** is scripts only (E-1661): becoming Grumpa-on-seahorse (88) starts timer 220 and shows
+the air bar unless the scene is 12, 16, 20, 30, 50 or 80. Every 4 s: Air > 0 → Air −6;
+Air 0 → timer 221, which takes 8 Life every 4 s until Air comes back (score 76 refills of 2,
+10, 100 in scene scripts). Life < 1 runs the character's death (E-1403).
 
 ## Scene links, `CFXToScene` (E-0804)
 
@@ -138,4 +161,6 @@ distance is below the radii's sum. A proximity-gated trigger (`+0x17c` = 1, `+0x
 passes, for bit 1 of `+0x188`, when the player's character is present, is the required one
 (`+0x150`, −1 any) and touches; with `+0x170` = 1 only once per stay inside. A click trigger
 needs the gate when clicked; a walk-in trigger (`+0x178` = 0) fires on every update the gate
-passes. Bits 2 and 4 (actor 4's character, actors 91..94) are Q-0811.
+passes. Bit 2 is the same test for actor 4's character (the companion) against the id
+`+0x14c` (−1 any), with its own once-latch; bit 4 the fighters' characters (combat). Each
+source passes on its own (E-0705, E-1533).
