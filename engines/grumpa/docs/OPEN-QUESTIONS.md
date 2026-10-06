@@ -608,3 +608,7 @@ actor 301, clips 35..37 by meaning, `+0x474/+0x478`, the trigger gate's bit 4 (Q
 - **What we checked:** the order in E-1660 only.
 - **Blocks:** nothing seen: the engine keeps the old type on an undone move (`character.cpp`).
 - **Status:** open
+
+### Q-1800 update (2026-10-06, E-1808) — the captain is active and lethal on first boarding
+- `path5_ship`: boarding 102 starts the captain's line and the fight at once; c69 kills base
+  Grumpa in three hits. Open: whether equipped weapons add attack (asked of combat).

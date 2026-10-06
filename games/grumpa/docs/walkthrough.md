@@ -69,6 +69,28 @@ lines, **view** view change, **timer**.
 Losing all life takes the other branch of the same scene: Grumpa's list 7 sets 96's flag 941
 and goes there: `grumpa_death.mpg` (E-1804).
 
+## What the fights add to the path (E-1808)
+
+Damage is attack − defence and only counts when positive (combat.md). Grumpa starts at
+attack 5, defence 2; the Octopus has defence 7, the two rat leaders and the Captain 18. So the
+gauntlets (step 9, attack 16) win the Octopus but not the ship: the rats and the Captain need
+attack 19 or more. The data offers, besides the gauntlets: the **Belt of Strength** (+11,
+desert scene 37, trigger 664), the **Jungle Mixture** (+11 for 3 minutes, the Ape King's
+cauldron with honey, scene 6) and the **Grandfather** (+20, scene 26, which needs gauntlets and
+belt first). No weapon changes the attack in the data. The robust order therefore adds,
+before step 11, the desert:
+
+- 9a. Jungle: kill the snake (scene 10 trigger 663, or the boulder from the rope in 11 → 9):
+  global 269 Snake Dead, which the desert gate tests.
+- 9b. Under the sea to the desert (73 → 58 → 72 → 30; swimming or the seahorse).
+- 9c. 30/34/35: a water container filled (35 trigger 664 or 211's well) given to the parrot
+  (34 trigger 665): the parrot follows; with g269 set its list opens the gate in 36.
+- 9d. 36 trigger 661 → 37: the scorpion (37 trigger 660 with the Lock Shaped Diamond from
+  scene 50, or a fight) and the belt (trigger 664): attack 27.
+
+Then the ship (steps 12..23). Steps 9a..9d are from the region read-outs and not yet played
+by a scenario; the Jungle Mixture is the alternative if the fights are quick (180 s).
+
 ## Choices and alternatives on the way
 
 - **Key Red / Key Blue**: the Bottle of Rum opens either lock instead (104 `tr667`, 108
@@ -160,4 +182,7 @@ The chain plays the path from a new game, each scenario starting from the previo
 |---|---|---|
 | `path1_hut` | 1 | in 211, saved in slot 1 |
 | `path2_gatekey` | 2 | at the gate with the key held: the lock click does not fire (cursor State, E-1800) |
+| `path3_jungle` | 3..5 | in scene 12 with the Fishing Net, saved in slot 3 |
+| `path4_gauntlets` | 6..8 | in 17's pool: the cave (exit to 18) lies across type-13 water, no swimming yet |
+| `path5_ship` (teleport to 101) | 14, 15 | on 102's deck the Captain's fight starts at once and kills base Grumpa (E-1808): scene 96 |
 | `film` (not chained) | 20 | the cork pulled in 109 (strength given by op), `unplug.mpg` plays, the flooded hull 119 runs on |

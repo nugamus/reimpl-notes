@@ -2922,3 +2922,43 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** scripted dev runs; corpus.
 - **Confidence:** verified (engine); the two original-bug readings follow from the cited code,
   not observed in the original.
+
+### E-1808 — The ship's enemies outmatch Grumpa's base strength; what makes the fights winnable
+- **Binary/file:** `Actors/Characters.abi` (six state slots: State, Life, slot 2 attack, slot 3
+  defence, role, hints), `Actors/global.atx` (timer 223), `Scenes/Scene_018.abi`,
+  `Scene_037.abi`, `Scene_026.abi`; the damage rule `combat.md` (E-1402: n = attack −
+  defence, only when > 0); scenario `path5_ship`.
+- **Evidence:** Grumpa c10 starts at Life 100, attack 5, defence 2. The ship's fighters: rat
+  leaders c37/c38 Life 150, attack 47, defence 18; Captain c69 Life 400, attack 40, defence 18;
+  the Giant Octopus c80 Life 140, attack 31, defence 7. So base Grumpa does no damage to any of
+  them, and needs attack > 7 for the octopus and > 18 for the rats and the captain. The data's
+  raises of c10's slot 2 (opcode 0x58) and slot 3 (0x5a): the gauntlets (18 trigger 665) +11/+2,
+  the Belt of Strength (37 trigger 664) +11, the Grandfather (global 243, needs both) +20/+20,
+  the Ape King's Jungle Mixture (Grumpa's list, timer g223) +11/+2 for 180 000 ms, after which
+  the timer sends (8, 89, 11) and (8, 91, 2) back. No weapon or item record changes the slots.
+  So the ship needs the gauntlets plus the belt (attack 27), or the gauntlets plus the timed
+  mixture. `path5_ship` (grumpa-dev b02e6ba0): on first boarding 102's trigger 660 activates
+  c69, who hits Grumpa for 38 (40 − 2) three times; Grumpa dies and the game goes to scene 96.
+- **Method:** corpus (`tools/logic.py`, the character slots), scenario run.
+- **Confidence:** proven from data under the combat spec's damage rule; whether equipped
+  weapons add attack in the code is asked of combat (Q-1800 update).
+
+### E-1535 — The companion fights and comes back (scenario `companion_fight`)
+- **Binary/file:** engine `combat.cpp`, `follower.cpp`, `character.cpp` (grumpa-a2); scenario
+  `engines/grumpa/tests/companion_fight.toml`; Characters.abi `.anb` lists (`parsers/abi.py`).
+- **Evidence:** the Scharlakanskraken 16 has no attack clip (slots 0..7, 0x1f..0x21), so it never
+  joins a fight (E-1430's clip-0x12 test); the golem 22 has. Dev run: Kraken let go (4, 0x37),
+  golem made the follower (22, 0x2d), scene 12: rat 35 engaged as 94 → "22 fights as 95 against
+  35" (role 7, actor 4 holds none), the golem hits the rat four times (24 each) until it dies;
+  the count drops to 1, fighter 95's flag is 1: the golem gets 0x2d (role 2, actor 4's again)
+  and follows Grumpa. Two engine choices marked as original bugs: (1) fighter 95 keeps its
+  character after the hand-back (E-1433) and its rule (E-1431: T dead → T = 10, then T = the
+  character's last attacker, the dead enemy) keeps it swinging at nothing until the scene
+  changes; the engine leaves 95 holding it (so it still joins no later fight in that scene, as
+  in the original) but runs the rule only while the character's role is 7. (2) Fights are not
+  saved (E-1300): a companion saved while fighting (role 7, actor 4 holding none) is held by no
+  one after a load; the engine gives it 0x2d on load. Dev run: saved mid-fight, loaded: the
+  golem is actor 4's (role 2) and follows.
+- **Method:** scripted dev runs; corpus.
+- **Confidence:** verified (engine); the two original-bug readings follow from the cited code,
+  not observed in the original.

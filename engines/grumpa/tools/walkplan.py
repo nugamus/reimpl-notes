@@ -9,7 +9,9 @@ types 19..21 (opened by floor opcode 6) are left out of the flood fill unless na
     python engines/grumpa/tools/walkplan.py plan <scene> sx sy sz gx gy gz [open types...]
         grumpa_vm "hold x y;ticks n;where" commands that walk the player from s to g: the
         shortest face path, cut where the view (face type) changes (released for the fade
-        to finish), each leg aimed at a point at most 300 units ahead in that leg's view
+        to finish), each leg aimed at a point at most LOOKAHEAD units ahead in that leg's view
+    python engines/grumpa/tools/walkplan.py route x y z <scene> <scene>...
+        plans across scenes: from (x, y, z) in the first, then from each entry to the exit
     python engines/grumpa/tools/walkplan.py --selftest
 
 The exit test uses a player sphere of PR units (a guess: Characters.abi radius, Q-0805 area);
@@ -35,6 +37,7 @@ SCENES = vc.CAB / "Scenes"
 CLOSED = {19, 20, 21}
 PR = 60.0       # player sphere radius for the exit test (rough)
 SPEED = 2.0     # world units per update while walking (rough, from runs)
+LOOKAHEAD = float(__import__("os").environ.get("LOOKAHEAD", 150))  # a leg aims at most this far ahead: the steering is by screen angle (E-0812)
 
 
 def load(n: int):
@@ -119,7 +122,7 @@ def proj(scene: int, view: int, x, y, z):
     return round((c[0] / c[3] + 1) * 400), round((1 - c[1] / c[3]) * 300)
 
 
-def plan(scene: int, s, g, opened=()) -> str:
+def plan(scene: int, s, g, opened=(), stop_within: float = 0.0) -> str:
     V, F, T, adj, _ = load(scene)
     closed = CLOSED - set(opened)
     cen = [tuple(sum(V[k][i] for k in f) / 3 for i in range(3)) for f in F]
@@ -146,6 +149,10 @@ def plan(scene: int, s, g, opened=()) -> str:
         path.append(prev[path[-1]])
     path.reverse()
     pts = [s] + [cen[i] for i in path[1:-1]] + [g]
+    if stop_within > 0:   # an exit: end at the first path point inside its sphere, so no leg
+        k = next((i for i, q in enumerate(pts) if math.dist(q, g) < stop_within), len(pts) - 1)
+        pts = pts[:max(k, 1) + 1]     # is left over to run in the next scene
+        path = path[:len(pts)]
     views, v = [], T[a] if T[a] <= 4 else 0
     for i in path:
         v = T[i] if T[i] <= 4 else v
@@ -157,15 +164,34 @@ def plan(scene: int, s, g, opened=()) -> str:
             cmds.append("release;ticks 60;where")   # the faded view change (185, 30) completes
             last = vk
         j, run = k + 1, math.dist(pts[k], pts[k + 1])
-        while j < len(pts) - 1 and views[min(j, len(views) - 1)] == vk and run < 300:
+        while j < len(pts) - 1 and views[min(j, len(views) - 1)] == vk and run < LOOKAHEAD:
             run += math.dist(pts[j], pts[j + 1])
             j += 1
         sx, sy = proj(scene, vk, *pts[j])
         cmds.append("hold %d %d;ticks %d;where" % (max(1, min(799, sx)), max(1, min(599, sy)),
                                                    int(math.dist(cur, pts[j]) / SPEED) + 5))
         cur, k = pts[j], j
+    if stop_within > 0:   # then straight at the exit's centre, with time to spare
+        sx, sy = proj(scene, last, *g)
+        cmds.append("hold %d %d;ticks %d;where" % (max(1, min(799, sx)), max(1, min(599, sy)),
+                                                   int(math.dist(cur, g) / SPEED) + 60))
     cmds.append("release;ticks 10;where")
     return ";".join(cmds)
+
+
+def route(scenes: list[int], start=None) -> str:
+    """Walk through scenes[0] -> scenes[1] -> ...: in each scene from the entry of the scene
+    left (or `start`) to the exit sphere leading to the next; `ticks 120` for the fade."""
+    out = []
+    for a, b in zip(scenes, scenes[1:]):
+        links = load(a)[4]
+        s = start
+        if s is None:
+            s = next(e[:3] for e in links["entries"] if e[6] == prev)
+        ex = next(e for e in links["exits"] if e[4] == b)
+        out.append(plan(a, s, ex[:3], stop_within=ex[3] * 0.8).replace("release;ticks 10;where", "release;ticks 120;where"))
+        prev, start = a, None
+    return ";".join(out)
 
 
 def selftest() -> None:
@@ -188,6 +214,8 @@ if __name__ == "__main__":
         nums = [int(x) for x in a[1:]] or sorted(int(p.stem[6:]) for p in SCENES.glob("Scene_*.scn"))
         for n in nums:
             print("\n".join(reach(n)))
+    elif a[:1] == ["route"]:   # route <x> <y> <z> <scene> <scene>...: start in the first
+        print(route([int(x) for x in a[4:]], tuple(map(float, a[1:4]))))
     elif a[:1] == ["plan"]:
         print(plan(int(a[1]), tuple(map(float, a[2:5])), tuple(map(float, a[5:8])), tuple(map(int, a[8:]))))
     else:

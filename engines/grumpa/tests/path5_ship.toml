@@ -1,0 +1,8 @@
+description = "Critical path steps 14-15 by teleport (games/grumpa/docs/walkthrough.md, E-1808): a new game taken to scene 101 from 58; clicking the hull (trigger 660) climbs on deck (102), whose walk-in trigger 660 starts the Captain's line (ended here by opcode 1) and activates c69. He hits base Grumpa (attack 5, defence 2) for 38 until he dies: Grumpa's death list takes the game to scene 96, where the death film plays (from the CD). path5_deck.png is the deck, path5_end.png scene 96 after the film."
+snaps = ["path5_deck.png", "path5_end.png"]
+timeout = 200
+args = ["-d1"]
+
+[keys]
+path = "C:/Users/Nugamus/Desktop/Code Projects/Game Reimplementations/games/grumpa/discs/cd"
+grumpa_vm = "58;go 101;ticks 60;where;click 560 200;ticks 300;where;op 640 1 0 0;ticks 2;snap {out}/path5_deck.png;ticks 1500;where;ticks 300;where;snap {out}/path5_end.png"
