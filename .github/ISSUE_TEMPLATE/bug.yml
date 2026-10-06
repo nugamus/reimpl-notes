@@ -1,0 +1,45 @@
+name: Bug or difference from the original
+description: Something in one of the engines looks wrong, or might behave differently from the original game.
+labels: [bug]
+body:
+  - type: dropdown
+    id: engine
+    attributes:
+      label: Game
+      options:
+        - Monet (x3d)
+        - Mission Sunlight (peintre)
+        - Ring (ring)
+        - Gilbert (gilbert)
+        - Grumpa (grumpa)
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens
+      description: What you saw, and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: where
+    attributes:
+      label: Where and how
+      description: The place in the game and the steps that lead there. A screenshot helps.
+  - type: input
+    id: save
+    attributes:
+      label: Save file
+      description: >-
+        Path of a save that shows it, e.g. C:\MonetPlay\saves\monet.003. Leave it on your
+        PC; agents read it from there (never upload game data here).
+  - type: dropdown
+    id: original
+    attributes:
+      label: Does the original game do the same?
+      options:
+        - Not checked
+        - "No: the original behaves differently"
+        - "Yes: the original does it too"
+    validations:
+      required: true
