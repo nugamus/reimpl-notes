@@ -9,7 +9,7 @@ git() { "/c/Program Files/Git/cmd/git.exe" "$@"; } # MSYS2 has no git: Git for W
 ENGINE=${1:?usage: build.sh <engine> [make args]}
 shift
 if [ "$MSYSTEM" != UCRT64 ]; then # Git Bash (MINGW64): re-run inside MSYS2 UCRT64
-	exec /c/msys64/usr/bin/env MSYSTEM=UCRT64 CHERE_INVOKING=1 /c/msys64/usr/bin/bash -lc \
+	exec /c/msys64/usr/bin/env MSYSTEM=UCRT64 CHERE_INVOKING=1 DEVROOT="$DEVROOT" /c/msys64/usr/bin/bash -lc \
 		"bash '$(cygpath -u "$0")' $ENGINE $*"
 fi
 SRC=${DEVROOT:-/c/scummvm-dev}/$ENGINE # DEVROOT: a parallel agent's tree
