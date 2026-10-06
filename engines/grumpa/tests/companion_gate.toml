@@ -1,7 +1,7 @@
-description = "Proximity gate bit 2 (E-0705, Q-0811): scene 211 entered from 1; after the opening line (real-time wait) Grumpa walks west along the plaza and the companion (16) following him walks into hint trigger 675 (gate bit 2, companion id 16, c16[4] == 2 & c16[5] == 0): it fires and the companion speaks (log: walk-in trigger 675 fired); the companion stays on the walk mesh through the opening (Q-1501)"
+description = "Proximity gate bit 2 (E-0705, Q-0811): scene 211 entered from 1; after the opening line (stopped at once: its end list gives control back) Grumpa walks west along the plaza and the companion (16) following him walks into hint trigger 675 (gate bit 2, companion id 16, c16[4] == 2 & c16[5] == 0): it fires and the companion speaks (log: walk-in trigger 675 fired); the companion stays on the walk mesh through the opening (Q-1501)"
 snaps = ["companion_gate.png"]
 timeout = 120
 args = ["-d1"]
 
 [keys]
-grumpa_vm = "1;ticks 5;go 211;ticks 2;who 16;ticks 10;who 16;wait 1000;who 16;where;hold 300 300;ticks 120;where;hold 400 100;ticks 80;where;hold 200 150;ticks 80;where;who 16;release;ticks 80;where;who 16;snap {out}/companion_gate.png"
+grumpa_vm = "1;ticks 5;go 211;ticks 2;who 16;ticks 10;who 16;op 656 1 0 0;ticks 20;who 16;where;hold 300 300;ticks 120;where;hold 400 100;ticks 80;where;hold 200 150;ticks 80;where;who 16;release;ticks 80;where;who 16;snap {out}/companion_gate.png"
