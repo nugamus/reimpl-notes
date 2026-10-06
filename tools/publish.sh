@@ -1,7 +1,8 @@
 #!/bin/bash
 # tools/publish.sh <engine>: copies every commit on <engine>-dev that the clean branch <engine>
-# lacks (except DEV: commits) onto <engine>, pushes <engine> to the fork, then rebases
-# <engine>-dev on it so the dev branch is again "clean branch + the DEV commit".
+# lacks (except DEV: commits) onto <engine>, pushes <engine> to the fork, copies the commits onto
+# the fork's (linear) master, then rebases <engine>-dev on it so the dev branch is again "clean branch +
+# the DEV commit".
 # Refuses commits without an Assisted-by trailer (ScummVM AI-GUIDELINES.md).
 set -e
 ENGINE=${1:?usage: publish.sh <engine>}
@@ -21,14 +22,20 @@ done
 
 tmp=C:/tmp/publish-$ENGINE-$$
 g worktree add -q "$tmp" "$ENGINE"
+before=$(git -C "$tmp" rev-parse HEAD)
 if ! git -C "$tmp" cherry-pick $picks > /dev/null; then
 	echo "Conflict publishing to $ENGINE: resolve in $tmp, git cherry-pick --continue, push, then"
 	echo "git -C $REPO worktree remove $tmp"
 	exit 1
 fi
+published=$(git -C "$tmp" rev-list --reverse "$before..HEAD")
 git -C "$tmp" push -q "$REMOTE" "$ENGINE"
 g worktree remove "$tmp"
 g log --oneline "$ENGINE" -$(echo $picks | wc -w)
+
+# The fork's master is linear: the same commits are copied onto it.
+REPO=$REPO REMOTE=$REMOTE bash "$(dirname "$0")/linear-master.sh" append $published ||
+	echo "$ENGINE itself is published; finish master as linear-master.sh says."
 
 # The dev branch: drop the now-published copies, keep the DEV commit on top.
 if git -C "$DEVWT" diff --quiet && git -C "$DEVWT" diff --cached --quiet; then

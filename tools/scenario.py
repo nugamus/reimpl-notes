@@ -1,0 +1,177 @@
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["pillow"]
+# ///
+"""Scenario runs: scripted, bounded playtests with screenshot checks.
+
+A scenario (`engines/<engine>/tests/<name>.toml`, committed) starts the engine in an exact
+state, drives it with the engine's dev-harness keys, and names the screenshots it takes.
+The runner builds a throwaway config from the engine's dev ini, runs the dev worktree's
+exe (C:\\scummvm-dev\\<engine>) with a timeout, then compares each screenshot with its
+reference in `engines/<engine>/tests/golden/<name>/` (gitignored: game imagery). A failure
+leaves `<snap>-compare.png` (reference | now | changed pixels in red) in
+`engines/<engine>/tests/out/<name>/` to look at.
+
+    uv run tools/scenario.py grumpa                 # every Grumpa scenario
+    uv run tools/scenario.py grumpa hut --update    # (re)record the references
+    uv run tools/scenario.py --selftest
+
+Scenario keys:
+    description = "what it shows"
+    snaps = ["hut.png"]            # files the run writes into {out}
+    timeout = 60                   # seconds
+    max_diff = 0.002               # allowed fraction of changed pixels per snap
+    save = "C:/MonetPlay/saves/monet.003"   # optional: copied into the run's save folder
+    [keys]                         # game-domain keys; {out} is the snap folder
+    grumpa_vm = "1;ticks 50;snap {out}/hut.png"
+"""
+
+from __future__ import annotations
+
+import configparser
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+import tomllib
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parents[1]
+DEV = Path("C:/scummvm-dev")
+TOLERANCE = 16  # per-channel difference that counts as a changed pixel
+
+
+def load_ini(path: Path) -> configparser.ConfigParser:
+    ini = configparser.ConfigParser(interpolation=None, strict=False, comment_prefixes=("#",))
+    ini.optionxform = str
+    ini.read(path, encoding="utf-8")
+    return ini
+
+
+def compare(golden: Path, actual: Path, out: Path, max_diff: float) -> tuple[bool, float]:
+    from PIL import Image, ImageChops
+
+    a, b = Image.open(golden).convert("RGB"), Image.open(actual).convert("RGB")
+    if a.size != b.size:
+        changed = 1.0
+        mask = Image.new("L", b.size, 255)
+    else:
+        bands = ImageChops.difference(a, b).split()
+        mask = Image.eval(ImageChops.lighter(ImageChops.lighter(bands[0], bands[1]), bands[2]),
+                          lambda v: 255 if v > TOLERANCE else 0)
+        changed = mask.histogram()[255] / (mask.size[0] * mask.size[1])
+    ok = changed <= max_diff
+    if not ok:
+        w, h = b.size
+        sheet = Image.new("RGB", (w * 3, h))
+        sheet.paste(a.resize(b.size), (0, 0))
+        sheet.paste(b, (w, 0))
+        red = Image.new("RGB", b.size, (255, 0, 0))
+        sheet.paste(Image.composite(red, b.point(lambda v: v // 3), mask.resize(b.size)), (w * 2, 0))
+        out.parent.mkdir(parents=True, exist_ok=True)
+        sheet.save(out)
+    return ok, changed
+
+
+def run(engine: str, path: Path, update: bool) -> bool:
+    sc = tomllib.loads(path.read_text(encoding="utf-8"))
+    name = path.stem
+    dev_ini = load_ini(REPO / "engines" / engine / "tools" / "scummvm.ini")
+    domain = sc.get("domain") or next(s for s in dev_ini.sections() if s != "scummvm")
+    exe = DEV / engine / "scummvm.exe"
+    if not exe.exists():
+        print(f"{engine}/{name}: no {exe} (bash tools/build.sh {engine})")
+        return False
+
+    with tempfile.TemporaryDirectory(prefix=f"scenario-{engine}-") as tmp:
+        tmp = Path(tmp)
+        out, saves = tmp / "out", tmp / "saves"
+        out.mkdir()
+        saves.mkdir()
+        if sc.get("save"):
+            shutil.copy(sc["save"], saves)
+        ini = dev_ini
+        if not ini.has_section("scummvm"):
+            ini.add_section("scummvm")
+        ini["scummvm"].update({"savepath": saves.as_posix(), "enable_unsupported_game_warning": "false",
+                               "gfx_mode": sc.get("gfx_mode", "surfacesdl")})
+        for k, v in sc.get("keys", {}).items():
+            ini[domain][k] = str(v).replace("{out}", out.as_posix())
+        cfg = tmp / "scummvm.ini"
+        with cfg.open("w", encoding="utf-8") as f:
+            ini.write(f, space_around_delimiters=False)
+
+        env = dict(os.environ, SDL_WINDOW_NO_ACTIVATION_WHEN_SHOWN="1",
+                   PATH="C:\\msys64\\ucrt64\\bin;" + os.environ.get("PATH", ""))
+        start = time.time()
+        # A renamed copy, so killing it on a timeout can never hit the user's scummvm.exe.
+        runner = tmp / f"scummvm-scenario-{engine}.exe"
+        shutil.copy(exe, runner)
+        try:
+            proc = subprocess.run([str(runner), f"--config={cfg}", domain], env=env, cwd=tmp,
+                                  timeout=sc.get("timeout", 60), capture_output=True, text=True)
+            status = f"exit {proc.returncode}"
+        except subprocess.TimeoutExpired:
+            status = "timed out"
+        took = time.time() - start
+
+        results, ok = [], True
+        for snap in sc.get("snaps", []):
+            actual, golden = out / snap, REPO / "engines" / engine / "tests" / "golden" / name / snap
+            if not actual.exists():
+                results.append(f"{snap} missing")
+                ok = False
+            elif update or not golden.exists():
+                golden.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(actual, golden)
+                results.append(f"{snap} recorded")
+            else:
+                cmp_png = REPO / "engines" / engine / "tests" / "out" / name / (Path(snap).stem + "-compare.png")
+                good, changed = compare(golden, actual, cmp_png, sc.get("max_diff", 0.002))
+                results.append(f"{snap} {'ok' if good else 'CHANGED'} {changed:.2%}" + ("" if good else f" -> {cmp_png}"))
+                ok &= good
+        print(f"{'PASS' if ok else 'FAIL'} {engine}/{name} ({status}, {took:.0f}s): " + "; ".join(results))
+        return ok
+
+
+def selftest() -> None:
+    from PIL import Image
+
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = Path(tmp)
+        a = Image.new("RGB", (100, 100), (10, 10, 10))
+        b = a.copy()
+        b.putpixel((5, 5), (200, 10, 10))
+        a.save(tmp / "a.png")
+        b.save(tmp / "b.png")
+        assert compare(tmp / "a.png", tmp / "a.png", tmp / "c.png", 0.0) == (True, 0.0)
+        ok, changed = compare(tmp / "a.png", tmp / "b.png", tmp / "c.png", 0.0)
+        assert not ok and abs(changed - 0.0001) < 1e-9 and (tmp / "c.png").exists()
+        assert compare(tmp / "a.png", tmp / "b.png", tmp / "d.png", 0.001)[0]
+    print("scenario selftest ok")
+
+
+def main(argv: list[str]) -> int:
+    if argv == ["--selftest"]:
+        selftest()
+        return 0
+    update = "--update" in argv
+    args = [a for a in argv if a != "--update"]
+    if not args:
+        print(__doc__)
+        return 2
+    engine, names = args[0], args[1:]
+    tests = REPO / "engines" / engine / "tests"
+    paths = [tests / f"{n}.toml" for n in names] if names else sorted(tests.glob("*.toml"))
+    if not paths:
+        print(f"{engine}: no scenarios in {tests}")
+        return 0
+    results = [run(engine, p, update) for p in paths]
+    print(f"{engine}: {sum(results)}/{len(results)} scenarios pass")
+    return 0 if all(results) else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

@@ -1,0 +1,6 @@
+description = "New game in the tutorial hut (scene 1): background, sprites and Grumpa's idle mesh"
+snaps = ["hut.png"]
+timeout = 60
+
+[keys]
+grumpa_vm = "1;ticks 50;snap {out}/hut.png"

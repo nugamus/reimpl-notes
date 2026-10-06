@@ -1,8 +1,9 @@
 """Decompile one named function to disk, with its callee list.
 
-One function at a time, never bulk. The output lands in `engines/x3d/notes/decomp/`
-so it can be read selectively instead of being dragged through context, and the callee
-list is what drives the next hop.
+One function at a time (decompile_all.py does a whole program). The output lands in
+`engines/<engine>/notes/decomp/` so it can be read selectively instead of being dragged
+through context, and the callee list is what drives the next hop. The example below is
+Monet's; any project and program work the same way.
 
     python -m pyghidra.ghidra_launch --install-dir C:\\ghidra \\
         ghidra.app.util.headless.AnalyzeHeadless ghidra_projects Monet \\

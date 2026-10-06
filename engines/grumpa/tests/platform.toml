@@ -1,0 +1,6 @@
+description = "Scene 61 after its fade-in: the platform, sword, snake and HUD drawn through the view camera"
+snaps = ["platform.png"]
+timeout = 60
+
+[keys]
+grumpa_vm = "61;ticks 80;snap {out}/platform.png"

@@ -79,3 +79,7 @@ CLAUDE.md
 
 # Stray copy of a play build (old quoting bug in build_play.sh)
 /tools/play/C*/
+
+# Scenario references and run output: game imagery, never published
+engines/*/tests/golden/
+engines/*/tests/out/
