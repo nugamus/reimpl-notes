@@ -25,12 +25,13 @@ GRUMPA.EXE	00421780	CFXCharacter::SetWorn	Equip/unequip carried object i: one wo
 GRUMPA.EXE	00421940	CFXCharacter::SetLocalDelta	set move delta to a local (x,y,z) offset rotated by yaw; y added to +0x178	E-1501
 GRUMPA.EXE	004219f0	CFXCharacter::SetForwardDelta	set move delta to a distance along the character's yaw	E-1501
 GRUMPA.EXE	00421a50	CFXCharacter::PreUpdate	vtable[4]: clears the rule click latch 0x4ba77c each update	E-1610
-GRUMPA.EXE	00421a60	CFXCharacter::Update	Per-frame character update: clock, frame step, clip queue advance, idle fidget counter +0x4a8, yaw step, root motion, floor move	E-1740
+GRUMPA.EXE	00421a60	CFXCharacter::Update	character update: anim tick, clip start (+0x178 reset on clip 0), root motion (y to +0x178), floor Move, step check 20/80, floor types, jump keeps y on 12/13	E-1407
 GRUMPA.EXE	00422670	CFXCharacter::IsPresent	Present: visible and at home in the current scene	E-1460
 GRUMPA.EXE	004226a0	CFXCharacter::Draw	Character draw: gate visible+home; build world matrix; worn attachments placed on body face vertex (acos of normal) then the body clip mesh	E-1700
 GRUMPA.EXE	00422f80	CFXCharacter::Serialize	CFXCharacter Serialize: modes 1/2/8 read the .abi record; mode 4 reads the status (active, visible, slots, home, pos, orientation, texture, worn flags, disable latch), mode 5 writes id + the same	E-1300
 GRUMPA.EXE	00424e90	CFXCharacter::GetBodySphere	Body sphere +0x17c: centre = position with y + [0x290]; returns it	E-1460
 GRUMPA.EXE	00424ed0	CFXCharacter::GetReactSphere	Reaction sphere +0x4ec: centre = position with y + [0x600], radius [0x5fc]; returns it	E-1460
+GRUMPA.EXE	00424f20	CFXCharacter::SetDrawTransform	builds the character draw transform at (x, y + [0x178] jump/clip bob, z) with rotation +0x160; only reader of +0x178	E-1406
 GRUMPA.EXE	004250a0	CFXCharacter::SetPosition	Set position, reset floor fields 0x44c..0x454	E-1431
 GRUMPA.EXE	004250f0	CFXCharacter::PostReaction	Push every command of the reaction for an id onto the global queue with conditions	E-1460
 GRUMPA.EXE	00425300	CFXCharacter::FindReaction	Pick the first reaction whose other character is present and whose sphere overlaps; once until it leaves	E-1460

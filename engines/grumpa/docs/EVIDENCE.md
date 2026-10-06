@@ -3214,3 +3214,42 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** PyGhidra decompile (`define_and_decompile.py`, `-readOnly`); hex of the
   shipped status files.
 - **Confidence:** proven (static + corpus).
+
+### E-1406 — A jump's height is cosmetic: `+0x178` is a draw-only y offset that sums to 0
+- **Binary/file:** character update `0x421a60` (clip-start block; root-motion tail before the
+  Move call at `0x4220cb`), `CFXCharacter::Draw`-side transform `FUN_00424f20`,
+  `FUN_00421940`, init `FUN_0041c9b0`; `Meshes/015_N2J2N_Grumpa.amb`, `016_W2J2N`, `017_R2J2N`.
+- **Evidence:** each animation tick the clip's `.amb` y of the current frame is **added** to
+  `+0x178` (accumulated; 0.0 `0x49045c` when the clip has no table). It is reset to 0 only when
+  a clip **0** (idle) starts (with `+0x160`, `+0x168`) and at init (`0x41c9b0`). The only
+  reader is `0x424f20`, which builds the draw transform at (x, y + `+0x178`, z): it never
+  enters the Move, the step check or the position. Corpus: the cumulative y of all three jump
+  clips returns to exactly 0.0 at the last frame (N2J2N/W2J2N 19 frames, peak 17.6 at frame 5,
+  dip −10.0 at frame 13; R2J2N 25 frames, peak 21.7 at frame 10); horizontal travel z 124.6
+  (N/W, x ≈ 0..1.4) and 208.1 (R). So the arc is a visual bob; the body's y comes only from
+  the floor.
+- **Method:** decompile dump grep (`[0x5e]`/`+ 0x178` across `notes/decomp/all`, only
+  `0x421940`, `0x421a60`, `0x424f20`, `0x41c9b0` touch a character's `+0x178`); `.amb` script.
+- **Confidence:** proven
+
+### E-1407 — No jump branch in the step check; scene 17's stones are static faces crossed only from the east shore
+- **Binary/file:** `0x421a60` after `0x4220cb`; floats read from `build/grumpa/Grumpa.dump.exe`
+  (`0x490460` = 1.0, `0x49049c` = 20.0, `0x490498` = 80.0, `0x4906c4` = 0.4, `0x490640` = 0.6);
+  `Scenes/Scene_017.scn` via `tools/walkplan.py load()`.
+- **Evidence:** the order after Move is unconditional on the clip: face −1 → old pos; new y
+  (= 0.4·old + 0.6·h from Move) > old y + 20 (+80 on a platform) → old x/y/z and
+  `0x4219f0(−2.0)`; then floor type; and only afterwards, on types 12/13, clips 0xf/0x10/0x11
+  set y = old y (E-1660). No airborne flag, no use of `+0x178`, no Space-held or run scaling:
+  the run jump goes further only because R2J2N's `.amb` does (E-1406). Scene 17 has no
+  platform: the 11 flagged 0x1a meshes (E-1600) are other scenes'; stone A (faces 1466..1485,
+  y 22.0..43.5) and B (1514..1529, y 25.5..45.0) are type-1 faces of the static mesh, water is
+  type 13. A landing tick passes only if h − y ≤ 33.3. Simulating the rules (E-0801 height,
+  x/z face lookup, no wall slide or radius) for N2J2N and R2J2N from every shore face within
+  260 of stone A, 5 yaws each: 11/380 land, all from the east shore (faces 541..558, 739..744,
+  x 502..550, z −1814..−1858, y −0.4..2.1) heading ≈ −1.1..−1.2 rad (toward −x), ending at
+  y 27..30 on A's low east part; from the south shore the rim is 40..44 above y ≈ 0 and the
+  tick is undone each time, so the body stays over the water at y ≈ 0 (kept by the type-13
+  rule) and sinks once the clip ends. A → B: 20/40 land (Δ ≈ 10..15).
+- **Method:** decompile; `/tmp/jump17.py` (corpus simulation, not committed).
+- **Confidence:** proven for the code; the crossing geometry is a simulation without wall
+  slide (Q-1401).

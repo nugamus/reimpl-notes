@@ -665,6 +665,11 @@ actor 301, clips 35..37 by meaning, `+0x474/+0x478`, the trigger gate's bit 4 (Q
 Corpus: only scene 14's triggers 664 (gate 5) and 668 (gate 4) use it. The spheres are the body
 spheres of E-1405 (radius `[0x28c]`, centre `[0x290]` up).
 
+### Q-1401 — Scene 17 jump landing with the full Move (wall slide, radius)
+E-1407's landing set for stone A (east shore only) comes from a simulation without the wall
+slide and the character radius `+0x28c`; a scenario in the engine (east shore faces 541..558,
+heading −x, R2J2N) should confirm it lands on faces 1466..1485.
+
 ### Q-1660 RESOLVED (2026-10-06, E-1612) — the ripple and the shadow
 `watersplasch.ANB` / `Splasch.tga` are loaded but never drawn. The ripple (`Virvel.tga`) and the
 shadow (`Shadow.tga`) are drawn by CFXCharacter::Draw as `walking.md` says; `+0x13c` is the

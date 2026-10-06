@@ -1,0 +1,8 @@
+description = "Jumping (docs/spec/combat.md, E-1406/E-1407): scene 17's piranha pool, walkthrough step 8. Grumpa placed on the east shore runs and jumps (R2J2N) onto stone A (drawn on its arc: the clip's .amb y lifts the mesh only), then onto stone B, then onto the cave bank; the jump over water keeps the shore height and each landing passes the 20-unit step test; then he walks into the exit to scene 18"
+snaps = ["pool_jump.png", "pool_stone_b.png", "pool_bank.png"]
+timeout = 120
+args = ["-d1"]
+
+[keys]
+random_seed = "1"
+grumpa_vm = "301;go 17;ticks 20;place 10 515 -1820 -85;ticks 10;head -85;ticks 20;head -85;key shift 1;hold;ticks 15;key space 1;ticks 4;key space 0;head -85;ticks 8;snap {out}/pool_jump.png;head -85;ticks 8;head -85;ticks 8;head -85;ticks 8;head -85;ticks 8;head -85;ticks 8;release;key shift 0;ticks 40;where;head 45;ticks 30;head 45;key shift 1;hold;ticks 12;key space 1;ticks 4;key space 0;head 45;ticks 8;head 45;ticks 8;head 45;ticks 8;head 45;ticks 8;head 45;ticks 8;head 45;ticks 8;release;key shift 0;ticks 40;where;snap {out}/pool_stone_b.png;head 0;ticks 30;head 0;key shift 1;hold;ticks 12;key space 1;ticks 4;key space 0;head 0;ticks 8;head 0;ticks 8;head 0;ticks 8;head 0;ticks 8;head 0;ticks 8;head 0;ticks 8;release;key shift 0;ticks 40;where;snap {out}/pool_bank.png;head -26;hold;ticks 20;head -26;ticks 20;head -26;ticks 20;head -26;ticks 20;head -26;ticks 20;head -26;ticks 40;release;ticks 60;where"
