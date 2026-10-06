@@ -2639,3 +2639,59 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** scripted dev runs (`grumpa_vm`, `where`, `cursor`).
 - **Confidence:** proven for the engine; the attachment placement against the original's
   pixels is not compared (no capture of the original).
+
+### E-1806 — Type 0x07 is `CFXCutScene`: a full-screen DirectShow film that pauses the game; Space or the film's end stops it and runs its list
+- **Binary/file:** factory `FUN_0040d2f0` case 7 (`new 0x25c`, ctor `0x429aa0`, vtable `0x4904f0`:
+  [1] Serialize `0x429d40`, [2] SetDevice `0x429c40` (error `CFXCutScene::Initialize(IFXDire…`),
+  [3]/[4] render/update empty `0x4761b0`, [6] DoCommand `0x429c70`); play `FUN_0042afc0`, stop
+  `FUN_0042b2c0`, run list `FUN_0042b3e0`, surface-renderer graph `FUN_0042aae0`; window
+  procedure `FUN_00410cb0` (`0x8001`/`0x8003`/`0x8004`, `WM_KEYDOWN` 0x20); factory tick
+  `FUN_0040e980`; boot `FUN_00436aa0` (`"%s\Movies"` into `0x4b9edc`); `CFXView::DoCommand`
+  `0x45ad40`; `CFXSound::DoCommand` `0x448a40`; `Scenes/Scene_{096,119,500}.abi`.
+- **Evidence:** **Fields:** Serialize mode 1/2 reads id `+0x108`, `+0x10c`, `+0x110`, the
+  condition vector, `+0x114`, the name (`+0x144`), `+0x13c`, then 19 u32 into a stack local
+  (discarded), then the command list `+0x248` (0x128-byte entries); save mode 4 keeps `+0x10c`,
+  `+0x110`, `+0x13c`, `+0x140`. `+0x114` and the 19 u32 are read by no method of the class.
+  **DoCommand:** 0 play, 1 stop, 23 (scene entry) play when `+0x13c = 1`; all three only while
+  `+0x140 = 0`; 13 sets `+0x140 = 1` (disabled), 52 clears it; others ignored. Corpus: `+0x13c`
+  = 1 only for scene 500's `grumpa_intro.mpg`, 0 for the 96 and 119 films (so the intro starts
+  on entering scene 500 and nothing needs to send it 0). **Play:** broadcasts opcode 96 to every
+  actor and runs the immediate list (characters stop their voice slots, E-1640; `CFXSound`
+  ignores 96); builds `<Movies dir>\<name>` with `"%s\%s"`, the Movies dir being
+  `<HKLM\SOFTWARE\Idol FX\Grumpa DataPath>\Movies` (no language folder; `0x42b105`
+  pushes `0x4b9edc`); `CLSID_FilterGraph` `RenderFile`, the video window owned by the game
+  window, `WS_CHILD`, 800×600 at the origin; notify window message `0x8001` with
+  `lParam = 0x10000 | id`; when the device reports bit 0 (`device vtable+0x58`) it first tries
+  a graph with its own surface renderer (`0x42aae0`) and on success fills the window black.
+  Either way the fade actor 185 is set to full brightness at once (`FUN_0042f290(185, 0)`, no
+  fade-out before), actor 0's `+0x10c`/`+0x110` are set 0, message `0x8003` sets the
+  film-playing flag `0x4ba724`, and the graph runs. While actor 0's `+0x10c = 0` the factory
+  tick only `Sleep(1)`s: no update, no render, no timers. **Input** while the flag is set:
+  mouse messages and Escape are ignored (every arm requires `0x4ba724 = 0`); **Space**
+  (`WM_KEYDOWN` 0x20) calls stop. A graph event `EC_COMPLETE` (1) or `EC_USERABORT` (2) on
+  `0x8001` calls stop too. **Stop** (only while a graph exists): `IMediaControl::Stop`, colour-
+  fill the back surface black, message `0x8004` clears the flag, release the graph, actor 0
+  `+0x10c`/`+0x110` = 1, push every command of `+0x248` with its conditions (`FUN_00408760`,
+  run by the next update), send op 1 to actor 3 (stop the held character), and op 87 to actor
+  602 (`CFXView`: `+0xdcc = 2`, full background redraw). So the list runs the same way whether
+  the film ends or is skipped. Opcode 1 sent by a command is the same stop.
+- **Method:** decompile (functions at `0x429aa0..0x429d40` are not defined in the project;
+  created in a read-only headless session), disassembly at `0x42b0fa..0x42b110` and
+  `0x42b578..0x42b58c`; corpus bytes after each film name.
+- **Confidence:** proven (static); whether looping ambience stays audible over the film is open
+  (Q-1802).
+
+### E-1532 — The seahorse mount works end to end in scene 73 (scenario `seahorse`)
+- **Binary/file:** engine `follower.cpp`, `character.cpp` (grumpa-a2); scenario
+  `engines/grumpa/tests/seahorse.toml`; `Scenes/Scene_073.abi` trigger 660.
+- **Evidence:** the role `+0x564` is the character's state slot 4 (value at `+0x104 + 4·0x118`,
+  E-0407 stride), so 660's condition `c10[4] == 1` is "Grumpa is the player". Trigger 660:
+  polygon (350,389)(205,372)(181,283)(231,224)(494,221)(504,286)(434,378), sphere (5.8, 3.9,
+  −174.3) r 390; commands `(121,16,1)(710,13)(660,13)(10,0xc)(10,3)(88,0xb)(88,2)(88,0x2c)
+  (8,79)(221,67)(220,67)`. Dev run: Grumpa walks from (579.7, −219.6) to (305.8, −59.8), the
+  net (121) held, a click at (350, 300) fires 660: 88 is the player (role 1) at its
+  Characters.abi place (81.9, −148.3), 10 inactive and hidden, the score shows the seahorse
+  icon and no air bar; 88 rides to (−131.5, 307.3); Backspace: 87 at (−153.0, 343.0), Grumpa
+  at (−89.7, 351.0), the player.
+- **Method:** scripted dev run; `.abi` read through `tools/parsers/abi.py`.
+- **Confidence:** verified (engine)

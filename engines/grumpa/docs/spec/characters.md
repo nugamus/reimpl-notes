@@ -60,7 +60,7 @@ is that scene, or when a command brings it there:
 
 ## Roles: the player and the follower (E-0816, E-1220..E-1224, E-1530)
 
-A character's role (`+0x564`): 0 none, 1 the player's, 2 the follower's, 3..7 a fighter's
+A character's role (`+0x564`, which is its state slot 4, so conditions such as `c10[4] == 1`, "Grumpa is the player", read it): 0 none, 1 the player's, 2 the follower's, 3..7 a fighter's
 (`combat`, E-1500). Two global actors hold one character each:
 
 - **Actor 3**, the player controller (`walking.md`), holds the player's character. **0x2c** on
@@ -100,6 +100,30 @@ becomes the scene when it is active; the freeze count is reset.
 **Shuffle aside** (the character update, E-1224): a role-0 character whose sphere overlaps the
 player's or the companion's steps 4 units away from it horizontally, then gets walk with turn
 π/2 and stop.
+
+## Sound slots and the speech queue (E-1640, E-1620, E-1223)
+
+Each `.wav` of a character's sound list is loaded once (with its clips) into slot
+`atoi(name)` of a 100-slot table (`065_CS_Gulp_VO.wav` is slot 65), from `Sounds\<name>`; a
+missing file leaves the slot empty. Character sounds have default volume and pan, no loop, no
+speaker and no command list, so playing or stopping one never changes a talking flag by
+itself. The character's **state slot 5** (talking) is written only by the queue below.
+
+**Op 0x48** `arg1` = n: ignored outside 0..99 or when n is already in the queue. n < 60 and
+n ≠ 32: play slot n now (no stop; a slot already playing just goes on). Otherwise append n to
+the speech queue (unbounded, even if the slot is empty); if it is now the only entry, its slot
+is loaded and slot 5 is 0, play it and set slot 5 = 1. Scripts send only n ≥ 60 (63/64 via
+actors 3/4); slots below 60 and 32 (tired) come from the clip-start hook.
+
+**Pump**, last step of the character update, so only for an active character at home in the
+current scene, on its animation steps: if the front's slot is loaded and no longer playing,
+pop it, slot 5 = 0, and play the next entry (if loaded) with slot 5 = 1. An entry whose slot is
+empty is never popped and blocks the queue (data: (16,61), (21,61), (28,60), (30..32,60)).
+**Flush**, on scene entry (op 0x17) and when a scene sound naming this speaker plays: only if
+the character is away from the current scene, stop the front's sound and empty the queue
+(slot 5 unchanged). A first line queued for an absent character therefore plays, but nothing
+after it until the character is back. **Op 0x60**: stop all 100 slots without commands; the
+queue stays, so the next pump moves on to the following line. No data sends 0x60.
 
 ## Mounts (E-1501..E-1503)
 
