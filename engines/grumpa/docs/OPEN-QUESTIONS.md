@@ -523,3 +523,5 @@ c16, `[5]==0`), so a companion hint line or trigger waits until he stops talking
   raw scan for `mov [reg+0x130], 3..6` on the mouse.
 - **Blocks:** nothing: show frame 0 of each picture; 9 at scene start.
 - **Status:** open
+
+### Q-0812 RESOLVED (2026-10-06, E-1530) — `global2.atx` `<22>` makes actor 3 hold Grumpa 10

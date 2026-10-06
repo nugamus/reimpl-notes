@@ -43,7 +43,7 @@ was; at 99 the frame is 0 after an add, `count − 1` after a subtract.
 | 76 / 77 | Air + / − `arg1`; plays `SX_addair` (if not at 99 after a non-zero add) / `SX_subair` (if Air was not 0) |
 | 78 / 79, 80 / 81, 82 / 83 | show / hide the air bar, the poison icon, the strength icon |
 | 85 | the form becomes character `arg1`: Life = that character's slot 1, its icon shown, the heart redrawn |
-| 50 / 51 | Life + / − `arg1`, for `arg2`: 0 the score's own Life, then the form character's slot 1 = Life; a character id: that character's slot 1 ± `arg1`, and the score's Life too if it is the current form; −10 / −11: passed on to actor 3 / 4 |
+| 50 / 51 | Life + / − `arg1`, for `arg2`: 0 the score's own Life, then the form character's slot 1 = Life; a character id: that character's slot 1 ± `arg1`, and the score's Life too if it is the current form; −10 / −11: passed on to actor 3 / 4, whose held character sends it back with its own id (as above; nothing when it holds none, E-1223) |
 
 A Life add (non-zero, not ending at 99) plays star 0 and `SX_currage`; a Life subtract from a
 non-zero Life plays star 1 and `SX_scare`. A character's opcodes 50/51 reach here as

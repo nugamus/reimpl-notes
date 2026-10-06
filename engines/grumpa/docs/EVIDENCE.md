@@ -2407,3 +2407,25 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** decompile; disassembly of the SafeDisc-broken call sites (PyGhidra).
 - **Confidence:** proven for the listed setters; kinds 3..6 unused is a search result
   (call sites of the three setters), not a proof (Q-1710).
+
+### E-1530 — Character opcodes 1, 0x37, 0x47, 500, 501; actor 3 starts holding Grumpa
+- **Binary/file:** `CFXCharacter::DoCommand` `FUN_0041e0d0` (cases 1, 0x37, 0x47, 500, 501),
+  actor 3 Serialize `FUN_004474e0` (case 6), `Actors/global2.atx` blocks `<22>`, `<23>`.
+- **Evidence:** character **op 1** is the request 2 (stop, `FUN_0041fde0(this, 2, 0.0)`), not a
+  deactivation (supersedes "op 1 (deactivate)" in E-0816, E-1222, E-1500, E-1501: a released
+  or replaced character stops walking and stays active and visible). **501**: active =
+  visible = 0, then the stop. **500**: active = visible = 1, the per-state slot flags cleared,
+  request 5. **0x37**: sent on to actor 4 as (0x37, `arg1`) — the follower releases its
+  character. **0x47 `arg1`**: placed at actor `arg1`'s position, a pending move of 30 along
+  its own yaw (`FUN_004219f0`, applied by the next tick's floor Move), orientation copied from
+  that actor, home = current scene, active = visible = 1, role 0 (supersedes the "position
+  only" reading of E-0403). Actor 3 Serialize mode 6 reads two integers and, if `+0x298` then
+  names a character, sets its role `+0x564` to 1, as the follower's (E-1220): `global2.atx`
+  `<22>` holds 3, 10 and `<23>` holds 4, 16, so a game starts with actor 3 holding Grumpa 10
+  (role 1) and actor 4 holding the Scharlakanskraken 16 (role 2); Characters.abi has 16
+  active and visible at home in scene 1 (97, 35, 238), beside Grumpa (117, 35, 206). Actor 3's
+  save (mode 4) writes its held character `+0x298` last (after `+0x280`), the follower's
+  (E-1220) its `+0x290`.
+- **Method:** decompile (dump `notes/decomp/GRUMPA.EXE__FUN_0041e0d0.c`, `_004474e0.c`);
+  global2.atx read; Characters.abi through `parsers/abi.py`.
+- **Confidence:** proven (the two mode-6 fields inferred from the file, as E-1220).
