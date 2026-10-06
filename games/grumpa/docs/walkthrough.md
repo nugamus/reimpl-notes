@@ -89,8 +89,10 @@ belt) is what makes the fights comfortable; the desert gives the belt:
 - 9d. 36 trigger 661 → 37: the scorpion (37 trigger 660 with the Lock Shaped Diamond from
   scene 50, or a fight) and the belt (trigger 664): attack 27.
 
-Then the ship (steps 12..23). Steps 9a..9d are from the region read-outs and not yet played
-by a scenario; the Jungle Mixture is the alternative if the fights are quick (180 s).
+Then the ship (steps 12..23). Steps 9a..9d are played by `path9a_snake` .. `path9d_belt`
+(E-1541; slot 9 for the ship). Found on the way: 7's roots need the Wood Splinter On Fire
+(133) or the Bottle of Rum; 34's parrot sits behind walls the diamond lock (663) opens, so the
+diamond (or Lock Shaped Stone, or Rum) is needed before the parrot too; the Jungle Mixture is the alternative if the fights are quick (180 s).
 
 ### The kit the ship's fights need (E-1809, E-1810)
 

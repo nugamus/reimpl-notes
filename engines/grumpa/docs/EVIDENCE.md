@@ -3253,3 +3253,24 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** decompile; `/tmp/jump17.py` (corpus simulation, not committed).
 - **Confidence:** proven for the code; the crossing geometry is a simulation without wall
   slide (Q-1401).
+
+### E-1541 — The desert prerequisites (walkthrough 9a–9d) play in the engine; walls kept
+- **Binary/file:** engine (grumpa-a2: `Characters::loadFloor`, wall records in saves, E-1540);
+  scenarios `engines/grumpa/tests/path9a_snake.toml` .. `path9d_belt.toml` (chained from
+  path3's slot 3 to slot 9), `sea100.toml`; scene data through `tools/logic.py`.
+- **Evidence:** dev runs (`walkto` legs from `walkplan.py`, items taken from the panel):
+  9a scene 7's roots block 10 (type-19 walls) until trigger 660 with the Wood Splinter On Fire
+  (133) or the Bottle of Rum; opening 10's door (663) lets the snake bite (Life −11) and its
+  end list sets global 269. 9b: 73, 58, 72, 30 on foot, Life 88 → 72 from the air timer. 9c:
+  the pond in 35 (664) fills the Empty Jar; scene 34's parrot area lies behind type-19 walls
+  that only the diamond lock (663: Lock Shaped Diamond, Lock Shaped Stone or Bottle of Rum,
+  mesh 713's end OPENWALL(0)) opens; walk-in 662 switches to the parrot camera (view 4) until
+  sound 643 ends (VIEW 2); the parrot's gate line 642 must end before 665 takes the water; then
+  c23 is the follower. 9d: in 36 a click on the parrot runs its rule 0 (Scene ID 36, 940 = 0);
+  the gate sound 641's end opens the walls and 661 goes to 37; the diamond on the scorpion
+  (660) and the pedestal (664): attack 5 → 16. Saving in 34 after the lock and loading kept
+  the walls open (needed by 9d's start) only with E-1540 implemented. Scene 9 → 61 and 30 → 34
+  defer floor opcodes to the next scene; they now reach the new floor (loaded before the
+  deferred commands).
+- **Method:** scripted dev runs; corpus.
+- **Confidence:** verified (engine)
