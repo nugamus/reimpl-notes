@@ -29,7 +29,7 @@ def strings_of(program, func, limit: int = 4) -> list:
         for ref in refs.getReferencesFrom(addr):
             data = listing.getDataAt(ref.getToAddress())
             if data is not None and data.hasStringValue():
-                s = str(data.getValue()).replace("\t", " ").replace("\n", "\\n")[:60]
+                s = str(data.getValue()).replace("\t", " ").replace("\r", "").replace("\n", "\\n")[:60]
                 if s not in found:
                     found.append(s)
                     if len(found) >= limit:
