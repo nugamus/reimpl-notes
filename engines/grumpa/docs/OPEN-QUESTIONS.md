@@ -585,3 +585,9 @@ on 12). No swim clips; air and drowning are global timers 220/221 in scripts.
 ### Q-0811 PARTLY RESOLVED (2026-10-06, E-1533) — bit 2 (the companion) is implemented; bit 4 (fighters) belongs to combat
 
 ### Q-1801 RESOLVED (2026-10-06, E-1534) — yes: at the surface (modes 1/2, y −0.5) scene 100's exit 101 is in reach; on foot Grumpa sinks to 58
+
+### Q-0806 RESOLVED (2026-10-06, E-1400..E-1404, E-1430..E-1433, E-1460) — combat is specced in `docs/spec/combat.md`
+Stance, attacks, block, the hit timer and hit test, damage through the score, death, the
+fighters 91..95 and the reactions that engage them. Q-1400's death callback is E-1433 (the
+death list and the release); Q-1420's hit clip is the score's (E-1402). Still open there:
+actor 301, clips 35..37 by meaning, `+0x474/+0x478`, the trigger gate's bit 4 (Q-0811).

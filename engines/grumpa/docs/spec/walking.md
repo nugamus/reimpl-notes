@@ -16,8 +16,8 @@ the player controller and holds the player's character (`+0x298`):
   (kind outside 9..25: over a hotspot, an item, the panel) does not walk.
 - **Release**: stop.
 - **Shift** with the left button held: run. **Space**: jump. **Ctrl**: combat stance (left a
-  random attack, right the block). **Backspace**: leave a mount. (Jump, combat and mounts are
-  not in this spec yet: Q-0806.)
+  random attack, right the block). **Backspace**: leave a mount. (Jump and combat: `combat.md`;
+  a walk, run or jump request from a clip with no row keeps the queue, E-1404.)
 
 ## Actor 3's update (E-0812)
 

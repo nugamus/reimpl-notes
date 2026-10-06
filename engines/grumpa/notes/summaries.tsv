@@ -1,10 +1,12 @@
 program	address	name	summary	evidence
 GRUMPA.EXE	00408c30	CFXActor::EvalConditions	evaluate a condition list (actor,slot,value,mode,link): OR of AND groups, absent actor skipped, item target to 186	E-1801
 GRUMPA.EXE	00408ff0	CFXActor::GetSlots	Returns the actor's state-slot vector (actor+0x118)	E-1620
+GRUMPA.EXE	0040e980	CFXActorFactory::Tick	Factory tick: Sleep(1) while actor0 +0x10c=0, else fixed 20 ms updates then render; pending scene change	E-1806
 GRUMPA.EXE	0040efa0	CFXActorFactory::DispatchCommands	Command dispatcher: runs due commands; target -1 broadcasts to actor ids 1..n ascending	E-1600
 GRUMPA.EXE	0040fdb0	CFXActorFactory::LoadGlobalGameStatus	LoadGlobalGameStatus: reads u32 id + actor Serialize records from Current\global.abi to EOF	E-1300
 GRUMPA.EXE	004100c0	CFXActorFactory::SaveGlobalGameStatus	SaveGlobalGameStatus: writes every actor 0..599 to Current\global.abi via Serialize	E-1300
 GRUMPA_NOCD.EXE	004106c0	CFXActorFactory::CreateFromATXFile	Creates an actor from its .atx file	E-0504
+GRUMPA.EXE	00410cb0	WinMain::WndProc	Window procedure: mouse/Esc to actors unless a film plays (0x4ba724); Space and graph events 1/2 stop the film; 0x8003/0x8004 set/clear the flag	E-1806
 GRUMPA.EXE	00415140	CFXAMesh::CFXAMesh	CFXAMesh constructor (0x150 B), current frame +0x11c = 0	E-1700
 GRUMPA.EXE	00415310	CFXAMesh::GetVertex	Copy 32-byte vertex idx of the current frame	E-1700
 GRUMPA.EXE	004157d0	CFXAMesh::CreateFromFile	Static .ANB mesh load: per-UV-slot vertex buffer (pos, normal, uv) per frame, index buffer of UV indices over all sections	E-1700
@@ -14,22 +16,42 @@ GRUMPA.EXE	00416a90	CFXAMeshEx::CreateFromFile	reads .amb per-frame root motion 
 GRUMPA.EXE	0041d320	CFXCharacter::~CFXCharacter	CFXCharacter destructor: frees vectors incl. pair list +0x12c	E-1502
 GRUMPA.EXE	0041e0d0	CFXCharacter::DoCommand	character command handler: show/hide/active, roles 0x2c player 0x2d follower 0x2e..0x30/0x4b/0x54 combat roles 3..7, 0x46 split rider form, 0x47 place at actor, score forwards	E-1501
 GRUMPA.EXE	0041f2b0	CFXCharacter::LoadResources	Load clips (slot atoi(name) of +0x2dc), textures and sounds (slot atoi(name) of the 100-slot +0x324, Sounds\name, speaker 0); runs once	E-1640
+GRUMPA.EXE	0041fd70	CFXCharacter::ResetReactions	On entering its home scene (walk mesh present): reset floor fields, clear reaction fired flags, idle	E-1460
 GRUMPA.EXE	0041fde0	CFXCharacter::Request	character request: clip-queue table per request, turn smoothing	E-0813
 GRUMPA.EXE	00421780	CFXCharacter::SetWorn	Equip/unequip carried object i: one worn per group {0,5}/{1..4}; flag [0x39c][i]; bonus [0x38c+4i] to slot 3 or [0x37c+4i] to slot 2	E-1300
 GRUMPA.EXE	00421940	CFXCharacter::SetLocalDelta	set move delta to a local (x,y,z) offset rotated by yaw; y added to +0x178	E-1501
 GRUMPA.EXE	004219f0	CFXCharacter::SetForwardDelta	set move delta to a distance along the character's yaw	E-1501
 GRUMPA.EXE	00421a60	CFXCharacter::Update	Per-frame character update: clock, frame step, clip queue advance, idle fidget counter +0x4a8, yaw step, root motion, floor move	E-1740
+GRUMPA.EXE	00422670	CFXCharacter::IsPresent	Present: visible and at home in the current scene	E-1460
 GRUMPA.EXE	004226a0	CFXCharacter::Draw	Character draw: gate visible+home; build world matrix; worn attachments placed on body face vertex (acos of normal) then the body clip mesh	E-1700
 GRUMPA.EXE	00422f80	CFXCharacter::Serialize	CFXCharacter Serialize: modes 1/2/8 read the .abi record; mode 4 reads the status (active, visible, slots, home, pos, orientation, texture, worn flags, disable latch), mode 5 writes id + the same	E-1300
+GRUMPA.EXE	00424e90	CFXCharacter::GetBodySphere	Body sphere +0x17c: centre = position with y + [0x290]; returns it	E-1460
+GRUMPA.EXE	00424ed0	CFXCharacter::GetReactSphere	Reaction sphere +0x4ec: centre = position with y + [0x600], radius [0x5fc]; returns it	E-1460
 GRUMPA.EXE	004250a0	CFXCharacter::SetPosition	Set position, reset floor fields 0x44c..0x454	E-1431
+GRUMPA.EXE	004250f0	CFXCharacter::PostReaction	Push every command of the reaction for an id onto the global queue with conditions	E-1460
+GRUMPA.EXE	00425300	CFXCharacter::FindReaction	Pick the first reaction whose other character is present and whose sphere overlaps; once until it leaves	E-1460
+GRUMPA.EXE	004254c0	CFXCharacter::AddReactCharacter	Append reaction entry {other id, fired=0} at +0x608 and an empty command vector at +0x614	E-1460
+GRUMPA.EXE	00425710	CFXCharacter::GetReactionCount	Number of reaction entries	E-1460
 GRUMPA.EXE	00425730	CFXCharacter::TakeHit	Take hit: last attacker, damage=attack-defence, score 0x33 life minus	E-1432
 GRUMPA.EXE	00425780	CFXCharacter::PumpSpeechQueue	Speech queue pump, end of the character update: front line stopped -> pop, slot 5 = 0, play next and slot 5 = 1	E-1620
+GRUMPA.EXE	004258f0	CFXCharacter::GetReactionCommands	Return the reaction command vector for an other-character id	E-1460
 GRUMPA.EXE	00425950	CFXCharacter::StopAllSounds	Op 0x60: stop all 100 sound slots without commands; queue untouched (pump then advances)	E-1640
 GRUMPA.EXE	00425980	CFXCharacter::FlushSpeechQueue	If the character is away from the current scene, stop the voice at the front of its speech queue (+0x3d0) and empty the queue	E-1620
 GRUMPA.EXE	00425cc0	CFXCharacter::QueueSound	Op 0x48: n<60 && n!=32 play slot now; else append to deque +0x3d0 (unbounded, skip if queued), start if sole entry and slot 5==0	E-1640
 GRUMPA.EXE	00425e30	CFXCharacter::OnDeath	Death: post death command list, release fighter for roles 3..7	E-1433
+GRUMPA.EXE	00425fc0	CFXCharacter::PostList640	Post the +0x640 command list to the global queue	E-1460
+GRUMPA.EXE	004261c0	CFXCharacter::PostList650	Post the +0x650 command list to the global queue	E-1460
 GRUMPA.EXE	00426580	CFXCharacter::ClipMinX	min vertex x over the current clip mesh (returned on FPU)	E-1501
 GRUMPA.EXE	004265e0	CFXCharacter::ClipMaxX	max vertex x over the current clip mesh (returned on FPU)	E-1501
+GRUMPA.EXE	00426640	CFXCharacter::GetReactions	Return the reaction entry vector (+0x604)	E-1460
+GRUMPA.EXE	00429aa0	CFXCutScene::CFXCutScene	CFXCutScene ctor (type 0x07, vtable 0x4904f0)	E-1806
+GRUMPA.EXE	00429c40	CFXCutScene::SetDevice	SetDevice: store the render device at +0x128	E-1806
+GRUMPA.EXE	00429c70	CFXCutScene::DoCommand	DoCommand: 0 play, 1 stop, 23 play if autoplay +0x13c, 13 disable / 52 enable (+0x140)	E-1806
+GRUMPA.EXE	00429d40	CFXCutScene::Serialize	Serialize: id,+0x10c,+0x110,conditions,+0x114,film name +0x144,autoplay +0x13c,19 discarded u32,end list +0x248	E-1806
+GRUMPA.EXE	0042aae0	CFXCutScene::BuildSurfaceGraph	Build a filter graph with the game's own surface renderer for the film (device flag bit 0 path)	E-1806
+GRUMPA.EXE	0042afc0	CFXCutScene::Play	Play: broadcast 96, DirectShow graph on Movies\name, full brightness, pause the factory (actor0 +0x10c/+0x110=0), msg 0x8003, run	E-1806
+GRUMPA.EXE	0042b2c0	CFXCutScene::Stop	Stop: stop graph, black back surface, msg 0x8004, release, resume factory, run end list, op 1 to actor 3, op 87 to 602	E-1806
+GRUMPA.EXE	0042b3e0	CFXCutScene::RunEndList	Push every command of the end list +0x248 with its conditions, then op 1 to actor 3	E-1806
 GRUMPA.EXE	0042f980	CFXFighter::CFXFighter	Fighter ctor: type 0x1c, held char/target -1, companion flag 1	E-1430
 GRUMPA.EXE	0042fb80	CFXFighter::GetOrientation	Copy held character orientation to +0x144	E-1430
 GRUMPA.EXE	0042fbd0	CFXFighter::GetPosition	Copy held character position to +0x150	E-1430
@@ -101,12 +123,22 @@ GRUMPA.EXE	00448f70	CFXSound::Play	Play: flush speaker queue if away, speaker st
 GRUMPA.EXE	00449040	CFXSound::StopRaw	Stop without commands: speaker slot 5 = 0, stop and rewind the buffer, [0x1a0] = 0	E-1620
 GRUMPA.EXE	00449900	CFXSound::LoadFromFile	Load a .wav file into the sound's DirectSound buffer	E-1640
 GRUMPA.EXE	00449f80	CFXSound::IsPlaying	Is playing: buffer status nonzero and [0x1a0]	E-1620
+GRUMPA.EXE	0044c6e0	CFXSphere::Overlaps	Two spheres overlap: centre distance < r1 + r2	E-1460
 GRUMPA.EXE	0044da00	CFXSprite::SetPos	sprite: set top-left position, recompute dest rect	E-1720
 GRUMPA.EXE	0044dfd0	CFXSprite::UpdateSize	sprite: size from surface, dest rect	E-1720
 GRUMPA.EXE	0044e1b0	CFXSprite::ColorMatch	sprite: colour key from COLORREF; -1 = pixel (0,0) of first frame	E-1720
 GRUMPA.EXE	0044ed90	CFXSprite::CreateFromFile	sprite: create from <base>0000.. frames while files exist (<=100)	E-1720
 GRUMPA.EXE	0044fc60	CFXStaticCharacter::CFXStaticCharacter	Ctor of the 0x1a mesh actor; contact tests on (+0x1e0=1), running/direction/counter 0	E-1681
+GRUMPA.EXE	004512a0	CFXStaticCharacter::RunPlayerContactList	Run player-contact list +14c (file list 3)	E-1807
+GRUMPA.EXE	00451580	CFXStaticCharacter::RunActor4ContactList	Run actor-4 contact list +15c (file list 4)	E-1807
+GRUMPA.EXE	00451860	CFXStaticCharacter::RunNamedContactList	Run named-actor contact list +18c (file list 6)	E-1807
+GRUMPA.EXE	00451b40	CFXStaticCharacter::RunFighterContactList	Run fighter-contact list +16c (file list 8)	E-1807
+GRUMPA.EXE	00451e20	CFXStaticCharacter::RunEndList	Run end-of-animation list +19c (file list 7)	E-1807
+GRUMPA.EXE	00452100	CFXStaticCharacter::Serialize	Serialize: load reads 8 command lists in order +12c,+13c,+14c,+15c,+17c,+18c,+19c,+16c	E-1807
 GRUMPA.EXE	004536e0	CFXStaticCharacter::GetMesh	0x1a static character: returns its mesh object (+0x1b0)	E-1600
 GRUMPA.EXE	00453990	CFXStaticCharacter::GetFrame	0x1a static character: returns current frame (+0x1c0)	E-1600
 GRUMPA.EXE	004539a0	CFXStaticCharacter::TestContacts	Contact spheres ride a vertex of the current frame (pair = vertex, radius); tests by +1bc bits 1/2/8/0x10 (player, actor4/held, +228 actor, fighters), runs lists +14c/+15c/+18c/+16c once per contact when +1e4=1	E-1681
+GRUMPA.EXE	004540c0	CFXStaticCharacter::RunForwardEndList	Run forward-end list +12c (file list 1)	E-1807
+GRUMPA.EXE	004543a0	CFXStaticCharacter::RunBackwardEndList	Run backward-end list +13c (file list 2)	E-1807
+GRUMPA.EXE	0045ad40	CFXView::DoCommand	CFXView DoCommand: 87 sets +0xdcc=2 (full background redraw)	E-1806
 GRUMPA.EXE	0047c9f0	CRT::_CIacos	CRT acos (_CIacos)	E-1700
