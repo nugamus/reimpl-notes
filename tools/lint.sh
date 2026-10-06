@@ -13,7 +13,7 @@ if [ "$MSYSTEM" != UCRT64 ]; then
 		"bash '$(cygpath -u "$0")' $ENGINE"
 fi
 git() { "/c/Program Files/Git/cmd/git.exe" "$@"; }
-cd /c/scummvm-dev/"$ENGINE" || exit 1
+cd "${DEVROOT:-/c/scummvm-dev}/$ENGINE" || exit 1
 DIR=engines/$ENGINE
 hard=0
 fail() { echo "HARD $*"; hard=$((hard + 1)); }

@@ -49,7 +49,7 @@ import tomllib
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-DEV = Path("C:/scummvm-dev")
+DEV = Path(os.environ.get("DEVROOT", "C:/scummvm-dev"))  # DEVROOT: a parallel agent's tree
 OPTS = {"asan": False, "path": None, "coverage": False}
 TOLERANCE = 16  # per-channel difference that counts as a changed pixel
 

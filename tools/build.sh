@@ -12,7 +12,7 @@ if [ "$MSYSTEM" != UCRT64 ]; then # Git Bash (MINGW64): re-run inside MSYS2 UCRT
 	exec /c/msys64/usr/bin/env MSYSTEM=UCRT64 CHERE_INVOKING=1 /c/msys64/usr/bin/bash -lc \
 		"bash '$(cygpath -u "$0")' $ENGINE $*"
 fi
-SRC=/c/scummvm-dev/$ENGINE
+SRC=${DEVROOT:-/c/scummvm-dev}/$ENGINE # DEVROOT: a parallel agent's tree
 [ -d "$SRC" ] || { echo "no worktree $SRC (git -C /c/scummvm worktree add $SRC $ENGINE-dev)"; exit 1; }
 cd "$SRC" || exit 1
 FLAGS="--disable-all-engines --enable-engine=$ENGINE --enable-optimizations --enable-eventrecorder"
