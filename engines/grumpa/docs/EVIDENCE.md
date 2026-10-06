@@ -2429,3 +2429,89 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** decompile (dump `notes/decomp/GRUMPA.EXE__FUN_0041e0d0.c`, `_004474e0.c`);
   global2.atx read; Characters.abi through `parsers/abi.py`.
 - **Confidence:** proven (the two mode-6 fields inferred from the file, as E-1220).
+
+
+### E-1800 — Actor 2's State (slot 0) mirrors the cursor kind; `2[0]==2` = the grab hand
+- **Binary/file:** CFXMouse update `0x445440` (the write, after the hover-timer restore and
+  before the picture step), setters `FUN_00446150`, `FUN_004461a0` (E-1721).
+- **Evidence:** every update (while `+0x10c` is set) the mouse copies its kind `+0x130` into
+  its own slot 0 (`+0x11c` → value `+0x104`), except that the walk-arrow kinds 9..24 are
+  written as 1. No other mouse function writes slot 0. So actor 2's State is: −1 before any
+  kind is set, 0 an item held (its icon is the cursor), 1 the default pointer or a walk
+  arrow, 2 the grab hand (hovering a type-0x19 trigger, an item in reach or a filled panel
+  slot), 7 attack (Ctrl, armed character); 3..6 never set (Q-1710). Hover is ignored while
+  an item is held, so State 2 implies no item on the cursor, and the 8-update hover timer
+  keeps it at 2 across a click. The 16 corpus conditions `(2, 0, 2, 0, link)` therefore mean
+  "clicked while the cursor shows the grab hand, nothing held" (e.g. a trigger click with
+  bare hands), not a generic plain click. The value lags the kind by up to one update
+  (the mouse, actor 2, updates first).
+- **Method:** decompile (dump).
+- **Confidence:** proven (static).
+
+### E-1801 — Condition list: an absent actor is skipped without touching the running state
+- **Binary/file:** `FUN_00408c30` (E-0201).
+- **Evidence:** when `actor[id]` is null the entry is skipped entirely: the result, the
+  previous result and the previous link stay as they were (refines E-0201's "unchanged").
+  Two edge effects follow from the state starting at result 0 / previous result 0 /
+  previous link 0: if the absent actor is entry 0, entry 1 is judged as an AND continuation
+  of a false group (it can never be true on its own); and the actor id recorded for the
+  "last tested is an item" step (E-0206) is set before the null check, so a list that comes
+  out true with an absent actor as its last entry dereferences a null actor (`+0x104`) in
+  the original.
+- **Method:** decompile (dump).
+- **Confidence:** proven (static); neither edge case checked in the corpus.
+
+### E-1802 — Scene links: only walls in scenes 5, 7 and 21 gate an exit; scene 58's ship hotspot sits behind its walls
+- **Binary/file:** `Scenes/Scene_*.scn` (walk mesh 0x08, links 0x14), `Scenes/Scene_058.abi`.
+- **Evidence:** `engines/grumpa/tools/walkplan.py reach` floods each entry's walk-mesh region
+  over shared edges with the closed wall types 19..21 left out, and tests the exit spheres. In
+  all 110 scenes every exit is reached from every entry except: scene 5 (wall 19 between the
+  exits to 6 and 212: the banana guard, trigger 664 `OPENWALL(0)`), scene 7 (wall 19 between
+  the exit to 10 and those to 8/309: the roots, trigger 660), scene 21 (entry from 69 walled
+  in until wall 19 opens). In scene 58 the nearest vertex of the open region to trigger 660's
+  sphere `(538, 419, 504) r150` (the ship's hull, `GOTO 101`) is 238 units away with the walls
+  closed and 40 with all open; the only `OPENWALL` reaching scene 58 is the Giant Octopus's
+  death list (`Characters.abi` c80 list 2: `@58 600.6(0)`). The walkthrough's map rests on this.
+  Player sphere radius taken as 60 (a guess).
+- **Method:** corpus statistic (`walkplan.py reach`, `--selftest`).
+- **Confidence:** proven for the mesh topology; the sphere radius is approximate.
+
+### E-1803 — Grumpa's strength slot and the two "strength > 15" hotspots
+- **Binary/file:** `Actors/Characters.abi` (c10), `Scenes/Scene_018.abi`, `Scene_109.abi`,
+  `Scene_061.abi`, `Scene_009.abi`, `Actors/global.atx`.
+- **Evidence:** c10's six state slots start `(32, 100, 5, 2, 1, 0)`; by the opcodes
+  0x58/0x5a (slot 2 / 3 += arg1, characters.md) slot 2 is the one the cork (109 trigger 661)
+  and the Sword of Might (61 trigger 663, 9 triggers 666/667) test with `c10[2] > 15`.
+  Scene 18 trigger 665 (the Gauntlets of Power, a click) sends `c10.88(11)` and `c10.90(2)`:
+  5 + 11 = 16 > 15. Scene 37 trigger 664 (the Belt) sends `88(11)` as well, the Grandfather
+  (global 243) `88(20)`, and c10's own list with g223 JungleMixture `88(11)` (the potion).
+  So one of them suffices for the cork; the gauntlets are the nearest (jungle island).
+- **Method:** corpus (`tools/logic.py`).
+- **Confidence:** proven from data; slot 2 = attack strength is a reading (combat Q-0806).
+
+### E-1804 — The ending: Captain c69's death list, scene 96, and the ship's order
+- **Binary/file:** `Actors/Characters.abi` (c69), `Scenes/Scene_102.abi`, `Scene_109.abi`,
+  `Scene_096.abi`.
+- **Evidence:** c69 (home 102, inactive, life 400) has list 2 `@96 940.56(1)`, `GOTO 96`;
+  Grumpa's (c10) list 7 is `@96 941.56(1)`, `GOTO 96`. Scene 96's script 781 plays film 620
+  `grumpa_outro.mpg` and `end_succesful_VS.wav` when flag 940 = 1, film 621
+  `grumpa_death.mpg` and `096_end_VS.wav` when 941 = 1; its exit leads to scene 1. Scene 102
+  walk-in trigger 660 (active in the file, sphere r615 around the deck entry) plays the
+  captain's line, whose end activates and shows c69. Scene 109 trigger 661 (the cork) defers to
+  102: trigger 660 on (11), the hold door 661 and the way back 662 off (13), and plays the
+  cork mesh whose end list plays film 620 `unplug.mpg` of scene 119 and goes there. 102's sound
+  642 (`102_ratbeard_final_VS.wav`, the same ending) is started by no command in the corpus.
+- **Method:** corpus (`tools/logic.py`).
+- **Confidence:** proven from data; whether 660, latched after its first firing, can be
+  re-armed by the cork's 11 depends on the latch rule (events.md: only 52 clears it).
+
+### E-1805 — In-scene films are type-0x07 actors in four scenes
+- **Binary/file:** `Scenes/Scene_500.abi`, `Scene_096.abi`, `Scene_119.abi`.
+- **Evidence:** the type-0x07 records' strings are the four `.mpg` films: scene 500 actor 620
+  `grumpa_intro.mpg` (its list: `GOTO(1, -1)`), scene 96 actors 620 `grumpa_outro.mpg` and
+  621 `grumpa_death.mpg` (lists: `1.60(1)`, the main menu), scene 119 actor 620 `unplug.mpg`
+  (list: `player.2`). They are started by opcode 0 (scene 96 script 781, scene 109 cork mesh
+  712's end list). No other record names a film.
+- **Method:** corpus (`tools/logic.py`, 0x07 names).
+- **Confidence:** proven from data.
+

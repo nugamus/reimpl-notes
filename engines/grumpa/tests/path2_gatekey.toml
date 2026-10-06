@@ -1,0 +1,9 @@
+description = "Critical path step 2 (games/grumpa/docs/walkthrough.md): from path1's save in the plaza (scene 211) the run tutorial line ends, Grumpa walks (walkplan.py legs) to the Gate Key and picks it up, walks to the gate (view 3), takes the key from the panel and clicks the lock (trigger 663). The original then plays the lock animation and goes to scene 307; the engine stops here: actor 2's State (the cursor kind, E-1800) is not modelled, so the trigger's condition list fails (E-1801). path2_gate.png is that stopped state; refresh it (--update) once the cursor State lands. Saved to slot 2."
+snaps = ["path2_key.png", "path2_gate.png"]
+timeout = 120
+args = ["-d1"]
+saves_from = "path1_hut"
+export_saves = true
+
+[keys]
+grumpa_vm = "211;load 1;ticks 10;where;wait 400;where;hold 578 190;ticks 141;where;hold 488 286;ticks 124;where;hold 288 264;ticks 147;where;hold 101 316;ticks 136;where;hold 15 355;ticks 64;where;release;ticks 60;where;hold 219 362;ticks 158;where;hold 127 426;ticks 132;where;hold 55 511;ticks 114;where;hold 125 524;ticks 60;where;release;ticks 10;where;snap {out}/d1.png;move 126 521;ticks 4;click 126 521;ticks 5;items;hold 372 547;ticks 163;where;hold 436 599;ticks 84;where;release;ticks 60;where;hold 483 507;ticks 137;where;release;ticks 10;where;op 90 19 0 0;ticks 2;click 547 438;op 90 19 0 0;ticks 2;move 470 447;ticks 2;snap {out}/path2_key.png;click 470 447;ticks 200;where;snap {out}/path2_gate.png;ticks 200;where;save 2"

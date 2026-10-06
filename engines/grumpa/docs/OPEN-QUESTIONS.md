@@ -525,3 +525,23 @@ c16, `[5]==0`), so a companion hint line or trigger waits until he stops talking
 - **Status:** open
 
 ### Q-0812 RESOLVED (2026-10-06, E-1530) — `global2.atx` `<22>` makes actor 3 hold Grumpa 10
+
+
+### Q-1800 — Is Captain c69 meant to be fought on the first boarding of scene 102?
+- **Known:** 102's walk-in trigger 660 is active in the file and starts the captain's line,
+  whose end activates c69 (E-1804); the cork (109 trigger 661) later sends 660 opcode 11,
+  which a latched trigger ignores. So by the data the captain is up on the first visit and the
+  hold (104..109) is not strictly needed for the ending; the design reads as "go below, pull
+  the cork, come back on the sinking deck".
+- **Next lead:** combat (Q-0806): can Grumpa win at strength 5/16 against c69 (life 400,
+  slots 2/3 = 40/18); does the original's latch really ignore 660's 11 (events.md).
+- **Blocks:** the walkthrough lists the designed order; nothing in the engine.
+- **Status:** open
+
+### Q-1801 — Do the boat and the dragonfly reach scene 101 over scene 100's 8-face mesh?
+- **Known:** on foot, every entry of scene 100 reaches only the exits to 58 and 82
+  (`walkplan.py reach 100`), not 101; the boat (c11) and dragonfly (c12) forms dismount at 101
+  (triggers 661/662). Whether mounts use the floor at all is unspecced (Q-0403).
+- **Blocks:** the surface route to the ship (the walkthrough uses the underwater one).
+- **Status:** open
+

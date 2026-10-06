@@ -1,4 +1,5 @@
 program	address	name	summary	evidence
+GRUMPA.EXE	00408c30	CFXActor::EvalConditions	evaluate a condition list (actor,slot,value,mode,link): OR of AND groups, absent actor skipped, item target to 186	E-1801
 GRUMPA.EXE	00408ff0	CFXActor::GetSlots	Returns the actor's state-slot vector (actor+0x118)	E-1620
 GRUMPA.EXE	0040efa0	CFXActorFactory::DispatchCommands	Command dispatcher: runs due commands; target -1 broadcasts to actor ids 1..n ascending	E-1600
 GRUMPA.EXE	0040fdb0	CFXActorFactory::LoadGlobalGameStatus	LoadGlobalGameStatus: reads u32 id + actor Serialize records from Current\global.abi to EOF	E-1300
@@ -76,7 +77,7 @@ GRUMPA.EXE	0043d990	CFXMatrix::Identity	Matrix object: set identity	E-1700
 GRUMPA.EXE	00444930	CFXMouse::CFXMouse	mouse actor ctor: kind, held item, timers -1	E-1720
 GRUMPA.EXE	00444b60	CFXMouse::Load	mouse load: 4 ints, 8 named pictures into slots 1..8, arrow1_..arrow16_ into 9..24, colour key	E-1720
 GRUMPA.EXE	00445360	CFXMouse::UpdateAngle	mouse actor: cursor distance and angle from the player's screen point	E-0812
-GRUMPA.EXE	00445440	CFXMouse::Update	mouse update: arrow angle, hover timer restore, picture step, glitter countdown, auto-drop after click	E-1721
+GRUMPA.EXE	00445440	CFXMouse::Update	mouse update: State = kind (walk arrows 9..24 as 1), hover timer restore, picture step, glitter countdown, auto-drop after click	E-1800
 GRUMPA.EXE	00445570	CFXMouse::Draw	mouse draw: slot[kind] (kind 0 = held item icon) top-left at mouse; itemglitter at -16,-16 while timer	E-1720
 GRUMPA.EXE	00446130	CFXMouse::SetKind	mouse: set kind unless 0	E-1721
 GRUMPA.EXE	00446150	CFXMouse::HoldItem	mouse: hold item n (kind 0, item State 6) or -1 (kind 9)	E-1721
