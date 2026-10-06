@@ -22,7 +22,15 @@ Scenario keys:
     timeout = 60                   # seconds
     max_diff = 0.002               # allowed fraction of changed pixels per snap
     save = "C:/MonetPlay/saves/monet.003"   # optional: copied into the run's save folder
+    saves_from = "chapter1"        # optional: start with the saves another scenario exported
+    export_saves = true            # optional: keep this run's saves for later scenarios
+    args = ["-d2", "--debugflags=script"]   # optional: extra ScummVM arguments (logging)
     [keys]                         # game-domain keys; {out} is the snap folder
+
+Every run's output is kept in `engines/<engine>/tests/out/<name>/run.log` (coverage.py and
+grep read it). Options: `--asan` runs the AddressSanitizer + UBSan build (tools/build-asan.sh) instead
+and fails on any memory error or undefined behaviour it reports, with the first report in
+the summary; `--path DIR` replaces the game folder (the fuzzer uses it).
     grumpa_vm = "1;ticks 50;snap {out}/hut.png"
 """
 
@@ -30,6 +38,7 @@ from __future__ import annotations
 
 import configparser
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -40,6 +49,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 DEV = Path("C:/scummvm-dev")
+OPTS = {"asan": False, "path": None}
 TOLERANCE = 16  # per-channel difference that counts as a changed pixel
 
 
@@ -80,9 +90,9 @@ def run(engine: str, path: Path, update: bool) -> bool:
     name = path.stem
     dev_ini = load_ini(REPO / "engines" / engine / "tools" / "scummvm.ini")
     domain = sc.get("domain") or next(s for s in dev_ini.sections() if s != "scummvm")
-    exe = DEV / engine / "scummvm.exe"
+    exe = (Path("C:/scummvm-asan") if OPTS["asan"] else DEV) / engine / "scummvm.exe"
     if not exe.exists():
-        print(f"{engine}/{name}: no {exe} (bash tools/build.sh {engine})")
+        print(f"{engine}/{name}: no {exe} (bash tools/build{'-asan' if OPTS['asan'] else ''}.sh {engine})")
         return False
 
     with tempfile.TemporaryDirectory(prefix=f"scenario-{engine}-") as tmp:
@@ -92,6 +102,9 @@ def run(engine: str, path: Path, update: bool) -> bool:
         saves.mkdir()
         if sc.get("save"):
             shutil.copy(sc["save"], saves)
+        if sc.get("saves_from"):
+            for f in (REPO / "engines" / engine / "tests" / "saves" / sc["saves_from"]).glob("*"):
+                shutil.copy(f, saves)
         ini = dev_ini
         if not ini.has_section("scummvm"):
             ini.add_section("scummvm")
@@ -99,23 +112,37 @@ def run(engine: str, path: Path, update: bool) -> bool:
                                "gfx_mode": sc.get("gfx_mode", "surfacesdl")})
         for k, v in sc.get("keys", {}).items():
             ini[domain][k] = str(v).replace("{out}", out.as_posix())
+        if OPTS["path"]:
+            ini[domain]["path"] = str(OPTS["path"])
         cfg = tmp / "scummvm.ini"
         with cfg.open("w", encoding="utf-8") as f:
             ini.write(f, space_around_delimiters=False)
 
-        env = dict(os.environ, SDL_WINDOW_NO_ACTIVATION_WHEN_SHOWN="1",
-                   PATH="C:\\msys64\\ucrt64\\bin;" + os.environ.get("PATH", ""))
+        dlls = "C:\\msys64\\clang64\\bin;" if OPTS["asan"] else "C:\\msys64\\ucrt64\\bin;"
+        env = dict(os.environ, SDL_WINDOW_NO_ACTIVATION_WHEN_SHOWN="1", PATH=dlls + os.environ.get("PATH", ""),
+                   ASAN_OPTIONS="detect_leaks=0:print_summary=1", UBSAN_OPTIONS="print_stacktrace=1")
         start = time.time()
         # A renamed copy, so killing it on a timeout can never hit the user's scummvm.exe.
         runner = tmp / f"scummvm-scenario-{engine}.exe"
         shutil.copy(exe, runner)
+        logdir = REPO / "engines" / engine / "tests" / "out" / name
+        logdir.mkdir(parents=True, exist_ok=True)
+        cmd = [str(runner), f"--config={cfg}", *sc.get("args", []), domain]
+        timeout = sc.get("timeout", 60)
+        if OPTS["asan"]:
+            timeout *= 4
         try:
-            proc = subprocess.run([str(runner), f"--config={cfg}", domain], env=env, cwd=tmp,
-                                  timeout=sc.get("timeout", 60), capture_output=True, text=True)
+            proc = subprocess.run(cmd, env=env, cwd=tmp, timeout=timeout, capture_output=True, text=True,
+                                  errors="replace")
             status = f"exit {proc.returncode}"
+            (logdir / "run.log").write_text(proc.stdout + proc.stderr, encoding="utf-8")
         except subprocess.TimeoutExpired:
             status = "timed out"
         took = time.time() - start
+        if sc.get("export_saves"):
+            kept = REPO / "engines" / engine / "tests" / "saves" / name
+            shutil.rmtree(kept, ignore_errors=True)
+            shutil.copytree(saves, kept)
 
         results, ok = [], True
         for snap in sc.get("snaps", []):
@@ -132,6 +159,11 @@ def run(engine: str, path: Path, update: bool) -> bool:
                 good, changed = compare(golden, actual, cmp_png, sc.get("max_diff", 0.002))
                 results.append(f"{snap} {'ok' if good else 'CHANGED'} {changed:.2%}" + ("" if good else f" -> {cmp_png}"))
                 ok &= good
+        if OPTS["asan"]:
+            log = (logdir / "run.log").read_text(encoding="utf-8", errors="replace") if (logdir / "run.log").exists() else ""
+            found = [l for l in log.splitlines() if "ERROR: AddressSanitizer:" in l or "runtime error:" in l]
+            results.append(f"sanitizers: {len(found)} reports" + (f", first: {found[0].strip()[:160]}" if found else ""))
+            ok &= not found
         print(f"{'PASS' if ok else 'FAIL'} {engine}/{name} ({status}, {took:.0f}s): " + "; ".join(results))
         return ok
 
@@ -158,7 +190,11 @@ def main(argv: list[str]) -> int:
         selftest()
         return 0
     update = "--update" in argv
-    args = [a for a in argv if a != "--update"]
+    OPTS["asan"] = "--asan" in argv
+    if "--path" in argv:
+        OPTS["path"] = argv[argv.index("--path") + 1]
+        argv = argv[:argv.index("--path")] + argv[argv.index("--path") + 2:]
+    args = [a for a in argv if a not in ("--update", "--asan")]
     if not args:
         print(__doc__)
         return 2
