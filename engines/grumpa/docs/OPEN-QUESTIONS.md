@@ -640,3 +640,11 @@ actor 301, clips 35..37 by meaning, `+0x474/+0x478`, the trigger gate's bit 4 (Q
   characters, where the original sends it on the press (E-0810) in ascending ids (E-0202).
 - **Blocks:** nothing seen: no rule and trigger fire on the same click in the data checked.
 - **Status:** open
+
+### Q-1502 — Does a left press that runs a character's rule also walk?
+- **Context:** E-1610: the rules run on the left-down broadcast; actor 3 gets the same
+  broadcast and walks unless the cursor kind is not an arrow (E-0811). The hover test
+  (`0x4263c0`) only arms the glitter, drawn over the cursor (E-1720); whether it changes the
+  kind is not read. In the stance the press also swings (E-1400).
+- **Engine:** a press that runs a rule does not walk (the mount's commands stop Grumpa anyway).
+- **Status:** open
