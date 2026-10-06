@@ -2858,3 +2858,27 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   the exits at the floor's height.
 - **Method:** corpus (scn.py); arithmetic from the cited rules.
 - **Confidence:** proven from data and code rules; not run (the engine has no modes yet).
+
+### E-1760 — A sound saved while playing restarts from its start on the next entry; its end list then runs
+- **Binary/file:** CFXSound Serialize `FUN_004492d0` mode 4 (`case 4`, reads) / mode 5 (writes);
+  DoCommand `FUN_00448a40` (disassembly `0x448a40..0x448b7c`); Update `FUN_00448db0`; Play
+  `FUN_00449200`/`FUN_00448f70`; Stop `FUN_00449280`; ctor `FUN_004484d0`; entry sequence E-0202.
+- **Evidence:** the scene status of a sound is `active +0x10c`, `visible +0x110`, its state
+  slots, then `+0x1a0` (playing) and `+0x1b4` (the latch: opcode 0xd sets it, 0x34 clears it,
+  while set every other opcode is ignored). The play position and the remaining time `+0x1a8`
+  are not kept. DoCommand has no arm for 25 (scene exit): leaving a scene, saving or loading
+  does not stop a playing sound or run its list; the actor is just written with playing = 1
+  and deleted. On entry the actor is rebuilt from the data (ctor: `+0x1a8 = 0`, no buffer
+  `+0x13c = 0`), the status read sets playing = 1, then broadcast 23 (0x17 arm `0x448b0a`):
+  playing == 1 and no buffer → deferred play `+0x1b8 = 1` (E-0406); broadcast 86 (0x56) only
+  loads the file. The first Update (`+0x10c` != 0) sees `+0x1b8`, calls `FUN_00449200`
+  (stop-raw, then Play: `+0x1a8` = the file's length `+0x17c`, buffer from the start) and
+  returns, so the timer branch cannot fire on the zeroed `+0x1a8`. When the restarted line's
+  timer runs out, Stop (`FUN_00449280`) queues its command list (`FUN_00448bb0`). The only
+  other ways to the list are opcode 0x1f5 (`0x448b66..0x448b75`) and the looping branch.
+  So in scene 211 a save in the middle of voice 656 loads with the player still off (actor 3's
+  `active` 0 is in its status, E-1300), the line plays again in full from its start, and its
+  end list's `(3, 0xb)` gives control back: no softlock. The command queue (`remote.abi`)
+  does not hold the end list while the line plays, so it plays no part.
+- **Method:** decompile (dump) and PyGhidra disassembly of the DoCommand (not in the dump).
+- **Confidence:** proven statically; not traced.

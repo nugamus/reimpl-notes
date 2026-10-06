@@ -119,8 +119,14 @@ GRUMPA.EXE	00447ba0	CFXToScene::DoCommand	DoCommand: only 0x17 (scene entry) sto
 GRUMPA.EXE	00448250	CFXToScene::FindEntry	find entry for previous scene (pos, rot); -2 keeps place; default first	E-0804
 GRUMPA.EXE	00448360	CFXToScene::TestExits	exit sphere test with latch, returns exit scene	E-0804
 GRUMPA.EXE	004484d0	CFXSound::CFXSound	CFXSound ctor: everything 0 (speaker, loop, volume/pan flags), type 0x18	E-1640
+GRUMPA.EXE	00448a40	CFXSound::DoCommand	DoCommand: 0x34 unlatch; latched ignores all; 0/500 play (deferred while updating), 1 stop raw, 0x1f5 stop+commands, 0xb/0xc active, 0xd stop+latch, 0x17 entry defers play if saved playing w/o buffer or play-on-entry, 0x56 load; no 25 arm	E-1760
+GRUMPA.EXE	00448bb0	CFXSound::RunEndCommands	Queue every command of the sound's CC list	E-1760
+GRUMPA.EXE	00448db0	CFXSound::Update	Update: deferred play first; non-looping playing sound counts [0x1a8] down, stops with commands at end; volume fades in/out; loop timer	E-1760
 GRUMPA.EXE	00448f70	CFXSound::Play	Play: flush speaker queue if away, speaker state slot 5 = 1, start the buffer (loop iff [0x1a4]), [0x1a0] = 1	E-1620
 GRUMPA.EXE	00449040	CFXSound::StopRaw	Stop without commands: speaker slot 5 = 0, stop and rewind the buffer, [0x1a0] = 0	E-1620
+GRUMPA.EXE	00449200	CFXSound::Restart	Play from the start: load the file if no buffer, stop raw, then Play	E-1760
+GRUMPA.EXE	00449280	CFXSound::Stop	Stop and run the command list (on end)	E-1760
+GRUMPA.EXE	004492d0	CFXSound::Serialize	Serialize: mode 1 data fields; mode 4 reads / 5 writes active, visible, slots, playing [0x1a0], latch [0x1b4]	E-1760
 GRUMPA.EXE	00449900	CFXSound::LoadFromFile	Load a .wav file into the sound's DirectSound buffer	E-1640
 GRUMPA.EXE	00449f80	CFXSound::IsPlaying	Is playing: buffer status nonzero and [0x1a0]	E-1620
 GRUMPA.EXE	0044c6e0	CFXSphere::Overlaps	Two spheres overlap: centre distance < r1 + r2	E-1460

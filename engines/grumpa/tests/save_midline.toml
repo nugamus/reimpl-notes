@@ -1,0 +1,7 @@
+description = "A save during a voice line (issue #16, E-1760): scene 211's entry script turns player control off until the companion's line Sch_space (656) ends; saved mid-line and loaded, the line plays again from its start and its end list gives control back (`who 10` in run.log: active 0, then 1). The snap is Grumpa walking after it."
+snaps = ["midline_walk.png"]
+timeout = 120
+args = ["-d1"]
+
+[keys]
+grumpa_vm = "1;ticks 5;go 211;ticks 120;who 10;save 5;go 1;load 5;ticks 5;who 10;wait 1500;who 10;hold 600 300;ticks 60;where;snap {out}/midline_walk.png"

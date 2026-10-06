@@ -1,6 +1,6 @@
 # Game state, saving and loading (engine behaviour)
 
-Evidence: E-0202, E-0203 (scene status), E-0501, E-0502, E-0832, E-1300, E-1750.
+Evidence: E-0202, E-0203 (scene status), E-0501, E-0502, E-0832, E-1300, E-1750, E-1760.
 
 ## The original
 
@@ -54,3 +54,10 @@ entry after a load is a first entry: the player is not placed at an entry point 
 he stands where the save has him. A save older than version 4 has no characters: the player
 is put at the loaded scene's first entry, at home there (E-0832); one older than version 5
 has no worn flags: Grumpa puts on what the equipment slots hold (E-1750).
+
+**A line playing when saved** (E-1760): a sound's status keeps `playing` and its latch, not
+the play position. Nothing stops a sound or runs its end list on scene exit, save or load. On
+the next entry of that scene (a load included) broadcast 23 sees `playing` with no buffer
+and the first update replays the line from its start; at its end the line's command list
+runs as usual. So a save in the middle of a line that holds the player (scene 211, sound
+656) loads with the player still off, hears the line again, and gets control back.

@@ -1,4 +1,4 @@
-description = "Platforms (walking.md, E-1600): scene 117, Grumpa walks from the entry onto the rising stepping stone C (0x1a 715, +0x1d0 = 1) and stands on it: platform set, floor type 15, then, when its 10 s delay timer has run, the stone rises and lifts him with its current frame"
+description = "Platforms (walking.md, E-1600): scene 117, Grumpa walks from the entry onto the rising stepping stone C (0x1a 715, +0x1d0 = 1) and stands on it: platform set, floor type 15, then, when its 10 s delay timer has run, the stone rises and lifts him with its current frame Since the idle fidget (E-1740) Grumpa stands in S02 by the second snap, and the companion comes along with `go` (actor 4's follower, E-1222; a teleport, not the data's route)."
 snaps = ["platform_on.png", "platform_up.png"]
 timeout = 60
 args = ["-d1"]
