@@ -171,3 +171,29 @@ Serialize(mode 1)` to EOF), just before `Scene_<n>.abi`. Exactly three records:
         n * f32 unk_m2[16]                       per view (projection-shaped)
 
 `scn.py` parses 110/110, every byte consumed. Open meanings: Q-0500, Q-0501.
+
+## The CD: InstallShield cabinet (E-1000)
+
+The CD holds the game data in an InstallShield 6 cabinet, `data1.hdr` + `data1.cab` +
+`data2.cab`, and four films loose in `Movies/`. Paths in the cabinet are
+`<file group>/<directory>/<name>`: the file groups are the top folders (`Actors`, `Bitmaps`,
+`Meshes`, `Scenes`, `UI`, `Sounds_`, `Save`, `Profileshell`, and per language `Sounds`,
+`Local`, `Shell`, `Movies` + ` Danish|Finnish|Norwegian|Swedish`), the cabinet's directory
+table only the subfolders (`UI/001_Menu`, `Save/Player1`, ...). `games/grumpa/discs/cab` is
+the same tree as unshield writes it (spaces and cp1252 letters as `_`).
+
+| Group | Files | Notes |
+|---|---:|---|
+| `Bitmaps` `Meshes` `Scenes` `Actors` `UI` | 2262, 1638, 221, 4, 125 | language-free game data |
+| `Sounds_` | 550 | shared sounds |
+| `Sounds <Language>` | 241..280 | voice lines; most names repeat in every language |
+| `Local <Language>` | 4 | `Text.txt` (menu), `Help.txt`, `Credits.txt`, `license.txt` |
+| `Shell <Language>` | 33 | the launcher's media |
+| `Movies <Language>` | 1 | `grumpa_intro.mpg`; none for Swedish |
+| CD `Movies/` (outside the cabinet) | 4 | Swedish `grumpa_intro.mpg`; `grumpa_death`, `grumpa_outro`, `unplug.mpg` for every language |
+
+328 names repeat across groups, so the cabinet must be read by group (ScummVM:
+`makeInstallShieldArchive("data", true)`), not by bare file name. The engine adds it to
+`SearchMan` with the groups' spaces read as `_`, so the CD and the unpacked folder resolve
+the same paths; detection uses `data1.hdr` and `is:data1.hdr:Items.abi`. The engine reads
+Swedish for now; the other languages are the same paths with another group name.

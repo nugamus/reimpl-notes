@@ -1570,3 +1570,33 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   nothing in the menu stops it.
 - **Method:** disassembly of the boot sequence; byte scan of the menu class for the pushes.
 - **Confidence:** strong (static; whether the intro film's playback mutes it is not read).
+
+### E-1000 — The CD's cabinet names files by file group; the game runs from the CD as is
+- **Binary/file:** `games/grumpa/discs/cd/data1.hdr` (685,933 B), `data1.cab` (4,206,704 B),
+  `data2.cab` (282,887,848 B); `Movies/`; `Setup.ini`.
+- **Evidence:** an InstallShield cabinet of major version 6: the descriptor's directory table
+  has only 16 entries, all leaf folders (`""`, `shellmedia`, `Current`, `Player`,
+  `Player1..6`, `001_Menu`, `002_Cursor`, `008_Score`, `090_Inventory`, `DIRECTX8`, a URL);
+  the top folders are the file groups (descriptor `+0x3e`: 71 hash chains of
+  `name, descriptor, next`; a group descriptor is `name, 0x12 bytes, first file, last file`,
+  as unshield reads it). A file's path is `<file group>/<directory>/<name>`: `Bitmaps` 2,262,
+  `Meshes` 1,638, `Scenes` 221, `Actors` 4, `UI` 125 (in `001_Menu` .. `090_Inventory`),
+  `Sounds_` 550, `Sounds <Language>` 241..280, `Local <Language>` 4, `Shell <Language>` 33,
+  `Movies Danish/Finnish/Norwegian` 1 each (`grumpa_intro.mpg`, 16,310,276 B, three md5s),
+  `Save` 20, `Profileshell` 36; 67 installer files. No `Movies Swedish` file: the Swedish
+  intro (md5 `7ac8c3b9…`) and the language-free `grumpa_death`, `grumpa_outro`, `unplug.mpg`
+  are only on the CD in `Movies/`. 328 file names occur in more than one group (the language
+  `Sounds` groups, `Text.txt` in each `Local` and `UI/001_Menu`, `Characters.abi` in `Actors`
+  51,645 B and `Scenes` 46,648 B), so a cabinet named by file name alone (ScummVM's
+  `makeInstallShieldArchive` default) loses them. Language groups are spelled with a space
+  (`Sounds Swedish`), which unshield writes as `_`; 11 names are cp1252 (`släpp_lös_mig_sv.wav`,
+  `dödgrumpapappa.tga`), which unshield writes with `_`. `Setup.ini` lists languages
+  0x0006, 0x000b, 0x0014, 0x001d (Danish, Finnish, Norwegian, Swedish), default 0x001d.
+- **Method:** `unshield l`/`g` (1.6.2); the engine's cabinet, named by file group, listed
+  6,111 members, identical to `games/grumpa/discs/cab` (spaces as `_`) but for the 67
+  installer files and the 11 cp1252 names. Scripted runs on the CD folder (dev
+  `grumpa_vm=1;ticks 50;snap`: pixel-identical to the `hut` reference made from the unpacked
+  cabinet; `grumpa_menu=1`; `grumpa_vm=211;op 646 0 0 0;wait 600`: the voice lines play).
+  Detection md5s by `tools/detection_entry.py`: `data1.hdr` `0fb9940d…`, `Actors/Items.abi`
+  `293eee0f…` (named alone in the cabinet).
+- **Confidence:** proven
