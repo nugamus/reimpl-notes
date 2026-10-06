@@ -89,3 +89,6 @@ engines/*/traces/longplay/
 
 # One-click bug reports (tools/report_bug.py): screenshots, saves, recordings
 /bugs/
+
+# Engine saves kept by scenarios and save-compatibility archives (thumbnails are game imagery)
+engines/*/tests/saves/

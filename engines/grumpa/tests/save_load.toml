@@ -1,0 +1,7 @@
+description = "Save-compatibility template: load slot {slot} from the title; the screen must match the one saved"
+snaps = ["loaded.png"]
+timeout = 60
+max_diff = 0.05
+
+[keys]
+grumpa_vm = "1;load {slot};ticks 80;snap {out}/loaded.png"

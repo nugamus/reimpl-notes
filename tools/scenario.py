@@ -203,7 +203,8 @@ def main(argv: list[str]) -> int:
         return 2
     engine, names = args[0], args[1:]
     tests = REPO / "engines" / engine / "tests"
-    paths = [tests / f"{n}.toml" for n in names] if names else sorted(tests.glob("*.toml"))
+    paths = [tests / f"{n}.toml" for n in names] if names else sorted(
+        p for p in tests.glob("*.toml") if not p.name.startswith(("save_", "_")))  # templates and temporaries
     if not paths:
         print(f"{engine}: no scenarios in {tests}")
         return 0

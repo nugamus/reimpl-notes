@@ -17,6 +17,8 @@ for e in $(grep -v '^#' tools/engines.txt | cut -d' ' -f1); do
 		uv run tools/scenario.py "$e" 2>&1 | grep -E '^(PASS|FAIL)|scenarios pass|no scenarios'
 		uv run tools/ksy_check.py "$e" 2>&1 | grep -E '^(ok|FAIL)'
 		bash tools/lint.sh "$e" 2>&1 | grep -E '^HARD|lint:'
+		python tools/doclint.py "$e" 2>&1 | grep -E "FIX" | sed "s/^ *FIX/FAIL doclint:/"
+		uv run tools/savecompat.py "$e" 2>&1 | grep -E "^(ok|FAIL)"
 	} 2>&1 )
 	echo "$out" >> "$log"
 	# Only what is new since the last night counts: known failures already have issues.

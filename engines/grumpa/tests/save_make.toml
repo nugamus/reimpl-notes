@@ -1,0 +1,6 @@
+description = "Save-compatibility template: scene 61 after its fade, snapped and saved to slot 1"
+snaps = ["saved.png"]
+timeout = 60
+
+[keys]
+grumpa_vm = "61;ticks 80;snap {out}/saved.png;save 1"
