@@ -49,8 +49,8 @@ line at its front, empty the queue). The speech queue (character op 0x48, slots 
 E-1223) uses the same slot: the first queued line plays at once only if slot 5 is 0 and then
 sets it; on each animation step of the active, present character, a front line whose sound has
 stopped is popped, slot 5 = 0, and the next queued line (if any) plays with slot 5 = 1.
-Character op 0x60 stops all 100 of the character's sound slots (each clears its speaker's
-slot 5) without running their command lists.
+Character op 0x60 stops all 100 of the character's sound slots without running command
+lists; their speaker is 0, so slot 5 is left to the queue (`characters.md`, E-1640).
 
 A sound that is not
 looping stops by itself at its end; **stopping runs the sound's command list**, which is how a

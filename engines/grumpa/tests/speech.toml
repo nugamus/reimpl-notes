@@ -1,0 +1,7 @@
+description = "Speech queue (characters.md, E-1640): scene 211 with the Kraken (16) present; op 0x48 queues slots 64 then 63: 64 speaks at once (slot 5 = 1), 63 waits and speaks when 64 ends, slot 5 returns to 0 after it; a repeated 64 while queued is ignored"
+snaps = ["speech.png"]
+timeout = 90
+args = ["-d1"]
+
+[keys]
+grumpa_vm = "211;op 16 11 0 0;op 16 2 0 0;op 16 72 64 0;op 16 72 63 0;op 16 72 64 0;ticks 5;slot 16 5;wait 1200;slot 16 5;snap {out}/speech.png"

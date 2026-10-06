@@ -13,7 +13,7 @@ GRUMPA.EXE	004166e0	CFXAMesh::Draw	Draw the mesh's current frame (DrawIndexedPri
 GRUMPA.EXE	00416a90	CFXAMeshEx::CreateFromFile	reads .amb per-frame root motion then the .anb	E-0815
 GRUMPA.EXE	0041d320	CFXCharacter::~CFXCharacter	CFXCharacter destructor: frees vectors incl. pair list +0x12c	E-1502
 GRUMPA.EXE	0041e0d0	CFXCharacter::DoCommand	character command handler: show/hide/active, roles 0x2c player 0x2d follower 0x2e..0x30/0x4b/0x54 combat roles 3..7, 0x46 split rider form, 0x47 place at actor, score forwards	E-1501
-GRUMPA.EXE	0041f2b0	CFXCharacter::LoadResources	load the character's .anb/.amb clips, textures and sounds	E-0815
+GRUMPA.EXE	0041f2b0	CFXCharacter::LoadResources	Load clips (slot atoi(name) of +0x2dc), textures and sounds (slot atoi(name) of the 100-slot +0x324, Sounds\name, speaker 0); runs once	E-1640
 GRUMPA.EXE	0041fde0	CFXCharacter::Request	character request: clip-queue table per request, turn smoothing	E-0813
 GRUMPA.EXE	00421780	CFXCharacter::SetWorn	Equip/unequip carried object i: one worn per group {0,5}/{1..4}; flag [0x39c][i]; bonus [0x38c+4i] to slot 3 or [0x37c+4i] to slot 2	E-1300
 GRUMPA.EXE	00421940	CFXCharacter::SetLocalDelta	set move delta to a local (x,y,z) offset rotated by yaw; y added to +0x178	E-1501
@@ -24,9 +24,9 @@ GRUMPA.EXE	00422f80	CFXCharacter::Serialize	CFXCharacter Serialize: modes 1/2/8 
 GRUMPA.EXE	004250a0	CFXCharacter::SetPosition	Set position, reset floor fields 0x44c..0x454	E-1431
 GRUMPA.EXE	00425730	CFXCharacter::TakeHit	Take hit: last attacker, damage=attack-defence, score 0x33 life minus	E-1432
 GRUMPA.EXE	00425780	CFXCharacter::PumpSpeechQueue	Speech queue pump, end of the character update: front line stopped -> pop, slot 5 = 0, play next and slot 5 = 1	E-1620
-GRUMPA.EXE	00425950	CFXCharacter::StopAllSounds	Op 0x60: stop all 100 character sound slots (no command lists)	E-1620
+GRUMPA.EXE	00425950	CFXCharacter::StopAllSounds	Op 0x60: stop all 100 sound slots without commands; queue untouched (pump then advances)	E-1640
 GRUMPA.EXE	00425980	CFXCharacter::FlushSpeechQueue	If the character is away from the current scene, stop the voice at the front of its speech queue (+0x3d0) and empty the queue	E-1620
-GRUMPA.EXE	00425cc0	CFXCharacter::QueueSound	Op 0x48: play character sound slot n (n<60, n!=32 at once) or append to the speech queue, starting it if slot 5 == 0	E-1620
+GRUMPA.EXE	00425cc0	CFXCharacter::QueueSound	Op 0x48: n<60 && n!=32 play slot now; else append to deque +0x3d0 (unbounded, skip if queued), start if sole entry and slot 5==0	E-1640
 GRUMPA.EXE	00425e30	CFXCharacter::OnDeath	Death: post death command list, release fighter for roles 3..7	E-1433
 GRUMPA.EXE	00426580	CFXCharacter::ClipMinX	min vertex x over the current clip mesh (returned on FPU)	E-1501
 GRUMPA.EXE	004265e0	CFXCharacter::ClipMaxX	max vertex x over the current clip mesh (returned on FPU)	E-1501
@@ -92,8 +92,10 @@ GRUMPA.EXE	004473c0	PlayerControl::RequestFromButtons	player controller: buttons
 GRUMPA.EXE	00447790	CFXPlayer::GetCharacter	Getter: actor 3 held character id +0x298	E-1430
 GRUMPA.EXE	00448250	CFXToScene::FindEntry	find entry for previous scene (pos, rot); -2 keeps place; default first	E-0804
 GRUMPA.EXE	00448360	CFXToScene::TestExits	exit sphere test with latch, returns exit scene	E-0804
+GRUMPA.EXE	004484d0	CFXSound::CFXSound	CFXSound ctor: everything 0 (speaker, loop, volume/pan flags), type 0x18	E-1640
 GRUMPA.EXE	00448f70	CFXSound::Play	Play: flush speaker queue if away, speaker state slot 5 = 1, start the buffer (loop iff [0x1a4]), [0x1a0] = 1	E-1620
 GRUMPA.EXE	00449040	CFXSound::StopRaw	Stop without commands: speaker slot 5 = 0, stop and rewind the buffer, [0x1a0] = 0	E-1620
+GRUMPA.EXE	00449900	CFXSound::LoadFromFile	Load a .wav file into the sound's DirectSound buffer	E-1640
 GRUMPA.EXE	00449f80	CFXSound::IsPlaying	Is playing: buffer status nonzero and [0x1a0]	E-1620
 GRUMPA.EXE	0044da00	CFXSprite::SetPos	sprite: set top-left position, recompute dest rect	E-1720
 GRUMPA.EXE	0044dfd0	CFXSprite::UpdateSize	sprite: size from surface, dest rect	E-1720
