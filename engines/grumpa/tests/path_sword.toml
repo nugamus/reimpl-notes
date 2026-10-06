@@ -1,0 +1,7 @@
+description = "Kit step: the Sword of Might (games/grumpa/docs/walkthrough.md, the kit table), by teleport: a new game taken to scene 11 from 8, the Rope (from 13) and the gauntlets' +11 given by op; Grumpa walks (dev walkto) to the hole, holds the rope and clicks it (trigger 660): he climbs down the rope into 9 (@9 placements); a click starts the climb (664), a second pulls the sword from the rock (666, strength > 15): the fanfare, the Sword of Might in the inventory; worn in the weapon slot: attack 5 + 11 + 20 = 36."
+snaps = ["sword_rope.png", "sword_worn.png"]
+timeout = 200
+args = ["-d1"]
+[keys]
+random_seed = "1"
+grumpa_vm = "8;go 11;ticks 40;where;op 116 42 0 0;op 10 88 11 0;walkto 285 -124 40 108;where;walkto 425 -124 40 109;where;walkto 497 -9 40 108;where;walkto 356 36 80 154;where;where;op 90 19 0 0;ticks 2;click 550 355;op 90 19 0 0;ticks 2;move 385 406;ticks 4;click 385 406;ticks 150;where;snap {out}/d1.png;move 572 474;ticks 4;click 572 474;ticks 300;where;snap {out}/sword_rope.png;move 572 474;ticks 4;click 572 474;ticks 400;where;items;op 90 19 0 0;ticks 2;click 550 355;click 520 210;op 90 19 0 0;ticks 30;where;snap {out}/sword_worn.png"

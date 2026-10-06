@@ -206,7 +206,7 @@ The chain plays the path from a new game, each scenario starting from the previo
 | `path6_sea` (teleport to 16) | 10..12 | dive, seahorse, ride to 58, walk round the ship (dev `walkto`), the Octopus fight lost at defence 2: scene 96 |
 | `path_shield` (teleport to 24) | kit | 24 → 39 → 75, the Shield of Protection picked and worn: defence 22 |
 | `path_grandfather` (teleport, seeds by op) | kit | the seed rooms 63/65/66, the witch's Fruitpunch (22), the tomb 25 → 26: the Grandfather, attack 25 / defence 22 |
-| Sword of Might | kit | not scripted: entering 11 from 8 bounces between the two scenes (engine, sent to walking) |
+| `path_sword` (teleport to 11, rope and gauntlets by op) | kit | the rope down into 9, the climb, the Sword of Might pulled (strength > 15) and worn: attack 36 (needs a3's 41236a45, the 8/11 exit fix) |
 | `boss_octopus` (teleport, kit by op) | 12 | the Octopus beaten in 3 hits of 60; it does no damage |
 | `boss_rat` (teleport, kit by op) | 16 | over the seesaw board (platform), the red rat leader beaten in 4 hits of 49 (it deals 3); the Key Red dropped |
 | `boss_captain` (teleport, kit by op) | 15, 23 | the Captain beaten with the whole kit; his last line, scene 96, the outro film |
