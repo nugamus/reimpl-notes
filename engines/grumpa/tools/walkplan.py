@@ -219,7 +219,8 @@ def route(scenes: list[int], start=None, walkto: bool = False) -> str:
         if s is None:
             s = next(e[:3] for e in links["entries"] if e[6] == prev)
         ex = next(e for e in links["exits"] if e[4] == b)
-        out.append(plan(a, s, ex[:3], stop_within=ex[3] * 0.8, walkto=walkto).replace("release;ticks 10;where", "release;ticks 120;where"))
+        leg = plan(a, s, ex[:3], stop_within=ex[3] * 0.8, walkto=walkto)
+        out.append(leg + ";ticks 120;where" if walkto else leg.replace("release;ticks 10;where", "release;ticks 120;where"))
         prev, start = a, None
     return ";".join(out)
 
