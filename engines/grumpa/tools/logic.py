@@ -3,7 +3,7 @@
 Walks every `Scenes/Scene_*.abi` with the validated `parsers/abi.py` (its byte layout, unchanged)
 and captures what it skips: each record's names (the `pstr` strings: sprite frames, mesh, wav),
 its state slots, the trigger gate words, and every command list (CC vectors, in order). Adds the
-`.scn` scene links (exits, entries), the characters of `Scenes/Characters.abi` and the globals
+`.scn` scene links (exits, entries), the characters of `Actors/Characters.abi` and the globals
 of `Actors/global.atx`. Commands print as `when:target.op(a1,a2) if cond`, a target or
 condition id labelled by its record (`g269 Snake Dead`, `i120 IO_rope`, `c10 grumpa`).
 
@@ -110,7 +110,7 @@ def labels(root: Path) -> dict[int, str]:
     lab = {3: "player", 4: "actor4", 8: "hud", 90: "inv", 180: "amb", 185: "fade", 186: "proxy"}
     for r in walk((root / "Actors/Items.abi").read_bytes()):
         lab[r["id"]] = "i%d %s" % (r["id"], (r["names"] or ["?"])[0].replace(".ANB", "").replace(".anb", ""))
-    for r in walk((root / "Scenes/Characters.abi").read_bytes()):
+    for r in walk((root / "Actors/Characters.abi").read_bytes()):
         nm = (r["names"] or ["?"])[0].rsplit(".", 1)[0]
         lab[r["id"]] = "c%d %s" % (r["id"], nm)
     for b in atx.parse((root / "Actors/global.atx").read_text(encoding="latin-1")):
@@ -205,8 +205,8 @@ if __name__ == "__main__":
     lab = labels(a.root)
     lines = []
     if not a.scenes:
-        lines.append("== Characters (Scenes/Characters.abi)")
-        dump_records(walk((a.root / "Scenes/Characters.abi").read_bytes()), lab, lines, "  ")
+        lines.append("== Characters (Actors/Characters.abi)")
+        dump_records(walk((a.root / "Actors/Characters.abi").read_bytes()), lab, lines, "  ")
         lines.append("== Globals (Actors/global.atx)")
         for b in atx.parse((a.root / "Actors/global.atx").read_text(encoding="latin-1")):
             g = events.parse_global(b)

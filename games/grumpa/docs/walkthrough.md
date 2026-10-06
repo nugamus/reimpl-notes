@@ -23,9 +23,9 @@ Grumpa travels (on foot, swimming with the air timer, or on a mount).
 
 | Area | Scenes | Boss (death list) |
 |---|---|---|
-| Jungle island (start) | 1, 211, 3, 5..18, 61, 90, 40, 212, 300..310 | Turtle c36 (scene 14): clears the spawners, drops the Seed Star |
-| Swamp island | 20..27, 39, 60, 63..69, 75, 320..326 | Crocodile c47 (27): Seed Cube |
-| Desert island | 30..37, 41, 80, 81, 330..338 | Hyena c55 (33): Seed Triangle; Scorpion c56 (37) |
+| Jungle island (start) | 1, 211, 3, 5..18, 61, 90, 40, 212, 300..310 | Turtle c36 (scene 14): its chest, the Seed Star |
+| Swamp island | 20..27, 39, 60, 63..69, 75, 320..326 | Crocodile c47 (27): its chest, Seed Cube, 5 coins |
+| Desert island | 30..37, 41, 80, 81, 330..338 | Hyena c55 (33): its chest, Seed Triangle, 5 coins; Scorpion c56 (37) |
 | Sea, surface | 4, 50, 82..87, 100, 101 | |
 | Sea, underwater (air timer) | 51, 53..58, 70..74 | Octopus c80 (58): opens the way into the ship; Skeleton c78 (56): the Oars |
 | Pirate ship | 102, 104..109, 114, 117..119 | rat leaders c38 (104, Key Red), c37 (108, Key Blue); Captain c69 (102): the ending |
@@ -64,7 +64,7 @@ lines, **view** view change, **timer**.
 | 20 | 109 | Pull the cork (strength > 15): the ship floods | `tr661 IF c10[2]>15`; cork mesh 712 end: film `unplug.mpg` (119 actor 620), `GOTO 119`; @102 door and way back closed (E-1804) | film |
 | 21 | 119 → 118 → 117 | Swim up through the flooded hull (air bubbles refill) | 119 `tr660`; 118 `tr662` (no key needed) | swim, timer |
 | 22 | 117 → 114 → 102 | Step onto a rising barrel to the flooded deck, then click back up | 117 `tr660..662` → 114 entries 750..752; 114 `tr660` → `GOTO 102` | plat, swim |
-| 23 | 102 → 96 | Kill Captain Ratbeard: the outro film and the end | c69 list 2: `@96 940.56(1)`, `GOTO 96`; 96 script 781: `grumpa_outro.mpg`, `end_succesful_VS.wav`; then the main menu (E-1804, E-1805) | fight, film |
+| 23 | 102 → 96 | Kill Captain Ratbeard: his last line, the outro film, the end | c69's death list starts sound 642 (`102_ratbeard_final_VS.wav`); its end: `@96 940.56(1)`, `GOTO 96`; 96 script 781: `grumpa_outro.mpg`, `end_succesful_VS.wav`; then the main menu (E-1810, E-1805) | fight, talk, film |
 
 Losing all life takes the other branch of the same scene: Grumpa's list 7 sets 96's flag 941
 and goes there: `grumpa_death.mpg` (E-1804).
@@ -92,6 +92,22 @@ belt) is what makes the fights comfortable; the desert gives the belt:
 Then the ship (steps 12..23). Steps 9a..9d are from the region read-outs and not yet played
 by a scenario; the Jungle Mixture is the alternative if the fights are quick (180 s).
 
+### The kit the ship's fights need (E-1809, E-1810)
+
+| Piece | Gives | Where | Needs |
+|---|---|---|---|
+| Father's Sword Broken | attack +6 | scene 1 (step 1) | |
+| Gauntlets of Power | attack +11, defence +2 | scene 18 (step 9) | the stones in 17 (jump) |
+| Sword of Might | attack +20 | scene 61 (from 10's snake door, trigger 663) or 9 (rope from 11) | attack > 15 to pull it (61 trigger 663) |
+| Shield of Protection | defence +20 | lies in scene 75 (swamp: 24 → 39 → 75) | reaching the swamp |
+| Belt of Strength | attack +11 | desert 37 (trigger 664) | steps 9a..9d |
+| Grandfather | attack +20, defence +20 | swamp 26 (trigger 660) | gauntlets and belt (g242), the Fruitpunch: the three seeds (Turtle 14 or Skeleton 56, Crocodile 27, Hyena 33) planted in 63/65/66, the fruits brewed by the witch (22) |
+
+The Captain (Life 400, attack 40, defence 18) against attack 22 / defence 9 (broken sword,
+gauntlets, wooden shield) loses 4 a hit while dealing 31: Grumpa dies first. With the whole
+kit (attack 67, defence 44) he deals 49 and takes nothing (`boss_captain`). The designed path
+is therefore all three islands: the bosses' seeds make the Grandfather, who wins the ship.
+
 ## Choices and alternatives on the way
 
 - **Key Red / Key Blue**: the Bottle of Rum opens either lock instead (104 `tr667`, 108
@@ -107,8 +123,8 @@ by a scenario; the Jungle Mixture is the alternative if the fights are quick (18
 - **The captain on the first visit**: by the data he is already up when Grumpa first boards
   (Q-1800); the hold and the cork are the designed way.
 
-Not needed for the ending, by the data: the three island bosses (they only clear their
-islands' enemy spawners and drop the seeds), the Ape King's son, the seeds and fruits, the
+Not needed to reach the ship, by the data: the three island bosses (their chests hold the
+seeds; the seeds only matter for the Grandfather, see the kit below), the Ape King's son, the seeds and fruits, the
 witch's Ancestor Fruitpunch and the Grandfather form (26), the golems, the parrot, the bear
 and the Monkey Champion followers, the Lock Shaped Stone and Diamond. No ship trigger tests a
 flag or item from the islands.
@@ -188,4 +204,5 @@ The chain plays the path from a new game, each scenario starting from the previo
 | `path4_gauntlets` | 6..8 | in 17's pool: walked into the water instead of jumping the stones; stays there (the original too) |
 | `path5_ship` (teleport to 101) | 14, 15 | on 102's deck the Captain's fight starts at once and kills base Grumpa (E-1808): scene 96 |
 | `path6_sea` (teleport to 16) | 10..12 | dive, seahorse, ride to 58, walk round the ship (dev `walkto`), the Octopus fight lost at defence 2: scene 96 |
+| `boss_captain` (teleport, kit by op) | 15, 23 | the Captain beaten with the whole kit; his last line, scene 96, the outro film |
 | `film` (not chained) | 20 | the cork pulled in 109 (strength given by op), `unplug.mpg` plays, the flooded hull 119 runs on |

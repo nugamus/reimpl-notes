@@ -3080,3 +3080,21 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   the Father's Sword (15) needs the gauntlets (+11) or the mixture.
 - **Method:** disassembly (E-1300, E-1700); scripted dev run.
 - **Confidence:** proven
+
+### E-1810 — The game's character database is `Actors/Characters.abi`; the real death lists (supersedes E-1804's ending chain)
+- **Binary/file:** `Actors/Characters.abi` (loaded, E-0402) vs `Scenes/Characters.abi` (never
+  opened, a different older copy: the files differ from byte 29); `tools/logic.py`, which read
+  the latter until 2026-10-06 (fixed; `notes/logic.txt` regenerated); scenario `boss_captain`.
+- **Evidence:** in the loaded database the Captain c69's death list (`+0x630`) is
+  `@102 642.0`: it starts his last line `102_ratbeard_final_VS.wav`, whose end list sets scene
+  96's flag 940 and goes to 96 (the outro). So sound 642 is the ending's trigger, not unused,
+  and the `@96 940` / `GOTO 96` pair E-1804 gave to c69 belonged to the stale file. Grumpa's
+  death (c10 list 7) sets 941 and goes to 96 (the death film). The bosses' death lists do not
+  clear the islands' spawners (that was the stale file too): Turtle c36 opens its chest (14:
+  sound 648, the Seed Star), Crocodile c47 and Hyena c55 their chests (+5 coins, `hud.9(5)`),
+  Octopus c80 opens scene 58's walls and arms 660; every boss adds to globals 201/202 (kills).
+  `boss_captain` (attack 67, defence 44 by op): c69 falls after 9 hits of 49, the line plays,
+  96 shows `grumpa_outro.mpg` (669 frames). With attack 22, defence 9 he takes 4 a hit and
+  Grumpa dies after three of his (31 each).
+- **Method:** corpus, scenario runs.
+- **Confidence:** proven.
