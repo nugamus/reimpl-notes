@@ -106,6 +106,28 @@ flag or item from the islands.
 - Sea: the shark's belly and the son (53/54), FoxyLady and the chest (50), the Skeleton
   Captain (56).
 
+## Water, air and drowning
+
+All of it is data (E-1661, E-1680..E-1682); the code only draws the ripple and limits boats
+on floor type 13 (E-1660).
+
+- **Air timer** `g220` (4 s): each firing, Air > 0 → Air −6 and again; Air 0 → it stops and
+  `g221` (4 s) starts: Life −8 each firing while Air is 0; once Air > 0, 221 stops and 220
+  restarts. Full air (99) lasts 68 s, then 8 Life every 4 s; Life < 1 kills Grumpa (death
+  film, scene 96). Conditions are tested when the command is queued, before its effect.
+- **Underwater scenes** (entry script: start 220, show the bar): 51, 53, 55..58, 70..74,
+  117..119. **Surfacing** (220 and 221 stop, Air +100, bar hidden): 12, 16, 20, 80, 101, 114;
+  30, 32, 50, 54 forget to stop 221 (Q-1680). The seahorse (73 trigger 660, c87) stops both
+  timers and hides the bar; leaving it (c88 list 1) starts 220 again unless the scene is
+  12, 16, 20, 30, 50 or 80.
+- **Bubbles**: animated meshes in 51, 55..58, 71, 118 with a contact sphere (r 13..27) on
+  one vertex; touching one gives Air +10 (+2 in 51 and 71's third), once per touch.
+- **Water floors** (type 13, Grumpa wades with a ripple; type 12 in 114): 12, 16, 17, 50 and
+  the other surface scenes; the underwater scenes are ordinary floor (type 0..3). Step 8
+  (14 → 301 → 17) has no air: the danger is the piranha bites. Step 10 (16 `tr665`, a walk-in
+  sphere r 765 when not in the boat or on the dragonfly) → 73, where the timer starts. Step 21
+  (119 → 118 → 117): air drains from 119 on, 118's bubbles refill; 117 → 114 refills to 100.
+
 ## Engine gaps on the critical path
 
 What the `grumpa` engine has (engine `CLAUDE.md` Status, 2026-10-06) against what the 23

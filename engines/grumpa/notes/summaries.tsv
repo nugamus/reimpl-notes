@@ -63,11 +63,13 @@ GRUMPA.EXE	00435080	CFXFollower::Update	every 2nd update copies the character's 
 GRUMPA.EXE	004350d0	CFXFollower::OnSceneEntry	places follower 20 behind the player (unless skipped), resets char to idle, sets home	E-1222
 GRUMPA.EXE	004351e0	CFXFollower::Serialize	atx: id, character (sets its role 2); save: active, visible, pos, orient, character	E-1220
 GRUMPA.EXE	00435430	CFXFollower::StepAlongYaw	moves +0x150 by arg along yaw (sin, 0, cos)	E-1222
+GRUMPA.EXE	00435a00	CFXCharacter::LoadSharedMeshes	Loads the four shared meshes once: waterripple, watersplasch, Shadow, effect (.ANB) into the table at 0x4ba74c	E-1660
 GRUMPA_NOCD.EXE	00437d00	CFXInventory::DoCommand	Inventory panel: handles commands sent to actor 90 (open/close on right click, take, give)	E-0504
 GRUMPA_NOCD.EXE	00438500	CFXInventory::Draw	Inventory panel: draws the nine slots and two equipment slots	E-0504
 GRUMPA_NOCD.EXE	00438660	CFXInventory::Layout	Inventory panel: lays out slot rectangles	E-0504
 GRUMPA_NOCD.EXE	004387d0	CFXInventory::Add	Adds an item to the inventory: counters for coins and drops, no duplicates, first free slot, else inventory full	E-0504
 GRUMPA_NOCD.EXE	004388e0	CFXInventory::Serialize	Inventory panel (actor type 4): reads and writes its state (Serialize)	E-0504
+GRUMPA.EXE	00439730	CFXGrumpaScore::Update	Score update: when active, advance its element sprites and sounds; no value changes	E-1661
 GRUMPA.EXE	004397a0	CFXGrumpaScore::DoCommand	score actor 8 commands; 0x33 subtracts life from a character and requests hit clip 0x17 while alive	E-1402
 GRUMPA.EXE	0043d840	CFXMatrix::Multiply	4x4 matrix product out = A*B	E-1700
 GRUMPA.EXE	0043d8c0	CFXMatrix::SetRotation	Matrix object: rotation from (pitch, yaw, roll) vector via YawPitchRoll	E-1700
@@ -90,6 +92,8 @@ GRUMPA.EXE	00446db0	PlayerControl::HitTest	player swing hit test: chars of actor
 GRUMPA.EXE	00446f70	PlayerControl::Update	player controller update: steer angle, keys Ctrl/Space/Shift/Backspace, view by floor type	E-0812
 GRUMPA.EXE	004473c0	PlayerControl::RequestFromButtons	player controller: buttons to walk/stop/attack request	E-0811
 GRUMPA.EXE	00447790	CFXPlayer::GetCharacter	Getter: actor 3 held character id +0x298	E-1430
+GRUMPA.EXE	00447920	CFXToScene::CFXToScene	Ctor: latch +0x15c=1, first-update +0x160=1, remembered scene 0, adds state slot 'Scene ID'	E-1682
+GRUMPA.EXE	00447ba0	CFXToScene::DoCommand	DoCommand: only 0x17 (scene entry) stores arg1 in state slot 1 'Scene ID'	E-1682
 GRUMPA.EXE	00448250	CFXToScene::FindEntry	find entry for previous scene (pos, rot); -2 keeps place; default first	E-0804
 GRUMPA.EXE	00448360	CFXToScene::TestExits	exit sphere test with latch, returns exit scene	E-0804
 GRUMPA.EXE	004484d0	CFXSound::CFXSound	CFXSound ctor: everything 0 (speaker, loop, volume/pan flags), type 0x18	E-1640
@@ -101,6 +105,8 @@ GRUMPA.EXE	0044da00	CFXSprite::SetPos	sprite: set top-left position, recompute d
 GRUMPA.EXE	0044dfd0	CFXSprite::UpdateSize	sprite: size from surface, dest rect	E-1720
 GRUMPA.EXE	0044e1b0	CFXSprite::ColorMatch	sprite: colour key from COLORREF; -1 = pixel (0,0) of first frame	E-1720
 GRUMPA.EXE	0044ed90	CFXSprite::CreateFromFile	sprite: create from <base>0000.. frames while files exist (<=100)	E-1720
+GRUMPA.EXE	0044fc60	CFXStaticCharacter::CFXStaticCharacter	Ctor of the 0x1a mesh actor; contact tests on (+0x1e0=1), running/direction/counter 0	E-1681
 GRUMPA.EXE	004536e0	CFXStaticCharacter::GetMesh	0x1a static character: returns its mesh object (+0x1b0)	E-1600
 GRUMPA.EXE	00453990	CFXStaticCharacter::GetFrame	0x1a static character: returns current frame (+0x1c0)	E-1600
+GRUMPA.EXE	004539a0	CFXStaticCharacter::TestContacts	Contact spheres ride a vertex of the current frame (pair = vertex, radius); tests by +1bc bits 1/2/8/0x10 (player, actor4/held, +228 actor, fighters), runs lists +14c/+15c/+18c/+16c once per contact when +1e4=1	E-1681
 GRUMPA.EXE	0047c9f0	CRT::_CIacos	CRT acos (_CIacos)	E-1700
