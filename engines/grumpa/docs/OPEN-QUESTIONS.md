@@ -626,3 +626,8 @@ actor 301, clips 35..37 by meaning, `+0x474/+0x478`, the trigger gate's bit 4 (Q
 - **Status:** open
 
 ### Q-1440 RESOLVED (2026-10-06, E-1610, E-1536) — the rules run on a left press on the character (`0x426490`); implemented
+
+### Q-1800 update (2026-10-06, E-1771) — equipped weapons do add attack
+- Worn weapons and shields add their bonuses to Grumpa's slots 2/3, which the damage rule
+  reads; the Sword of Might gives attack 25 > 18. Left open: the captain's first-boarding
+  design question itself.

@@ -3065,3 +3065,18 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   and −8179.5 in 25, and exit 58 fires.
 - **Method:** scripted dev run.
 - **Confidence:** verified (engine)
+
+### E-1771 — Worn weapons and shields count in combat: their bonus is in slots 2 and 3
+- **Binary/file:** `FUN_00421780` (E-1300, E-1700), damage `0x425730` (E-1432); engine
+  `character.cpp` `wear`, `combat.cpp` `hit`; dev run `grumpa_vm` with `slot 10 2`.
+- **Evidence:** wearing attachment k adds its attack bonus `[0x37c]` to state slot 2 (weapons)
+  or its defence bonus `[0x38c]` to slot 3 (shields), taking it off subtracts it; the damage
+  rule reads the attacker's slot 2 and the victim's slot 3. So equipment counts, through the
+  slots, though no data record sends 0x58/0x5a for it (E-1808's "no item record"). Grumpa's
+  attack with each weapon: Father's Sword broken 5+6 = 11, Father's Sword 15, Hammer 13, Sword
+  of Might 25; defence with the Wooden Shield 7, the Shield of Protection 22. Engine run
+  (grumpa-dev 8a1efaeb): the Sword of Might (110) put in the weapon slot takes c10's slot 2
+  from 5 to 25. So of the weapons only the Sword of Might alone beats the ship's defence 18;
+  the Father's Sword (15) needs the gauntlets (+11) or the mixture.
+- **Method:** disassembly (E-1300, E-1700); scripted dev run.
+- **Confidence:** proven
