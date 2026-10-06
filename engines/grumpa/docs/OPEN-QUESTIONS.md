@@ -531,7 +531,8 @@ c16, `[5]==0`), so a companion hint line or trigger waits until he stops talking
   follower release `0x434c50`), `+0x650` by `0x4261c0` (end of DoCommand case 0x60). No reader
   of `+0x660` in the dump besides Serialize and unwinds.
 - **Next lead:** byte-scan for `[reg+0x660]` / `lea reg,[reg+0x660]` outside 0x422f80.
-- **Status:** open
+- **Status:** RESOLVED (E-1610): `0x426490` on op 0x12 (click) and `0x4263c0` each update (hover
+  glitter) read the rules through `+0x664`; `+0x650` is the end of case 0x46, not 0x60.
 
 ### Q-1800 — Is Captain c69 meant to be fought on the first boarding of scene 102?
 - **Known:** 102's walk-in trigger 660 is active in the file and starts the captain's line,
@@ -612,3 +613,16 @@ actor 301, clips 35..37 by meaning, `+0x474/+0x478`, the trigger gate's bit 4 (Q
 ### Q-1800 update (2026-10-06, E-1808) — the captain is active and lethal on first boarding
 - `path5_ship`: boarding 102 starts the captain's line and the fight at once; c69 kills base
   Grumpa in three hits. Open: whether equipped weapons add attack (asked of combat).
+
+### Q-1610 — Which character file's ending is right: c69's death list differs between the two
+- **Context:** E-1610, E-1804. The loaded `Actors/Characters.abi` gives the captain c69 the death
+  list `@102 sound 642` and Grumpa c10 `0xc` to the inventory, `@96 941=1`, `@96 940=0`, GOTO 96;
+  the unloaded `Scenes/Characters.abi` (which `tools/logic.py` and E-1661/E-1680/E-1804 read)
+  gives c69 `@96 940=1`, GOTO 96. With the loaded file, killing the captain does not go to the
+  outro by itself: what sets 940 and leads to scene 96 (the ship's order, the cork in 109, the
+  parrot's rule in 36?) must be re-read from the scenes.
+- **Next lead:** `tools/logic.py` labels and character blocks should read `Actors/Characters.abi`;
+  then trace 940 and `GOTO 96` over the scene scripts.
+- **Status:** open
+
+### Q-1440 RESOLVED (2026-10-06, E-1610, E-1536) — the rules run on a left press on the character (`0x426490`); implemented

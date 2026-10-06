@@ -2,7 +2,7 @@
 
 The character database, how a character comes to be in a scene, and the commands it takes.
 Format: `docs/formats/README.md` (`.abi`, type 0x03) and `tools/parsers/abi.py` `t_03`.
-Evidence: E-0400..E-0404, E-1220..E-1224, E-1500..E-1503, E-1530. Open: Q-0402, Q-0403, Q-1500.
+Evidence: E-0400..E-0404, E-1220..E-1224, E-1500..E-1503, E-1530, E-1610. Open: Q-0402, Q-0403, Q-1500, Q-1610.
 
 ## The database (E-0401, E-0402)
 
@@ -26,8 +26,34 @@ Per character the engine needs:
 | `kind` (`+0x128`), `parts` (`+0x13c`, `+0x140`) | 0 creature, 1 mount, 2 rider form made of two parts |
 | `pairs` (`+0x12c`) | (other id, form id): which form two characters make together |
 
-The rule, reaction and message lists are kept but not run yet (Q-0403); the message lists are
-empty in the data.
+## Command lists (E-1610)
+
+A record carries, in file order, its rules, two plain lists, messages, the death list and the
+reactions (E-0401). Running a list = push each command with its conditions, in order (tested at
+the push, `when` honoured, E-0617); no self id is substituted.
+
+| list | runs when |
+|---|---|
+| rules `+0x660` (conditions + commands each) | **click**: on the left-button broadcast 0x12, if the character is active, at home and the mouse is inside its screen rectangle: the first rule whose conditions hold while the player's character's reaction sphere touches this one's (combat.md, Reactions) pushes its commands, and no other rule of any character fires until the next update. **Hover**: every update, the same test without pushing turns on the mouse glitter (inventory.md). |
+| `+0x640` | the follower lets the character go (op 0x37 to actor 4), after its stop and role 0 |
+| `+0x650` | the rider form splits (op 0x46), pushed on the form after Grumpa is the player again |
+| messages | none in the data |
+| death `+0x630` | the death timer ends (combat.md, Death), or the scene is left (0x19) while it is still running; then the character is hidden, inactive, home −1 |
+| reactions | combat.md, Reactions |
+
+What the data does with them (`Actors/Characters.abi`; the copy in `Scenes/` is not loaded and
+differs): the **rules** are the item uses and mounts: on Grumpa (10) the jungle mixture, honey,
+the Life potions, branches and water; honey on the bear 13/28, blood oranges on the kraken 16,
+bananas on the monkey 42, the oars on the boat 27; mounting the dragonfly 21, bear 28 and
+seahorse 87 (when the cursor's state is 1 and Grumpa is the player: the rider form becomes the
+player, both parts hidden; the seahorse also hides the air bar and stops the air timers); the
+parrot 23 in scene 36. **`+0x640`** is a voice line on the companions (16, 20, 22, 23, 25, 26,
+42). **`+0x650`**: the boat 11 gives the oars back, the dragonfly 12 stops its timer 222, the
+seahorse 88 starts the air timer 220 and shows the air bar unless in scene 12, 16, 20, 30, 50
+or 80. **Death**: enemies count Globalcounters 201/202, some drop keys or coins or change
+scenes; a rider form (11, 12, 13, 88) puts Grumpa at its place as the player and disables itself
+and the mount; Grumpa (10) defers flag 941 = 1 and 940 = 0 to scene 96 and goes there; the
+captain 69 plays sound 642 in scene 102.
 
 ## Presence (E-0403)
 
@@ -141,6 +167,15 @@ the mount, then Grumpa, get 0x47 with the form's id (placed on the form, 30 forw
 at home); Grumpa's pending move becomes (d·cos yaw, 0, −d·sin yaw) with d = |the mount's
 current clip's least vertex x| + |Grumpa's greatest|, so he steps off sideways; Grumpa gets
 0x2c (the form stops, Grumpa is the player, the score shows him).
+
+**Mounting by click** (E-1610): a mount's rule list (21 dragonfly, 27 boat, 28 bear, 87 seahorse)
+has a rule with the conditions "Grumpa is the player" (`c10[4] == 1`) and, for the boat, the
+Oars on the cursor; its commands make the rider form the player and hide both parts. Rules
+run on a left press: the first character that is active, at home, under the cursor (its
+drawn screen bounds) and whose reaction sphere (E-1460) the player's touches runs its first
+rule whose conditions hold; one rule a press. Grumpa's own rules (items used on him) work the
+same way. The list `+0x640` is posted when actor 4 lets the character go, `+0x650` at the end
+of the split.
 
 **Backspace** (actor 3, each animation tick while held, no latch): if the player's character
 is a rider form it gets 0x46; else actor 4 gets 0x37 (the companion is let go).

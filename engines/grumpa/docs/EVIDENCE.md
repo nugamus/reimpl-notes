@@ -2980,6 +2980,50 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Confidence:** proven for the files; where the installer copies `Local_*` (presumably
   over `UI/001_Menu/`) is not read from the setup script.
 
+### E-1610 — CFXCharacter command lists: what runs each one, and their contents in the loaded file
+- **Binary/file:** `GRUMPA.EXE` dump (`build/grumpa-import`); Serialize `0x422f80` (E-0401);
+  rules `0x4263c0` (hover) and `0x426490` (click), DoCommand `0x41e0d0` (case 0x12 → `0x426490`
+  at `0x41e7e9`; case 0x19 → `0x425e30` at `0x41e727`; case 0x46 tail → `0x4261c0` at
+  `0x41eae3`), update `0x421a60` (`0x4263c0` at `0x421b38`; death timer → `0x425e30` at
+  `0x4222e3`), follower DoCommand `0x434c50` (0x37 → `0x425fc0` at `0x434d2a`), character
+  vtable[4] `0x421a50` (pointer at `0x49047c`); `Actors/Characters.abi`.
+- **Evidence:** call targets by an E8 scan of the dump: `0x425fc0` and `0x4261c0` have exactly
+  one caller each, `0x425e30` two, `0x4263c0`/`0x426490` one each; the latch `0x4ba77c` is
+  written only at `0x421a50` (= 0) and `0x42656a` (= 1). The lists, in file order:
+  **rules** `+0x660` (n × {EC conditions at +0x104, CC commands at +0x114}, 0x124 B each):
+  on op 0x12 (left button down broadcast), if the character is active, at home and the mouse
+  point is in its screen rect `+0x148`, and the latch is 0: the first rule whose conditions
+  hold (`0x408c30`) while the player's character (actor 3 `+0x298`) has its reaction sphere
+  (`0x424ed0`) overlapping this one's (`0x44c6e0`) has its commands pushed (`0x408960`) and
+  the latch is set; no further rule or character fires until the latch is cleared by any
+  character's vtable[4] at the start of the next update (E-0202 order). Every update
+  `0x4263c0` runs the same test without pushing and, if the latch is 0, arms the mouse glitter
+  (`0x446330`, E-1720) and stops. **`+0x640`**: pushed when the follower lets the character go
+  (op 0x37 to actor 4, after op 1 and role 0). **`+0x650`**: pushed on the rider form itself
+  at the end of op 0x46 (the split, after 0x47/0x47/0x2c). **messages** `+0x674/+0x684`: none
+  in the data. **death** `+0x630`: pushed when the death timer reaches 0 (E-1433), or on op 0x19
+  (leaving the scene) while the death timer is still > 0 (then hidden, inactive, home −1).
+  **reactions**: E-1460. Every push copies the command and its conditions to `0x408760`
+  (conditions tested at push, `when` honoured, E-0617); there is no self-id substitution.
+  Census of `Actors/Characters.abi` (44 records): rules on c10 (5: item use on Grumpa: jungle
+  mixture, honey, potions/flea/…, branches, water), c13 (honey), c16 (blood orange: Hulk),
+  c21/c28/c87 (mount: `2[0]==1 & c10[4]==1`; form 12/13/88 becomes the player, both parts
+  hidden; c87 also hides the air bar 79 and stops 220/221), c23 (parrot, no conditions:
+  scene 36 sets 940), c27 (boat: Oars held), c28 rule 1 (honey to the bear), c42 (banana);
+  `+0x640` on c16, 20, 22, 23, 25, 26, 42 (each only a voice 0x48(60)); `+0x650` on c11
+  (Oars back to inventory 42/43), c12 (voice, stop Dragon-Time 222), c13 (voice), c88 (voice;
+  start 220 and show the air bar unless scene 12/16/20/30/50/80); death lists on 27 records
+  (enemies add Globalcounters 201/202; c10: inventory op 0xc, `@96 941=1`, `@96 940=0`, GOTO
+  96; c11/c12/c13/c88: Grumpa placed at the form and made the player, form and mount
+  disabled; c69: `@102` sound 642). `Scenes/Characters.abi` (not loaded, E-0402) differs:
+  there c69's death sets 940 and goes to 96 and c10's lacks 0xc and `940=0`; E-1804 cited
+  that file. E-1661's "c88 L1 (becoming the form)" is the `+0x650` split list: the air timer
+  starts when Grumpa gets off the seahorse; "c87 L0" is c87's rule 0 (mounting).
+- **Method:** decompile dump + capstone/E8 scan of the dump; corpus walk of both character
+  files with `abi.py`'s t_03 grammar, lists tagged by field.
+- **Confidence:** proven (code paths and data); the rect `+0x148` is assumed to be the drawn
+  screen bounds (not read here).
+
 ### E-1809 — Worn weapons and shields add attack and defence (supersedes E-1808's "no weapon")
 - **Binary/file:** `Actors/Characters.abi` c10 attachments (`[0x37c]` weapon bonus to slot 2,
   `[0x38c]` shield bonus to slot 3, E-1700); engine `Characters::wear`.
@@ -3006,3 +3050,18 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   Used by the proximity gate, the scene exits, the fighters' and the follower's push-apart.
 - **Method:** decompile (one function) against the sphere layout of E-0705.
 - **Confidence:** proven
+
+### E-1536 — The engine mounts the boat by its click rule and sails scene 100 (scenario `sea100`)
+- **Binary/file:** engine `follower.cpp` (`Characters::clickRules`), `scene.cpp`, `walk.cpp`
+  (grumpa-a2); scenario `engines/grumpa/tests/sea100.toml`; Characters.abi boat 27 rule 0.
+- **Evidence:** boat 27's rule 0: conditions `c10[4] == 1` and `i111[0] == 6` (the Oars held);
+  commands (11, 0x47, 27), (11, 0x2c), 27 and 10 off and hidden, voice 60, (4, 0x37), …; its
+  reaction to 10 only plays voice 61 (the hint). Dev run: Grumpa walked to the shore, the
+  reaction plays, the Oars held, a press on the boat (its bounds (400,426)–(559,501)): "character
+  27 rule 0", 11 the player at the boat. `go 100` (first entry, y 41): the boat stays at
+  y −0.5 (mode 1, E-1660) and sails from (−6058.9, −4355.8) to (−2233.5, −1906.5), then "exit
+  to scene 101" (E-1534 confirmed). Backspace in 101 splits the form; Grumpa on foot sinks
+  (101 is water too) and leaves for 58; in 100 on foot he sinks from y 54 to −6862 in 5 updates
+  and −8179.5 in 25, and exit 58 fires.
+- **Method:** scripted dev run.
+- **Confidence:** verified (engine)
