@@ -156,7 +156,7 @@ Air 0 → timer 221, which takes 8 Life every 4 s until Air comes back (score 76
 
 The `.scn`'s record 0x14 (id 601):
 
-- **Exits** `(x, y, z, r, scene)`: each update the player's sphere is tested against every
+- **Exits** `(x, y, z, r, scene)`: each update, after the characters have updated (actor 601 after 10..88, E-0202, so a player placed at an entry is first settled on the floor), the player's sphere is tested against every
   exit sphere. A touched exit becomes the remembered one and, unless the latch is set, sends
   (185, 31, scene): the faded scene change; then the latch is set. An untouched exit that is
   the remembered one clears the latch. Every scene starts latched (remembered 0) and clears

@@ -1,0 +1,7 @@
+description = "Scene links (walking.md, E-0804, E-0818, E-0202): entering 11 from 8, Grumpa is placed at the entry just outside exit 8's sphere and settles 5 units down into it; the exits test after the characters' update, so he is inside from the first test and stays latched in 11 (before the fix the scenes bounced 8 <-> 11)"
+snaps = ["entry_settle.png"]
+timeout = 60
+args = ["-d1"]
+
+[keys]
+grumpa_vm = "8;go 11;ticks 80;where;snap {out}/entry_settle.png"
