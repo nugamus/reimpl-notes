@@ -2962,3 +2962,20 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** scripted dev runs; corpus.
 - **Confidence:** verified (engine); the two original-bug readings follow from the cited code,
   not observed in the original.
+
+### E-1770 — The language's folders: texts, voices, the intro
+- **Binary/file:** `games/grumpa/discs/cab/Local_*`, `Sounds_*`, `Movies_*`, `UI/001_Menu/`,
+  `discs/cd/Movies/`; engine `menu.cpp`, `dialogue.cpp`, `movie.cpp`, `detection_tables.h`;
+  scenarios `engines/grumpa/tests/lang_{sv,da,fi,nb}.toml`.
+- **Evidence:** `UI/001_Menu/Text.txt` has the md5 of `Local_Swedish/Text.txt`
+  (987d2174...), the other three differ (Danish ba1105e6..., Finnish 79220604...,
+  Norwegian 596c780d...), so the menu folder holds the default language's copies. Each
+  `Sounds_<language>` has the Swedish voice names but four (`014_pirateboss_yell`,
+  `065_CS_kraken_spawnpoint_VO`, `CS_challenge_follower_VO`, `Fatbastard_Heavy_Breathing`),
+  all four also in `Sounds_`. `Movies_Danish|Finnish|Norwegian` hold only
+  `grumpa_intro.mpg`. Engine runs: `--detect` on the CD lists Grumpa in Swedish, Danish,
+  Finnish and Norwegian; the menu with `language` sv/da/fi/nb shows "Nytt Spel", "Nyt
+  Spil", "Uusi peli", "Nytt Spill" (Grumpa.TTF draws all four).
+- **Method:** file comparison; scripted dev runs.
+- **Confidence:** proven for the files; where the installer copies `Local_*` (presumably
+  over `UI/001_Menu/`) is not read from the setup script.

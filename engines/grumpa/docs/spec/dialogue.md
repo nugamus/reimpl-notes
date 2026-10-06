@@ -61,3 +61,15 @@ conversation goes on: the end of one line starts the next (or opens a door, move
 A character's message list (`characters.md`) would be shown as a fading caption by opcode
 0x44 (through the scene manager, 185). Every list is empty in this edition: there is no
 on-screen text besides the menus, help and credits (`Local_<language>`).
+
+## Languages (E-0002, E-1770)
+
+One disc holds Danish, Finnish, Norwegian and Swedish (the installer's default). A language
+has its own `Local_<language>/` texts (`Text.txt`, `Help.txt`, `Credits.txt`, `license.txt`;
+the menu folder `UI/001_Menu/` carries the Swedish copies), `Sounds_<language>/` voices and
+`Movies_<language>/grumpa_intro.mpg` (the Swedish intro and the other films are in the CD's
+`Movies/`). Sounds are looked up in the language's folder, then the common `Sounds_/`; a
+name a language lacks (four Swedish names: the pirate boss's yell, two Kraken lines, the
+fat man's breathing) comes from `Sounds_/`. The engine takes the language from ScummVM's
+detection: the CD has four entries, the same files, one per language; an installed folder
+(whose languages are not known) has one, and the game options' language picks.

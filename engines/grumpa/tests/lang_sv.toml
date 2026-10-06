@@ -1,0 +1,7 @@
+description = "Languages (E-1770): the main menu with language=sv: Text.txt from Local_<language>/ (Swedish: the menu folder's copy), drawn in Grumpa.TTF."
+snaps = ["menu_sv.png"]
+timeout = 60
+
+[keys]
+language = "sv"
+grumpa_menu = "{out}/menu_sv.png"
