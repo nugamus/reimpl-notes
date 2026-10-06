@@ -2839,3 +2839,22 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** decompile; corpus; scripted dev run.
 - **Confidence:** proven (code); the stuck companion is the engine running the original's
   rule, not observed in the original.
+
+### E-1534 — Scene 100 is open sea: mounts at the surface reach 101, Grumpa on foot sinks to 58
+- **Binary/file:** `Scenes/Scene_100.scn` (`tools/parsers/scn.py`); E-1660 (mode `[0x48c]`),
+  E-1503 (modes per form), E-0802 (height blend), E-0804 (exit spheres).
+- **Evidence:** scene 100's walk mesh is 8 faces, 9 vertices, every face type 13 (water),
+  every vertex at y −8179.7, x −11958..4485, z −8743..5138, all one connected region. Exits
+  (centre, r): 101 (−336.8, 0, −261.6) r 1767.4; 58 (−3382.6, −23098.1, −3394.3) r 18091.8;
+  82 r 72521.7, 81 r 11147.8, 83 r 4472.1, 84 r 10007.8, all at y 0. Entries at y 41.1..54.2
+  (from 101: (−2432.2, 54.2, −1308.8)). On foot (mode 0) Move blends y toward the floor
+  (0.4·y + 0.6·height each tick, E-0802), so Grumpa sinks toward −8180: the exits at y 0 (101
+  among them) fall out of reach, while 58's sphere (bottom at y −41190, top at −5006) catches
+  him: the underwater route. The boat (mode 1) is held at y −0.5 on every tick and the
+  dragonfly (mode 2) on type 13 too (E-1660), so both stay at the surface and touch exit 101
+  when within about 1767 + their sphere radius (30) of (−337, −262) horizontally; the region
+  covers that point (face 2 / 5 around the origin). So mounts cross 100 to 101 by sailing or
+  flying toward the scene centre; `walkplan.py reach 100` lists only 58/82 because it tests
+  the exits at the floor's height.
+- **Method:** corpus (scn.py); arithmetic from the cited rules.
+- **Confidence:** proven from data and code rules; not run (the engine has no modes yet).

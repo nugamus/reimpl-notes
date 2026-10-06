@@ -583,3 +583,5 @@ on 12). No swim clips; air and drowning are global timers 220/221 in scripts.
 - **Status:** open
 
 ### Q-0811 PARTLY RESOLVED (2026-10-06, E-1533) — bit 2 (the companion) is implemented; bit 4 (fighters) belongs to combat
+
+### Q-1801 RESOLVED (2026-10-06, E-1534) — yes: at the surface (modes 1/2, y −0.5) scene 100's exit 101 is in reach; on foot Grumpa sinks to 58
