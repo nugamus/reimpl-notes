@@ -109,8 +109,8 @@ Character opcode 0x44 plays films through actor 187 from lists that are empty in
 
 ## The proximity gate (E-0705)
 
-A trigger's sphere is the `x, y, z, r` after its polygon; a character's is its position
-raised by its radius `[0x290]` (Characters.abi). Spheres overlap when the centre distance is
+A trigger's sphere is the `x, y, z, r` after its polygon; a character's is centred
+`[0x290]` above its position, of radius `[0x28c]` (Characters.abi, E-1405). Spheres overlap when the centre distance is
 below the sum of the radii. With `+0x154 = 1` the gate passes for: bit 1 of `+0x188`, the
 player's character (actor 3's, present in the scene, `+0x150` −1 or its id); bit 2, actor
 4's character (`+0x14c` −1 or its id); bit 4, the characters of actors 91..94. With

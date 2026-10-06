@@ -132,6 +132,21 @@ mode 1), playback value 5 while idle (clip 0) else 8; on every other type the sh
 `Shadow.ANB`; on type 13 above −4 neither. Floor types 1..3 are only view numbers, 8 is never
 read.
 
+How they are drawn (E-1612), only while the character is not dying (`+0x474` ≠ 1), after the
+worn attachments and before the body mesh:
+
+- **Ripple**: `waterripple.ANB` textured with `Bitmaps/Virvel.tga`; world = scale s then
+  translate (x, 4, z), no rotation. Lighting off; blending by the texture's alpha
+  (SRCALPHA / INVSRCALPHA; Draw first asks for ONE/ONE but the 32-bit texture's bind
+  overrides it); z-test and z-write stay on. Each draw advances the shared mesh: one frame
+  every 50 / fps draws (fps 5 idle, 8 otherwise, integer division: every 10 or 6 draws),
+  looping. The counter is shared, so every rippled character advances it.
+- **Shadow**: `Shadow.ANB` textured with `Bitmaps/Shadow.tga`; world = the character's own
+  matrix (orientation, position + (0, `+0x178`, 0), no scale), so it turns with the
+  character at the mesh's own size. Lighting off, z-bias 16, z-write off, alpha blending by
+  the texture's alpha; frame 0 always. Every drawn character gets it on non-water floors.
+- `watersplasch.ANB` / `Splasch.tga` are loaded but never drawn.
+
 **Air** is scripts only (E-1661): becoming Grumpa-on-seahorse (88) starts timer 220 and shows
 the air bar unless the scene is 12, 16, 20, 30, 50 or 80. Every 4 s: Air > 0 → Air −6;
 Air 0 → timer 221, which takes 8 Life every 4 s until Air comes back (score 76 refills of 2,
@@ -155,8 +170,7 @@ The `.scn`'s record 0x14 (id 601):
 
 ## The proximity gate (E-0207, E-0705)
 
-A character's sphere is centred on its position raised by its radius `[0x290]`, of that
-radius; a trigger's is the four floats after its polygon. Two spheres touch when the centre
+A character's sphere is centred `[0x290]` above its position, of radius `[0x28c]` (E-1405); a trigger's is the four floats after its polygon. Two spheres touch when the centre
 distance is below the radii's sum. A proximity-gated trigger (`+0x17c` = 1, `+0x154` = 1)
 passes, for bit 1 of `+0x188`, when the player's character is present, is the required one
 (`+0x150`, −1 any) and touches; with `+0x170` = 1 only once per stay inside. A click trigger

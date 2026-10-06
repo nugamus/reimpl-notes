@@ -660,3 +660,7 @@ actor 301, clips 35..37 by meaning, `+0x474/+0x478`, the trigger gate's bit 4 (Q
   kind is not read. In the stance the press also swings (E-1400).
 - **Engine:** a press that runs a rule does not walk (the mount's commands stop Grumpa anyway).
 - **Status:** open
+
+### Q-0811 RESOLVED (2026-10-06, E-0705, E-1405) — bit 4 is implemented: the characters of fighters 91..94, each with its own latch
+Corpus: only scene 14's triggers 664 (gate 5) and 668 (gate 4) use it. The spheres are the body
+spheres of E-1405 (radius `[0x28c]`, centre `[0x290]` up).
