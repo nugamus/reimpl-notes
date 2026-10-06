@@ -3192,3 +3192,25 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   3 (Shadow, effect) are not reloaded on message 0x8002.
 - **Method:** PyGhidra disassembly (`disasm_range`), decompiles, TGA headers.
 - **Confidence:** proven (static); the device identity is by vtable layout and state values.
+
+### E-1540 — Walk-mesh wall flags survive leaving a scene and a save/load (CFXFloor mode 4/5)
+- **Binary/file:** CFXFloor Serialize `0x432880` (no Ghidra function; defined read-only),
+  ctor `0x432600`, SaveGameStatus `0x410390`, LoadScene `0x40cb30(scene, saveOld)`, load
+  slot `0x442d40`; `games/grumpa/discs/cab/Save/Current/{001,211,307,500}_status.abi`.
+- **Evidence:** Serialize mode 5 writes id `+0x108`, active `+0x10c`, visible `+0x110`, then
+  0x71 (113) bytes from `+0x3048`; mode 4 reads the same minus the id. 113 bytes = the 28
+  dword flags of indices 0..27 plus the low byte of index 28 (values are only 0/1, ctor
+  sets all 29 dwords to 1, so nothing is lost). SaveGameStatus loops ids from 600 to the end
+  of the actor table, so the floor (id 600) is the first record of every status file
+  (shipped files: id 600, then the next id at offset 125 = 4+4+4+113; 001/307/500 have all
+  flags 1, 211 all 0). LoadScene: if `saveOld` == 1 write the old scene's status, delete
+  ids 600..979 (`0x40ef40(600, 0x3d4)`), load `.scn` (new floor, flags all 1 from the ctor)
+  and `.abi`, then `0x410bf0` reads `<n>_status.abi` back if present (mode 4 overwrites the
+  flags) before broadcast 23 (the floor's op 23 only clears the platform list, E-0803).
+  Load slot copies `Player<n>\*` into `Current\` and calls LoadScene(scene, 0), so the old
+  scene is not written over the loaded file; save writes the current scene's status first
+  (E-0502). So walls opened by op 6 (e.g. scene 34's diamond lock) stay open on revisit and
+  after a save/load; walls reset to closed only for a scene with no status file yet.
+- **Method:** PyGhidra decompile (`define_and_decompile.py`, `-readOnly`); hex of the
+  shipped status files.
+- **Confidence:** proven (static + corpus).

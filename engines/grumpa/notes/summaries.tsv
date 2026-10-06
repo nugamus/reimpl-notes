@@ -1,10 +1,12 @@
 program	address	name	summary	evidence
 GRUMPA.EXE	00408c30	CFXActor::EvalConditions	evaluate a condition list (actor,slot,value,mode,link): OR of AND groups, absent actor skipped, item target to 186	E-1801
 GRUMPA.EXE	00408ff0	CFXActor::GetSlots	Returns the actor's state-slot vector (actor+0x118)	E-1620
+GRUMPA.EXE	0040cb30	CFXActorFactory::LoadScene	LoadScene(scene, saveOld): saveOld==1 writes old scene status, deletes ids 600..979, loads .scn/.abi, then enter sequence 0x410bf0 (status read back)	E-1540
 GRUMPA.EXE	0040e980	CFXActorFactory::Tick	Factory tick: Sleep(1) while actor0 +0x10c=0, else fixed 20 ms updates then render; pending scene change	E-1806
 GRUMPA.EXE	0040efa0	CFXActorFactory::DispatchCommands	Command dispatcher: runs due commands; target -1 broadcasts to actor ids 1..n ascending	E-1600
 GRUMPA.EXE	0040fdb0	CFXActorFactory::LoadGlobalGameStatus	LoadGlobalGameStatus: reads u32 id + actor Serialize records from Current\global.abi to EOF	E-1300
 GRUMPA.EXE	004100c0	CFXActorFactory::SaveGlobalGameStatus	SaveGlobalGameStatus: writes every actor 0..599 to Current\global.abi via Serialize	E-1300
+GRUMPA.EXE	00410390	CFXActorFactory::SaveGameStatus	SaveGameStatus(scene): writes every actor id>=600 with Serialize mode 5 to Current\<n>_status.abi	E-1540
 GRUMPA_NOCD.EXE	004106c0	CFXActorFactory::CreateFromATXFile	Creates an actor from its .atx file	E-0504
 GRUMPA.EXE	00410cb0	WinMain::WndProc	Window procedure: mouse/Esc to actors unless a film plays (0x4ba724); Space and graph events 1/2 stop the film; 0x8003/0x8004 set/clear the flag	E-1806
 GRUMPA.EXE	00415140	CFXAMesh::CFXAMesh	CFXAMesh constructor (0x150 B), current frame +0x11c = 0	E-1700
@@ -68,7 +70,9 @@ GRUMPA.EXE	00430810	CFXFighter::Serialize	Serialize: mode 6 reads id and charact
 GRUMPA.EXE	00430960	CFXFighter::Engage	Engage a character with target; fighter count, actor 301 start, follower->actor 95	E-1430
 GRUMPA.EXE	00430a60	CFXFighter::Release	Release fighter; count--, actor 301 stop, companion back to follower	E-1433
 GRUMPA.EXE	00430b40	CFXFighter::GetCharacter	Getter: held character id +0x2a0	E-1430
+GRUMPA.EXE	00432600	CFXFloor::CFXFloor	CFXFloor ctor: vtable 0x49067c, all 29 wall-type flags at +0x3048 set to 1 (closed)	E-1540
 GRUMPA.EXE	004327c0	CFXFloor::HandleEvent	floor opcodes 5/6 set/clear blocking flags, 23 clears platforms	E-0803
+GRUMPA.EXE	00432880	CFXFloor::Serialize	CFXFloor Serialize: modes 1/2 read mesh, 3 write mesh, 4 read active/visible/113 B wall flags +0x3048, 5 same with id first	E-1540
 GRUMPA.EXE	00432aa0	CFXFloor::AddPlatform	Floor: append an actor id to the platform list +0x148 (vector push_back)	E-1600
 GRUMPA.EXE	00433010	CFXFloor::FloorType	Floor type of the character's face: 15 on a platform, else the face's u16	E-1600
 GRUMPA.EXE	00433040	CFXFloor::PointInFace	point in walk-mesh face: x/z box then 3 strict edge tests	E-0800
@@ -104,6 +108,7 @@ GRUMPA.EXE	0043d8e0	CFXMatrix::SetScale	Matrix object: set diagonal scale (x,y,z
 GRUMPA.EXE	0043d910	CFXMatrix::SetTranslation	Matrix object: set translation row	E-1700
 GRUMPA.EXE	0043d960	CFXMatrix::Set	Matrix object: rotation then translation	E-1700
 GRUMPA.EXE	0043d990	CFXMatrix::Identity	Matrix object: set identity	E-1700
+GRUMPA.EXE	00442d40	CFXGame::LoadSlot	Load slot: ops 25/36, empty Current, copy Player<n> into it, reload globals, LoadScene(scene, 0)	E-1540
 GRUMPA.EXE	00444930	CFXMouse::CFXMouse	mouse actor ctor: kind, held item, timers -1	E-1720
 GRUMPA.EXE	00444b60	CFXMouse::Load	mouse load: 4 ints, 8 named pictures into slots 1..8, arrow1_..arrow16_ into 9..24, colour key	E-1720
 GRUMPA.EXE	00445360	CFXMouse::UpdateAngle	mouse actor: cursor distance and angle from the player's screen point	E-0812
