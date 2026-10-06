@@ -2263,3 +2263,147 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   `[0x490]` 1 only for Grumpa 10.
 - **Method:** decompile; Characters.abi read with `tools/parsers/abi.py` (offsets of `t_03`).
 - **Confidence:** proven
+
+### E-1430 — Actors 91..95 (type 0x1c) are `CFXFighter`: layout, vtable, Serialize, engage
+- **Binary/file:** `CreateActor` case 0x1c (`operator new(0x2c4)`, ctor `FUN_0042f980`), vtable
+  `0x490618`: [1] Serialize `0x430810` (error string `CFXFighter::Serialize`), [2] device
+  `0x42fb20` (`CFXFighter::Initialize`), [4] Update `0x430790`, [6] DoCommand `0x42fcb0`. Engage
+  `FUN_00430960`, release `FUN_00430a60`, held-character getter `FUN_00430b40`; character
+  opcodes in `CFXCharacter::DoCommand` `FUN_0041e0d0` (cases 0x2e, 0x2f, 0x30, 0x4b, 0x54).
+- **Evidence:** fields: type `+0x104` = 0x1c, active `+0x10c`, visible `+0x110`, orientation
+  `+0x144` (yaw `+0x148`) and position `+0x150` copied from the character (`FUN_0042fb80`,
+  `FUN_0042fbd0`), sphere block `+0x15c` (`FUN_0042fc20`, as the follower's), dist `+0x288`,
+  target position `+0x28c..+0x294`, target character id `+0x298` (−1), clock `+0x29c`, held
+  character `+0x2a0` (−1), scene `+0x2a4`, hit countdown `+0x2a8`, last seen clip-start count
+  `+0x2b4`, companion flag `+0x2bc` (ctor 1; scene entry 1; follower release 0x37 sets 0, E-1222).
+  Serialize mode 6 reads two integers (global2.atx `<28>`: id 91..95, character −1). Engagement
+  is by character opcodes sent to the enemy character: **0x2e** → actor 91 role 3, **0x2f** →
+  92 role 4, **0x30** → 93 role 5, **0x4b** → 94 role 6 (target = actor 3's held character,
+  the player); **0x54 `arg1`** → actor 95 role 7 with target `arg1`. Each only if that actor
+  exists and the character's life (state slot 1, `+0x11c → +0x21c`) > 0; then the character's
+  last attacker `+0x488` = the target, home `+0x444` = current scene, active and visible = 1,
+  role `+0x564` = 3..7. Engage (`0x430960`, no-op when already holding that character): a
+  previously held character gets DoCommand 1 and role 0; if the global fighter count
+  `DAT_004c018c` was 0, actor 301 gets DoCommand 0; count += 1; hold, target, active, visible
+  set. Then if actor 4 holds a character, actor 95 is inactive and that character has clip slot
+  0x12 (`+0x2dc` entry +0x48 non-null), the follower's character gets opcode 0x54 with the new
+  enemy's id (it becomes actor 95, the fighting companion) and actor 4's `+0x290` = −1.
+- **Method:** decompile (functions defined in a private copy of the project); vtable read from
+  `GRUMPA.EXE`.
+- **Confidence:** proven (which two fields mode 6 fills is inferred from the file).
+
+### E-1431 — CFXFighter::Update: the enemy AI rule (approach, taunt, attack, separation)
+- **Binary/file:** Update `0x430790`, rule `FUN_0042ff50`, hit test `FUN_00430680`; floats
+  `0x4904a0` 0.46, `0x49034c` 1.0, `0x490614` π, `0x49064c` 280, `0x490648` 180, `0x490644`
+  140, `0x49063c` 70, `0x490494` 4, `0x490640` 0.6 (at `0x4301e9`), `0x490650` double −0.8 (at
+  `0x43073c`); acos `FUN_0047c9f0` of d.z (`0x430085`); rand `FUN_0047cce7`; sphere test
+  `FUN_0044c6e0`; place `FUN_004250a0`.
+- **Evidence:** Update: only when active and the held character exists; `+0x29c` += 0.46 and
+  when > 1.0 it drops by 1.0, the character's position and orientation are copied and the rule
+  runs. Rule, C = held character, T = `+0x298`: stop if either is −1 or C's life ≤ 0. If T's
+  life > 0 and T visible: (a) if T is inactive and the player's character p (actor 3 `+0x298`)
+  is valid, ≠ T and active: T = p, end. (b) T = C's last attacker `+0x488` (initially the
+  player); P = T's position. d = (F.x−P.x, 0, F.z−P.z) normalised; heading = acos(d.z),
+  negated when d.x < 0; turn = π + heading − yaw. dist = 3D |F−P| → `+0x288`. dist > 280:
+  request 1 (run) with turn; 180 < dist ≤ 280: request 0 (walk); 140 < dist ≤ 180: request
+  0x23/0x24/0x25 (`.anb` 35..37, S05..S07) by rand()%3. dist ≤ 140 and C has started a new
+  clip since the last decision (C `+0x43c`, incremented at every clip start, ≠ `+0x2b4`): if
+  C's current clip `+0x434` is an attack 0x12..0x14, `+0x2a8` = trunc(clip frames `+0x498` ×
+  0.6); if it is 0x17 (hit), `+0x2a8` = 0; then rand()%6: 0 → request 2 (stop), 1 → 0x23,
+  2 → 0x24, 3/4/5 → attack 0x12/0x13/0x14, all with turn; `+0x2b4` = C `+0x43c`. dist < 70:
+  C is moved to F + 4·u (u = (F−P)/|F−P| 3D; x, z only, y kept). For each actor 91..95 other
+  than itself holding a character whose sphere overlaps C's: C moved 4 units away from it the
+  same way; the same against actor 4's character. Last, if `+0x2a8` > 0 it counts down and on
+  reaching 0 the hit test runs: if dist < 140 and the horizontal unit vector (F−P) dotted with
+  the fighter's forward (sin yaw, 0, cos yaw) < −0.8 (target within about 37° in front), the
+  target takes a hit (E-1432) with attack = C's state slot 2 (`+0x11c → +0x334`). If T is dead
+  or not visible: actors 91..94: T ≠ 10 → T = 10 and C `+0x488` = 10 (go for Grumpa), end;
+  T = 10 → C request 2 (stop), T = −1. Actor 95: if the count > 1, T = the held character of
+  the first active actor of 91..94 (also into C `+0x488`), end; none and T ≠ 10 → T = 10, end;
+  else stop and T = −1.
+- **Method:** decompile + disassembly (capstone) of the float operands.
+- **Confidence:** proven
+
+### E-1432 — Taking a hit: damage = attack − defence, sent as Life minus to the score
+- **Binary/file:** `FUN_00425730(victim, attacker id, attack)`; callers `FUN_00430680` (enemy
+  hits), `FUN_00446db0` (the player's hits, E-0811).
+- **Evidence:** victim `+0x488` = attacker id (so a fighter's character re-targets whoever
+  last hit it). If the victim's life (slot 1) ≥ 0 and damage = attack − victim's slot 3
+  (`+0x11c → +0x44c`, defence; the player's block clip 0x15 adds 5 to it, E-0811) is > 0,
+  actor 8 (score) gets DoCommand(0x33, damage, victim id): a Life minus on that character
+  (E-1223, `docs/spec/score.md`). No clip is requested here (no hit-reaction request).
+- **Method:** decompile.
+- **Confidence:** proven
+
+### E-1433 — Death of a fighter's character and the release; scene change and entry
+- **Binary/file:** character update `0x421a60` (decompile lines 340..352), `FUN_00425e30`,
+  release `FUN_00430a60`, fighter DoCommand `0x42fcb0` (cases 0x17, 0x19); 0x19 is broadcast
+  by `FUN_0040e980` before the scene is changed (then `FUN_0040cb30` loads the new one).
+- **Evidence:** character update: life ≤ 0 and `+0x47c` == −1 → turn steps `+0x4ac` = 0,
+  request 4 (die: 8 then 0xc); if clip slot 8 is loaded, `+0x47c` = its frame count and
+  `+0x480` = that + 20. `+0x47c` counts down each update; at 0 `FUN_00425e30` posts every
+  command of the death list `+0x630` (ClassC records) and, for role 3..7, releases fighter
+  91..95. `+0x480` reaching 0 resets `+0x47c/+0x480` to −1 and other state. Release: count −=
+  1; hold, target = −1, active, visible = 0; count 0 → actor 301 DoCommand 1. If actor 95 is
+  active and the count is now 1 (only the companion left): its character gets opcode 0x2d (back
+  to follower, E-1223) when 95's `+0x2bc` == 1, else role 0 and the released actor's `+0x2bc`
+  = 1; count = 0; actor 301 DoCommand 1 (actor 95 itself is not cleared). Fighter **0x19**
+  (leaving the scene): actor 301 DoCommand 1; actor 95 active: same 0x2d/role-0 hand-back,
+  then cleared; actor 94 active: character request 5, role 0, fighter cleared; 91..93 holding:
+  character request 5, active = 0, visible = 0, home −1 (`FUN_004250e0`), role 0, fighter
+  cleared; count = 0. **0x17** (entry, `arg1` scene): `+0x2bc` = 1, actor 301 DoCommand 1,
+  `+0x2a4` = scene; 91..93 holding: request 5, inactive, home −1, fighter cleared. 0..3,
+  0xb..0xd, 0x32..0x36, 500, 501 go to the held character's DoCommand; others are ignored.
+- **Method:** decompile.
+- **Confidence:** proven
+
+### E-1720 — The cursor's pictures: kind = picture slot; load, draw, colour key, top-left hotspot (resolves Q-0900)
+- **Binary/file:** CFXMouse (factory type 2, ctor `FUN_00444930`, vtable `0x490820`: load
+  `0x444b60`, draw `0x445570`, update `0x445440`, message `0x446210`); CFXSprite (vtable
+  `0x4908ec`, ctor `0x44c800`, create-from-file `0x44ed90`, position `0x44da00`/`0x44e0d0`,
+  size `0x44dfd0`, colour key `0x44e1a0`/`0x44e100`/`0x44e1b0`); constants `0x490848` = 2.6,
+  `0x490844` = 0.3925, `0x49081c` = π; `UI/002_Cursor/002_Cursor.atx`.
+- **Evidence:** the mouse owns an array of 25 sprites (`+0x12c`, stride 0x318), indexed by
+  the kind `+0x130`. Load reads four ints (`2 1 1 9` in the file), then the nine names into
+  slots 1..8 and, for the ninth (`arrow1_.tga`), the name cut at its first `'1'` and
+  formatted `%s%s%d_.tga` for 1..16 into slots 9..24 (loop `0x1bd8..0x4d58`). Slot 0 is
+  unused. Each picture: CreateFromFile loads `<base>0000.<ext>`, `0001`, … while files exist
+  (up to 100 frames); colour key COLORREF −1 = the colour of pixel (0,0) of the first frame,
+  set as the source colour key on every frame; slots 1..8 also get `+0x10c` = 1 (arrows only
+  `+0x110`). Kinds: 1 default, 2 grabing, 3 pointpush, 4 pull, 5 push, 6 stop, 7 attack,
+  8 itemglitter, 9..24 arrow1_..arrow16_. Draw (when `+0x110` visible): kind −1 nothing;
+  kind 0 = the held item's (`+0x140`) icon sprite (item `+0x134`); else slot[kind]; placed
+  with its top-left at the mouse point `+0x158/+0x15c` (dest rect = point .. point + size:
+  the hotspot is the top-left corner). While `+0x14c` > 0 slot 8 (itemglitter) is drawn too,
+  at mouse − (16,16); `FUN_00446330` sets it to 10, the update counts it down. Arrow kind
+  each update (only while kind is 9..24 and actor 3 exists): 9 + trunc(angle × 2.6 −
+  0.3925), angle = `+0x154` (E-0817) in 0..2π, so straight below the player = 9 + 7
+  (arrow8_), above = arrow1_/arrow16_. No kind 25 exists; PlayerControl (`FUN_004473c0`)
+  treats kinds 9..25 as "walk cursor" (an off-by-one bound, harmless).
+- **Method:** decompile (dump + `def_and_decomp.py` for `0x444b60`, `0x446210`); constants
+  read in PyGhidra.
+- **Confidence:** proven (mapping, placement, key); the frame timing is Q-1710.
+
+### E-1721 — Who sets the cursor kind
+- **Binary/file:** `FUN_00446130` (set kind unless 0), `FUN_00446150` (hold item / −1),
+  `FUN_004461a0` (hover kind), mouse update `0x445440`, message `0x446210`, call sites
+  `0x447145`, `0x4591ec`, `0x45922e`, `0x438c00`, `0x43e0f1/0x43e101`, `0x43e19e/0x43e1ad`.
+- **Evidence:** **Hold** (`FUN_00446150 n`): `+0x140` = n, hover timer 0; n = −1 → kind 9
+  (walk arrow); else kind 0 (the item's icon) and the item gets State 6. **Hover**
+  (`FUN_004461a0 k`, ignored while an item is held): on the first hover the current kind is
+  saved (`+0x138`, flag `+0x134`), kind = k, timer `+0x160` = 8; the update counts the timer
+  down and at 0 restores the saved kind. So a hover kind lasts while it is re-sent every
+  update and reverts 8 updates after the mouse leaves. Senders: a type-0x19 trigger under
+  the mouse → 2 (`0x4591ec`, `0x45922e`, constant push 2: triggers carry no cursor field);
+  an item in reach → 2 (E-0900); the inventory panel: over the panel 1, over a filled slot
+  2 (`0x438c00`); PlayerControl: Ctrl held (GetAsyncKeyState 0x11) and the character armed
+  (`+0x48`) → 7 attack (`0x447145`). Panel open/close (`0x43e0a0`, `0x43e160`): hold −1
+  then kind 1 (default pointer). Message 0x23: drop held, kind 9; 2/3 show/hide; 0x1a puts
+  the system cursor on the player. A click while holding arms `+0x144` = 16 (`0x445660`);
+  16 updates later, if no handler took it (`+0x148` 0), an item still in State 6 is dropped
+  (`FUN_0043c340`) and kind = 9. No code found that sets kinds 3..6 (pointpush, pull, push,
+  stop) by constant; `sword_*` and `attack_ready_*` files are not in the cursor's list.
+  PlayerControl walks only while the kind is a walk arrow (9..25).
+- **Method:** decompile; disassembly of the SafeDisc-broken call sites (PyGhidra).
+- **Confidence:** proven for the listed setters; kinds 3..6 unused is a search result
+  (call sites of the three setters), not a proof (Q-1710).

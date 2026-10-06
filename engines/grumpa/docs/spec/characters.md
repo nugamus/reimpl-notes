@@ -72,3 +72,22 @@ and at home, every update adds 0.46 to an accumulator; past 1.0 it loses 1.0 and
 steps; at the clip's last frame the frame goes to 0 and the next queued clip (if any) starts,
 so the idle loops at 23 frames a second. The per-frame motion table the update also applies
 is Q-0601.
+
+## Attachments (E-1700, E-1300)
+
+Each attachment entry is `{.ANB, .tga, face, attack bonus, defence bonus}`: `face` is a
+face index of the body mesh, the bonuses go to state slots 2 and 3 while worn. A worn flag per
+entry (start 0, saved in the status) is set by `wear(k, on)`: groups {0, 5} (shields) and
+{1..4} (weapons) hold one worn entry each. Grumpa (10): 0 Shield (face 593, def 20),
+1 Father's Sword (592, att 10), 2 Hammer (592, att 8), 3 Sword of Might (592, att 20),
+4 Father's Sword broken (592, att 6), 5 Wooden Shield (593, def 5).
+
+Drawing, before the body, for every worn entry k, in any clip:
+- p, n = position and normal of the vertex the body's index buffer names first for face
+  `face_k`, in the current clip at its current frame (the GPU vertex is the corner's UV slot,
+  which carries the corner's position vertex, see E-1700).
+- pitch = acos(n.y), negated if n.z < 0; yaw = 0, but for shields (k = 0, 5) yaw = acos(n.y),
+  negated if n.y < 0; roll = 0.
+- world = YawPitchRoll(yaw, pitch, 0) translated to p, then times the character matrix
+  (its yaw-pitch-roll orientation, at position + (0, `+0x178`, 0)); row vectors, D3D order.
+- draw the attachment `.ANB` at frame 0 (it never animates) with its `.tga`.

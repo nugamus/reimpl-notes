@@ -68,6 +68,13 @@ tick). Request −1 stops there; any other clears the queue and pushes, by the c
 
 1. The frame steps; past the clip's last frame it is 0 and the queue's next slot plays (an
    empty queue loops the clip).
+   **Idle fidget (E-1740)**: the front is popped only when the queue holds more than one slot,
+   so the last one repeats. At each clip start, a counter `[0x4a8]` goes +1 if the new clip is
+   0 and to 0 otherwise. When it passes 10 (the 11th idle start in a row) it goes back to 0 and,
+   if slot 0x1f is loaded, the queue becomes 0x1f, 0x20: the current idle plays out, S01 plays
+   once, then S02 (0x20) loops until a request (walk or run from 0x20 plays 0x21 first). No
+   randomness; every character, not only the player. Requests leave the counter alone
+   (request 5 doesn't count as a start); a spawned character starts at 9, a new one at 0.
 2. One yaw step, except in clips 8, 0xc and 0x12..0x14.
 3. **Root motion**: unless the clip is 0, the clip's `.amb` record for the frame `(x, y, z)` is
    the move: `dx = z·sin(yaw) + x·cos(yaw)`, `dz = z·cos(yaw) − x·sin(yaw)` (local +z forward;

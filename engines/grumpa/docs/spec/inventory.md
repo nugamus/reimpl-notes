@@ -72,6 +72,38 @@ left click on the hotspot while holding the right item runs the guarded commands
 (42 to another item) or keep it. Help.txt: clicking where nothing reacts drops the held
 item beside Grumpa (needs a player character; Q-0202).
 
+## The cursor's picture
+
+The cursor shows one picture chosen by its kind (E-1720). Pictures come from
+`UI/002_Cursor/` in the order of `002_Cursor.atx`. Each picture is every numbered frame
+that exists from `<base>_0000` up. Its colour key is the colour of the first frame's
+pixel (0,0). The picture is drawn with its **top-left corner at the mouse point**.
+
+| Kind | Picture | Set by (E-1721) |
+|---|---|---|
+| −1 | nothing | the start state (Q-1710) |
+| 0 | the held item's icon | taking an item onto the cursor |
+| 1 | `default_*` | opening or closing the inventory panel; hovering the panel |
+| 2 | `grabing_*` | hovering a trigger, an item in reach (E-0900), or a filled panel slot |
+| 3..6 | `pointpush`, `pull`, `push`, `stop` | no setter found (Q-1710) |
+| 7 | `attack_*` | Ctrl held while the player's character is armed |
+| 8 | `itemglitter_*` | not used as a kind (see the glitter overlay below) |
+| 9..24 | `arrow1_.tga` .. `arrow16_.tga` | the default with nothing held: dropping or putting back an item, message 0x23 |
+
+- **Walk arrow:** each update, while the kind is 9..24 and a player character exists,
+  kind = 9 + trunc(angle × 2.6 − 0.3925). The angle (E-0817) runs from 0 to 2π, and the
+  cursor straight below the player gives `arrow8_`. Walking by click needs a walk-arrow
+  kind.
+- **Hover** (kinds 1, 2, 7) is ignored while an item is held. The first hover saves the
+  current kind. Each hover re-arms an 8-update timer, and when the timer runs out the saved
+  kind comes back. So the hover picture stays while the hover is sent every update.
+- **Glitter overlay:** for 10 updates after it is armed (by `0x4263c0`, whose exact trigger is not yet known: Q-1710), `itemglitter` is also drawn at
+  the mouse point − (16, 16).
+- **Click while holding:** if nothing takes the item within 16 updates, the item is dropped
+  beside Grumpa and the kind returns to 9.
+- Triggers carry no cursor field: every hotspot shows `grabing`. The `sword_*` and
+  `attack_ready_*` files are not in the cursor's list.
+
 ## The inventory panel (actor 90, E-0504)
 
 From the first block of `UI/090_Inventory/090_Inventory.atx`: hidden and inactive at start,

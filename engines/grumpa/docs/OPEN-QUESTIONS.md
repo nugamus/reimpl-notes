@@ -386,7 +386,7 @@ not move in the engine (Q-0403), so a click keeps standing in for walking into t
   `arrow1_`).
 - **What we checked:** the setter; not the cursor's draw, which maps the kind to a picture.
 - **Blocks:** nothing: the engine shows `grabing` over hotspots and items, `default` else.
-- **Status:** open
+- **Status:** resolved (2026-10-06, E-1720, E-1721): kind k = picture slot k (1 default, 2 grabing, 7 attack, 9..24 arrows).
 
 ### Q-0500 PARTLY RESOLVED (2026-10-06, E-0800..E-0804)
 The walk mesh code reads only vertex floats 0..2; floats 3..7 (normal (0,1,0) and two more,
@@ -500,4 +500,26 @@ c16, `[5]==0`), so a companion hint line or trigger waits until he stops talking
 - **Next lead:** callers of `FUN_0041e0d0` with constants 0x2e..0x30 (type 0x1c actors or
   global2.atx); for positions, trace scene 40 entering with Grumpa on the bear.
 - **Blocks:** enemy engagement order; exact mount placement.
+- **Status:** open
+
+### Q-1420 — Combat: actor 301, the hit-reaction clip, the meaning of clips 35..37
+- **Context:** E-1430..E-1433: the first engaged fighter sends DoCommand 0 to actor 301, the
+  last released one DoCommand 1 (combat music or HUD, not identified). Neither hit path
+  (E-1432) requests the hit clip 0x17 (`023_N2H2N`); who plays it on a Life minus (score to
+  character?) is not traced. Fighters request `.anb` 35..37 (S05..S07) at 140..180 units and
+  as 1/3 of close-range choices (taunt or guard, known by name only).
+- **Next lead:** actor 301's class in the global `.atx`/`.abi`; the score's DoCommand 0x33 path
+  to the character; the character update where clip 0x17 starts (`+0x474` = 1).
+- **Status:** open
+
+### Q-1710 — Cursor picture animation timing; kinds 3..6; the cursor's initial kind
+- **Context:** E-1720/E-1721. CFXSprite steps a frame every (timer rate / `+0x1e0`) updates
+  (`+0x1e0` = 50 by default, `0x44da50`) only while `+0x1d0` (playing) is 1, with loop modes
+  in `+0x1e4` (`0x44dd80`); the cursor never starts its sprites explicitly. The kind after
+  load is the ctor's −1 (draws nothing) until a hold/message sets it; the four ATX ints
+  (`2 1 1 9`) are read but their targets were not traced. `+0x11c`'s `+0x104` gets the kind
+  (1 for arrows) every update: unknown object.
+- **Next lead:** `0x40a990` targets in `0x444b60` (disassembly); sprite `+0x128`/`+0x1cc`;
+  raw scan for `mov [reg+0x130], 3..6` on the mouse.
+- **Blocks:** nothing: show frame 0 of each picture; 9 at scene start.
 - **Status:** open
