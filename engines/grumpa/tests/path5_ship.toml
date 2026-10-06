@@ -4,5 +4,6 @@ timeout = 200
 args = ["-d1"]
 
 [keys]
+random_seed = "1"
 path = "C:/Users/Nugamus/Desktop/Code Projects/Game Reimplementations/games/grumpa/discs/cd"
 grumpa_vm = "58;go 101;ticks 60;where;click 560 200;ticks 300;where;op 640 1 0 0;ticks 2;snap {out}/path5_deck.png;ticks 1500;where;ticks 300;where;snap {out}/path5_end.png"
