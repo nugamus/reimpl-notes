@@ -76,3 +76,6 @@ engines/x3d/traces/inv/
 CLAUDE.md
 .claude/
 .mcp.json
+
+# Stray copy of a play build (old quoting bug in build_play.sh)
+/tools/play/C*/
