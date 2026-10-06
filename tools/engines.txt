@@ -1,0 +1,6 @@
+# One line per engine: <engine> <game folder(s) under games/>. Every tool reads this list.
+x3d monet
+peintre mission-sunlight
+ring ring
+gilbert gilbert
+grumpa grumpa

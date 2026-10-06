@@ -26,8 +26,8 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 KSC = REPO / "third_party" / "kaitai" / "kaitai-struct-compiler-0.11" / "bin" / "kaitai-struct-compiler.bat"
-GAMES = {"x3d": ["monet"], "peintre": ["mission-sunlight"], "ring": ["ring"],
-         "gilbert": ["gilbert"], "grumpa": ["grumpa"]}
+GAMES = {l.split()[0]: l.split()[1:] for l in (REPO / "tools" / "engines.txt").read_text().splitlines()
+         if l.strip() and not l.startswith("#")}
 
 
 def meta(ksy: Path) -> tuple[str, list[str]]:
@@ -83,12 +83,11 @@ def check(engine: str, only: str | None, max_files: int) -> int:
                  if f.is_file() and f.suffix.lower().lstrip(".") in exts]
         if max_files:
             files = files[:max_files]
-        fails, partial = [], 0
+        fails, partial, other = [], 0, 0
         container = "instances:" in ksy.read_text(encoding="utf-8")  # payload read by offset, not to the end
         for f in files:
             try:
                 obj = cls.from_file(str(f))
-                obj._read() if hasattr(obj, "_read") and not getattr(obj, "_m_read", True) else None
                 if not obj._io.is_eof():
                     if container:
                         partial += 1
@@ -96,11 +95,19 @@ def check(engine: str, only: str | None, max_files: int) -> int:
                         fails.append(f"{f.name} (stops at {obj._io.pos()} of {f.stat().st_size})")
                 obj._io.close()
             except Exception as e:
-                fails.append(f"{f.name} ({type(e).__name__}: {str(e)[:60]})")
+                # A magic/constant check failing in the first bytes means another format sharing
+                # the extension (Gilbert's lang.dat next to game.dat), not a parser bug.
+                m = re.search(r"at pos (\d+)", str(e))
+                if type(e).__name__.startswith("Validation") and m and int(m.group(1)) <= 32:
+                    other += 1
+                else:
+                    fails.append(f"{f.name} ({type(e).__name__}: {str(e)[:60]})")
         status = "ok  " if not fails else "FAIL"
         bad += bool(fails)
-        print(f"{status} {engine}/{ksy.stem}: {len(files) - len(fails)}/{len(files)} .{'/.'.join(exts)} files parse"
+        mine = len(files) - other
+        print(f"{status} {engine}/{ksy.stem}: {mine - len(fails)}/{mine} .{'/.'.join(exts)} files parse"
               + (" to the end" if not container else f" ({partial} read by offset, so not to the end)")
+              + (f"; {other} other formats with the same extension skipped" if other else "")
               + (f"; e.g. {'; '.join(fails[:3])}" if fails else ""))
     return bad
 

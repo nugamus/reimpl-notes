@@ -8,7 +8,7 @@
 set -e
 REPO=/c/scummvm
 REMOTE=fork
-ALL="x3d peintre ring gilbert grumpa"
+ALL="$(grep -v '^#' "$(dirname "$0")/engines.txt" | cut -d' ' -f1 | paste -sd' ' -)"
 ENGINES=${*:-$ALL}
 HERE=$(cd "$(dirname "$0")" && pwd)
 g() { git -C "$REPO" "$@"; }

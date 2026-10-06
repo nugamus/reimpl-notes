@@ -17,7 +17,7 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
-ENGINES = ["x3d", "peintre", "ring", "gilbert", "grumpa"]
+ENGINES = [l.split()[0] for l in (Path(__file__).resolve().parents[2] / "tools" / "engines.txt").read_text().splitlines() if l.strip() and not l.startswith("#")]
 GIT = "git"
 
 

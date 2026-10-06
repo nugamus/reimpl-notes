@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-ENGINES = ["x3d", "peintre", "ring", "gilbert", "grumpa"]
+ENGINES = [l.split()[0] for l in (Path(__file__).resolve().parents[1] / "tools" / "engines.txt").read_text().splitlines() if l.strip() and not l.startswith("#")]
 CLASS = re.compile(r"^\s*(?:class|struct)\s+(\w+)\s*(?::[^{;]*)?\{", re.M)
 
 

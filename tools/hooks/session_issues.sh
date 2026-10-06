@@ -3,7 +3,8 @@
 # many issues wait for the user's decision (agents leave those alone), so no session
 # starts without seeing them. Issues: github.com/nugamus/reimpl-notes. Silent when offline.
 R=nugamus/reimpl-notes
-ENGINES='map(.name) | map(select(. == "x3d" or . == "peintre" or . == "ring" or . == "gilbert" or . == "grumpa")) | first // "other"'
+NAMES=$(grep -v '^#' "$(dirname "$0")/../engines.txt" | cut -d' ' -f1 | sed 's/.*/"&"/' | paste -sd, -)
+ENGINES="map(.name) | map(select(. as \$n | [$NAMES] | index(\$n))) | first // \"other\""
 list() { # <search> -> "engine<TAB>#n title" lines
 	gh issue list -R "$R" --state open --limit 200 --search "$1" --json number,title,labels \
 		--jq ".[] | \"\(.labels | $ENGINES)\t#\(.number) \(.title)\"" 2>/dev/null

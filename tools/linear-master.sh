@@ -10,7 +10,7 @@
 set -e
 REPO=${REPO:-/c/scummvm}
 REMOTE=${REMOTE:-fork}
-ENGINES=${ENGINES:-x3d peintre ring gilbert grumpa}
+ENGINES=${ENGINES:-$(grep -v '^#' "$(dirname "$0")/engines.txt" | cut -d' ' -f1 | paste -sd' ' -)}
 HERE=$(cd "$(dirname "$0")" && pwd)
 g() { git -C "$REPO" "$@"; }
 OWN_PATHS="README.md .github/workflows/engines.yml"
