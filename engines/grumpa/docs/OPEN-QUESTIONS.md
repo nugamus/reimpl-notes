@@ -600,3 +600,11 @@ actor 301, clips 35..37 by meaning, `+0x474/+0x478`, the trigger gate's bit 4 (Q
 - **Next lead:** decompile `FUN_0042f290` and the fade's DoCommand for that call.
 - **Blocks:** nothing in the data.
 - **Status:** open
+
+### Q-1601 — The floor type after a move is undone
+- **Context:** E-0803/E-1660: the character update sets the floor type `+0x450` from the new
+  face before the back-to-old checks (off the mesh, step limit, closed wall, a boat off type 13).
+  Whether a move that is undone also restores `+0x450` is not read.
+- **What we checked:** the order in E-1660 only.
+- **Blocks:** nothing seen: the engine keeps the old type on an undone move (`character.cpp`).
+- **Status:** open
