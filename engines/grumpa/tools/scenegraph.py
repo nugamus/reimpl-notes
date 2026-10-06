@@ -299,13 +299,42 @@ def selftest() -> None:
     print("selftest ok")
 
 
+def write_graph(scenes: dict) -> Path:
+    """The scene graph in the engine-independent format tools/route.py reads
+    (engines/<engine>/notes/graph.json): nodes are scenes; an edge is a trigger whose command
+    list goes to another scene, with the harness input that fires it (grumpa_vm syntax:
+    click the polygon's centre, then let the fade run) and whether conditions guard it."""
+    import json
+    edges = []
+    for n, s in sorted(scenes.items()):
+        for tid, trig in sorted(s["triggers"].items()):
+            navs, _ = exits_of(trig)
+            if not navs or not trig["poly"]:
+                continue
+            cx = round(sum(p[0] for p in trig["poly"]) / len(trig["poly"]))
+            cy = round(sum(p[1] for p in trig["poly"]) / len(trig["poly"]))
+            for dest, guarded in navs:
+                edges.append({"from": str(n), "to": str(dest), "guarded": guarded,
+                              "action": f"trigger {tid} at ({cx}, {cy})",
+                              "input": f"click {cx} {cy};ticks 80"})
+    out = REPO / "engines/grumpa/notes/graph.json"
+    out.write_text(json.dumps({"engine": "grumpa", "start": "1",
+                               "nodes": [str(n) for n in sorted(scenes)], "edges": edges},
+                              indent=1), encoding="utf-8")
+    return out
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("root", nargs="?", default=str(CORPUS))
     ap.add_argument("--selftest", action="store_true")
+    ap.add_argument("--graph", action="store_true", help="write notes/graph.json for tools/route.py")
     args = ap.parse_args()
     if args.selftest:
         selftest()
+    elif args.graph:
+        out = write_graph(build(Path(args.root)))
+        print(f"wrote {out}")
     else:
         root = Path(args.root)
         scenes = build(root)

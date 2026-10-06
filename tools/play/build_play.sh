@@ -13,7 +13,7 @@ BRANCH=$ENGINE-dev
 SRC=/c/scummvm-play-$ENGINE
 OUT=$2
 WIN_OUT=$(cygpath -m "$OUT")
-FLAGS="--disable-all-engines --enable-engine=$ENGINE --enable-optimizations --disable-debug"
+FLAGS="--disable-all-engines --enable-engine=$ENGINE --enable-optimizations --disable-debug --enable-eventrecorder"
 COMMIT=$(git -C /c/scummvm rev-parse "$BRANCH")
 if [ ! -d "$SRC" ]; then
 	git -C /c/scummvm worktree add --detach "$SRC" "$BRANCH"

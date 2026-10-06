@@ -33,7 +33,14 @@ grep -nE '\bstd::|\bthrow\b|\btry *\{|\bcatch *\(|dynamic_cast<|typeid\(' $files
 grep -nE "\b0[bB][01]+\b|[0-9]'[0-9]{3}|\[\]\(auto|decltype\(auto\)|std::make_unique" $files |
 	while read -r l; do echo "HARD $l: C++14 or later"; done | tee -a /tmp/lint-hard
 grep -nE '\b(printf|fprintf|puts)\(' $files | while read -r l; do echo "soft $l: use debug()/warning()"; done
+# Clean room (rule 3): names only a decompiler produces must never appear in engine code.
+grep -nE '\b(FUN|DAT|LAB|PTR|SUB|UNK|thunk_FUN)_[0-9a-fA-F]{6,8}\b|\b[iu]Var[0-9]+\b|\b(param|local|in_stack|extraout_[A-Z]+|unaff_[A-Z]+)_[0-9a-fA-F]+\b|\bcVar[0-9]+\b|\bbVar[0-9]+\b|\bsVar[0-9]+\b|\bpvVar[0-9]+\b' $files |
+	while read -r l; do echo "HARD $l: decompiler-generated name (clean room, rule 3)"; done | tee -a /tmp/lint-hard
 hard=$((hard + $(wc -l < /tmp/lint-hard)))
+# Endianness: reading file data through a pointer cast breaks on big-endian ScummVM ports;
+# use READ_LE_UINT32 / stream readUint32LE (soft: some casts are of our own structs).
+grep -nE '\*\s*\(\s*(const\s+)?(u?int(16|32|64)|uint(16|32)|int(16|32))\s*\*\s*\)\s*\(?\s*[a-zA-Z_]' $files |
+	grep -vE 'READ_|WRITE_|getBasePtr|getPixels' | while read -r l; do echo "soft $l: raw pointer cast of data, check endianness (READ_LE_*/readUint*LE)"; done
 
 # Commits on the dev branch that would be published (everything but the DEV commit).
 while read -r sha subject; do

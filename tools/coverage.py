@@ -7,7 +7,8 @@ and prints one coverage line per program. Kinds:
   lib       recognised library code (Function ID names: CRT, STL, MFC)
   lib?      unnamed, but inside a 64 KB block that is mostly recognised library code
             (MSVC links the libraries as one block, after the game's own objects)
-  specced   game code whose address is cited in EVIDENCE.md
+  summarized game code with a one-line summary (tools/summary.py), shown in the last column
+  specced   game code whose address is cited in EVIDENCE.md (as 0x... or FUN_...)
   named     game code with a name we gave it (no evidence cited yet)
   unknown   game code nobody has looked at: where reverse engineering should go
 
@@ -31,7 +32,8 @@ def is_library_name(name: str) -> bool:
     return not GAME_NAME.match(name) and "::" not in name and not name.startswith("CFX")
 
 
-def triage(rows: list[dict], cited: set[int]) -> list[dict]:
+def triage(rows: list[dict], cited: set[int], summarized: dict[int, str] | None = None) -> list[dict]:
+    summarized = summarized or {}
     blocks = defaultdict(lambda: [0, 0])
     for r in rows:
         b = blocks[r["addr"] >> 16]
@@ -43,6 +45,8 @@ def triage(rows: list[dict], cited: set[int]) -> list[dict]:
             r["kind"] = "lib"
         elif r["addr"] >> 16 in lib_blocks and GAME_NAME.match(r["name"]):
             r["kind"] = "lib?"
+        elif r["addr"] in summarized:
+            r["kind"] = "summarized"
         elif r["addr"] in cited:
             r["kind"] = "specced"
         elif not GAME_NAME.match(r["name"]):
@@ -56,11 +60,24 @@ def cited_addresses(engine: str) -> set[int]:
     ev = REPO / "engines" / engine / "docs" / "EVIDENCE.md"
     if not ev.exists():
         return set()
-    return {int(m, 16) for m in re.findall(r"0x([0-9a-fA-F]{6,8})\b", ev.read_text(encoding="utf-8"))}
+    text = ev.read_text(encoding="utf-8")
+    return {int(m, 16) for m in re.findall(r"(?:0x|FUN_)([0-9a-fA-F]{6,8})\b", text)}
+
+
+def summaries(engine: str) -> dict[int, str]:
+    p = REPO / "engines" / engine / "notes" / "summaries.tsv"
+    out = {}
+    if p.exists():
+        for line in p.read_text(encoding="utf-8").splitlines()[1:]:
+            f = line.split("\t")
+            if len(f) >= 4:
+                out[int(f[1], 16)] = (f"{f[2]}: " if f[2] else "") + f[3]
+    return out
 
 
 def main(engine: str) -> int:
     cited = cited_addresses(engine)
+    summ = summaries(engine)
     dumps = sorted((REPO / "engines" / engine / "notes" / "decomp").glob("**/INDEX.tsv"))
     if not dumps:
         print(f"{engine}: no INDEX.tsv; run decompile_all.py first")
@@ -72,15 +89,16 @@ def main(engine: str) -> int:
             if len(f) < 4 or not re.fullmatch(r"[0-9a-fA-F]+", f[0]):
                 continue  # blank, or a stray piece of an old dump's string column
             rows.append({"addr": int(f[0], 16), "name": f[1], "bytes": f[2], "callers": f[3]})
-        rows = triage(rows, cited)
+        rows = triage(rows, cited, summ)
         out = index.with_name("TRIAGE.tsv")
-        out.write_text("address\tname\tkind\tbytes\tcallers\n" + "".join(
-            f"{r['addr']:08x}\t{r['name']}\t{r['kind']}\t{r['bytes']}\t{r['callers']}\n" for r in rows), encoding="utf-8")
+        out.write_text("address\tname\tkind\tbytes\tcallers\tsummary\n" + "".join(
+            f"{r['addr']:08x}\t{r['name']}\t{r['kind']}\t{r['bytes']}\t{r['callers']}\t{summ.get(r['addr'], '')}\n"
+            for r in rows), encoding="utf-8")
         n = defaultdict(int)
         for r in rows:
             n[r["kind"]] += 1
-        game = n["specced"] + n["named"] + n["unknown"]
-        print(f"{engine} {index.parent.relative_to(REPO)}: {game} game functions, {n['specced']} specced, "
+        game = n["summarized"] + n["specced"] + n["named"] + n["unknown"]
+        print(f"{engine} {index.parent.relative_to(REPO)}: {game} game functions, {n['summarized']} summarized, {n['specced']} specced, "
               f"{n['named']} named, {n['unknown']} unknown ({100 * (game - n['unknown']) // max(game, 1)}% looked at); "
               f"{n['lib'] + n['lib?']} library ({n['lib?']} by block) -> {out.name}")
     return 0

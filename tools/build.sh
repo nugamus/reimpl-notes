@@ -15,7 +15,7 @@ fi
 SRC=/c/scummvm-dev/$ENGINE
 [ -d "$SRC" ] || { echo "no worktree $SRC (git -C /c/scummvm worktree add $SRC $ENGINE-dev)"; exit 1; }
 cd "$SRC" || exit 1
-FLAGS="--disable-all-engines --enable-engine=$ENGINE --enable-optimizations"
+FLAGS="--disable-all-engines --enable-engine=$ENGINE --enable-optimizations --enable-eventrecorder"
 if ! grep -q "^SAVED_CONFIGFLAGS *:= $FLAGS\$" config.mk 2>/dev/null; then
 	./configure $FLAGS > configure.log 2>&1 || { tail -20 configure.log; exit 1; }
 fi

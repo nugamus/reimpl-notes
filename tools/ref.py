@@ -37,6 +37,7 @@ SOURCES = [
     ("ours", REPO / "engines", "*/docs/**/*.md"),
     ("ours", REPO / "engines", "*/docs/**/*.ksy"),
     ("ours", REPO / "engines", "*/CLAUDE.md"),
+    ("ours", REPO / "engines", "*/notes/summaries.tsv"),
     ("ours", REPO / "games", "*/docs/**/*.md"),
     ("ours", REPO / "docs", "**/*.md"),
     ("scummvm-src", SCUMMVM, "video/*.h"),

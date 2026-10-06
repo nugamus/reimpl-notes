@@ -1,0 +1,7 @@
+program	address	name	summary	evidence
+GRUMPA_NOCD.EXE	004106c0	CFXActorFactory::CreateFromATXFile	Creates an actor from its .atx file	E-0504
+GRUMPA_NOCD.EXE	00437d00	CFXInventory::DoCommand	Inventory panel: handles commands sent to actor 90 (open/close on right click, take, give)	E-0504
+GRUMPA_NOCD.EXE	00438500	CFXInventory::Draw	Inventory panel: draws the nine slots and two equipment slots	E-0504
+GRUMPA_NOCD.EXE	00438660	CFXInventory::Layout	Inventory panel: lays out slot rectangles	E-0504
+GRUMPA_NOCD.EXE	004387d0	CFXInventory::Add	Adds an item to the inventory: counters for coins and drops, no duplicates, first free slot, else inventory full	E-0504
+GRUMPA_NOCD.EXE	004388e0	CFXInventory::Serialize	Inventory panel (actor type 4): reads and writes its state (Serialize)	E-0504
