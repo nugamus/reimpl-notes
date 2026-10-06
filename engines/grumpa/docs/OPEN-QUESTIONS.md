@@ -479,9 +479,25 @@ The "talking flag" is the speaker character's state slot 5 (1 while one of its l
 No animation, mouth or input code reads it; event conditions do (31, all on the companion
 c16, `[5]==0`), so a companion hint line or trigger waits until he stops talking.
 
+### Q-1400 — Combat leftovers: death callback and the hit-clip side effects
+- **Context:** E-1403: `FUN_00425e30` runs when the death timer `+0x47c` (= N2D's F) ends;
+  clip 0x17 start sets `+0x474` = 1 and zeroes `+0x11c` of `[DAT_004ba74c + 0xc]`; `+0x478`
+  is 1 for the five characters whose body stays. None of these were read.
+- **Blocks:** what a killed enemy leaves behind (drops, score, reactions).
+- **Status:** open
+
 ### Q-0810 RESOLVED
 - E-1600: the platform list is filled on scene entry (op 0x17) by flagged 0x1a actors after
   the floor clears it; Move tests pos+delta against each active platform's frame-0 faces
   (uv-index triples into the vertex buffer, all sections, the floor's face test), takes the
   current frame's y of the face's first corner as height (y = 0.4·y + 0.6·h), no x/z riding;
   the character allows +80 steps and floor type 15 on a platform.
+
+### Q-1500 — Who sends the combat roles 0x2e/0x2f/0x30 and where a scripted mount stands
+- **Context:** E-1500: these ops never occur in scene data; 0x4b does (bosses), 0x54 comes
+  from `FUN_00430960`. E-1502: scene mounts (`0x2c` to 12/13/88) set no position; the form
+  stands wherever its home/position put it (Characters.abi or an earlier 0x29/0x47).
+- **Next lead:** callers of `FUN_0041e0d0` with constants 0x2e..0x30 (type 0x1c actors or
+  global2.atx); for positions, trace scene 40 entering with Grumpa on the bear.
+- **Blocks:** enemy engagement order; exact mount placement.
+- **Status:** open

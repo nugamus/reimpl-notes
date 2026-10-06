@@ -1996,6 +1996,156 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** decompile.
 - **Confidence:** proven for the branches; `FUN_0044c6e0`'s exact test not read.
 
+### E-1740 — The idle fidget: counter `+0x4a8`, 11 idle cycles, queue 0x1f then 0x20 (looping)
+- **Binary/file:** character update `0x421a60` (clip-change block, labels near `0x421def`, `0x421e51`; decompile
+  lines 102..217); ctor `0x41c9b0` (sets `+0x4a8` = 0); spawn `FUN_0044b120` (sets it to 9).
+- **Evidence:** the counter is `+0x4a8` and is touched only at a clip boundary: when the frame
+  `+0x494` reaches the clip's frame count it goes to 0 and the queue front becomes the clip
+  `+0x434` (previous in `+0x438`); the front is popped only when the queue holds more than one
+  entry, so the last entry repeats. Then: new clip == 0 → counter + 1 (and `+0x178`, `+0x160`,
+  `+0x168` zeroed); any other clip → counter = 0. If counter > 10 (unsigned, i.e. the 11th
+  consecutive start of clip 0): when slot 0x1f is loaded (`[+0x2dc]+0x7c` non-zero) the queue
+  is emptied and 0x1f, 0x20 are pushed (count 2); the counter is set to 0 either way. No
+  rand(), no threshold variation, no 0x21: 0x21 is queued only by a request from 0x20 (E-0813).
+  So the 11th idle cycle plays out, then 0x1f once (popped, counter 0), then 0x20 repeats
+  forever until a request. The clip-start hook (`FUN_00425cc0`) is skipped when 0x20 follows
+  0x20. Requests (`FUN_0041fde0`) never touch `+0x4a8`; request 5 sets clip 0 directly, so it
+  does not count. Same code for every character (no player test); characters without slot
+  0x1f just reset. A spawned character starts at 9: it fidgets after 2 idle cycles.
+- **Method:** decompile (`notes/decomp/GRUMPA.EXE__FUN_00421a60.c`), grep of the dump for `0x4a8`.
+- **Confidence:** proven
+
+### E-1620 — The "talking flag" is the speaker's state slot 5; only conditions read it (Q-0401)
+- **Binary/file:** CFXSound play `FUN_00448f70` / stop `FUN_00449040`; character speech queue:
+  push `FUN_00425cc0` (op 0x48), pump `FUN_00425780` (last call of the character update
+  `FUN_00421a60`), flush `FUN_00425980`, stop-all `FUN_00425950` (character op 0x60,
+  `FUN_0041e0d0`); `FUN_00408ff0` returns `actor + 0x118` (the state-slot vector); sound
+  is-playing `FUN_00449f80`.
+- **Evidence:** the written address is `[slotvec.begin] + 0x67c` with begin = `actor+0x11c`
+  (stride 0x118, value at +0x104, E-0201): 5 × 0x118 + 0x104 = 0x67c, so it is the value of
+  **state slot 5** of the speaker character, not a mesh field (corrects E-0405's wording).
+  A grep of the whole dump for `0x67c` finds only these four writers/one test (`FUN_00425cc0`
+  tests it == 0 before starting a queued line); no animation, mesh, render or input code reads
+  it. Play: if `[0x3ac]` speaker > 0 and the actor exists, `FUN_00425980(speaker)` runs (only
+  when the speaker is not in the current scene, `+0x444 != +0x448`: stop the sound at the
+  front of its speech queue `+0x3d0` and empty the queue), then slot 5 = 1. Stop
+  (`FUN_00449040`, also used by op 0x60 on all 100 slots) sets slot 5 = 0 for a speaker > 0.
+  Pump, each frame step of an active at-home character (after the 0.46 accumulator, E-1312):
+  if the queue is non-empty and the front slot's sound has stopped (`FUN_00449f80` = 0: buffer
+  not playing or `[0x1a0]` = 0), pop it, slot 5 = 0, and if another entry remains, play it
+  and slot 5 = 1. Corpus (`tools/logic.py`): slot 5 is read by 31 conditions, all
+  `c16 Sharlakanskraken[5]==0`, always together with `[4]==2`, on companion hint sounds
+  (`so645 003_sch_beware_cannonbal`, `010_sch_snake`, ...) and walk-in proximity triggers
+  660..673: a new companion line starts only when he is not already talking.
+- **Method:** decompile, grep of `notes/decomp/all` for `0x67c`; corpus condition listing.
+- **Confidence:** proven
+
+### E-1400 — Combat stance (Ctrl) and the attack hit timer of actor 3
+- **Binary/file:** actor 3 update `0x446f70` (`0x4470a9..0x447119`), `FUN_004473c0`,
+  set cursor kind `FUN_004461a0`; floats `0x490640` 0.6.
+- **Evidence:** each actor-3 animation tick (0.46 clock), after the steer angle: when the
+  character's clip-start counter `+0x43c` (incremented by the character update each time a
+  clip starts) differs from actor 3's copy `+0x2b0`: if the new clip `+0x434` is 0x12..0x14
+  the hit timer `+0x2b4` = trunc(F × 0.6), F = the clip's frame count `+0x498`; if it is 0x17
+  (hit) the timer = 0 (an attack interrupted by a hit never lands); the copy is updated.
+  Then, if the timer > 0 it is decremented, and on reaching 0 the hit test `FUN_00446db0`
+  runs (once per attack clip; the setting tick counts as the first). Ctrl (0x11) up →
+  stance `+0x2c4` = 0 (cursor not touched); Ctrl down and the character has clip slot 0x12
+  (`+0x2dc` table `+0x48`) → cursor kind 7 and stance = 1. Space jump needs stance 0. In
+  stance, button events (`FUN_004473c0`) never walk: left held → random 0x12 + rand()%3
+  only while the clip is 0 or 0x20; right held → request 0x15; no left and the clip is 2 or
+  5 → request 2 (stop, run before the right-button test).
+- **Method:** decompile; disassembly of the `__ftol` operand (`FILD [+0x498]`, `FMUL [0x490640]`).
+- **Confidence:** proven
+
+### E-1401 — The player's hit test `FUN_00446db0`: actors 91..94, 140 units, facing dot < −0.8
+- **Binary/file:** `FUN_00446db0` (`0x446db0..0x446f6x`); `FUN_00430b40` (type 0x1c actor →
+  its character id `+0x2a0`); floats `0x490644` 140.0, `0x490650` −0.8 (double), `0x49045c` 0.
+- **Evidence:** for actors 91, 92, 93, 94 (table offsets 0x16c..0x178) that exist and whose
+  character id is not −1 and exists: d = actor 3's copy of the player's position
+  (`+0x150/+0x154/+0x158`) − the character's `+0x16c..+0x174`; if the **3D** length < 140:
+  u = normalize(dx, 0, dz) (from the target towards the player), f = normalize(sin yaw, 0,
+  cos yaw) with yaw = actor 3's copy `+0x148`; if u·f < −0.8 (the target within ≈ 36.9° of
+  the player's forward) → `FUN_00425730(target char, attacker = actor 3's character id,
+  damage = the player character's state slot 2 value)`. `+0x11c` is the state-slot array
+  (stride 0x118, value at +0x104, E-1300), so `+0x21c/+0x334/+0x44c/+0x564` are slots
+  1/2/3/4: damage is slot 2 (attack strength incl. the worn objects 1..4 bonus), not a clip
+  or mesh value. Several targets can be hit by one swing; no sound here.
+- **Method:** decompile; disassembly at `0x446e4d..0x446e9e` shows the y component stored 0.
+- **Confidence:** proven
+
+### E-1402 — Taking damage: `FUN_00425730`, score op 0x33, hit clip 0x17
+- **Binary/file:** `FUN_00425730(target, attacker, damage)`; score DoCommand `FUN_004397a0`
+  case 0x33.
+- **Evidence:** `FUN_00425730` always stores the attacker id in the target's `+0x488` (the
+  type 0x1c controller `FUN_0042ff50` reads it to pick whom to chase). Then, if the target's
+  slot 1 (Life, `+0x21c`) >= 0 and n = damage − target slot 3 (defence, `+0x44c`) > 0 and
+  actor 8 exists: actor 8 DoCommand(0x33, n, target id). Score 0x33 with a character id:
+  that character's slot 1 −= n; if it is still > 0 the character gets request 0x17 (N2H2N,
+  then idle); if the character is the current form the score's Life is reduced too (star 1,
+  `SX_scare`, `docs/spec/score.md`). No invulnerability timer: every swing that passes the
+  hit test and beats the defence costs n.
+- **Method:** decompile.
+- **Confidence:** proven
+
+### E-1403 — Block and death in the character update `0x421a60`
+- **Binary/file:** `notes/decomp/GRUMPA.EXE__FUN_00421a60.c` (clip-start block and the
+  per-tick tail after the floor move).
+- **Evidence:** at each clip start: new clip 0x15 → slot 3 (defence, `+0x11c → +0x44c`) += 5;
+  previous clip `+0x438` was 0x15 → slot 3 −= 5 (so +5 defence exactly while N2D2N plays);
+  new clip 0x17 → `+0x474` = 1 and `[DAT_004ba74c + 0xc] + 0x11c` = 0 (Q-1400). Each
+  animation tick: if slot 1 (Life) < 1 and `+0x47c` == −1: `+0x4ac` (turn steps) = 0,
+  request 4 (clips 8 N2D, 0xc D2D), and if clip slot 8 exists `+0x47c` = its F and `+0x480` =
+  F + 20. `+0x47c` counts down per tick and at 0 runs `FUN_00425e30` (not read, Q-1400);
+  `+0x480` counts down and at 0: active `+0x10c` = 0, visible `+0x110` = 0, home `+0x444` =
+  −1, both timers −1, `+0x478` = 0; except characters 0x13, 0x38, 0x40, 0x45, 0x50: home =
+  current scene `+0x448`, visible = 1, `+0x478` = 1 (the body stays). Roles 3/4/5 then
+  message actors 0xb1..0xb3 (E-1224).
+- **Method:** decompile.
+- **Confidence:** proven for the order; `FUN_00425e30` and `+0x474/+0x478` meaning open.
+
+### E-1700 — Worn attachments: the table's three u32, and how Draw places them
+- **Binary/file:** `CFXCharacter::Draw` `FUN_004226a0` loop `0x422761..0x42295c`;
+  `FUN_00421780` (SetWorn); Serialize `FUN_00422f80` (`0x4231f0` arm, attachment reads);
+  lazy loader `FUN_0041f2b0` (attachment meshes `+0x34c` from names `+0x3ac` by
+  `FUN_004157d0`, class ctor `FUN_00415140` sets frame `+0x11c = 0`; textures `+0x35c` from
+  `+0x3bc`); mesh helpers `FUN_00415310` (copy vertex), `FUN_004166e0` (draw current frame),
+  `FUN_00416680` (advance frame); matrix helpers `FUN_0043d990` (identity), `FUN_0043d8c0`
+  (rotation from (pitch, yaw, roll) via `FUN_00473e71`), `FUN_0043d910` (translation),
+  `FUN_0043d960` (rotation + translation), `FUN_0043d840` (4x4 product A·B); `FUN_0047c9f0`
+  = `acos` (CRT `_CIacos`: `fpatan(sqrt(1-x²), x)`, error name "acos" at `0x4b61c0`);
+  constant `0x49045c` = 0.0. `Actors/Characters.abi` record 10; `Meshes/*Grumpa*.ANB`.
+- **Evidence:** per attachment entry the three u32 are `[0x36c][i]` = a **face index** of the
+  body mesh, `[0x37c][i]` = the weapon bonus SetWorn adds to state slot 2 (`+0x334`),
+  `[0x38c][i]` = the shield bonus added to slot 3 (`+0x44c`) (E-1300). Names go to the
+  vectors `+0x3a8` (.ANB) and `+0x3b8` (.tga). Grumpa (id 10), from the corpus:
+  0 `000_IO_Shield` (593, 0, 20), 1 `001_IO_FathersSword` (592, 10, 0), 2 `002_IO_Hammer`
+  (592, 8, 0), 3 `003_IO_SwordOfMight` (592, 20, 0), 4 `004_IO_FathersSwordBroken`
+  (592, 6, 0), 5 `005_IO_WoodenShield` (593, 0, 5); textures `00k_IT_<same>.tga`. All 26 of
+  Grumpa's clips have 594 faces (592/593 are the last two). Draw, after building the
+  character matrix (yaw-pitch-roll of `+0x160`, translation `(x, y + [0x178], z)` of
+  `+0x16c`) and before the body, for each i with worn flag `[0x39c][i] == 1`: takes the
+  current clip's mesh (`+0x2dc[+0x434]`), reads the index buffer's first index of face
+  `[0x36c][i]` (ushort at `+0x10c + 6·face`, `0x42279f..0x4227ad`) and copies that vertex of
+  the clip's **current frame** (`+0x108 + ((frame·nverts) + index)·0x20`; pos f32×3, normal
+  f32×3 at +0xc). pitch = acos(ny), negated when nz < 0; yaw = 0, except for i = 0 or 5 (the
+  shields): yaw = acos(ny), negated when ny < 0 (`0x4227f5..0x42281f`; it tests ny again, not
+  nx). Local matrix = rotation (yaw, pitch, roll 0) with translation = the vertex position;
+  world = local · character matrix (`0x4228a3`), `SetTransform(WORLD=1, ...)` (`0x4228c1`),
+  texture `+0x35c[i]`, draws mesh `+0x34c[i]` at its frame `+0x11c`, which nothing but the
+  constructor (0) ever sets (only `FUN_0041f2b0`, `FUN_0041fc20` and Draw touch `+0x34c`),
+  so the attachment is static, frame 0. No clip, swim or boat test: any worn flag draws.
+  The loader (`FUN_004157d0`, `0x41611a..0x416641`) builds one GPU vertex per UV slot: the
+  index buffer holds the faces' UV indices (sections concatenated, offsets added), and each
+  slot gets the position/normal of the position vertex its corners name (the last corner
+  writing a slot wins), per frame.
+  Worn flags start 0 (SetDevice zeroes `[0x39c]` with `[0x35c]`); only SetWorn and the
+  status load (mode 4, E-1300) change them.
+- **Method:** decompile + capstone disassembly of `0x42276b..0x42295c`; corpus run of
+  `tools/parsers/abi.py` / `anb.py`.
+- **Confidence:** proven for the rule; acos(ny) for the shield yaw looks like a slip for nx
+  but is what the code does.
+
 ### E-1600 — Platforms: the 0x1a meshes `CFXFloor::Move` walks on (resolves Q-0810)
 - **Binary/file:** `FUN_00433bb0` (Move, platform loop), `FUN_00433250` (face test on given
   arrays), `FUN_00433490` (height, platform branch), `FUN_004536e0` (0x1a → mesh `+0x1b0`),
@@ -2037,27 +2187,79 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   sharing); `ground.ANB`/`down.ANB` (scene 61) not found under `Meshes/` by those names.
 - **Confidence:** proven
 
-### E-1620 — The "talking flag" is the speaker's state slot 5; only conditions read it (Q-0401)
-- **Binary/file:** CFXSound play `FUN_00448f70` / stop `FUN_00449040`; character speech queue:
-  push `FUN_00425cc0` (op 0x48), pump `FUN_00425780` (last call of the character update
-  `FUN_00421a60`), flush `FUN_00425980`, stop-all `FUN_00425950` (character op 0x60,
-  `FUN_0041e0d0`); `FUN_00408ff0` returns `actor + 0x118` (the state-slot vector); sound
-  is-playing `FUN_00449f80`.
-- **Evidence:** the written address is `[slotvec.begin] + 0x67c` with begin = `actor+0x11c`
-  (stride 0x118, value at +0x104, E-0201): 5 × 0x118 + 0x104 = 0x67c, so it is the value of
-  **state slot 5** of the speaker character, not a mesh field (corrects E-0405's wording).
-  A grep of the whole dump for `0x67c` finds only these four writers/one test (`FUN_00425cc0`
-  tests it == 0 before starting a queued line); no animation, mesh, render or input code reads
-  it. Play: if `[0x3ac]` speaker > 0 and the actor exists, `FUN_00425980(speaker)` runs (only
-  when the speaker is not in the current scene, `+0x444 != +0x448`: stop the sound at the
-  front of its speech queue `+0x3d0` and empty the queue), then slot 5 = 1. Stop
-  (`FUN_00449040`, also used by op 0x60 on all 100 slots) sets slot 5 = 0 for a speaker > 0.
-  Pump, each frame step of an active at-home character (after the 0.46 accumulator, E-1312):
-  if the queue is non-empty and the front slot's sound has stopped (`FUN_00449f80` = 0: buffer
-  not playing or `[0x1a0]` = 0), pop it, slot 5 = 0, and if another entry remains, play it
-  and slot 5 = 1. Corpus (`tools/logic.py`): slot 5 is read by 31 conditions, all
-  `c16 Sharlakanskraken[5]==0`, always together with `[4]==2`, on companion hint sounds
-  (`so645 003_sch_beware_cannonbal`, `010_sch_snake`, ...) and walk-in proximity triggers
-  660..673: a new companion line starts only when he is not already talking.
-- **Method:** decompile, grep of `notes/decomp/all` for `0x67c`; corpus condition listing.
+### E-1500 — Character opcodes 0x2e/0x2f/0x30/0x4b/0x54 are combat roles, not mounts
+- **Binary/file:** `CFXCharacter::DoCommand` `FUN_0041e0d0` (cases 0x2e, 0x2f, 0x30, 0x4b,
+  0x54), `FUN_00430960` (type 0x1c actors 91..95, take a character), `FUN_00447790`.
+- **Evidence:** each needs its type 0x1c actor (0x2e → actor 91, 0x2f → 92, 0x30 → 93,
+  0x4b → 94, 0x54 → 95; `DAT_004b9bc4 + 0x16c..0x17c`) and the character's slot 1 (life,
+  mesh `+0x21c`) > 0. It calls `FUN_00430960(actor, own id, x)` with x = actor 3's character
+  id (for 0x54: `arg1`), stores x in `+0x488` (the opponent), home `+0x444` = current scene,
+  active = visible = 1, role `+0x564` = 3, 4, 5, 6, 7 respectively. `FUN_00430960`: if the
+  actor already holds another character, that one gets queued op 1 and role 0; when the
+  global fight counter `DAT_004c018c` goes 0 → 1 it broadcasts op 0x12d (301); counter += 1;
+  actor `+0x2a0` = character, `+0x298` = opponent, actor active/visible = 1; then if actor 4
+  holds a companion, actor 95 is inactive and the companion has clip slot 0x12 (attack),
+  the companion is queued op 0x54 with `arg1` = this character (it fights it as role 7) and
+  actor 4 lets go (`+0x290` = −1). Corpus: only 0x4b (75) occurs in scene data, sent to 34,
+  35, 37, 38, 55 (rat leaders, hyena boss); 0x2e/0x2f/0x30/0x54 come from elsewhere (0x54
+  from the code above). 0x2c also queues `(8, 0x55, own id)` to the score (E-0704).
+- **Method:** decompile; corpus sweep with `tools/events.py` `scenes()`.
+- **Confidence:** proven (which code sends 0x2e..0x30 not located: Q-1500)
+
+### E-1501 — Opcode 0x46 splits a rider form into Grumpa and the mount
+- **Binary/file:** `FUN_0041e0d0` arm at `0x41ea1f..0x41eaef`; `FUN_004219f0`,
+  `FUN_00421940`, `FUN_00426580`, `FUN_004265e0`, `FUN_0041f2b0`, `FUN_004261c0`.
+- **Evidence:** only if kind `+0x128` == 2 and both parts `+0x13c` (rider, Grumpa 10) and
+  `+0x140` (mount) name existing actors. Order: the form's active = visible = 0 (home and
+  role untouched); the mount, then Grumpa, get DoCommand 0x47 with `arg1` = the form's id
+  (each: placed at the form's position, move delta `+0x294` = 30·(sin yaw, 0, cos yaw) with
+  its own yaw, orientation `+0x160..+0x168` copied from the form, home = current scene,
+  active = visible = 1, role 0); both LoadResources (`FUN_0041f2b0`); d = |min x| over the
+  vertices (32-byte records, first float) of the mount's current clip mesh (`FUN_00426580`,
+  start FLT_MAX) + |max x| of Grumpa's (`FUN_004265e0`, start FLT_MIN); Grumpa's move delta
+  is overwritten with the local offset (d, 0, 0) turned by his yaw: (d·cos yaw, 0, −d·sin yaw)
+  (`FUN_00421940`, only if his slot-0 clip exists): he steps sideways by the two half-widths,
+  the mount keeps the 30-unit forward step (deltas go through the floor Move on the next
+  tick, E-0814); then Grumpa gets DoCommand 0x2c (E-0816: the form, still held by actor 3,
+  is queued op 1 and role 0; Grumpa becomes actor 3's character, role 1; score gets
+  `(8, 0x55, 10)`: Life and icon switch to Grumpa); finally `FUN_004261c0(form)` walks the
+  form's `+0x650` command list (copies only; effect opaque). Disassembly: mount = `ebx`
+  first 0x47 at `0x41ea82`, Grumpa `edi` at `0x41ea93`, fabs/fadd at `0x41eaab..0x41eaba`,
+  vector (d, 0, 0) at `0x41eac2..0x41eacd`, 0x2c at `0x41eade`.
+- **Method:** decompile + capstone disassembly of `GRUMPA_NOCD.EXE`; floats `0x4904c4`
+  3.4e38, `0x4904c8` 1.2e−38.
+- **Confidence:** proven
+
+### E-1502 — Mounting is scripted; the pair list `+0x12c` is only loaded and saved
+- **Binary/file:** whole `.text` of `GRUMPA_NOCD.EXE` scanned (capstone) for `[reg+0x12c]`,
+  `+0x130`, `+0x134`; Serialize `FUN_00422f80`, dtor `FUN_0041d320` (`0x41dab0`); scene data.
+- **Evidence:** in the character class the vector `+0x12c` (first `+0x130`, last `+0x134`,
+  8-byte entries) is touched only by the ctor (`0x41c9e7`), Serialize (`0x424160..0x424bbc`)
+  and the destructor (`0x41dab0`); no other code compares kind `+0x128` (only DoCommand 0x46
+  and actor 3's Backspace test). No proximity mount exists. Scenes mount by commands: scene
+  20 `(3,0xc)(3,3)(12,0xb)(12,2)(12,0x2c)` (Grumpa off/hidden via actor 3, dragonfly rider 12
+  on, shown, made the player), scene 40 the same with 10 and 13 (bear), scene 73 with 10 and
+  88 (seahorse). Scene 101 dismounts by script: `(12,0xc)(12,3)(21,0xb)(21,2)(10,0xb)(10,2)
+  (10,0x36,101)(21,0x36,101)(10,0x2c)` (no 0x46), the boat form 11 the same with 27. Op 0x46
+  (70) in data only resets forms on scene entry: `(13,70)(13,0x36,s)(28,0x36,s)...` in many
+  scenes (8, 10, 12, 16, 20, 21, 25, ...).
+- **Method:** disassembly scan; `tools/events.py` corpus sweep.
+- **Confidence:** proven for the code; the positions of a scripted mount come from the
+  form's own state (scene data or Characters.abi), not from this code.
+
+### E-1503 — Backspace in actor 3's update; mount movement uses the same code
+- **Binary/file:** actor 3 update `0x446f70` (Backspace block after Shift), character update
+  `0x421a60`, `FUN_0041fde0`; Characters.abi `[0x48c]`, `[0x490]`.
+- **Evidence:** on each animation tick, if GetAsyncKeyState(8) is non-zero (no edge latch;
+  any non-zero result) and actor 3 holds a character: if its kind `+0x128` == 2 it is sent
+  0x46 at once (direct DoCommand, not queued), else, if actor 4 exists, actor 4 gets 0x37
+  (release the companion, E-1222). So holding Backspace on a mount dismounts on the first
+  tick and, Grumpa then being the held character, releases the companion on the next.
+  Movement: neither `FUN_0041fde0` (request table, E-0813) nor the update reads `+0x128`;
+  rider forms walk through the same requests, with clip slots from their own `.anb` list.
+  The difference is data: mode `[0x48c]` 1 for boat 11 and boat 27 (only type-13 water
+  faces walkable, y −0.5, E-0803), 2 for dragonfly 12 and 21, 0 for 10, 13, 28, 87, 88;
+  radius group `[0x28c]/[0x5fc]` 50/250 (11), 30/150 (12, 13), 25/125 (10, 88), 90/450 (27);
+  `[0x490]` 1 only for Grumpa 10.
+- **Method:** decompile; Characters.abi read with `tools/parsers/abi.py` (offsets of `t_03`).
 - **Confidence:** proven
