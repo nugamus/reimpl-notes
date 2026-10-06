@@ -1,0 +1,7 @@
+description = "Platforms (walking.md, E-1600): scene 117, Grumpa walks from the entry onto the rising stepping stone C (0x1a 715, +0x1d0 = 1) and stands on it: platform set, floor type 15, then, when its 10 s delay timer has run, the stone rises and lifts him with its current frame"
+snaps = ["platform_on.png", "platform_up.png"]
+timeout = 60
+args = ["-d1"]
+
+[keys]
+grumpa_vm = "1;ticks 5;go 117;ticks 30;where;hold 429 252;ticks 60;where;ticks 60;where;ticks 60;where;release;ticks 20;where;ticks 40;where;snap {out}/platform_on.png;ticks 250;where;ticks 30;where;ticks 30;where;snap {out}/platform_up.png"

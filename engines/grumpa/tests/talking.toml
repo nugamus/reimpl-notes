@@ -1,0 +1,7 @@
+description = "Talking (dialogue.md, E-1620): scene 211, the Kraken's tutorial line Sch_shift (sound 646, speaker 16) plays: the Kraken's state slot 5 is 1 while it plays and 0 after its end chain has finished"
+snaps = ["talking.png"]
+timeout = 60
+args = ["-d1"]
+
+[keys]
+grumpa_vm = "211;slot 16 5;op 646 0 0 0;ticks 5;slot 16 5;wait 900;slot 16 5;snap {out}/talking.png"
