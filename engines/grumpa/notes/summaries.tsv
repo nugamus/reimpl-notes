@@ -6,6 +6,7 @@ GRUMPA.EXE	00416a90	CFXAMeshEx::CreateFromFile	reads .amb per-frame root motion 
 GRUMPA.EXE	0041fde0	CFXCharacter::Request	character request: clip-queue table per request, turn smoothing	E-0813
 GRUMPA.EXE	00421780	CFXCharacter::SetWorn	Equip/unequip carried object i: one worn per group {0,5}/{1..4}; flag [0x39c][i]; bonus [0x38c+4i] to slot 3 or [0x37c+4i] to slot 2	E-1300
 GRUMPA.EXE	00422f80	CFXCharacter::Serialize	CFXCharacter Serialize: modes 1/2/8 read the .abi record; mode 4 reads the status (active, visible, slots, home, pos, orientation, texture, worn flags, disable latch), mode 5 writes id + the same	E-1300
+GRUMPA.EXE	00425cc0	CFXCharacter::PlayVoice	sound slot n: <60 plays now, else queued speech	E-1223
 GRUMPA.EXE	004327c0	CFXFloor::HandleEvent	floor opcodes 5/6 set/clear blocking flags, 23 clears platforms	E-0803
 GRUMPA.EXE	00433040	CFXFloor::PointInFace	point in walk-mesh face: x/z box then 3 strict edge tests	E-0800
 GRUMPA.EXE	00433490	CFXFloor::Height	floor height: inverse-distance blend of edge projections, or platform vertex y	E-0801
@@ -13,6 +14,17 @@ GRUMPA.EXE	00433830	CFXFloor::FindFace	linear search for face under point	E-0800
 GRUMPA.EXE	00433880	CFXFloor::FindFaceNear	face under point: hint, its neighbours, then full scan	E-0800
 GRUMPA.EXE	00433950	CFXFloor::CollectWalls	flood faces within radius, collect boundary-edge contacts	E-0802
 GRUMPA.EXE	00433bb0	CFXFloor::Move	move a sphere over the floor: platforms, wall slide (100 iter), y smoothing 0.4/0.6	E-0802
+GRUMPA.EXE	004349a0	CFXFollower::CFXFollower	ctor: type 0x17, character -1, place-on-entry 1, state -1	E-1220
+GRUMPA.EXE	00434af0	CFXFollower::Initialize	stores the device pointer at +0x128	E-1220
+GRUMPA.EXE	00434b20	CFXFollower::GetOrientation	copies the character's orientation into +0x144	E-1221
+GRUMPA.EXE	00434b70	CFXFollower::GetPosition	copies the character's position into +0x150	E-1221
+GRUMPA.EXE	00434bc0	CFXFollower::GetVolume	copies the character's 0x110-byte volume block into +0x15c	E-1224
+GRUMPA.EXE	00434c50	CFXFollower::DoCommand	forwards char ops; 0x17 entry placement, 0x23 skip placement, 0x37 release	E-1222
+GRUMPA.EXE	00434dd0	CFXFollower::Follow	run >170, walk >100, stop <=100, step aside <70 with 20-step turn freeze	E-1221
+GRUMPA.EXE	00435080	CFXFollower::Update	every 2nd update copies the character's pos/orient and runs the follow rule	E-1221
+GRUMPA.EXE	004350d0	CFXFollower::OnSceneEntry	places follower 20 behind the player (unless skipped), resets char to idle, sets home	E-1222
+GRUMPA.EXE	004351e0	CFXFollower::Serialize	atx: id, character (sets its role 2); save: active, visible, pos, orient, character	E-1220
+GRUMPA.EXE	00435430	CFXFollower::StepAlongYaw	moves +0x150 by arg along yaw (sin, 0, cos)	E-1222
 GRUMPA_NOCD.EXE	00437d00	CFXInventory::DoCommand	Inventory panel: handles commands sent to actor 90 (open/close on right click, take, give)	E-0504
 GRUMPA_NOCD.EXE	00438500	CFXInventory::Draw	Inventory panel: draws the nine slots and two equipment slots	E-0504
 GRUMPA_NOCD.EXE	00438660	CFXInventory::Layout	Inventory panel: lays out slot rectangles	E-0504

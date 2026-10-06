@@ -1906,3 +1906,92 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** decompile (`0x422f80` defined in memory, read-only project; not in the dump).
 - **Confidence:** proven for the field order and the global file; the save/load functions'
   mode arguments (5 / 4) follow from the id being written by mode 5 and read by the loader.
+
+### E-1220 — Actor 4 (type 0x17) is `CFXFollower`: layout, vtable, Serialize
+- **Binary/file:** `CreateActor` case 0x17 (`operator new(0x298)` = count word + one 0x294-byte
+  object), ctor `FUN_004349a0`, dtor `FUN_00434a90`, vtable `0x4906f4`: [1] Serialize
+  `0x4351e0`, [2] device `0x434af0` (error string `CFXFollower::Initialize`), [4] Update
+  `0x435080`, [6] DoCommand `0x434c50`. 0x4351e0/0x434af0/0x434c50 are not functions in the
+  project; decompiled after defining them in memory (read-only project).
+- **Evidence:** fields: type `+0x104` = 0x17, active `+0x10c` = 1, visible `+0x110` = 1,
+  orientation `+0x144` (yaw `+0x148`), position `+0x150`, a copy of the character's 0x110-byte
+  block `+0x15c..+0x26c` (`FUN_00434bc0`, from the character's `FUN_00424e90`; ctor puts 60.0
+  at `+0x26c`), step direction `+0x270..+0x278`, place-on-entry flag `+0x27c` = 1, turn-freeze
+  countdown `+0x280` = 0, update divider `+0x284` = 0, last request state `+0x288` = −1, entry
+  scene `+0x28c`, held character id `+0x290` = −1 (getter `FUN_004354d0`, setter
+  `FUN_004354c0`). Serialize mode 6 (`.atx`) reads two integers (global2.atx `<23>`: 4, 16)
+  and, if `+0x290` then names a character, sets that character's role (`+0x118`→`+4`→`+0x564`)
+  to 2; mode 7 writes two. Save (mode 4) writes active, visible, position (12), orientation
+  (12), character; load (mode 5) reads the id `+0x108` first, then the same.
+- **Method:** decompile; vtable and constants read from `GRUMPA.EXE`.
+- **Confidence:** proven (which two fields mode 6 fills is inferred from the file, 4 = id,
+  16 = character, since the reader calls lost their arguments).
+
+### E-1221 — CFXFollower::Update: every second update, walk/run/stop toward the player
+- **Binary/file:** `0x435080` → `FUN_00434b70` (character position `+0x16c` → `+0x150`),
+  `FUN_00434b20` (character orientation `+0x160` → `+0x144`), `FUN_00434dd0` (the rule);
+  player position from actor 3 `FUN_00446ac0`; acos `FUN_0047c9f0` (argument checked in the
+  disassembly at `0x434e57`); floats `0x4906ec` π, `0x490718` 170, `0x4904a4` 100,
+  `0x49063c` 70, `0x490494` 4, `0x490458` 0.5.
+- **Evidence:** nothing happens unless `+0x290` names an existing character. `+0x284` counts
+  updates; on the second it resets to 0 and the rule runs (so every 40 ms). With F the
+  follower's character position and P the player character's: d = (F.x−P.x, 0, F.z−P.z)
+  normalised, heading = acos(d.z), negated when d.x < 0; turn = π + heading − yaw(`+0x148`)
+  (the relative turn to face the player). If `+0x280` > 0, turn = 0 and `+0x280` −= 1.
+  dist = full 3D |F−P|. dist > 170: request 1 (run, E-0813) with turn, state `+0x288` = 1;
+  100 < dist ≤ 170: request 0 (walk) with turn, state 1; dist ≤ 100: request 2 (stop) with
+  turn only if state ≠ 2, then state 2. Then, if dist < 70: u = (F−P)/|F−P| (3D); the
+  character is moved to (F.x + 4·u.x, F.y, F.z + 4·u.z) (`FUN_004250a0`), given request 0 with
+  turn + π·0.5, state 0, and `+0x280` = 20 (turn frozen for 20 rule runs).
+- **Method:** decompile + disassembly.
+- **Confidence:** proven
+
+### E-1222 — CFXFollower::DoCommand and scene-entry placement
+- **Binary/file:** `0x434c50`, entry `FUN_004350d0`, step `FUN_00435430`, character
+  `FUN_0041fd70`, `FUN_004250e0`, `FUN_00425fc0`.
+- **Evidence:** forwarded unchanged to the held character's DoCommand (dropped when none):
+  0..3, 0xb..0xd, 0x32..0x36, 0x48, 500, 501. **0x17** (scene entry, `arg1` = scene):
+  `+0x28c` = scene; if `+0x27c` == 1, the follower takes the player's position and
+  orientation (actor 3 `ac0`/`a70`) and steps −20 along the player's yaw (x += −20·sin yaw,
+  z += −20·cos yaw, y unchanged): 20 units behind the player; else `+0x27c` is set back to 1
+  and the stored position/orientation (last copied from the character) is kept. Then the
+  character is placed there (position, orientation `+0x160` = `+0x144`), gets request 5
+  (reset to idle), and if active (`+0x10c` == 1) its home `+0x444` = the scene; then
+  `FUN_0041fd70` (if home == scene and a global `+0x960` flag is set: clears `+0x44c/+0x450/
+  +0x454` to −1 and the per-state slot flags, request 5 again); finally `+0x280` = 0.
+  **0x23**: `arg1` ≠ 0 → `+0x27c` = 0 (skip the next entry placement, one-shot), 0 → 1.
+  **0x37** (release): if holding, the character gets DoCommand(1, 0, 0) (deactivate), role
+  `+0x564` = 0, `FUN_00425fc0` (rebuilds its `+0x640` list; effect opaque), and `+0x290` = −1;
+  then if actor 95 (type 0x1c, global2.atx) exists and is active, its `+0x2bc` = 0.
+  Everything else is ignored.
+- **Method:** decompile.
+- **Confidence:** proven
+
+### E-1223 — Character opcode 0x2d makes the character the follower; 0x48 queues a voice slot
+- **Binary/file:** `CFXCharacter::DoCommand` `FUN_0041e0d0` (cases 0x2d, 0x32/0x33, 0x48),
+  `FUN_00425cc0`.
+- **Evidence:** 0x2d: only if actor 4 exists and holds no character (`+0x290` == −1): actor
+  4's `+0x290` = this character's id, home `+0x444` = current scene `+0x448`, active and
+  visible = 1, role `+0x564` = 2; otherwise ignored (no replacement, unlike 0x2c). 0x32/0x33:
+  sent on to actor 8 (score) as (op, `arg1`, this character's id), so a score Life ± with
+  `arg2` −10/−11 travels score → actor 3/4 → its character → score with the character id,
+  and lands on that character's slot 1 (`docs/spec/score.md`). 0x48 `arg1` = n (`FUN_00425cc0`, 0..99):
+  sound slot n of the character's table `+0x324` (loaded on demand, `FUN_0041f2b0`); ignored
+  if n is already queued; n < 60 and n ≠ 32 plays at once; otherwise n is appended to the
+  speech queue `+0x3d0` (count `+0x3fc`) and, if it is the only entry and the speaker is not
+  already talking (mesh `+0x67c` == 0), plays now and marks talking. So 63/64 are queued
+  voice lines of the companion/player.
+- **Method:** decompile.
+- **Confidence:** proven
+
+### E-1224 — Role 2 in the character update: nothing follower-specific; others are pushed off
+- **Binary/file:** character update `0x421a60` (`0x4223ff..`), `FUN_0044c6e0` (volume
+  overlap), follower block `FUN_00434bc0`.
+- **Evidence:** the update reads `+0x564` in three places: clip sounds (role ≠ 0 → the clip
+  number goes through `FUN_00425cc0`), when the `+0x480` countdown set after request 4 (die) ends, roles 3/4/5 tell actors 0xb1/0xb2/
+  0xb3 op 0x47), and role 0. Role 2 has no branch of its own: the following lives entirely in
+  actor 4. A role-0 character overlapping the player's volume (actor 3 `b10`) or the
+  follower's copied volume (`+0x15c`) is moved 4 units away from that character horizontally,
+  then given request 0 with turn π·0.5 and request 2 (a shuffle aside).
+- **Method:** decompile.
+- **Confidence:** proven for the branches; `FUN_0044c6e0`'s exact test not read.
