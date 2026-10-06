@@ -12,12 +12,12 @@ list() { # <search> -> "engine<TAB>#n title" lines
 show() { sort | awk -F'\t' '{ a[$1] = a[$1] (a[$1] ? "; " : "") $2 } END { for (e in a) print "  " e ": " a[e] }'; }
 
 approved=$(list "label:approved") || exit 0
-bugs=$(list "label:bug -label:approved -label:needs-decision")
+bugs=$(list "label:bug,tooling -label:approved -label:needs-decision")
 waiting=$(gh issue list -R "$R" --state open --search "label:needs-decision" --json number --jq length 2>/dev/null)
 
 [ -z "$approved" ] || { echo "Approved by the user (do these first; enhancements become game options):"; echo "$approved" | show; }
 if [ -n "$bugs" ]; then
-	echo "Open bugs (before new Next items; gh issue view <n> -R $R):"
+	echo "Open bugs and tooling tasks (before new Next items; gh issue view <n> -R $R):"
 	echo "$bugs" | show
 fi
 [ -z "$approved$bugs" ] && echo "Open bugs: none."

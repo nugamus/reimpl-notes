@@ -30,7 +30,8 @@ Scenario keys:
 Every run's output is kept in `engines/<engine>/tests/out/<name>/run.log` (coverage.py and
 grep read it). Options: `--asan` runs the AddressSanitizer + UBSan build (tools/build-asan.sh) instead
 and fails on any memory error or undefined behaviour it reports, with the first report in
-the summary; `--path DIR` replaces the game folder (the fuzzer uses it).
+the summary; `--coverage` turns on the engines' `coverage` debug channel for
+tools/runcoverage.py; `--path DIR` replaces the game folder (the fuzzer uses it).
     grumpa_vm = "1;ticks 50;snap {out}/hut.png"
 """
 
@@ -49,7 +50,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 DEV = Path("C:/scummvm-dev")
-OPTS = {"asan": False, "path": None}
+OPTS = {"asan": False, "path": None, "coverage": False}
 TOLERANCE = 16  # per-channel difference that counts as a changed pixel
 
 
@@ -127,7 +128,8 @@ def run(engine: str, path: Path, update: bool) -> bool:
         shutil.copy(exe, runner)
         logdir = REPO / "engines" / engine / "tests" / "out" / name
         logdir.mkdir(parents=True, exist_ok=True)
-        cmd = [str(runner), f"--config={cfg}", *sc.get("args", []), domain]
+        cov = ["-d1", "--debugflags=coverage"] if OPTS["coverage"] else []
+        cmd = [str(runner), f"--config={cfg}", *cov, *sc.get("args", []), domain]
         timeout = sc.get("timeout", 60)
         if OPTS["asan"]:
             timeout *= 4
@@ -191,10 +193,11 @@ def main(argv: list[str]) -> int:
         return 0
     update = "--update" in argv
     OPTS["asan"] = "--asan" in argv
+    OPTS["coverage"] = "--coverage" in argv
     if "--path" in argv:
         OPTS["path"] = argv[argv.index("--path") + 1]
         argv = argv[:argv.index("--path")] + argv[argv.index("--path") + 2:]
-    args = [a for a in argv if a not in ("--update", "--asan")]
+    args = [a for a in argv if a not in ("--update", "--asan", "--coverage")]
     if not args:
         print(__doc__)
         return 2

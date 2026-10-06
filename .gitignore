@@ -83,3 +83,6 @@ CLAUDE.md
 # Scenario references and run output: game imagery, never published
 engines/*/tests/golden/
 engines/*/tests/out/
+
+# Frames from playthrough videos of the originals (tools/longplay.py): their imagery
+engines/*/traces/longplay/

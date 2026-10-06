@@ -69,6 +69,17 @@ def check(engine: str) -> int:
     print(f"  GUI text not wrapped in _(): {len(gui)}" + "".join(f"\n      {n}:{i}: {l[:100]}" for n, i, l in gui[:5]))
     print(f"  keys read directly (not via the keymapper; fine for typing text): {len(keys)}"
           + "".join(f"\n      {n}:{i}: {l[:100]}" for n, i, l in keys[:5]))
+    # Our own test tooling (not an upstream requirement, but how we keep the engine right).
+    tests = Path(__file__).resolve().parents[1] / "engines" / engine / "tests"
+    scenarios = len(list(tests.glob("*.toml")))
+    dev_all = "\n".join(git("show", f"{engine}:{n}") for n in fs if n.endswith(".cpp"))
+    print("  testing (ours):")
+    for name, ok, why in [
+        (f"scenarios ({scenarios})", scenarios >= 3, "at least boot, a scene, a save/load round trip (new-scenario skill)"),
+        ("coverage debug channel", '"cov ' in dev_all, 'debugC(1, kDebugCoverage, "cov <kind> %d", ...) at the script/event dispatch'),
+        ("coverage universe", (tests / "coverage.txt").exists(), "tests/coverage.txt: every opcode and room the spec defines"),
+    ]:
+        print(f"    {'ok  ' if ok else 'TODO'} {name.ljust(width - 2)}  {'' if ok else why}")
     todo = sum(not r[1] for r in rows)
     print(f"  {todo} to do; the engine wiki page, a game-data md5 list for the wiki, and a forum/Discord heads-up are manual")
     return todo
