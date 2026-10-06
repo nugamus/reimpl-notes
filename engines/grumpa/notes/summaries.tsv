@@ -1,7 +1,11 @@
 program	address	name	summary	evidence
+GRUMPA.EXE	0040fdb0	CFXActorFactory::LoadGlobalGameStatus	LoadGlobalGameStatus: reads u32 id + actor Serialize records from Current\global.abi to EOF	E-1300
+GRUMPA.EXE	004100c0	CFXActorFactory::SaveGlobalGameStatus	SaveGlobalGameStatus: writes every actor 0..599 to Current\global.abi via Serialize	E-1300
 GRUMPA_NOCD.EXE	004106c0	CFXActorFactory::CreateFromATXFile	Creates an actor from its .atx file	E-0504
 GRUMPA.EXE	00416a90	CFXAMeshEx::CreateFromFile	reads .amb per-frame root motion then the .anb	E-0815
 GRUMPA.EXE	0041fde0	CFXCharacter::Request	character request: clip-queue table per request, turn smoothing	E-0813
+GRUMPA.EXE	00421780	CFXCharacter::SetWorn	Equip/unequip carried object i: one worn per group {0,5}/{1..4}; flag [0x39c][i]; bonus [0x38c+4i] to slot 3 or [0x37c+4i] to slot 2	E-1300
+GRUMPA.EXE	00422f80	CFXCharacter::Serialize	CFXCharacter Serialize: modes 1/2/8 read the .abi record; mode 4 reads the status (active, visible, slots, home, pos, orientation, texture, worn flags, disable latch), mode 5 writes id + the same	E-1300
 GRUMPA.EXE	004327c0	CFXFloor::HandleEvent	floor opcodes 5/6 set/clear blocking flags, 23 clears platforms	E-0803
 GRUMPA.EXE	00433040	CFXFloor::PointInFace	point in walk-mesh face: x/z box then 3 strict edge tests	E-0800
 GRUMPA.EXE	00433490	CFXFloor::Height	floor height: inverse-distance blend of edge projections, or platform vertex y	E-0801

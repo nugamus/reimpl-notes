@@ -1878,3 +1878,31 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   the version-3 references (46 %), as intended.
 - **Method:** scripted dev runs.
 - **Confidence:** verified (engine)
+
+### E-1300 — `CFXCharacter` scene status: what Serialize mode 4 reads (mode 5 writes)
+- **Binary/file:** `CFXCharacter::Serialize` `0x422f80` (`case 4` read arm, `case 5` write arm;
+  reads through `FUN_004026c0`, writes through `FUN_00402220`); state slot Serialize read arm
+  `0x409107` (one u32 at slot `+0x104`); `FUN_004100c0` SaveGlobalGameStatus (`"%s\Current\global.abi"`,
+  every actor 0..599 through `vtable[1]`, error `"CFXActorFactory::SaveGloba..."`),
+  `FUN_0040fdb0` LoadGlobalGameStatus (reads `u32 id` then `actor[id]->vtable[1]` to EOF);
+  `FUN_00421780` (equip / unequip a carried object).
+- **Evidence:** mode 4 reads, in order: `active [0x10c]`, `visible [0x110]`; each state slot's
+  value (the existing vector `+0x11c`, stride 0x118, one u32 each, E-0407); home scene
+  `[0x444]`; position `[0x16c]` f32×3; orientation `[0x160]` f32×3; texture index `[0x440]`;
+  `u32 n [0x344]` (the carried-object count) and n × u32 from the array `[0x39c]`; the
+  disable latch `[0x46c]` (set by opcode 0xd, cleared only by 0x34, E-0403). Mode 5 writes
+  `id [0x108]` first, then the same fields in the same order (so a status record is
+  `{u32 id, mode-4 body}`); for Grumpa 10 (6 carried objects) the body is 4 × (2 + 6 + 1 + 3 +
+  3 + 1 + 1 + 6 + 1) = 96 bytes. `[0x39c][i]` is the "object i is worn" flag:
+  `FUN_00421780(i, on)` clears the other worn object of its group (group {0, 5} or {1..4}),
+  subtracting its bonus, then sets flag i and adds the bonus — `[0x38c+4i]` to state slot 3
+  (`+0x11c → +0x44c`) for objects 0 and 5, `[0x37c+4i]` to slot 2 (`+0x334`) for 1..4. So the
+  slots carry the equipment bonuses and the flags say which carried objects are worn.
+  **Not kept:** the current clip / frame, the request queue, the talking flag `+0x67c`, the
+  current scene `[0x448]` (rebuilt by the entry broadcast 0x17), the floor/walk fields
+  `[0x28c] [0x290] [0x48c] [0x490]`, and nothing of the mesh object (no call into it; its role
+  `+0x564` from 0x2c..0x30/0x54 is lost). Characters (ids 10..88) are global actors (< 600),
+  so they go to `global.abi`, not a scene's status file.
+- **Method:** decompile (`0x422f80` defined in memory, read-only project; not in the dump).
+- **Confidence:** proven for the field order and the global file; the save/load functions'
+  mode arguments (5 / 4) follow from the id being written by mode 5 and read by the loader.
