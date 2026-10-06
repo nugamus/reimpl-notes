@@ -9,6 +9,7 @@ GRUMPA_NOCD.EXE	004106c0	CFXActorFactory::CreateFromATXFile	Creates an actor fro
 GRUMPA.EXE	00410cb0	WinMain::WndProc	Window procedure: mouse/Esc to actors unless a film plays (0x4ba724); Space and graph events 1/2 stop the film; 0x8003/0x8004 set/clear the flag	E-1806
 GRUMPA.EXE	00415140	CFXAMesh::CFXAMesh	CFXAMesh constructor (0x150 B), current frame +0x11c = 0	E-1700
 GRUMPA.EXE	00415310	CFXAMesh::GetVertex	Copy 32-byte vertex idx of the current frame	E-1700
+GRUMPA.EXE	00415350	CFXAMesh::GetBounds	Mesh: refresh and return its bounds at +0x124	E-1612
 GRUMPA.EXE	004157d0	CFXAMesh::CreateFromFile	Static .ANB mesh load: per-UV-slot vertex buffer (pos, normal, uv) per frame, index buffer of UV indices over all sections	E-1700
 GRUMPA.EXE	00416680	CFXAMesh::Advance	Advance the mesh frame by the tick divisor, wrapping at the frame count	E-1700
 GRUMPA.EXE	004166e0	CFXAMesh::Draw	Draw the mesh's current frame (DrawIndexedPrimitive FVF 0x112)	E-1700
@@ -88,6 +89,7 @@ GRUMPA.EXE	00435080	CFXFollower::Update	every 2nd update copies the character's 
 GRUMPA.EXE	004350d0	CFXFollower::OnSceneEntry	places follower 20 behind the player (unless skipped), resets char to idle, sets home	E-1222
 GRUMPA.EXE	004351e0	CFXFollower::Serialize	atx: id, character (sets its role 2); save: active, visible, pos, orient, character	E-1220
 GRUMPA.EXE	00435430	CFXFollower::StepAlongYaw	moves +0x150 by arg along yaw (sin, 0, cos)	E-1222
+GRUMPA.EXE	00435690	CFXCharacter::ReloadSharedTextures	Reload the shared textures (message 0x8002); names Spalsch.tga (missing) so Shadow/effect are not reloaded	E-1612
 GRUMPA.EXE	00435a00	CFXCharacter::LoadSharedMeshes	Loads the four shared meshes once: waterripple, watersplasch, Shadow, effect (.ANB) into the table at 0x4ba74c	E-1660
 GRUMPA_NOCD.EXE	00437d00	CFXInventory::DoCommand	Inventory panel: handles commands sent to actor 90 (open/close on right click, take, give)	E-0504
 GRUMPA_NOCD.EXE	00438500	CFXInventory::Draw	Inventory panel: draws the nine slots and two equipment slots	E-0504
@@ -98,6 +100,7 @@ GRUMPA.EXE	00439730	CFXGrumpaScore::Update	Score update: when active, advance it
 GRUMPA.EXE	004397a0	CFXGrumpaScore::DoCommand	score actor 8 commands; 0x33 subtracts life from a character and requests hit clip 0x17 while alive	E-1402
 GRUMPA.EXE	0043d840	CFXMatrix::Multiply	4x4 matrix product out = A*B	E-1700
 GRUMPA.EXE	0043d8c0	CFXMatrix::SetRotation	Matrix object: rotation from (pitch, yaw, roll) vector via YawPitchRoll	E-1700
+GRUMPA.EXE	0043d8e0	CFXMatrix::SetScale	Matrix object: set diagonal scale (x,y,z)	E-1612
 GRUMPA.EXE	0043d910	CFXMatrix::SetTranslation	Matrix object: set translation row	E-1700
 GRUMPA.EXE	0043d960	CFXMatrix::Set	Matrix object: rotation then translation	E-1700
 GRUMPA.EXE	0043d990	CFXMatrix::Identity	Matrix object: set identity	E-1700
@@ -109,6 +112,7 @@ GRUMPA.EXE	00445570	CFXMouse::Draw	mouse draw: slot[kind] (kind 0 = held item ic
 GRUMPA.EXE	00446130	CFXMouse::SetKind	mouse: set kind unless 0	E-1721
 GRUMPA.EXE	00446150	CFXMouse::HoldItem	mouse: hold item n (kind 0, item State 6) or -1 (kind 9)	E-1721
 GRUMPA.EXE	004461a0	CFXMouse::HoverKind	mouse: hover kind for 8 updates, saves previous kind; ignored while holding	E-1721
+GRUMPA.EXE	004461e0	CFXMouse::GetPoint	mouse: pointer to the mouse point +0x158	E-1774
 GRUMPA.EXE	00446210	CFXMouse::OnMessage	mouse message: 2 show, 3 hide, 0x1a cursor to player, 0x23 drop held -> kind 9	E-1721
 GRUMPA.EXE	00446330	CFXMouse::Glitter	mouse: show itemglitter overlay for 10 updates	E-1720
 GRUMPA.EXE	00446340	CFXMouse::ClearGlitter	mouse: clear itemglitter overlay	E-1720
@@ -133,9 +137,16 @@ GRUMPA.EXE	004492d0	CFXSound::Serialize	Serialize: mode 1 data fields; mode 4 re
 GRUMPA.EXE	00449900	CFXSound::LoadFromFile	Load a .wav file into the sound's DirectSound buffer	E-1640
 GRUMPA.EXE	00449f80	CFXSound::IsPlaying	Is playing: buffer status nonzero and [0x1a0]	E-1620
 GRUMPA.EXE	0044c6e0	CFXSphere::Overlaps	Two spheres overlap: centre distance < r1 + r2	E-1460
+GRUMPA.EXE	0044d9f0	CFXSprite::SetFps	sprite: set fps +0x1e0	E-1773
 GRUMPA.EXE	0044da00	CFXSprite::SetPos	sprite: set top-left position, recompute dest rect	E-1720
+GRUMPA.EXE	0044da40	CFXSprite::SetMode	sprite: set mode bits +0x1e4	E-1773
+GRUMPA.EXE	0044da50	CFXSprite::Update	sprite update: while active and playing, step a frame every rate/fps ticks	E-1773
+GRUMPA.EXE	0044dd80	CFXSprite::StepFrame	sprite frame step by mode bits (1 loop, 2 ping-pong, 4 fwd, 8 back, 0x10 fwd-then-back)	E-1773
 GRUMPA.EXE	0044dfd0	CFXSprite::UpdateSize	sprite: size from surface, dest rect	E-1720
 GRUMPA.EXE	0044e1b0	CFXSprite::ColorMatch	sprite: colour key from COLORREF; -1 = pixel (0,0) of first frame	E-1720
+GRUMPA.EXE	0044e2c0	CFXSprite::DoCommand	sprite DoCommand: 0 play, 1 stop, 2/3 show/hide, 0xb/0xc active, 0xd off, 0x17 autoplay, 0x34 revive, 500/501	E-1773
+GRUMPA.EXE	0044ed10	CFXSprite::Play	sprite: play (request flag, reset frame by mode, playing=1 unless media object pending)	E-1773
+GRUMPA.EXE	0044ed80	CFXSprite::Stop	sprite: stop (clear play request)	E-1773
 GRUMPA.EXE	0044ed90	CFXSprite::CreateFromFile	sprite: create from <base>0000.. frames while files exist (<=100)	E-1720
 GRUMPA.EXE	0044fc60	CFXStaticCharacter::CFXStaticCharacter	Ctor of the 0x1a mesh actor; contact tests on (+0x1e0=1), running/direction/counter 0	E-1681
 GRUMPA.EXE	004512a0	CFXStaticCharacter::RunPlayerContactList	Run player-contact list +14c (file list 3)	E-1807
@@ -149,5 +160,8 @@ GRUMPA.EXE	00453990	CFXStaticCharacter::GetFrame	0x1a static character: returns 
 GRUMPA.EXE	004539a0	CFXStaticCharacter::TestContacts	Contact spheres ride a vertex of the current frame (pair = vertex, radius); tests by +1bc bits 1/2/8/0x10 (player, actor4/held, +228 actor, fighters), runs lists +14c/+15c/+18c/+16c once per contact when +1e4=1	E-1681
 GRUMPA.EXE	004540c0	CFXStaticCharacter::RunForwardEndList	Run forward-end list +12c (file list 1)	E-1807
 GRUMPA.EXE	004543a0	CFXStaticCharacter::RunBackwardEndList	Run backward-end list +13c (file list 2)	E-1807
+GRUMPA.EXE	00455ff0	CFXTexture::CreateFromFile	Texture load from file (+ optional .tma material)	E-1612
+GRUMPA.EXE	00456920	CFXTexture::Bind	Bind texture: SetMaterial; if 32-bit image alpha blend SRCALPHA/INVSRCALPHA, stage0 alpha = texture; SetTexture(0)	E-1612
+GRUMPA.EXE	004569f0	CFXTexture::Unbind	Unbind texture: alpha blend off if 32-bit, SetTexture(0,null)	E-1612
 GRUMPA.EXE	0045ad40	CFXView::DoCommand	CFXView DoCommand: 87 sets +0xdcc=2 (full background redraw)	E-1806
 GRUMPA.EXE	0047c9f0	CRT::_CIacos	CRT acos (_CIacos)	E-1700

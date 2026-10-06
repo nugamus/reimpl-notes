@@ -522,6 +522,17 @@ c16, `[5]==0`), so a companion hint line or trigger waits until he stops talking
 - **Next lead:** `0x40a990` targets in `0x444b60` (disassembly); sprite `+0x128`/`+0x1cc`;
   raw scan for `mov [reg+0x130], 3..6` on the mouse.
 - **Blocks:** nothing: show frame 0 of each picture; 9 at scene start.
+- **Status:** resolved 2026-10-06 except Q-1711 (E-1772, E-1773, E-1774): kinds 3..6 and 8 are
+  never set (complete scan; no corpus command targets actor 2); the start kind is 9 (the ATX's
+  fourth int); pictures animate at 10 fps, loop + ping-pong; `0x4263c0` is the character
+  click-rule glitter.
+
+### Q-1711 — Sprite Play's media-object branch (`+0x128`, `0x45c4b0`)
+- **Context:** E-1773. Play (`0x44ed10`) sets playing directly only when the sprite's `+0x128`
+  object (0x13c bytes, ctor `0x456cf0`, made in `0x44d710`) reports `+0x108` != 1; else it
+  goes through `0x4578d0` and the update starts playing later. Assumed 0 for picture sprites.
+- **Next lead:** what writes that object's `+0x108` (class around `0x456cf0`..`0x45c4c0`).
+- **Blocks:** nothing (cursor pictures animate either way once playing).
 - **Status:** open
 
 ### Q-0812 RESOLVED (2026-10-06, E-1530) — `global2.atx` `<22>` makes actor 3 hold Grumpa 10
@@ -572,7 +583,8 @@ on 12). No swim clips; air and drowning are global timers 220/221 in scripts.
   found in the decompile dumps (Draw uses slots 0 and 2), nor what the ripple's `+0x13c` (5
   idle, 8 moving) controls (likely the frame rate).
 - **Blocks:** a splash effect when entering water, if any; cosmetic.
-- **Status:** open
+- **Status:** RESOLVED (2026-10-06, E-1612): nobody draws watersplasch (mesh 1, Splasch.tga);
+  `+0x13c` is the ripple's frames per second (R / fps draws per frame, looping).
 
 ### Q-1680 — Surface scripts 30, 32, 50, 54 leave the drowning timer 221 running
 - **Context:** E-1680. Entering 30/32/50/54 while Air is 0 refills Air but does not stop 221;

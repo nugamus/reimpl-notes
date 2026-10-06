@@ -81,14 +81,14 @@ pixel (0,0). The picture is drawn with its **top-left corner at the mouse point*
 
 | Kind | Picture | Set by (E-1721) |
 |---|---|---|
-| −1 | nothing | the start state (Q-1710) |
+| −1 | nothing | the constructor only; Load replaces it at once (E-1772) |
 | 0 | the held item's icon | taking an item onto the cursor |
 | 1 | `default_*` | opening or closing the inventory panel; hovering the panel |
 | 2 | `grabing_*` | hovering a trigger, an item in reach (E-0900), or a filled panel slot |
-| 3..6 | `pointpush`, `pull`, `push`, `stop` | no setter found (Q-1710) |
+| 3..6 | `pointpush`, `pull`, `push`, `stop` | never: loaded, never shown (E-1772) |
 | 7 | `attack_*` | Ctrl held while the player's character is armed |
 | 8 | `itemglitter_*` | not used as a kind (see the glitter overlay below) |
-| 9..24 | `arrow1_.tga` .. `arrow16_.tga` | the default with nothing held: dropping or putting back an item, message 0x23 |
+| 9..24 | `arrow1_.tga` .. `arrow16_.tga` | the start kind (the ATX's fourth number), and the default with nothing held: dropping or putting back an item, message 0x23 |
 
 - **Walk arrow:** each update, while the kind is 9..24 and a player character exists,
   kind = 9 + trunc(angle × 2.6 − 0.3925). The angle (E-0817) runs from 0 to 2π, and the
@@ -97,10 +97,22 @@ pixel (0,0). The picture is drawn with its **top-left corner at the mouse point*
 - **Hover** (kinds 1, 2, 7) is ignored while an item is held. The first hover saves the
   current kind. Each hover re-arms an 8-update timer, and when the timer runs out the saved
   kind comes back. So the hover picture stays while the hover is sent every update.
-- **Glitter overlay:** for 10 updates after it is armed (by `0x4263c0`, whose exact trigger is not yet known: Q-1710), `itemglitter` is also drawn at
-  the mouse point − (16, 16).
+- **Glitter overlay:** for 10 updates after it is armed, `itemglitter` is also drawn at the
+  mouse point − (16, 16). It is armed each update by a filled panel slot, a trigger, or a
+  character (E-1774): while the inventory panel is closed and the mouse point is inside the
+  character's screen rectangle, the first of its click rules whose conditions hold while the
+  player's reaction sphere touches the character's arms it (unless a click already fired a
+  rule this update). It means "a click here does something now".
 - **Click while holding:** if nothing takes the item within 16 updates, the item is dropped
   beside Grumpa and the kind returns to 9.
+- **Start:** `002_Cursor.atx` holds four numbers before the names: the actor id (2), active
+  (1), visible (1) and the start kind (9). So the cursor starts as a walk arrow (E-1772).
+  Nothing in the game data sends commands to the cursor (actor 2).
+- **Animation** (E-1773): every picture plays from the start at 10 frames a second (a new
+  frame every 5 updates), looping back and forth: 0, 1, …, last, last−1, …, 1, 0, 1, …. Only
+  the picture being shown (and the glitter while it shows) advances; a hidden picture keeps
+  its frame. The arrows never animate. Frames on disc: `default` 2, `grabing` 4, `attack` 2,
+  `itemglitter` 5.
 - Triggers carry no cursor field: every hotspot shows `grabing`. The `sword_*` and
   `attack_ready_*` files are not in the cursor's list.
 

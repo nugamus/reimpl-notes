@@ -3098,3 +3098,97 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   Grumpa dies after three of his (31 each).
 - **Method:** corpus, scenario runs.
 - **Confidence:** proven.
+
+### E-1772 — Cursor kind: the complete writer list; start kind 9 from the ATX; kinds 3..6 never set (Q-1710)
+- **Binary/file:** `GRUMPA_NOCD.EXE` (`build/grumpa-import`); mouse Load `0x444b60`
+  (`0x444b89`..`0x444bbd`), SetKind `0x446130`, Hold `0x446150`, Hover `0x4461a0`, update
+  `0x445440`, message `0x446210`; `UI/002_Cursor/002_Cursor.atx`; `notes/logic.txt`.
+- **Evidence:** a byte scan of `.text` for every `mov [reg+0x130], imm/reg` finds, in the mouse
+  class (`0x444930`..`0x446340`), only: ctor `0x44494e` (−1), update `0x44547b` (hover restore)
+  and `0x445559` (9, auto-drop), SetKind `0x446138`, Hold `0x446167` (9) / `0x446174`, Hover
+  `0x4461d7`, message `0x44623d` (9); every other hit lies in other classes. An E8 scan for
+  calls: SetKind from Load `0x444bbd` (the ATX value), the walk-arrow step `0x445430`
+  (9 + angle term) and the panel `0x43e101`/`0x43e1ad` (1); Hover from `0x438c76` (panel),
+  `0x438cad`, `0x43baa3`, `0x4591ec`, `0x45922e` (all push 2) and `0x447145` (7); Hold from
+  20 sites (item numbers or −1). So no code path sets kinds 3, 4, 5, 6, or 8: `pointpush`,
+  `pull`, `push`, `stop` are loaded and never shown. The four ATX ints are read in order into
+  `+0x108` (2, the actor id), `+0x10c` (1, active: the update gate of E-1800), `+0x110`
+  (1, visible: the draw gate of E-1720) and `+0x130` (9, the kind), and Load then calls
+  SetKind(9): **the cursor starts as a walk arrow**, the ctor's −1 never survives a Load.
+  Corpus: `logic.txt` (characters, items, globals, scenes) has no command whose target is
+  actor 2 and no broadcast of ops 2, 3, 0x1a or 0x23; only conditions read `2[0]` (E-1800).
+- **Method:** pefile + capstone scans of the dump; decompile dump; grep of `logic.txt`.
+- **Confidence:** proven (static, complete scan of direct writes and direct calls).
+
+### E-1773 — Cursor pictures animate: 10 fps, loop + ping-pong, only the shown picture steps
+- **Binary/file:** mouse init `0x444ae6`..`0x444b3b` (40 sprites, stride 0x318), CFXSprite
+  DoCommand `0x44e2c0` (jump table `0x44e3b0`/`0x44e3d0`), Play `0x44ed10`, Stop `0x44ed80`,
+  update `0x44da50`, frame step `0x44dd80`, mouse update `0x445440`.
+- **Evidence:** for each of its 40 sprites the mouse init sets the clock object, loop mode
+  3 (`0x444b04`, `0x44da40`), rate 10 (`0x444b13`, `0x44d9f0`) and sends sprite op 0 (play,
+  `0x444b2c` vtable+0x18 → `0x44e360` → Play). Sprite ops (`0x44e2c0`): 0 play, 1 stop,
+  2/3 show/hide, 0xb/0xc active on/off, 0xd off, 0x17 play if autoplay, 0x34 revive, 500
+  show+active+play, 501 hide+inactive+stop. Sprite update steps only while its `+0x10c` is
+  set (E-1720: slots 1..8 yes, arrow slots 9..24 no, so arrows never animate). Mode 3 =
+  bit 1 loop + bit 2 ping-pong: frames 0,1,..,n−1,n−2,..,1,0,1,.. one step every 50/10 = 5
+  updates (0.1 s, E-0701 rule). Mouse update steps only slot[kind] (when kind ≠ 0) and slot 8
+  while the glitter counter is > 0; other pictures keep their frame while not shown. Frame
+  counts on disc: default 2, grabing 4, pointpush/pull/push/stop 4, attack 2, itemglitter 5.
+- **Method:** capstone disassembly of the dump; decompile dump (`0x44da50`, `0x44dd80`,
+  `0x44ed10`).
+- **Confidence:** proven (static). Play's branch on the sprite's `+0x128` media object
+  (`0x45c4b0`, its `+0x108`) is assumed 0 for picture sprites (Q-1711).
+
+### E-1774 — The glitter arm `0x4263c0`: a character under the mouse that can be clicked now
+- **Binary/file:** character update `0x421a60` (`0x421aff`..`0x421b4b`), `0x4263c0`,
+  PtInRect import `0x4901d0`, mouse point getter `0x4461e0`.
+- **Evidence:** each update, for each character: if the inventory panel (actor 90) is not
+  visible (`+0x110` == 0) and the mouse exists and the mouse point (`+0x158`) is in the
+  character's screen rect `+0x148`, `0x4263c0` runs and `+0x2d0` = 1 (else `+0x2d0` = 0).
+  `0x4263c0` walks the character's click rules (`+0x660`, E-1610): the first rule whose
+  conditions hold while the player's reaction sphere overlaps this character's arms the
+  glitter (10 updates, E-1720) if the click latch `0x4ba77c` is 0. Other Glitter callers:
+  `0x438d0b` (panel) and `0x4591fc` (trigger). So the glitter means "a click here now does
+  something".
+- **Method:** capstone disassembly (the caller is SafeDisc-broken in the decompile); dump.
+- **Confidence:** proven (static).
+
+### E-1612 — How CFXCharacter::Draw draws the water ripple and the shadow (resolves Q-1660)
+- **Binary/file:** `CFXCharacter::Draw` `0x4226a0` (disassembly `0x422a4b..0x422da3`),
+  `CFXCharacter::LoadSharedMeshes` `0x435a00` (textures table `0x4ba73c`), texture bind
+  `0x456920` / unbind `0x4569f0`, texture load `0x455ff0` → `0x456400` (`+0x154`),
+  `CFXAMesh::Advance` `0x416680`, matrix scale `0x43d8e0`; texture reload `0x435690` (from
+  message 0x8002 in `0x4378c0`); corpus `Bitmaps/Virvel.tga`, `Shadow.tga`, `Splasch.tga`.
+- **Evidence:** the device behind `[+0x144]` vtable `0x38` is a Direct3D 7 device (slots
+  `0x2c` SetTransform, `0x40` SetMaterial, `0x50` SetRenderState, `0x8c` SetTexture, `0x94`
+  SetTextureStageState). Textures parallel the meshes: 0 `Virvel.tga`, 1 `Splasch.tga`, 2
+  `Shadow.tga`, 3 `effect.tga` (`0x435a00`); a `<name>.tma` beside it supplies the
+  D3DMATERIAL7 (`+0x110..+0x150`; only `effect.tma`, `effect_item.tma` exist). The bind
+  `0x456920`: SetMaterial, and if `+0x154` (set by `0x456400` when the image is 32-bit)
+  ALPHABLENDENABLE 1, SRCBLEND SRCALPHA, DESTBLEND INVSRCALPHA, stage 0 ALPHAOP SELECTARG1,
+  ALPHAARG1 TEXTURE; then SetTexture(0). Unbind: ALPHABLENDENABLE 0 if `+0x154`, SetTexture(0,
+  null). Virvel.tga 256×256 and Shadow.tga 64×64 are 32-bit with 8 alpha bits; Splasch.tga is
+  16-bit. Draw order (gated as E-1700): worn attachments, then ripple or shadow, then the
+  body clip mesh (world = `[+0x400]` again, at `0x422d9c`). Both effects only when `+0x474` ≠ 1.
+  **Ripple** (type 13, y < −4 or mode 1, mesh 0 loaded): a fresh matrix = identity, diagonal
+  = s (`0x43d8e0`), translation row (x, 4.0, z) (`0x40800000` at `0x422b19`): no rotation;
+  SetTransform(WORLD); LIGHTING 0, ALPHABLENDENABLE 1, SRCBLEND ONE, DESTBLEND ONE; then the
+  bind overrides the blend to SRCALPHA/INVSRCALPHA (Virvel is 32-bit), so the drawn result is
+  ordinary alpha blending by the texture's alpha; z-test and z-write untouched (on). `+0x13c`
+  (5 if clip `+0x434` = 0, else 8) is the mesh's frames per second: Advance increments
+  `+0x120` and when it reaches R / `+0x13c` (R = 50, E-0701; unsigned) steps frame `+0x11c`,
+  wrapping to 0 at the frame count `+0x118` (always loops), counter 0. Advance runs once per
+  rippled character's Draw on the one shared mesh, so two rippled characters double its rate.
+  After: ALPHABLENDENABLE 0, LIGHTING 1. **Shadow** (type ≠ 13, mesh 2 loaded): world = the
+  character's own matrix `[+0x400]` (orientation `+0x160`, position + (0, `+0x178`, 0), no
+  scale; E-1700), so Shadow.ANB is drawn in the character's local space at its own size,
+  turning with it; LIGHTING 0, ZBIAS 16 (`0x2f`), ZWRITEENABLE 0 (`0xe`); bind (alpha blend);
+  draw; no Advance call, so the frame stays 0; after: LIGHTING 1, ZBIAS 0, ZWRITE 1. Cull
+  mode is never touched. No radius `[0x28c]` is read. Mesh 1 / `Splasch.tga`: no reader in
+  Draw or elsewhere (the only users of `0x4ba74c` / `0x4ba73c` are `0x435a00`, `0x435690`,
+  the clears `0x41c8c0`/`0x41c940`, and Draw's slots 0, 2, 3). Every character that passes
+  Draw's gate gets the shadow or ripple; no per-character flag. Side note: the reload
+  `0x435690` names `Bitmaps\Spalsch.tga` (missing), so its chain stops there and slots 2 and
+  3 (Shadow, effect) are not reloaded on message 0x8002.
+- **Method:** PyGhidra disassembly (`disasm_range`), decompiles, TGA headers.
+- **Confidence:** proven (static); the device identity is by vtable layout and state values.
