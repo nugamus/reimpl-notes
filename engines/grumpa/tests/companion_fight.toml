@@ -1,0 +1,8 @@
+description = "The companion in a fight (characters.md, combat.md; E-1430, E-1433): the Kraken is let go (4, 0x37) and the golem 22 made the follower (0x2d) in scene 1; scene 12: the golem comes along 20 behind Grumpa; the pirate rat 35 engaged as fighter 94 (0x4b): the golem, which has an attack clip, joins as fighter 95 (role 7) against the rat, hits it until it dies; then, only the companion left, it goes back to actor 4 (role 2) and follows Grumpa again; a save made mid-fight loads with the golem back with actor 4 (role 2)"
+snaps = ["companion_fight_engaged.png", "companion_fight_back.png"]
+timeout = 120
+args = ["-d1"]
+
+[keys]
+random_seed = "1"
+grumpa_vm = "1;ticks 5;op 4 55 0 0;op 22 45 0 0;go 12;ticks 10;where;who 22;who 35;op 35 75 0 0;ticks 5;who 22;who 35;ticks 300;who 22;who 35;snap {out}/companion_fight_engaged.png;save 7;ticks 1500;who 22;who 35;ticks 200;who 22;where;snap {out}/companion_fight_back.png;load 7;ticks 5;who 22"
