@@ -387,3 +387,24 @@ not move in the engine (Q-0403), so a click keeps standing in for walking into t
 - **What we checked:** the setter; not the cursor's draw, which maps the kind to a picture.
 - **Blocks:** nothing: the engine shows `grabing` over hotspots and items, `default` else.
 - **Status:** open
+
+### Q-0500 PARTLY RESOLVED (2026-10-06, E-0800..E-0804)
+The walk mesh code reads only vertex floats 0..2; floats 3..7 (normal (0,1,0) and two more,
+likely uv) are never read by the floor, so the engine can ignore them. The per-face u16 is
+the floor type (E-0803: 12/13 water-like, 19/20/21 blocking walls toggled by floor opcodes
+5/6). The exit's fourth float is the sphere radius; exits change scene, entries place the
+player (E-0804). Still open: Q-0800.
+
+### Q-0800 — Floor types 1, 2, 3, 8 and the meaning of mode `+0x48c`
+- **Context:** E-0803: the character stores the floor type at `+0x450`; only types 12, 13,
+  >18 and the platform value 15 are tested in the update. Corpus face counts: 0 35917,
+  1 7426, 13 2981, 2 2931, 3 1192, 19 503, 12 273, 20 108, 8 46, 21 6.
+- **What we checked:** the update at `0x421a60`; the dump has no other reader of `+0x450`
+  (it may be read through a pointer, e.g. footstep sounds or the actor 3/4 holders).
+- **Blocks:** nothing for walking; footsteps / swimming detail.
+- **Status:** open
+
+### Q-0202 update (2026-10-06) — items use the same stand-in
+Items lying in a scene (E-0900) are hovered and picked up only with the player's character
+within 160 units. Until the character walks, the engine skips that reach test, as the click
+stands in for walking to the item (`inventory.cpp` update). Restore it with the trigger sphere.

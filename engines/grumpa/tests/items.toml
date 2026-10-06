@@ -1,0 +1,6 @@
+description = "Scene 1: the sword, shield and dust bottle lying on the floor; click the shield and the sword to pick them up, open the panel, equip the sword (weapon slot) and the shield (shield slot). Needs the DEV harness's click to go through the panel first."
+snaps = ["items_floor.png", "items_equipped.png"]
+timeout = 60
+
+[keys]
+grumpa_vm = "1;ticks 80;snap {out}/items_floor.png;move 163 356;ticks 4;click 163 356;move 232 317;ticks 4;click 232 317;op 90 19 0 0;click 630 350;click 520 210;click 540 350;click 740 210;snap {out}/items_equipped.png"
