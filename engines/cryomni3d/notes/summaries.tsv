@@ -1,0 +1,15 @@
+program	address	name	summary	evidence
+CHINE.EXE	00414fb0	MyMouse::update	Updates cursor position from DirectInput relative motion, clamped to the screen; button states	E-0605
+CHINE.EXE	004153c0	MyWarp::hitTest	Maps the cursor hot point through the warp and searches the place zones	E-0604
+CHINE.EXE	00415440	MyMouse::getHotPoint	Cursor hot point: top-left plus sprite hot-spot offset or half the sprite size	E-0604
+CHINE.EXE	00415a20	MyScreen::drawDebugInfo	Debug overlay: fps, zone, context, WRP_Alpha/x, WRP_Beta/y, video mode, memory	E-0602
+CHINE.EXE	00416ca0	MyWarp::init	Warp init: projection tables for hfov 75.137/vfov 50, 3 MB 2048x768x16bpp warp buffer	E-0600
+CHINE.EXE	00416d60	MyWarp::loadWarp	Loads a warp (HNM6 single frame at 0x44, or TGA fallback) into the warp buffer, then setView	E-0600
+CHINE.EXE	004170a0	MyWarp::scrollByCursor	Per-frame view turning: edge bands 100/540 and 100/380 push velocity, divided by (5-speed)*1250/1500, decay 0.8	E-0605
+CHINE.EXE	00417400	MyWarp::zoomIn	Zoom transition: n frames re-initialising the warp with hfov dropping 1 deg per frame, then restores 75.137	E-0606
+CHINE.EXE	00417500	MyWarp::turnToPoint	Animates the view 32 frames toward the point (x,y) at 20% per frame, focal 416 px	E-0606
+CHINE.EXE	00420370	Zones::find	Linear search of the current zone list (40-byte records) for a point; returns index or -1	E-0604
+CHINE.EXE	00441b80	Warp::screenToImage	Maps a screen point to warp image (x 0..2047, y = 767 - row) by bilinear blend of the grid	E-0604
+CHINE.EXE	00441c90	Warp::init	Builds the 31x21 projection tables (angles, hypotenuses, vertical coords) from hfov/vfov in degrees; same as upstream Omni3D init	E-0601
+CHINE.EXE	00441df0	Warp::setView	Clamps beta to 0.9*vfov, wraps alpha, fills the 31x41-point 16.16 image-coordinate grid; same as upstream updateImageCoords	E-0602
+CHINE.EXE	0044205c	Warp::render	Renders 640x480 16bpp view from the warp image: 30x40 blocks of 16x16 interpolated from the grid	E-0603

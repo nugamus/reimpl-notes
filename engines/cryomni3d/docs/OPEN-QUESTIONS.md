@@ -43,3 +43,17 @@ Entry format:
 - **Blocks:** nothing yet; corpus tools should skip these four files until answered.
 - **Status:** open. Check the executable's protection (Detect It Easy) and whether its code
   opens `Data/file/`.
+
+### Q-0600 — Does Versailles' original warp renderer use upstream's >>10 / >>15 row deltas?
+- **Context:** China's renderer (E-0603) changes the per-pixel x and y steps down a
+  16-row block by (delta >> 4) and (delta >> 9); upstream `Omni3DManager::getSurface` uses
+  >> 10 and >> 15. Everything else in the grid and renderer matches.
+- **Blocks:** whether China can use `getSurface` unchanged (a per-game shift) or upstream
+  carries a slip that also affects Versailles.
+- **Status:** open. Decompile Versailles' warp blitter and compare.
+
+### Q-0601 — Who reads China's warp edge columns (0x534858, 0x534854)?
+- **Context:** `Warp::setView` (0x441df0) stores the image x of the two ends of the top or
+  bottom grid row (E-0602). No function in the decompile dump names them as readers.
+- **Blocks:** nothing for display; maybe zone culling or sound panning.
+- **Status:** open. Ghidra references to the two globals.
