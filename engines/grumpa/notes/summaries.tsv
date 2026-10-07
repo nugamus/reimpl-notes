@@ -1,4 +1,5 @@
 program	address	name	summary	evidence
+GRUMPA.EXE	00401c00	CFXPlacement::Serialize	embedded position+orientation object (ctor 0x401bb0): Serialize of vec3 +0x104 and vec3 +0x110; a spawner's point	E-0408
 GRUMPA.EXE	00408c30	CFXActor::EvalConditions	evaluate a condition list (actor,slot,value,mode,link): OR of AND groups, absent actor skipped, item target to 186	E-1801
 GRUMPA.EXE	00408ff0	CFXActor::GetSlots	Returns the actor's state-slot vector (actor+0x118)	E-1620
 GRUMPA.EXE	0040cb30	CFXActorFactory::LoadScene	LoadScene(scene, saveOld): saveOld==1 writes old scene status, deletes ids 600..979, loads .scn/.abi, then enter sequence 0x410bf0 (status read back)	E-1540
@@ -33,6 +34,7 @@ GRUMPA.EXE	00424e90	CFXCharacter::GetBodySphere	Body sphere +0x17c: centre = pos
 GRUMPA.EXE	00424ed0	CFXCharacter::GetReactSphere	Reaction sphere +0x4ec: centre = position with y + [0x600], radius [0x5fc]; returns it	E-1460
 GRUMPA.EXE	00424f20	CFXCharacter::SetDrawTransform	builds the character draw transform at (x, y + [0x178] jump/clip bob, z) with rotation +0x160; only reader of +0x178	E-1406
 GRUMPA.EXE	004250a0	CFXCharacter::SetPosition	Set position, reset floor fields 0x44c..0x454	E-1431
+GRUMPA.EXE	004250e0	CFXCharacter::SetHome	home +0x444 = arg	E-0408
 GRUMPA.EXE	004250f0	CFXCharacter::PostReaction	Push every command of the reaction for an id onto the global queue with conditions	E-1460
 GRUMPA.EXE	00425300	CFXCharacter::FindReaction	Pick the first reaction whose other character is present and whose sphere overlaps; once until it leaves	E-1460
 GRUMPA.EXE	004254c0	CFXCharacter::AddReactCharacter	Append reaction entry {other id, fired=0} at +0x608 and an empty command vector at +0x614	E-1460
@@ -142,6 +144,11 @@ GRUMPA.EXE	00449280	CFXSound::Stop	Stop and run the command list (on end)	E-1760
 GRUMPA.EXE	004492d0	CFXSound::Serialize	Serialize: mode 1 data fields; mode 4 reads / 5 writes active, visible, slots, playing [0x1a0], latch [0x1b4]	E-1760
 GRUMPA.EXE	00449900	CFXSound::LoadFromFile	Load a .wav file into the sound's DirectSound buffer	E-1640
 GRUMPA.EXE	00449f80	CFXSound::IsPlaying	Is playing: buffer status nonzero and [0x1a0]	E-1620
+GRUMPA.EXE	0044a1c0	CFXSpawner::SetFactory	stores the factory pointer at +0x130	E-0408
+GRUMPA.EXE	0044a1f0	CFXSpawner::DoCommand	0x34 clears / 0xd sets the latch +0x12c; 0x17 stores the scene in +0x128 and runs the spawn round	E-0408
+GRUMPA.EXE	0044a250	CFXSpawner::Serialize	min/max, points (pos, orientation, ids); status keeps active, visible, slots, latch +0x12c	E-0408
+GRUMPA.EXE	0044b120	CFXSpawner::SpawnPoint	random not-yet-spawned id from point list; place, orient, show, home, Life reset, request 5, record id	E-0408
+GRUMPA.EXE	0044b560	CFXSpawner::SpawnRound	501 to every candidate id, then min+rand%(max-min+1) distinct random points spawned	E-0408
 GRUMPA.EXE	0044c6e0	CFXSphere::Overlaps	Two spheres overlap: centre distance < r1 + r2	E-1460
 GRUMPA.EXE	0044d9f0	CFXSprite::SetFps	sprite: set fps +0x1e0	E-1773
 GRUMPA.EXE	0044da00	CFXSprite::SetPos	sprite: set top-left position, recompute dest rect	E-1720

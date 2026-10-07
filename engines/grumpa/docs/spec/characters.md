@@ -181,12 +181,28 @@ of the split.
 is a rider form it gets 0x46; else actor 4 gets 0x37 (the companion is let go).
 
 
-## Spawners (type 0x1d, E-0404)
+## Spawners (type 0x1d, E-0404, E-0408)
 
-A spawner holds spawn points, each a position, an orientation and a list of character ids.
-Spawning a point picks a random id from its list that is not already spawned (up to 60 draws),
-moves that character to the point, turns it, sets `active = visible = 1` and sends it opcode 2
-(so its home becomes the current scene).
+A spawner holds `min`, `max` and spawn points, each a position, an orientation (yaw-pitch-roll,
+copied to the character's `+0x160`) and a list of character ids. Opcodes: 0xd latches it off,
+0x34 clears the latch (the latch is kept in the scene status); while latched it ignores
+everything. Its update does nothing and it ignores scene leave (0x19) and 86.
+
+**On scene entry (0x17, arg1 = scene):** nothing if `max` = 0. Otherwise:
+1. every id of every point gets opcode 501 (inactive, invisible, stop; home unchanged);
+2. count = `min` + rand() % (`max` − `min` + 1), at most the number of points;
+3. `count` times: a random point not used yet this round (re-drawn on a repeat; more than 10
+   comparisons in one draw ends the round early), then spawn that point.
+
+**Spawning a point:** a random id from its list, re-drawn while that id was already spawned
+by this spawner (more than 60 comparisons: the point stays empty). The character is moved to
+the point, given its orientation, `active = visible = 1`, opcode 2, home = the scene, Life
+(slot 1) reset to the Life it was loaded with, request 5, role (slot 4) 0, clip counter 9,
+draw height 0, `+0x478` = 1, and updated twice. There is no Life or alive check: a character
+killed earlier comes back whole. The spawned list lives as long as the spawner, which is
+rebuilt from the `.abi` on every entry, so each visit spawns afresh. Nothing despawns on
+leaving, except the fighters' own leave rule (`combat.md`); the next entry's step 1 hides any
+earlier spawn.
 
 ## Drawing
 

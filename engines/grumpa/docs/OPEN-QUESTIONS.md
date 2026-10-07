@@ -674,3 +674,9 @@ heading −x, R2J2N) should confirm it lands on faces 1466..1485.
 `watersplasch.ANB` / `Splasch.tga` are loaded but never drawn. The ripple (`Virvel.tga`) and the
 shadow (`Shadow.tga`) are drawn by CFXCharacter::Draw as `walking.md` says; `+0x13c` is the
 ripple's frames per second (one frame every 50 / fps draws, shared, looping).
+
+### Q-0408 — A character's `+0x478`
+The spawner sets it to 1 on spawn (E-0408), the death's hide timer to 0 (or 1 for the bodies
+that stay, E-1433). No reader found yet; the engine can ignore it until one is. Next lead: a
+byte search for `78 04 00 00` displacements in the decrypted dump (the linear disassembly
+desyncs).

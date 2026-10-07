@@ -3274,3 +3274,56 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   deferred commands).
 - **Method:** scripted dev runs; corpus.
 - **Confidence:** verified (engine)
+
+### E-0408 — Spawner (0x1d): spawns on scene entry, min..max distinct points, restores Life (completes E-0404)
+- **Binary/file:** vtable `0x4908c0` (slot 1 Serialize `0x44a250`, slot 2 `0x44a1c0` stores the
+  factory at `+0x130`, slot 5 update `0x4080a0` = `ret`, slot 6 DoCommand `0x44a1f0`); spawn
+  round `0x44b560` (only caller of it: `0x44a22d`); point spawn `0x44b120` (only caller:
+  `0x44b83d`); point Serialize `0x401c00`; character load `0x423303..0x423316`.
+- **Evidence:** DoCommand `0x44a1f0`: op 0x34 → latch `+0x12c` = 0; while the latch is set every
+  other op is ignored; op 0xd → latch = 1; op 0x17 → `+0x128` = arg1 (the new scene), then the
+  spawn round, unless the global `0x4c04cc` == 1 (in .bss; its only reference in the binary is
+  this read, so it is always 0). No other op (no 0x19, no 0x56) does anything; the update is
+  empty. Spawn round `0x44b560`: nothing if max `+0x158` == 0; count = min `+0x154` +
+  rand() % (max − min + 1), capped at the number of points; first every id of every point
+  gets DoCommand 501 (inactive, invisible, stop; home untouched); then `count` times: a random
+  point index rand() % npoints, re-drawn while it equals one already used this round (a
+  local list); more than 10 comparisons in one draw abandons the rest of the round; then
+  `0x44b120(index)`. Point spawn `0x44b120`: random id from the point's list, re-drawn while
+  it is in the spawner's `+0x148` list (more than 60 comparisons → that point spawns
+  nothing); id not loaded → log `"*** ERROR! Character not loaded ***"`, nothing; else
+  `SetPosition(point +0x104)`, orientation `+0x160..+0x168` = point `+0x110` (vec3), active =
+  visible = 1, DoCommand(2), home `+0x444` = `+0x128` (`0x4250e0`), Life (slot 1, `[+0x11c]
+  +0x21c`) = `+0x484`, Request(5, 0.0) (`0x41fde0`), `+0x478` = 1, role (slot 4,
+  `+0x564`) = 0, clip counter `+0x4a8` = 9, draw height `+0x178` = 0, update (vtable
+  +0x14) called twice, id appended to `+0x148`. `+0x484` is written only at `0x423316`, from
+  slot 1 just after the character's load: the Life it was loaded with. Status (Serialize
+  mode 4, `0x44a286`): active, visible, the slots and the latch `+0x12c` only; `+0x148` is
+  not kept, not loaded and never cleared, but the spawner is rebuilt from the `.abi` on each
+  entry. File layout (mode 1/2, `0x44a3b0`): `+0x108`, active, visible, slot vector, min, max,
+  `u32 n` points, each = point Serialize (`0x401c00`: position vec3 `+0x104`, orientation
+  vec3 `+0x110`, 24 bytes) + `u32 k` + `k` character ids (`+0x120`).
+- **Corpus:** 47 spawners (all id 760); (min, max) from (0,0) (scene 57: never spawns) to
+  (3,3); 1..6 points; ids 30, 31, 32 in most scenes, 39..41 (scene 71), 43/44/81..85 (scenes
+  51, 57, 58, 70, 72).
+- **Method:** disassembly (capstone over the decrypted dump; `0x44a1f0`, `0x44a250` are not
+  Ghidra functions), decompile dump of `0x44b120`, `0x44b560`; corpus via `abi.py`.
+- **Confidence:** proven; the meaning of `+0x478` is open (E-1433's death writes it 0).
+
+### E-1683 — A contact sphere's vertex is a GPU vertex (one per uv index), not a position vertex (refines E-1681)
+- **Binary/file:** contact test `FUN_004539a0` (E-1681: "32-byte vertices" of the current
+  frame, the mesh's vertex buffer); `Scenes/Scene_090.abi` meshes 710..712 (`rolling_stone_01/02`,
+  `primus_rolling_stone_03`, 51 frames, one section of 54 position vertices and 312 uv indices).
+- **Evidence:** the buffer the test reads is the one the renderer draws from, one 32-byte
+  vertex per uv index carrying the position of the vertex that corner names (E-0600: each face
+  corner on the vertex its uv index holds). The rolling stones' spheres name vertices
+  (0, 42, 166, 203), (0, 161, 281, 140), (0, 31, 21, 260): beyond 54, so they are uv indices;
+  the bubbles' vertex 0 is the same either way. Mapping uv index → its corner's position vertex
+  puts the four spheres around the stone's surface; reading them as position vertices drops
+  all but vertex 0. Geometry (stone 02 against Grumpa's sphere, radius 25 at +30, standing at
+  (1945, 266, 1212) on its path): the nearest sphere overlaps by 38 units at frame 37 with the
+  uv mapping, while vertex 0 alone passes 33 units clear.
+- **Method:** corpus (`tools/parsers/anb.py`, `abi.py`), engine run (scenario `boulder`: two
+  rolls, Life 99 → 77 → 55, hud 51(22) from each stone's third list).
+- **Confidence:** proven for the index space (indices above the position count exist); the
+  hit verified in the engine.
