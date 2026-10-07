@@ -88,3 +88,18 @@ Entry format:
 - **Blocks:** decompiling the game script; listing all places.
 - **Status:** open. Next: create functions over that range in Ghidra (each handler starts
   `mov eax,[esp+4]; cmp eax,1`), re-run decompile_all.
+
+### Q-0100 — What are the two s32 fields in China's SPR image ID (unk_16, unk_1a)?
+- **Context:** E-0102: the loader 0x41f760 keeps them in the sprite (offsets 12 and 16 of
+  its in-memory header); values 0..603 and 0..458, often beyond the sprite's own size.
+- **What we checked:** the loader and the corpus ranges only; no reader of the two fields.
+- **Blocks:** nothing in the format; drawing sprites at the right place may need them.
+- **Status:** open. Find the blitters that read sprite+12/+16 (likely a screen position).
+
+### Q-0101 — Which CHINE.EXE routine reads WAV files, and which fmt fields does it use?
+- **Context:** E-0104: all 763 WAVs are plain PCM; the loader was not traced (callers with
+  `%s%s.wav`: 0x403640, 0x404710, 0x404d00; `MySound.cpp` from 0x415bb0).
+- **What we checked:** the decompile index for wav strings only.
+- **Blocks:** nothing for playback through ScummVM's WAV reader; whether the game honours
+  the 44100 Hz rate of `SOUND/BOITE32A.WAV` is unknown.
+- **Status:** open.

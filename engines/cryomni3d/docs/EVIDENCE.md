@@ -383,3 +383,106 @@ of 100 per area, so related entries stay together.
   then `<L>:\Chine\Data\Loc\<stem>`; it sets display mode 2. Stems may carry a folder
   (the menu passes `<L>:\Chine\Data\Interf\fondtitr`).
 - **Used by:** spec/china-boot.md Start-up, Main menu; Q-0502.
+
+### E-0100 — China's HNM/HNS files are HNM6 as in Mission Sunlight, 764/764 (2026-10-07)
+- **Source:** corpus statistic: `python engines/cryomni3d/tools/parsers/hnm.py`
+  ("HNM: 764/764 files valid, every byte consumed; chunks IX 13721, AA 44, BB 9423,
+  IW 191"); `hnm.ksy` compiled by `tools/ksy_check.py` parses all 764 China files to the end.
+- **Shows:** every `.HNM`/`.HNS` under `CHINE/` (WARP 191, IMAGES 127, SYNC 384, INTERF 15,
+  LOC 2, HNM 44, `Cd.hnm` 1) has the 64-byte HNM6 header (`unk_04` 0, bpp 16, `unk_14` 0,
+  `unk_18` 0, author "Pascal URRO  R&D", copyright "-Copyright CRYO-"), `frame_count`
+  superchunks (flag byte 0) of 4-aligned chunks (flags 0), and a zero u32 at the end, as in
+  Mission Sunlight (peintre E-0200..E-0203). Per folder: IMAGES, INTERF, LOC and `Cd.hnm` are
+  640x480 one-frame IX stills; SYNC 384 files of 7 IX frames each (one key frame), no sound;
+  HNM 44 `.HNS` 640x480, 11..3118 frames, 1..38 key frames, all with sound: audio_flags
+  0xA1 (37, 22050 Hz stereo), 0x21 (5, 22050 Hz mono), 0xC1 (2, 44100 Hz stereo), each
+  agreeing with its AA chunk's CRYO_APC 1.20 header (rate = ((flags & 0x60) >> 4) * 11025,
+  stereo = bit 7), every file 15 frames/s of sound (each BB = AA ADPCM / 32). 9 HNS hold
+  only the AA chunk (short sound); in the others the sound frames end 10..85 frames before
+  the last video frame (31 short in 18 files). `unk_1a` is 2 in every non-warp.
+- **Used by:** `docs/formats/hnm.ksy`, README "HNM6".
+
+### E-0101 — China's warps are one-frame 2048x768 HNM6 files with an IW chunk (2026-10-07)
+- **Source:** corpus statistic (as E-0100); ScummVM `engines/cryomni3d/image/hnm.cpp`
+  (`HNMFileDecoder::loadStream`: the first chunk tag IW selects warp mode, IX normal; the
+  header's buffer size "is not reliable on IW") and `image/codecs/hnm.cpp`
+  (`DecoderImpl::reset` asserts quality > 0 in warp mode; `decodeIWkf` walks 8x8 blocks).
+- **Shows:** all 191 files in `DATA/WARP` are 2048x768, `frame_count` 1, `unk_1a` 1,
+  `max_frame_size` 0x300000 (2048*768*2), `file_size` = file length - 4 (the terminator
+  is not counted; every other China HNM counts it), and one chunk `IW` whose payload has a
+  24-byte header (s32 quality = 85 in all 191, then bit, motion, short-motion, jpeg and end
+  offsets, bit = 24, end = payload size) instead of IX's 28 bytes (IX adds unk_18 = end).
+  No IW appears outside WARP and no IX inside it.
+- **Used by:** `docs/formats/hnm.ksy` (`video_iw`), README "HNM6".
+
+### E-0102 — China's SPR is one 15-bit picture in a TGA container with a 12-byte ID (2026-10-07)
+- **Source:** Ghidra `/china/CHINE.EXE!0x41f760` (the loader every game source calls for
+  `*.spr`: callers in `Interface.cpp`, `MyMouse.cpp` (`tri270.spr`), `save.cpp`, `load.cpp`,
+  `Minutes.cpp`, the puzzles); corpus statistic `python engines/cryomni3d/tools/parsers/spr.py`
+  ("SPR: 448/448 files valid, every byte consumed; 27 key colours (most common 0x001f x184,
+  0x03e0 x88, 0x037e x33); 304 files contain their key colour; unk_16 0..603, unk_1a 0..458").
+- **Shows:** the loader reads 18 header bytes (width at 12, height at 14, depth at 16),
+  then three u32 (the first's low u16 kept as the sprite's key colour, the other two kept
+  as two s32 fields), accepts only depth 15 or 16, allocates width*height*2 + 20 bytes,
+  reads width*height*2 pixel bytes; on a 16-bit (565) screen it converts the pixels and the
+  key from 555 to 565. In the corpus every file is: id_length 12, colour map 0, type 2,
+  origins 0, depth 15, descriptor 0x20, the 12 ID bytes, then exactly width*height u16
+  pixels (bit 15 never set). The two s32 fields lie in 0..603 and 0..458 and often exceed
+  the sprite's own size (274 and 269 files), so they look like screen positions, but nothing
+  here shows how they are used (Q-0100). Mission Sunlight's SPR (a multi-frame RLE bank with
+  a palette) is a different format.
+- **Used by:** `docs/formats/spr.ksy`, README "SPR".
+
+### E-0103 — China's TGA: uncompressed true colour, 16-bit or one 24-bit file (2026-10-07)
+- **Source:** Ghidra `/china/CHINE.EXE!0x416510` (`MyTga.cpp` loader; error "TGA load
+  Failure."); corpus statistic `python engines/cryomni3d/tools/parsers/tga.py` ("TGA: 151/151
+  files valid, every byte consumed; 39 x 16-bit footer, 111 x 16-bit no footer, 1 x 24-bit
+  footer").
+- **Shows:** the loader reads the 18-byte header, skips id_length bytes, reads width*height*2
+  bytes when depth is 16 or width*height*3 when depth is 24 (then converts to the screen's
+  555 or 565), any other depth fails; it flips the rows when descriptor bit 5 is clear and
+  never reads the footer. Corpus: id_length 0, type 2, origins 0, depth 16 (150 files) or 24
+  (`DATA/SPRITES/LOAD/FOND.TGA`, 640x480), descriptor 0 (112) or 1 (39), bit 15 never set
+  in 16-bit pixels, and nothing after the pixels but, in 40 files, the 26-byte TGA 2.0
+  footer with zero offsets. Mission Sunlight's TGA (peintre E-0104) is the 16-bit subset.
+- **Used by:** `docs/formats/tga.ksy`, README "TGA".
+
+### E-0104 — China's WAV: plain RIFF PCM, 16-bit mono, 22050 Hz but one (2026-10-07)
+- **Source:** corpus statistic `python engines/cryomni3d/tools/parsers/wav.py` ("WAV:
+  763/763 files valid, every byte consumed; 762 x tag 1 (PCM), 1 ch, 22050 Hz, 16 bit;
+  1 x tag 1 (PCM), 1 ch, 44100 Hz, 16 bit"; chunk orders fmt+data 320, fmt+data+LIST 440,
+  fmt+data+LIST+cue+LIST 3).
+- **Shows:** every `.WAV` (LOC/VOICES 721, SOUND 25, PUZZLES 16, SPRITES/LOAD 1) is a RIFF
+  WAVE whose RIFF size is the file size - 8, chunks padded to even, a 16-byte `fmt ` (or 18
+  with cbSize 0) of PCM 16-bit mono, a `data` chunk a whole number of samples long; only
+  `DATA/SOUND/BOITE32A.WAV` is 44100 Hz. No APC or other Cryo codec among them.
+- **Used by:** `docs/formats/wav.ksy`, README "WAV".
+
+### E-0105 — China's CRF fonts have Versailles' layout, 224 glyphs each (2026-10-07)
+- **Source:** Ghidra `/china/CHINE.EXE!0x413300` (`MyFont.cpp`: loads `font01..09.crf`,
+  `font10..11.crf`) and `0x413420` (one font: whole file in memory, the header u16 at 0xc
+  and 0xe byte-swapped, glyphs indexed from offset 0x30 for characters 0x20 up while the
+  offset stays inside the file, each glyph 10 + h*w bytes); ScummVM
+  `engines/cryomni3d/fonts/cryofont.cpp` (`CryoFont::load`: magic, three u16, s16 height,
+  32-byte comment, then `k8bitCharactersCount` = 223 glyphs of BE u16 h, u16 w, s16 offX,
+  s16 offY, u16 advance, w*h bytes); corpus statistic
+  `python engines/cryomni3d/tools/parsers/crf.py` ("CRF: 11/11 files valid, every byte
+  consumed; 224 glyphs each; unk_08/unk_0a (1, 1) x11; comments 32 '?' x11").
+- **Shows:** China's fonts have exactly the layout ScummVM reads for Versailles, with 224
+  glyphs (0x20..0xFF) filling each file to its last byte; ScummVM's 223 leaves the 0xFF
+  glyph unread (Versailles' `DATAS_V/FONTS/FONT01.CRF` also holds 224). Bitmaps hold only 0
+  and 255. The third u16 (`unk_0c`) is 9..24, heights 12..20.
+- **Used by:** `docs/formats/crf.ksy`, README "CRF".
+
+### E-0106 — China's two MASK.RAW are 640x480 zone maps read under the mouse (2026-10-07)
+- **Source:** strings `mask.raw` next to `Puzzle4\` and `horloge\` in CHINE.EXE; Ghidra
+  `/china/CHINE.EXE!0x417e90` (`Puzzle4.cpp`, loads `Puzzle4\mask.raw` whole with
+  0x413200) and its loop 0x4189bc; `0x41bd30` (`PuzzleHorloge.cpp`, same load) and
+  0x41c1d0; corpus statistic `python engines/cryomni3d/tools/parsers/raw.py`
+  ("HORLOGE/MASK.RAW: 55 values 0..54; PUZZLE4/MASK.RAW: 25 values 231..255; RAW: 2/2").
+- **Shows:** both files are 307,200 bytes = 640*480, no header; the code reads the byte at
+  `mask + y * 640 + x` for the mouse position. Puzzle 4 subtracts 0xE7: 0..23 pick a label
+  from a table of 3 rows of 8 names, 24 (byte 0xFF, 203,151 pixels) is no zone. The clock
+  puzzle treats 0 as no zone (291,917 pixels) and values below 0x37 as zones (1..54 occur;
+  some tests are < 13). Puzzle meaning belongs in `games/china/docs/`.
+- **Used by:** `docs/formats/raw.ksy`, README "RAW".
