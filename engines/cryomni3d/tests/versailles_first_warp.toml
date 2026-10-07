@@ -1,0 +1,6 @@
+description = "Versailles guard: a new game from the menu, the opening video skipped, the first panorama of level 1"
+snaps = ["warp.png"]
+timeout = 60
+domain = "versailles"
+[keys]
+dev_input = "1500:key 27;3000:key 27;4500:key 27;6000:key 27;7500:key 27;9000:key 27;14000:click 254 184;16000:key 27;18000:key 27;20000:key 27;24000:key 27;27000:snap {out}/warp.png;27500:quit"

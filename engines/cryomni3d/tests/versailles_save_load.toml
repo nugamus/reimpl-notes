@@ -1,0 +1,6 @@
+description = "Versailles guard: save in the first panorama, turn the view, load: the view comes back"
+snaps = ["loaded.png"]
+timeout = 70
+domain = "versailles"
+[keys]
+dev_input = "1500:key 27;3000:key 27;4500:key 27;6000:key 27;7500:key 27;9000:key 27;14000:click 254 184;16000:key 27;18000:key 27;20000:key 27;24000:key 27;26000:save 1;27000:move 630 240;29000:move 320 200;30000:load 1;36000:snap {out}/loaded.png;36500:quit"

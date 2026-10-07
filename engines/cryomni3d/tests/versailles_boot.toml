@@ -1,0 +1,6 @@
+description = "Versailles (DOS/English) guard for shared code: logos skipped with Escape, the main menu"
+snaps = ["menu.png"]
+timeout = 60
+domain = "versailles"
+[keys]
+dev_input = "1500:key 27;3000:key 27;4500:key 27;6000:key 27;7500:key 27;9000:key 27;16000:snap {out}/menu.png;16500:quit"
