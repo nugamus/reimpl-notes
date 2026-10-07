@@ -15,7 +15,10 @@ SRC=/c/scummvm-dev/$ENGINE
 OUT=/c/scummvm-asan/$ENGINE
 [ -d "$SRC" ] || { echo "no worktree $SRC"; exit 1; }
 mkdir -p "$OUT" && cd "$OUT" || exit 1
-FLAGS="--disable-all-engines --enable-engine=$ENGINE --enable-asan --enable-ubsan --enable-optimizations"
+# The engine and its subengines (cryomni3d: versailles, ...): --disable-all-engines drops them.
+ENGINES=$(awk -F'"' -v e="$ENGINE" '$1 == "add_engine " e " " {print e, $4}' "$SRC/engines/$ENGINE/configure.engine" | tr -s ' ' ',' | sed 's/,$//')
+[ -n "$ENGINES" ] || ENGINES=$ENGINE
+FLAGS="--disable-all-engines --enable-engine=$ENGINES --enable-asan --enable-ubsan --enable-optimizations"
 if ! grep -q "^SAVED_CONFIGFLAGS *:= $FLAGS\$" config.mk 2>/dev/null; then
 	CXX=clang++ "$SRC/configure" $FLAGS > configure.log 2>&1 || { tail -20 configure.log; exit 1; }
 fi

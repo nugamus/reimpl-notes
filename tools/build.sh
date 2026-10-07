@@ -15,7 +15,10 @@ fi
 SRC=${DEVROOT:-/c/scummvm-dev}/$ENGINE # DEVROOT: a parallel agent's tree
 [ -d "$SRC" ] || { echo "no worktree $SRC (git -C /c/scummvm worktree add $SRC $ENGINE-dev)"; exit 1; }
 cd "$SRC" || exit 1
-FLAGS="--disable-all-engines --enable-engine=$ENGINE --enable-optimizations --enable-eventrecorder"
+# The engine and its subengines (cryomni3d: versailles, ...): --disable-all-engines drops them.
+ENGINES=$(awk -F'"' -v e="$ENGINE" '$1 == "add_engine " e " " {print e, $4}' "$SRC/engines/$ENGINE/configure.engine" | tr -s ' ' ',' | sed 's/,$//')
+[ -n "$ENGINES" ] || ENGINES=$ENGINE
+FLAGS="--disable-all-engines --enable-engine=$ENGINES --enable-optimizations --enable-eventrecorder"
 if ! grep -q "^SAVED_CONFIGFLAGS *:= $FLAGS\$" config.mk 2>/dev/null; then
 	./configure $FLAGS > configure.log 2>&1 || { tail -20 configure.log; exit 1; }
 fi

@@ -13,7 +13,10 @@ BRANCH=$ENGINE-dev
 SRC=/c/scummvm-play-$ENGINE
 OUT=$2
 WIN_OUT=$(cygpath -m "$OUT")
-FLAGS="--disable-all-engines --enable-engine=$ENGINE --enable-optimizations --disable-debug --enable-eventrecorder"
+# The engine and its subengines (cryomni3d: versailles, ...): --disable-all-engines drops them.
+ENGINES=$(awk -F'"' -v e="$ENGINE" '$1 == "add_engine " e " " {print e, $4}' <(git -C /c/scummvm show "$BRANCH:engines/$ENGINE/configure.engine") | tr -s ' ' ',' | sed 's/,$//')
+[ -n "$ENGINES" ] || ENGINES=$ENGINE
+FLAGS="--disable-all-engines --enable-engine=$ENGINES --enable-optimizations --disable-debug --enable-eventrecorder"
 COMMIT=$(git -C /c/scummvm rev-parse "$BRANCH")
 if [ ! -d "$SRC" ]; then
 	git -C /c/scummvm worktree add --detach "$SRC" "$BRANCH"
