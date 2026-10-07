@@ -4,4 +4,4 @@ timeout = 60
 args = ["-d1"]
 
 [keys]
-grumpa_vm = "1;ticks 20;where;snap {out}/walk_start.png;hold 560 520;ticks 100;where;release;ticks 60;where;snap {out}/walk_moved.png;go 211;ticks 10;op 3 11 0 0;where;hold 600 300;ticks 60;where;hold 760 10;ticks 200;where;snap {out}/walk_exit.png;release;ticks 2;hold 560 520;ticks 60;release;ticks 40;where;save 3;go 211;where;load 3;ticks 30;where;snap {out}/walk_loaded.png;hold 700 300;ticks 40;where"
+grumpa_vm = "1;ticks 20;where;snap {out}/walk_start.png;walkto 215 80 15 100;where;ticks 60;where;snap {out}/walk_moved.png;go 211;ticks 10;op 3 11 0 0;where;hold 600 300;ticks 60;where;hold 760 10;ticks 200;where;snap {out}/walk_exit.png;release;ticks 2;hold 560 520;ticks 60;release;ticks 40;where;save 3;go 211;where;load 3;ticks 30;where;snap {out}/walk_loaded.png;hold 700 300;ticks 40;where"

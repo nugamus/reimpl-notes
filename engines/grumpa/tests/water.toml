@@ -4,4 +4,5 @@ timeout = 60
 args = ["-d1"]
 
 [keys]
+random_seed = "1"
 grumpa_vm = "1;ticks 30;snap {out}/shadow.png;go 16;ticks 30;op 665 13 0 0;placexyz 132 -49 -611;op 185 30 0 0;ticks 60;where;snap {out}/ripple.png"
