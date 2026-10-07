@@ -3367,3 +3367,14 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
 - **Method:** decompile + disassembly; corpus sweep (`t_1a` fields, 18-u32 block index 2 =
   `+0x1bc`, 3 = `+0x1e4`, 5 = `+0x228`).
 - **Confidence:** proven (static + corpus)
+
+### E-1811 — No cursor over a film: the system cursor is hidden at boot, the game's own is drawn with the frame
+- **Binary/file:** boot `FUN_00436aa0` (`ShowCursor(0)` at the end of a successful start, after
+  the factory has created its actors); the only `ShowCursor(1)` is in `FUN_0045c7e0` (shutdown);
+  CFXMouse draw `0x445570` (E-1720); film play `FUN_0042afc0` (E-1806).
+- **Evidence:** the Windows cursor is hidden once at start and shown again only on exit. The
+  cursor the player sees is CFXMouse's sprite, drawn into the back surface by the factory's
+  render like any actor. While a cut scene plays the game neither updates nor draws (E-1806),
+  so nothing draws the cursor over the film.
+- **Method:** decompile dump (grep for `ShowCursor`), with E-1720 and E-1806.
+- **Confidence:** proven (static).

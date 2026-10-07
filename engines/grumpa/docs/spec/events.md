@@ -95,7 +95,7 @@ autoplay `+0x13c`, the command list `+0x248`; the rest is unused.
   13 disables (0, 1 and 23 are then ignored), 52 enables; nothing else.
 - **Play:** broadcast 96 (characters stop their voice lines) and run the immediate list; the
   fade level goes to 255 at once (no fade before); the film fills the 800×600 screen and the
-  game stops: no updates, no drawing, no timers. Space skips it; Escape and the mouse do
+  game stops: no updates, no drawing, no timers. No cursor shows: the game's cursor is drawn with its frame and the system one is hidden from boot (E-1811). Space skips it; Escape and the mouse do
   nothing. Scene sounds already playing are not stopped (Q-1802).
 - **End** (the film's end or Space): the screen black, the game runs again, the film's list
   is pushed (it runs on the next update), opcode 1 to actor 3 (the held character stops) and a
