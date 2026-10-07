@@ -155,3 +155,30 @@ Entry format:
   period hardware (a choice, not a fact); a longplay video's turning speed could settle it
   (`tools/longplay.py`).
 - **Status:** open.
+
+### Q-0010 — Which cursor does China show over the plain warp, and where is its hot spot?
+- **Context:** the first engine slice (boot to `pne140`) needs a cursor before zones are
+  implemented. Zone cursors are known (E-0700..E-0705: finger, eye, hand, `util`, mouth,
+  question mark, table at 0x45d1d0), the cursor over no zone and the hot spot per sprite
+  are not yet specced.
+- **What we checked:** games/china/docs/places.md, spec/china-warp.md (the hit test uses
+  the sprite's hot-spot offset or its centre).
+- **Blocks:** the exact cursor outside zones.
+- **Status:** open. Decided for now: `SPRITES/CURSEURS/PTROUG.SPR` with its centre as the
+  hot spot, because the hit test falls back to the centre (E-0604).
+
+### Q-0011 — The ANJGEN41 dialogue and the menu music in the first slice
+- **Context:** spec/china-boot.md "Before the menu" (E-0504): between INTRO and ITB the
+  game plays the lip-synced dialogue ANJGEN41, then starts `ALLEE.ZIK`.
+- **What we checked:** ZIK is raw 16-bit stereo 22050 Hz PCM (E-0206); the synced dialogue
+  player is not specced yet.
+- **Blocks:** nothing; the engine skips both until the dialogue player exists.
+- **Status:** open (implementation order, not an unknown). Decided: skip them in the boot
+  slice because the dialogue player comes with the dialogue slice.
+
+### Q-0012 — Saves in the engine before the scene logic exists
+- **Context:** the menu's Load/Save need the save layout (E-0208) and the game state it
+  holds (variables, objects, place, angles, minutes).
+- **Blocks:** the Load button stays disabled in the boot slice.
+- **Status:** open (implementation order). Decided: ScummVM saves come with the state
+  slice; the original's `.sav` layout is read for import later.

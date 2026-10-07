@@ -804,3 +804,26 @@ of 100 per area, so related entries stay together.
   is per frame, so the turning speed depended on the PC. The original has no frame rate to
   copy (Q-0800).
 - **Used by:** spec/china-boot.md Main loop.
+
+### E-0007 — China's code map corrected: place procedures fill 0x421f00..0x436e20 (2026-10-08)
+- **Source:** E-0700 (the 270 place procedures reached only through function pointers),
+  E-0507 (`Script_Start` 0x436db0, `pne140` 0x431050).
+- **Shows:** supersedes E-0004's "then a Cryo library block" for 0x422000..0x437000: the
+  game's own place procedures occupy 0x421f00..0x436e20 (undefined in the first Ghidra
+  analysis); the Cryo library code (APC 0x43750d.., timer, file I/O, DirectInput) follows
+  them, and the warp projection is at 0x441b80..0x44205c (E-0601..E-0604).
+- **Used by:** CLAUDE.md Ground truth (China code map).
+
+### E-0008 — China editions and their detection files (2026-10-08)
+- **Source:** extraction of the DVD (`games/china/discs/dvd-multi/dvd1/`) and the French
+  CD (`games/china/discs/fr-cd/cd1/`); md5 of the first 5000 bytes and sizes of
+  `CHINE.EXE` and `DATA/LOC/LOAD.HNM` per edition; ScummVM `--detect` on each folder.
+- **Shows:** the DVD holds `DVD/<DE FR IT NL SP SW US>/`, each a full CD tree
+  (`CHINE/CHINE.EXE` 578,560 B, its own md5 per language); `US` is byte-identical to the
+  English CD's data. Per language only `LOC/` (six texts, `LOAD.HNM`, `PINCEAU.HNM`),
+  `LOC/VOICES/` (dubbed), eight subtitled `HNM/*.HNS`, `INTERF/FONDTITR.HNM` and `CD.HNM`
+  differ. The FR CD's `CHINE.EXE` is 573,952 B (Templier's `8850a946…`, E-0002); its data
+  matches the DVD's FR folder in size. `CHINE.EXE` + `LOAD.HNM` tell all nine apart; the
+  detection entries in `detection_tables.h` use them, and each language folder of the DVD
+  is a game folder of its own.
+- **Used by:** detection (GType_CHINA).

@@ -1,0 +1,6 @@
+description = "China (EN CD): LOGO, INTRO and ITB skipped with Escape, the main menu with 'Start the game' hovered"
+snaps = ["menu.png"]
+timeout = 60
+domain = "china"
+[keys]
+dev_input = "2500:key 27;5500:key 27;8500:key 27;11000:move 230 230;12000:snap {out}/menu.png;12500:quit"

@@ -1,0 +1,6 @@
+description = "China: a new game from the menu enters pne140, the first panorama, at alpha 4.7 (E-0507)"
+snaps = ["pne140.png"]
+timeout = 60
+domain = "china"
+[keys]
+dev_input = "2500:key 27;5500:key 27;8500:key 27;11000:move 230 230;12000:click 230 230;13000:move 320 240;15000:snap {out}/pne140.png;15500:quit"
