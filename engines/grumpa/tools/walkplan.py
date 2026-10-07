@@ -184,14 +184,15 @@ def plan(scene: int, s, g, opened=(), stop_within: float = 0.0, avoid=(), walkto
         k = next((i for i, q in enumerate(pts) if math.dist(q, g) < stop_within), len(pts) - 1)
         pts = pts[:max(k, 1) + 1]     # is left over to run in the next scene
         path = path[:len(pts)]
-    if walkto:   # the dev harness's closed-loop "walkto x z r n" through points ~120 apart
+    if walkto:   # the dev harness's closed-loop "walkto x z r n scene" through points ~120 apart;
+        # a leg is skipped once an earlier one has left the scene (an exit sphere touched early)
         cmds, last = [], s
         for q in pts[1:-1]:
             if math.dist(q, last) >= 120:
-                cmds.append("walkto %d %d 40 %d;where" % (q[0], q[2], int(math.dist(q, last) / SPEED) + 40))
+                cmds.append("walkto %d %d 40 %d %d;where" % (q[0], q[2], int(math.dist(q, last) / SPEED) + 40, scene))
                 last = q
         r = 20 if stop_within <= 0 else 1   # an exit: walk on until the scene changes
-        cmds.append("walkto %d %d %d %d;where" % (g[0], g[2], r, int(math.dist(g, last) / SPEED) + 80))
+        cmds.append("walkto %d %d %d %d %d;where" % (g[0], g[2], r, int(math.dist(g, last) / SPEED) + 80, scene))
         return ";".join(cmds)
     views, v = [], T[a] if T[a] <= 4 else 0
     for i in path:

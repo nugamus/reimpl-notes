@@ -1,0 +1,9 @@
+description = "Leaving the gauntlets cave 18 for the piranha pool 17 (critical path step 9, from path4_gauntlets' save, slot 4): the exit to 17 fires during an earlier walkto leg than planned; the later legs carry scene 18 and are skipped, so Grumpa stays at 17's entry from 18 (walk-in trigger 663 and the exit back to 18 do not fire)"
+snaps = ["cave_exit.png"]
+timeout = 200
+args = ["-d1"]
+saves_from = "path4_gauntlets"
+
+[keys]
+random_seed = "1"
+grumpa_vm = "18;load 4;ticks 10;where;walkto 168 8 40 102 18;walkto 215 -127 40 112 18;walkto 179 -244 40 101 18;walkto 146 -406 40 122 18;walkto 128 -551 40 114 18;where;walkto 79 -861 1 236 18;where;ticks 120;where;snap {out}/cave_exit.png"
