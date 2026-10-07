@@ -1,0 +1,8 @@
+description = "Scene 27, the crocodile boss and the ants (E-1684): the ant meshes (myra, contact flags 0x11) bite the player (3rd list, Life -4) and the fighters' characters (8th list: bite, the boss 47 Life -1 twice, timer 920). Grumpa walks into trigger 660 (the boss talks, then engages as fighter 94) and stands south of the myra_2 trail, so the boss stops on it: its Life 160 drops to 140 before Grumpa, not fighting back, dies"
+snaps = ["ants.png"]
+timeout = 200
+args = ["-d1"]
+
+[keys]
+random_seed = "1"
+grumpa_vm = "1;ticks 5;go 27;ticks 30;where;slot 47 1;wait 600;where;placexyz 62 80 8;wait 300;placexyz -20 79 -560;wait 900;where;slot 47 1;slot 8 2;snap {out}/ants.png"
