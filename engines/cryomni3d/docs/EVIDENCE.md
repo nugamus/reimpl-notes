@@ -228,3 +228,158 @@ of 100 per area, so related entries stay together.
   focal length in pixels. zoomIn(n): n frames, each re-running `Warp::init(h, 50)` with h
   from 75.137 down by 1 per frame, setView, render, flip; then `Warp::init(75.137, 50)`.
 - **Used by:** spec/china-warp.md (Transitions).
+
+### E-0500 — China's WinMain and start-up order (2026-10-07)
+- **Source:** Ghidra `/china/CHINE.EXE` (decompile dump `notes/decomp/all/`): CRT `entry`
+  0x4456d0 calls 0x4118a0 (WinMain) with the module handle; 0x4118a0 calls 0x4053b0 (boot),
+  then font load 0x413300, then the game 0x4064e0, then shutdown 0x405950; 0x4053b0 body.
+- **Shows:** boot first creates a named 32-byte file mapping "Chine" (0x45c0a0); if it
+  already exists (GetLastError 183) boot returns 4 and WinMain exits silently (one instance
+  only). Otherwise, in order, each must return 0 or start-up stops: globals reset 0x4056c0,
+  error module 0x412d10, keyboard 0x414b30, window 0x4176b0, screen 0x415570, warp 0x416ca0,
+  file 0x412f10, CD check 0x41ff50(1), loading screen 0x405740, timer 0x416bb0, sound
+  0x415bb0, mouse 0x414d20, objects 0x417a30, then game modules (0x4106a0, 0x410280,
+  0x406d90, 0x40ec80, 0x404080 dialogue, carte 0x401000, 0x4119f0, music 0x412680), then
+  `chine.cfg` 0x405870, then the pre-menu videos (E-0504), then menu music 0x4057b0.
+  0x41f160 (several times in the chain) is an empty "return 0".
+- **Used by:** spec/china-boot.md Start-up.
+
+### E-0501 — `chine.cfg`: four LE uint32 options, written by the options screen (2026-10-07)
+- **Source:** CHINE.EXE 0x405870 (read), 0x4059f0 (write), 0x4056c0 (defaults), 0x40e630
+  (options screen: labels `omni3D`, `sous_titre`, `musique`, `save` 0x45c97c, `retour`;
+  speed names `tres_lent` .. `tres_rapide`); corpus `CHINE/chine.cfg` = 2, 1, 1, 0 (E-0005).
+- **Shows:** `chine.cfg` (current directory) is read only if it exists; fields in order:
+  (1) panorama speed 0..4 (default 2; the options button steps it modulo 5), (2) subtitles
+  on/off (default 1), (3) music on/off (default 1), (4) unk_save_mode (default 0); after
+  reading, the in-memory flag "save mode" = (field 4 == 0). The options screen toggles the
+  fourth button between the two values and keeps field 4 = !flag. Missing file: defaults.
+- **Used by:** spec/china-boot.md Start-up; Q-0500.
+
+### E-0502 — China's CD check: `disk%d.dat` on drives C..Z, `cd` prompt (2026-10-07)
+- **Source:** CHINE.EXE 0x41ff50 (called with disk 1), 0x41ffb0, 0x420020, 0x41ff30;
+  strings `%c:\Chine\Data\disk%d.dat` 0x45ee9c, `%c:\Chine\Data\` 0x45ee8c, `cd` 0x45eeb8;
+  corpus `CHINE/DATA/DISK1.DAT` (0 bytes) and `CHINE/Cd.hnm`.
+- **Shows:** the check opens `<L>:\Chine\Data\disk1.dat` for drive letters 'c'..'z' in
+  order and keeps the first letter that opens; every later CD path is `<L>:\Chine\Data\...`.
+  If none opens, 0x420020 shows the still image `cd` (found as `Cd.hnm` in the game
+  folder, E-0510) and polls each frame: Escape aborts start-up (returns 3), Space waits 4 s
+  and rescans; the loop repeats until a drive is found.
+- **Used by:** spec/china-boot.md Start-up.
+
+### E-0503 — China's screen is 640x480 16-bit; warp buffer 2048x768 (2026-10-07)
+- **Source:** CHINE.EXE 0x415570 (MyScreen init: mode call with 0x280, 0x1e0, 0x10; pitch
+  global 0x500), 0x416ca0 (MyWarp init), screen-sized copies of 0x25800 dwords (0x96000 B)
+  in 0x407140 and 0x406de0.
+- **Shows:** a 640x480 16-bit DirectDraw mode (pitch 1280); a pixel-format global (15 or
+  16) selects 555 or 565 routines. Warp init calls the projection set-up 0x441c90 with the
+  floats 75.137 and 50.0, zeroes the view angles (alpha 0x53485c, beta 0x534844) and
+  allocates the warp buffer of 0x300000 bytes (= 2048 x 768 x 2, the WARP HNM size, E-0005).
+- **Used by:** spec/china-boot.md Start-up; Q-0501.
+
+### E-0504 — what plays before China's menu, and how it is skipped (2026-10-07)
+- **Source:** CHINE.EXE 0x4053b0 tail; 0x41fd70 (`<L>:\Chine\Data\` + `Hnm\` 0x45ee58);
+  0x4146c0 (HNS player); 0x403380 then 0x404710 (dialogue lip-sync player, `%s%s%d.hnm`,
+  `%s%s.wav`, subtitles drawn only while the subtitle option is set); 0x4057b0, 0x41fcc0,
+  0x41fd00 (`Data\Music\`, `Music\`, `Allee.zik`); 0x405740 (`Load`, "Chargement en
+  cours..."); corpus `DATA/HNM/{LOGO,INTRO,ITB}.HNS`, `SYNC/P000ANJ0..3.HNM`,
+  `P000EMP0..3.HNM`, `LOC/VOICES/ANJGEN41.WAV`, `LOC/DIAL.TXT` block `#ANJGEN41#`.
+- **Shows:** during boot the loading screen shows image `Load` with the white text
+  "Chargement en cours..." at (x 50, y 200), font 3. After `chine.cfg`: `logo.hns`, then
+  `intro.hns` (both from `<L>:\Chine\Data\Hnm\`), then the dialogue `ANJGEN41` with the
+  speaker stems `P000ANJ` and `P000EMP` (face loops `SYNC\<stem><0..3>.hnm`, voice
+  `ANJGEN41.wav`) with subtitles forced off for it, then `itb.hns`, then music `Allee.zik`
+  (local `Data\Music\` first, else the CD's `Music\`; started only if the music option is
+  on). The HNS player sets a 10 ms multimedia timer, pre-buffers up to 2 s, then shows
+  frames; it stops when Escape (DIK 1) is down or the left mouse button is clicked; each
+  video is skipped separately (the result is ignored). The dialogue player also stops on
+  Escape.
+- **Used by:** spec/china-boot.md Before the menu.
+
+### E-0505 — China's main menu: `fondtitr`, eight bullets, labels from LABELS.TXT (2026-10-07)
+- **Source:** CHINE.EXE 0x406de0 (Interface: `fondtitr`, `roug_1..6.spr`, `blc_1..6.spr`;
+  pushes at 0x406e43..0x407071), 0x407140 (menu screen), 0x41f760 (SPR loader), 0x420340
+  (point-in-rect), 0x4136d0 (text draw: first coordinate y, second x), 0x406d20 (save
+  slots); corpus `DATA/INTERF/ROUG_*.SPR`, `BLC_*.SPR` (header bytes 0x0c..0x1d, read by a
+  script), `DATA/LOC/LABELS.TXT`.
+- **Shows:** background `Interf\fondtitr` (`FONDTITR.HNM`), copied to a 640x480 back
+  buffer. SPR file = 18-byte TGA-style header (width u16 @0x0c, height u16 @0x0e, bpp u8
+  @0x10 must be 15 or 16), key colour u32 @0x12, x i32 @0x16, y i32 @0x1a, then w*h 16-bit
+  pixels. All twelve bullets are 14x14, key 0x1f. Slots (normal sprite `roug_n`, hover
+  `blc_n`; x, y): 0 `nouveau_jeu` "Start the game" (196,225); 1 `charge_jeu` "Load a game"
+  (212,254); 2 `reprendre`/`reprendre2` "Resume the game"/"Resume the visit" (230,283);
+  3 `sauve_jeu` "Save the game" (246,312); 4 `visite` "Visit the site" (264,341);
+  5 `consulte_doc` "Consult the documentation" (280,370); 6 `options` "Options" and 7
+  `quitter` "Leave the game" reuse `roug_6`/`blc_6` moved by (+20 x, +25 y) per step:
+  (300,395), (320,420). Label at (x+20, y+1). Hit rectangle = bullet rectangle grown right
+  by the label width and down by the label height; hovering draws `blc_n` and the label in
+  0xffff, else `roug_n` and the label in 0x7020 (enabled) or 0x9a73 (disabled). Enabled:
+  0 if fewer than 12 of `Data\Saved\<name>_game<1..12>.sav` exist; 1 if any exists or save
+  mode is set; 2 if a game is running or variable 0 (visit) is set; 3 if save mode and a
+  game is running; 4..7 always. A click on an enabled button returns a choice: 0 gives 1
+  new game, 1 gives 2 load, 2 gives 3 resume, 3 gives 4 save, 4 gives 5 visit, 7 gives 6
+  quit; 5 opens the documentation (0x4070a0, 0x4085d0) and 6 the options screen (0x40e630)
+  inside the menu.
+- **Used by:** spec/china-boot.md Main menu.
+
+### E-0506 — menu choices and what "new game" sets up (2026-10-07)
+- **Source:** CHINE.EXE 0x406360 (menu dispatcher), 0x403a30 (reset), 0x403440, 0x4033c0
+  /0x4201d0/0x4201c0 (game variable table at 0x45eec8, 12-byte entries), 0x41f190 (set
+  scene handler), 0x410900/0x410da0 (`CHOISISSEZ VOTRE EMBLEME:`), 0x41e930 (`Fondlod`,
+  load), 0x41e090 (`Fondsvg`, save); pushes of 0x436db0 at 0x4063ee and 0x406481.
+- **Shows:** choice 1 (new game): reset game state (0x403a30); if save mode is off, the
+  emblem chooser runs first and Cancel returns to the menu; then game-running = 1, scene
+  handler = 0x436db0 (`Script_Start`), object 0x1e set to state 2 unless already 1..3,
+  variable 0 (visit) = 0. Choice 2 load (emblem loader or 0x41e930), 3 resume, 4 save
+  (0x41e090), 5 visit: reset, variable 0 = 1, handler 0x436db0, game-running = 0. Choice 6
+  quits: the game loop ends and the credits (0x403b10, `credits.txt`) run.
+- **Used by:** spec/china-boot.md Main menu, New game; Q-0500.
+
+### E-0507 — China's first place: `Script_Start` then `pne140`, alpha 4.7 (2026-10-07)
+- **Source:** CHINE.EXE raw disassembly (capstone) at 0x436db0 and 0x431050 (the region
+  0x421f00..0x436e20 has no Ghidra functions, Q-0503); 0x403a10, 0x402d50, 0x402dd0,
+  0x416d60; strings `Script_Start` 0x4629c0, `MIN001` 0x4629b8, `pne140` 0x45be08,
+  `lionne_pne`, `lion_pne`; corpus `DATA/WARP/PNE140.HNM`.
+- **Shows:** a scene handler takes one int: 1 returns a data pointer, 2 its name, 3 runs on
+  entry, 0 each frame. `Script_Start` on entry: clears 0x5305a8, sets variable 1 = 1, calls
+  0x411d80("MIN001"), sets view alpha = 4.7f, beta = 0 (0x403a10 writes them straight to
+  the warp angles), then switches to handler 0x431050. That handler (name `pne140`) on entry
+  registers its zones (0x403060, 0x4031b0, 0x403100 with labels `lionne_pne`, `lion_pne`)
+  and loads warp `pne140`: 0x402d50 builds `<L>:\Chine\Data\warp\pne140` (0x402dd0) and
+  loads it with 0x416d60, stores the name, sets display mode 1 (warp) and the cross-fade
+  flag. So the first panorama is `DATA/WARP/PNE140.HNM` at alpha 4.7, beta 0.
+- **Used by:** spec/china-boot.md New game.
+
+### E-0508 — China's game loop and per-frame order (2026-10-07)
+- **Source:** CHINE.EXE 0x4064e0, 0x406530, 0x406880, 0x41f380, 0x415370, 0x4170a0,
+  0x417230, 0x404e80; the debug line at 0x415a20.
+- **Shows:** 0x4064e0 runs the menu, then frames until a frame asks for the menu (then the
+  menu again) or quit is set (then credits). One frame: input/keys 0x406880 (frame rate,
+  debug keys, Space or the interface trigger opens the interface screen 0x40efd0 whose
+  result can return to the menu; Escape calls 0x4039f0); if the window is active: music
+  tick 0x412740, mouse 0x414fb0, 0x415270, sound 0x403640, hotspot under the cursor
+  0x415370, scene handler call 0x41f380 (entry call with 3 once, then 0); then draw by
+  display mode: 2 = still image, 1 = warp: if the cross-fade flag is set, the old frame is
+  cross-faded into the new view (0x404e80, 640x480) first; then view update 0x4170a0, warp
+  render 0x417230, labels 0x4107c0, optional overlays (inventory debug 0x40fd60, debug text
+  0x415a20, 0x420260), cursor 0x415340, then unlock 0x415860 and flip 0x415900.
+- **Used by:** spec/china-boot.md Main loop.
+
+### E-0509 — China's panorama scrolling by cursor near the edges (2026-10-07)
+- **Source:** CHINE.EXE 0x4170a0; floats 0x45021c 100.0, 0x450220 380.0, 0x450224 1250.0,
+  0x450228 1500.0, 0x45022c 0.8; 0x441df0 (set view, beta clamped to plus/minus 0.9 x a
+  library limit, alpha wrapped by a period global).
+- **Shows:** cursor point = cursor position + half the cursor size. dx = 100 - x if x < 100,
+  540 - x if x > 540, else 0; dy = y - 100 if y < 100, y - 380 if y > 380, else 0. With
+  s = 5 - speed option: alpha velocity += dx / (s x 1250), beta velocity += dy / (s x 1500);
+  if either velocity is non-zero the angles advance by it, the view is set, and both
+  velocities are multiplied by 0.8 (per frame).
+- **Used by:** spec/china-boot.md Main loop; Q-0501.
+
+### E-0510 — China's still-image lookup order (2026-10-07)
+- **Source:** CHINE.EXE 0x402e20, 0x402fb0 (`Images\`, `%s%s%s.%s`), 0x41fdb0 (`Loc\`),
+  0x416510 (TGA), 0x416d60 (HNM).
+- **Shows:** a still is shown by stem: `<stem>.tga`, then `<stem>.hnm` (both relative to
+  the game folder), then `<L>:\Chine\Data\Images\<stem>.hnm`, then `...Images\<stem>.tga`,
+  then `<L>:\Chine\Data\Loc\<stem>`; it sets display mode 2. Stems may carry a folder
+  (the menu passes `<L>:\Chine\Data\Interf\fondtitr`).
+- **Used by:** spec/china-boot.md Start-up, Main menu; Q-0502.

@@ -1,13 +1,43 @@
 program	address	name	summary	evidence
+CHINE.EXE	00402d50	Main::setWarp	Loads warp <L>:\Chine\Data\warp\<name>, mode warp, cross-fade flag	E-0507
+CHINE.EXE	00402e20	Main::setImage	Shows a still by stem: tga, hnm, CD Images, CD Loc; mode still	E-0510
+CHINE.EXE	00403380	Dial::playDialogue	Waits for sound channel 3, then plays a lip-sync dialogue	E-0504
+CHINE.EXE	00403a10	MyWarp::setAngles	Sets warp view alpha and beta	E-0507
+CHINE.EXE	00404710	Dial::runDialogue	Lip-sync dialogue player: voice wav, two speakers' SYNC face loops, subtitles if enabled	E-0504
+CHINE.EXE	004053b0	Main::boot	Boot: single-instance mapping, module inits in order, chine.cfg, logo/intro/ANJGEN41 dialogue/itb, menu music	E-0500
+CHINE.EXE	004056c0	Main::resetGlobals	Resets option and state globals to defaults (speed 2, subtitles 1, music 1)	E-0501
+CHINE.EXE	00405740	Main::showLoading	Loading screen: still Load and text Chargement en cours...	E-0504
+CHINE.EXE	004057b0	Music::startMenuMusic	Starts menu music Allee.zik (local Data\Music then CD), if music option on	E-0504
+CHINE.EXE	00405870	Main::readConfig	Reads chine.cfg: speed, subtitles, music, save-mode field	E-0501
+CHINE.EXE	004059f0	Main::writeConfig	Writes chine.cfg (four uint32 options)	E-0501
+CHINE.EXE	00406360	Main::menuDispatch	Menu dispatcher: new game, load, resume, save, visit, quit	E-0506
+CHINE.EXE	004064e0	Main::run	Game: menu, then frames until menu or quit, then credits	E-0508
+CHINE.EXE	00406530	Main::frame	One game frame: input, script, warp or still draw, cursor, flip	E-0508
+CHINE.EXE	00406880	Main::handleKeys	Per-frame keys: fps, debug keys, Space interface, Escape	E-0508
+CHINE.EXE	00406d20	Main::scanSaveSlots	Marks which of the 12 save files exist	E-0505
+CHINE.EXE	00406de0	Interface::loadMenu	Loads the main menu: fondtitr background and roug_n/blc_n bullet sprites	E-0505
+CHINE.EXE	00407140	Interface::mainMenu	Main menu screen: 8 bullets with labels, hover, enable rules; returns the choice	E-0505
+CHINE.EXE	004118a0	Main::WinMain	WinMain: boot, fonts, game loop, shutdown; exits silently when another instance runs	E-0500
+CHINE.EXE	004146c0	Main::playHns	Plays an HNS video full screen; Escape or left click stops; returns 1 if skipped	E-0504
 CHINE.EXE	00414fb0	MyMouse::update	Updates cursor position from DirectInput relative motion, clamped to the screen; button states	E-0605
 CHINE.EXE	004153c0	MyWarp::hitTest	Maps the cursor hot point through the warp and searches the place zones	E-0604
 CHINE.EXE	00415440	MyMouse::getHotPoint	Cursor hot point: top-left plus sprite hot-spot offset or half the sprite size	E-0604
+CHINE.EXE	00415570	MyScreen::init	Screen init: 640x480 16-bit DirectDraw mode	E-0503
 CHINE.EXE	00415a20	MyScreen::drawDebugInfo	Debug overlay: fps, zone, context, WRP_Alpha/x, WRP_Beta/y, video mode, memory	E-0602
-CHINE.EXE	00416ca0	MyWarp::init	Warp init: projection tables for hfov 75.137/vfov 50, 3 MB 2048x768x16bpp warp buffer	E-0600
+CHINE.EXE	00416ca0	MyWarp::init	Warp init: projection 75.137/50.0, zero view angles, 2048x768x2 warp buffer	E-0503
 CHINE.EXE	00416d60	MyWarp::loadWarp	Loads a warp (HNM6 single frame at 0x44, or TGA fallback) into the warp buffer, then setView	E-0600
-CHINE.EXE	004170a0	MyWarp::scrollByCursor	Per-frame view turning: edge bands 100/540 and 100/380 push velocity, divided by (5-speed)*1250/1500, decay 0.8	E-0605
+CHINE.EXE	004170a0	MyWarp::updateView	Edge scrolling of the warp view with velocity and 0.8 decay	E-0509
 CHINE.EXE	00417400	MyWarp::zoomIn	Zoom transition: n frames re-initialising the warp with hfov dropping 1 deg per frame, then restores 75.137	E-0606
 CHINE.EXE	00417500	MyWarp::turnToPoint	Animates the view 32 frames toward the point (x,y) at 20% per frame, focal 416 px	E-0606
+CHINE.EXE	0041f190	Main::setScene	Sets the current scene handler and switches music by scene	E-0506
+CHINE.EXE	0041f380	Main::runScene	Calls the scene handler: 3 on entry, then 0 each frame	E-0508
+CHINE.EXE	0041f760	Main::loadSprite	Loads a .spr sprite (TGA-like header, key colour, x, y, 16-bit pixels)	E-0505
+CHINE.EXE	0041fd70	Main::cdHnmPath	CD path of the Hnm\ video folder	E-0504
+CHINE.EXE	0041ff30	Main::cdDataPath	Formats the CD data root <L>:\Chine\Data\	E-0502
+CHINE.EXE	0041ff50	Main::checkCd	CD check for disk N: scans drives for disk%d.dat, shows cd prompt until found	E-0502
+CHINE.EXE	0041ffb0	Main::findCdDrive	Finds the drive letter c..z holding \Chine\Data\disk%d.dat	E-0502
+CHINE.EXE	00420020	Main::cdPrompt	Insert-CD prompt: shows still cd, Escape aborts, Space waits 4 s and returns	E-0502
+CHINE.EXE	00420340	Main::pointInRect	Point-in-rectangle test (rect stored y1,x1,y2,x2)	E-0505
 CHINE.EXE	00420370	Zones::find	Linear search of the current zone list (40-byte records) for a point; returns index or -1	E-0604
 CHINE.EXE	00441b80	Warp::screenToImage	Maps a screen point to warp image (x 0..2047, y = 767 - row) by bilinear blend of the grid	E-0604
 CHINE.EXE	00441c90	Warp::init	Builds the 31x21 projection tables (angles, hypotenuses, vertical coords) from hfov/vfov in degrees; same as upstream Omni3D init	E-0601

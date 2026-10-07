@@ -57,3 +57,34 @@ Entry format:
   bottom grid row (E-0602). No function in the decompile dump names them as readers.
 - **Blocks:** nothing for display; maybe zone culling or sound panning.
 - **Status:** open. Ghidra references to the two globals.
+
+### Q-0500 — What is China's fourth option, `save`?
+- **Context:** E-0501, E-0505, E-0506: `chine.cfg` field 4 and the options button
+  labelled `save` toggle a flag that gates the emblem chooser on New game, Load and Save.
+- **What we checked:** the flag's uses in the menu and dispatcher only.
+- **Blocks:** naming the field; how the two save systems differ (emblem profiles vs. the
+  plain `Fondlod`/`Fondsvg` screens).
+- **Status:** open. Next: 0x410da0, 0x41e930, 0x41e090 and LABELS.TXT `#save#`.
+
+### Q-0501 — China's warp angle units and limits
+- **Context:** E-0503, E-0507, E-0509: start alpha 4.7; projection set-up 0x441c90(75.137,
+  50.0); alpha wraps by a runtime period (0x533c98), beta is clamped to 0.9 x 0x5314c4.
+- **What we checked:** the call sites only.
+- **Blocks:** the starting direction in degrees and the pitch limits.
+- **Status:** open. Next: decompile 0x441c90 and 0x441df0.
+
+### Q-0502 — Extension of China's `Loc\` still-image fallback
+- **Context:** E-0510: the last try is `<L>:\Chine\Data\Loc\<stem>` with no extension
+  added in 0x402e20; `Load` exists as `DATA/LOC/LOAD.HNM`.
+- **What we checked:** 0x402e20 and 0x41fdb0.
+- **Blocks:** nothing practical (load `<stem>.hnm`).
+- **Status:** open. Next: 0x416d60's path handling.
+
+### Q-0503 — China's scene scripts have no Ghidra functions
+- **Context:** E-0507: scene handlers (`Script_Start` 0x436db0, `pne140` 0x431050, ...)
+  live in 0x421f00..0x436e20, which auto-analysis left undefined (reached only through
+  pushed pointers).
+- **What we checked:** raw disassembly of the two handlers.
+- **Blocks:** decompiling the game script; listing all places.
+- **Status:** open. Next: create functions over that range in Ghidra (each handler starts
+  `mov eax,[esp+4]; cmp eax,1`), re-run decompile_all.
