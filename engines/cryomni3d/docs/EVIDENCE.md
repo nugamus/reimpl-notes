@@ -68,3 +68,61 @@ of 100 per area, so related entries stay together.
   shared `CM6_*`/`Spr_p*` DLLs in Aztec, Egypt II and Versailles II are a first hint of one
   later engine generation (Q-0002).
 - **Used by:** CLAUDE.md Ground truth (corpus).
+
+### E-0004 — China's executable: MSVC 5, no protection, own source layout (2026-10-07)
+- **Source:** `python tools/identify.py games/china/discs/en-iso/cd1/CHINE/CHINE.EXE`
+  (Detect It Easy: PE32, Microsoft Linker 5.10, MSVC 11.00-13.10, DirectDraw, DirectInput,
+  DirectSound; no packer or protector reported); Ghidra `CryOmni3D.gpr` program
+  `/china/CHINE.EXE` (imported and analysed 2026-10-07: 838 functions); the assert scan
+  `tools/ghidra/scripts/assert_namer.py` (`engines/cryomni3d/notes/china-module-map.md`).
+- **Shows:** the error routine is passed `F:\Chine\Sources\<file>.cpp` and a line number
+  (format string "Fatal error (%d) in File %s at Line %d" at file offset 0x5b864); 29 source
+  paths name 48 functions. Sources, in link (alphabetical) order and their first attributed
+  function: `carte` 0x401000, `credits` 0x403a50, `Dial` 0x403eb0, `Interface` 0x406de0,
+  `Label` 0x410300, `load` 0x410900, `Minutes` 0x411ac0, `Music` 0x412680, `MyError`
+  0x412d10, `MyFile` 0x412f10, `MyFont` 0x413300, `MyKeyb` 0x414b30, `MyMouse` 0x414d20,
+  `MyScreen` 0x415570, `MySound` 0x415bb0, `MyTga` 0x416510, `MyTimer` 0x416bb0, `MyWarp`
+  0x416ca0, `MyWind` 0x4176b0, `Object` 0x417a30, `Puzzle4` 0x417e90, `PuzzleBombe`
+  0x4192c0, `PuzzleBoudha` 0x41a3b0, `PuzzleBoutons` 0x41a8f0, `PuzzleGO` 0x41b5d0,
+  `PuzzleHorloge` 0x41bd30, `PuzzlePenjing` 0x41c520, `PuzzleSceaux` 0x41d020, `save`
+  0x41dea0. Game code runs 0x401000..about 0x420000 (paths and data folders at 0x41f190..
+  0x41ffb0), then a DirectDraw/DirectSound wrapper (0x420500..0x421e80, French error
+  strings), then a Cryo library block (APC sound "CRYO_APC" 0x43750d.., a timer 0x438110,
+  file I/O with "ERREUR FileOpen" 0x4388f1.., DirectInput keyboard and mouse 0x44102b..),
+  then the MSVC runtime. No Cryo library DLL: everything is in the one executable.
+- **Used by:** CLAUDE.md Ground truth (China); naming in Ghidra.
+
+### E-0005 — China's data: one CD, folders and file types (2026-10-07)
+- **Source:** listing of `games/china/discs/en-iso/cd1/CHINE` and `python tools/identify.py`
+  on it (`engines/cryomni3d/notes/corpus-triage-china.md`); the disc images in
+  `games/china/images/` (EN ISO is a single 614 MB `CHINE.mdf`; the DVD a single 3.7 GB
+  `CHINE.iso`; the FR CD a single `CHINE.bin`).
+- **Shows:** the game is one CD. `CHINE/` holds `CHINE.EXE`, `Cd.hnm`, `chine.cfg` (16 B:
+  four LE uint32 2, 1, 1, 0), `readme.*`, and `DATA/` with: `FONTES` 11 `.CRF` (magic
+  `CRYOFONT`, the format upstream's `fonts/cryofont` reads for Versailles); `HNM` 44 `.HNS`
+  (640x480 HNM6 videos with sound); `IMAGES` 127 `.HNM` (640x480 HNM6 stills); `INTERF` 15
+  `.HNM`, 50 `.SPR`, 119 `.TGA`; `INVENT` 19 `.SPR`, 2 `.TGA`; `LOC` 2 `.HNM`, six text
+  files (`CREDITS DIAL Fichetxt LABELS LISTE MINUTES`), `VOICES/` 720 `.WAV` + 1;
+  `MUSIC` 6 `.ZIK`; `PUZZLES/<8 puzzles>` 257 `.SPR`, 29 `.TGA`, 16 `.WAV`, 2 `.RAW`
+  (307,200 B = 640x480 bytes); `SAVED` (empty); `SOUND` 25 `.WAV`; `SPRITES/{CURSEURS,LOAD,
+  OBJETS}` 122 `.SPR`, 1 `.TGA`; `SYNC` 384 `.HNM` (640x480 HNM6); `WARP` 191 `.HNM` (HNM6,
+  header width 2048, height 768 for the first two). `DISK1.DAT` is empty (0 B). TGAs are
+  type-2 uncompressed 16-bit. Every HNM/HNS starts with `HNM6` and the string
+  "Pascal URRO  R&D" at 0x20. There are no `.wam`, `.hlz`, `.hlw` or `.dat` level files as
+  in Versailles: place links and game logic are not in the data folders.
+- **Used by:** formats README (the format list); CLAUDE.md Ground truth.
+
+### E-0006 — China's logic lives in the executable; text is in LOC (2026-10-07)
+- **Source:** strings of `CHINE.EXE` (file offsets): object table names (`CLE_JARRE`,
+  `MANDAT1..4`, `PINCEAU`, ... with `c_<x>`/`r_<x>`/`i_<x>` sprite stems, 0x5c680..0x5cb94),
+  game variables and dialogue/sync ids (`VAR_LETTRE_REVELEE`, `VAR_Pieces`,
+  `Venant_de_HORLOGE`, `CHAPITRE`, `MODE_VISITE`, `ANMI5111`, ... 0x5e364..), the debug line
+  "%d i/s - Zone %d / Label : %s / Contexte : %s / Chap : %d" (0x5bdc4), save names
+  "%s_game%d.sav" and "Data\Saved\"; `DATA/LOC/DIAL.TXT` (694 blocks `#<id>#`, a `<text>`
+  line and one `GOTO <id>` line each).
+- **Shows:** like Versailles (whose logic upstream reimplements in C++), China's places,
+  objects, variables and scenario are compiled into the executable; data files hold only
+  media and text. Dialogue text blocks are keyed by the same ids as the voice files
+  (`LOC/VOICES/<id>.WAV`) and sync videos.
+- **Used by:** the plan: game logic must be recovered from `CHINE.EXE` and specced in
+  `games/china/docs/`.
