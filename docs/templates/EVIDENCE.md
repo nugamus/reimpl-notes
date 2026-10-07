@@ -6,7 +6,7 @@ supersede it with a new one that names the old id.
 Entry format:
 
 ```
-### E-0001 (YYYY-MM-DD): what is proven, in one line
+### E-0001 — <one-line claim> (YYYY-MM-DD)
 - **Source:** Ghidra `<program>!0x<address>` (`<name>`), an assert path, a trace line
   (`traces/INDEX.md` entry), or a corpus statistic (the script and its output).
 - **Shows:** what that source says, in words (never pasted decompiler output, rule 3).

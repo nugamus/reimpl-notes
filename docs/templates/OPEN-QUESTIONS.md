@@ -6,7 +6,7 @@ and specs until a question here is answered.
 Entry format:
 
 ```
-### Q-0001 — The question, precisely
+### Q-0001 — <one-line question>
 - **Context:** where it came up, with E-ids.
 - **What we checked:** what was tried, so nobody repeats it.
 - **Blocks:** what can't be done or is guessed until it is answered.

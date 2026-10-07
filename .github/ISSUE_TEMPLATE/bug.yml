@@ -12,6 +12,7 @@ body:
         - Ring (ring)
         - Gilbert (gilbert)
         - Grumpa (grumpa)
+        - CryOmni3D games: Versailles, Atlantis, China, Egypt, ... (cryomni3d)
     validations:
       required: true
   - type: textarea

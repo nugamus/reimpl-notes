@@ -19,8 +19,8 @@ set -euo pipefail
 NAME="${1:-${GHIDRA_PROJECT:-}}"
 [ -n "$NAME" ] || { echo "usage: headless.sh <Monet|Peintre|Ring|Gilbert|Grumpa|...>"; exit 0; }
 case "$NAME" in # one fixed port per project: the port says which project answers
-  Monet) PORT=8089 ;; Peintre) PORT=8090 ;; Ring) PORT=8091 ;; Gilbert) PORT=8092 ;; Grumpa) PORT=8093 ;;
-  *) PORT="${GHIDRA_MCP_PORT:-8094}" ;;
+  Monet) PORT=8089 ;; Peintre) PORT=8090 ;; Ring) PORT=8091 ;; Gilbert) PORT=8092 ;; Grumpa) PORT=8093 ;; CryOmni3D) PORT=8094 ;;
+  *) PORT="${GHIDRA_MCP_PORT:-8095}" ;;
 esac
 GHIDRA_HOME="${GHIDRA_HOME:-C:/ghidra}"
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
