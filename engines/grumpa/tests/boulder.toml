@@ -1,0 +1,8 @@
+description = "Rolling boulders on the hill, scene 90 (E-1681): Grumpa enters 90 and is placed in stone 02's path (1945, 1212), where only its contact spheres on GPU vertices 281 and 140 reach him (vertex 0 alone passes 33 units off); walk-in trigger 660 starts timers 920/921, each stone rolls (op 500) with its contact spheres on (op 14); a sphere touching him runs the stone's third list, hud 51(22): Life -22, and op 15 turns that stone's contact off until its next roll"
+snaps = ["boulder.png"]
+timeout = 120
+args = ["-d1"]
+
+[keys]
+random_seed = "1"
+grumpa_vm = "1;ticks 5;go 90;ticks 30;where;slot 8 2;placexyz 1945 400 1212;ticks 5;where;ticks 300;where;slot 8 2;ticks 300;slot 8 2;snap {out}/boulder.png"

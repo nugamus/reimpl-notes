@@ -112,7 +112,12 @@ ms, ticks left). Running and direction start at 0, so nothing moves until the ac
   forward-end list (1st); on the next play down to 0, then running off, direction up,
   backward-end list (2nd). Restart = play again when the timer is on, else running on.
 - **ops**: 2/3 visible, 11/12 active, 13 latch (inactive, invisible; ignores all but 52), 52
-  unlatch, 14/15 bubble tests on/off (Q-0600), 86 reload mesh and texture, 92 texture.
+  unlatch, 14/15 contact tests on/off, 86 reload mesh and texture, 92 texture.
+- **contact spheres** (E-1681, E-1683): each `(vertex, radius)` rides a vertex of the current
+  frame, the vertex counted as the renderer's buffer counts them: one per uv index, across the
+  sections in order, at the position of the vertex that uv index's corner names. With flag bit
+  1 the player's body sphere touching one runs the third list (once per touch with `once`).
+  The air bubbles (Air +10) and scene 90's rolling stones (Life −22, then op 15) use it.
 - **scene status**: active, visible, latch, playing, running, direction, frame and autoplay are
   kept; autoplay is kept as 0, so a revisited scene does not autoplay again (E-0602).
 

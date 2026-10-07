@@ -1,0 +1,8 @@
+description = "Spawners (characters.md Spawners, E-0408): scene 35's spawner 760 (min 3, max 3, five points) places three different characters from its points' lists on entry, each at its point with full Life; leaving and coming back spawns afresh"
+snaps = ["spawn35.png", "spawn35_fight.png", "spawn35_again.png"]
+timeout = 90
+args = ["-d1"]
+
+[keys]
+random_seed = "1"
+grumpa_vm = "1;ticks 5;go 35;ticks 40;snap {out}/spawn35.png;where;walkto -243 419 250 300 35;where;ticks 400;where;slot 8 2;snap {out}/spawn35_fight.png;go 34;ticks 30;go 35;ticks 40;snap {out}/spawn35_again.png"
