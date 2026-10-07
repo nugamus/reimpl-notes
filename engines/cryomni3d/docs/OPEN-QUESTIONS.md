@@ -103,3 +103,24 @@ Entry format:
 - **Blocks:** nothing for playback through ScummVM's WAV reader; whether the game honours
   the 44100 Hz rate of `SOUND/BOITE32A.WAV` is unknown.
 - **Status:** open.
+
+### Q-0700 — What does 0x417400 do with a go zone's fourth argument?
+- **Context:** E-0702: clicking a type 0/2/4 zone in a warp calls 0x417500 (mouse) and
+  0x417400 (record field 7) before the goto; field 7 is 0 in all 608 decoded type-0
+  zones (one undecoded).
+- **Blocks:** the exact camera motion on a click (turn towards the zone? zoom?).
+- **Status:** open. Decompile 0x417400/0x417500.
+
+### Q-0701 — What do the letters of China's dialogue ids mean?
+- **Context:** E-0704: GICD1011, GIDD1011, ANGC1011, XPRD4101: two speaker letters, then
+  one, then D/C/H/Q/..., then act + three digits. Only partly read.
+- **Blocks:** nothing (ids are opaque keys); naming in docs only.
+- **Status:** open. Tabulate DIAL.TXT ids against their speakers' sync videos.
+
+### Q-0702 — China place dumper: conditions are not rendered
+- **Context:** `engines/cryomni3d/tools/china_places.py` lists API calls and zone tests in
+  address order; the variable/object tests and their branches are not turned into
+  if/else, so a place's logic must still be read from its listing (done for pne140 in
+  `games/china/docs/places.md`).
+- **Blocks:** writing every place's spec mechanically.
+- **Status:** open. Next: follow the conditional jumps (cmp/test + jcc) into a tree.

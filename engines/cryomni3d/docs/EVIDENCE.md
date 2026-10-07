@@ -486,3 +486,110 @@ of 100 per area, so related entries stay together.
   puzzle treats 0 as no zone (291,917 pixels) and values below 0x37 as zones (1..54 occur;
   some tests are < 13). Puzzle meaning belongs in `games/china/docs/`.
 - **Used by:** `docs/formats/raw.ksy`, README "RAW".
+
+### E-0700 — China's places are 270 procedures in code, chained in one list (2026-10-07)
+- **Source:** CHINE.EXE .text 0x421f00..0x436e20 (no function defined there by Ghidra's
+  auto-analysis: reached only through function pointers); `0x41f190` (goto),
+  `0x41f380` (per-frame tick), `0x41f6a0` (find by name), `0x41f3c0` (debug name);
+  `uv run engines/cryomni3d/tools/china_places.py --selftest` ("270 procedures, list
+  covers all of them").
+- **Shows:** every place (and every close-up, puzzle entry and cut-scene step) is a cdecl
+  procedure `int proc(int msg)`, each 16-byte aligned and starting `mov eax,[esp+4]`.
+  msg 1 returns the next procedure of a global list (head 0x436db0 "Script_Start"; the
+  last returns 0); msg 2 returns the place name; msg 3 is the entry part; any other value
+  runs the event part (the entry part falls through into it). The tick 0x41f380 calls the
+  current procedure with 3 once after a goto, then with 0 every frame. Goto 0x41f190
+  stores the procedure, asks its name (msg 2) and switches music by the name's first
+  three letters through the table at 0x45ed10 (PNE/AIE/AIO/CTP/CGC -> Allee; CPC/LGE/SPF
+  -> Bureaux1; LGA/BPI/ESP/NWF/BAN/BDA -> Bureaux2; PDC -> Concub; JIX -> Jardins;
+  CTH/CHS/SHS -> SalleHS; `.zik` in DATA/MUSIC). Find-by-name 0x41f6a0 walks the list from
+  the head with msg 1 comparing msg 2 names (at most 5000 steps): the map and the loader
+  use it (callers 0x4013e0, 0x4114b0, 0x4116b0). All 270 procedures are on the list.
+- **Used by:** `games/china/docs/places.md`, `engines/cryomni3d/tools/china_places.py`.
+
+### E-0701 — China's zones: 40 rectangles in warp coordinates (2026-10-07)
+- **Source:** CHINE.EXE `0x420330` (count at 0x5305a8 = 0), `0x4202e0` (append, refuses
+  past 0x28), `0x420460` (record = 0x5305b0 + 40*i), `0x420370`/`0x420340` (hit test),
+  `0x4153c0` (mouse -> `0x441b80` -> hit test), `0x4203c0` (debug draw flips y as
+  0x2ff - y); rect data e.g. 0x465fc0 = {290,1982,460,2047} and 0x465fd0 = {290,0,460,62}
+  for warp jixw111.
+- **Shows:** a place's hotspots ("zones") are axis-aligned rectangles of four u32 in .data,
+  given as {top, left, bottom, right} in the warp's own picture coordinates (x 0..2047
+  around the cylinder, y 0..767; inclusive bounds). The mouse's screen position is turned
+  into warp coordinates by the Omni3D library (0x441b80) and the zones are tested in
+  creation order; the first hit wins. A zone crossing x = 0 is given twice (one rect
+  ending at 2047, one starting at 0). Record (40 bytes): rect[4], disabled (1 = off),
+  type, target (procedure or string), arg, alpha (float), beta (float). At most 40 per
+  place; procedures reset the list (0x420330) first thing in their entry part and refer to
+  zones by creation index.
+- **Used by:** `games/china/docs/places.md`.
+
+### E-0702 — China's zone types, cursors and click actions (2026-10-07)
+- **Source:** CHINE.EXE zone creators `0x403060` (type 0), `0x4030a0` (2), `0x403290` (4),
+  `0x4032f0` (6), `0x403100` (7), `0x403210` (8), `0x4031b0` (9); `0x403590`/`0x4035d0`
+  (enable/disable by index); the generic handler `0x41f430`; cursor set `0x4151a0` with
+  the sprite list at 0x45d1d0 loaded by `MyMouse.cpp` 0x414d20 (index 8 doigt, 9 voir,
+  10 prendre, 12 doigt, 14 util, 15 interrog, 16 bouche); corpus statistic from
+  `china_places.py`: 609 type-0, 23 type-2, 84 type-4, 44 type-6, 332 type-7, 325 type-8,
+  37 type-9 creations; types 1, 3, 5 never created.
+- **Shows:** type 0 "go" (args: disabled, target procedure, an arg always 0, alpha, beta
+  as doubles; alpha < 0 = keep the view), cursor 8 (finger; 12 outside a warp); type 2
+  "look" (target procedure = a close-up), cursor 9 (eye); type 4 "take" (target procedure
+  or 0), cursor 10 (hand) when no object is held; type 6 "use", cursor 14 when no object
+  is held; type 7 "label" (a LABELS.TXT key looked up by 0x410600, "ACCES LEGENDE
+  INCONNU" if missing): hovering shows the text, no cursor change; type 8 "documentation"
+  (a Fichetxt.txt key, "ACCES BASE DOCUMENTAIRE INCONNU" if missing): with empty hands
+  hovering shows the title and cursor 15 (question mark), clicking opens that entry
+  (0x40c5a0) and re-enters the place (0x41f170); type 9 "talk", cursor 16 (mouth). Over a
+  type 4/6 zone while holding an object the cursor is that object's cursor. Visit mode
+  (variable 0 MODE_VISITE != 0): types 2, 4, 6, 9 are created disabled; labels (type 7)
+  exist only in visit mode (created disabled otherwise); enabling (0x403590) leaves types
+  6, 7, 9 off in visit mode. Clicking a type 0/2/4 zone (0x41f430's pressed branch):
+  in a warp, turns the view towards the click (0x417500 with the mouse position,
+  0x417400 with arg), sets alpha/beta when alpha >= 0, then goes to the target procedure
+  when it is not 0. Otherwise the clicked zone's index stays in 0x48f27c (hover clears it
+  to -1) and the procedure's own event part reacts to it.
+- **Used by:** `games/china/docs/places.md`.
+
+### E-0703 — China's script API used by the place procedures (2026-10-07)
+- **Source:** CHINE.EXE callees of the 270 procedures (counts from `china_places.py`):
+  `0x402d50` warp (DATA/WARP/<name>.HNM via `warp\` + name, 182 calls), `0x402cf0` video
+  (`%s%s.hns` from DATA/HNM, 42), `0x402e20` still image (Images\<name>.tga, 87),
+  `0x403380` -> `0x404710` sync dialogue (166), `0x403350` -> `0x404d00` voice-only
+  dialogue (9), `0x4033c0`/`0x403580` = `0x4201d0`/`0x4201c0` variable set/get on the table
+  at 0x45eec4 ({name, value, id} x 220; 0 MODE_VISITE, 1 CHAPITRE, then
+  NWFH401, Venant_de_BOUTON, ...), object state get/set `0x417da0`/`0x417dc0` on the
+  table at 0x45d5c0 (48-byte records, name at +4, state at +0x24; states 0 initial,
+  1 cursor, 2 inventory, 3 destroyed, per the debug strings at file 0x5b4e4..), wrappers
+  `0x4033e0` (==3), `0x403400` (!=0), `0x403420` (==1), `0x403440` (to inventory),
+  `0x403480` (to cursor), `0x4034f0` (destroy; drops it from the hand); `0x4035f0` ->
+  `0x405ed0` puzzle by number; `0x411d80` add a MINUTES.TXT key to the notebook (60);
+  `0x403a10` set view alpha/beta (floats in radians, 46); `0x4037e0`/`0x4039a0`/`0x4039f0`
+  sound on channel 3 (queue / play and wait / stop); `0x41f190` goto (170).
+- **Shows:** the full verb set a place can use; everything a place does is a sequence of
+  these calls guarded by variable and object tests.
+- **Used by:** `games/china/docs/places.md`, `china_places.py` (API table).
+
+### E-0704 — China's id conventions: warps, sync videos, dialogue lines (2026-10-07)
+- **Source:** `china_places.py` output (e.g. pne140: `sync_video('GICD1011', 'D140gia',
+  'D140ANJ')`); `0x404710` formats `%s%s%d.hnm` for 4 slots (0x48f078, stride 32);
+  corpus: DATA/SYNC has D140GIA0..3 / E110GIG0..3 style names, DATA/LOC/DIAL.TXT has
+  `#GICD1011#` with `GOTO ANGC1011`, DATA/LOC/VOICES has GICD1011.WAV; `var_set(CHAPITRE,
+  n)` takes values 1..18 across the procedures.
+- **Shows:** a warp name is a 3-letter area code (music table, E-0700) plus an optional
+  `w` and three digits (pne140, jixw111, aie600b); its transition videos are `<area>h<nnn>`
+  .HNS in DATA/HNM. A sync dialogue names a DIAL.TXT block (also the voice WAV), and two
+  video stems: the speaker's and Anjing's (`<letter><3 digits><3-letter speaker>`), each
+  played as stem + 0..3 (.HNM in DATA/SYNC). Dialogue ids are two letters of speaker,
+  one of listener, a letter, then four digits whose first is the act (Q-0701); game
+  variables named after a dialogue id record that it was heard. CHAPITRE is a story step
+  (1..18), not the game's chapter.
+- **Used by:** `games/china/docs/places.md`.
+
+### E-0705 — China's new game starts in pne140, facing alpha 4.7 (2026-10-07)
+- **Source:** CHINE.EXE `0x436db0` (Script_Start): zones reset, CHAPITRE = 1, notebook
+  MIN001, view alpha 4.7 / beta 0, goto 0x431050 (pne140); new game `0x406360` and
+  `0x41f100` go to 0x436db0; pne140's procedure 0x431050 as dumped by `china_places.py
+  pne140` and its disassembly 0x431050..0x43142b.
+- **Shows:** the worked example in `games/china/docs/places.md` (zones, conditions, clicks).
+- **Used by:** `games/china/docs/places.md`.
