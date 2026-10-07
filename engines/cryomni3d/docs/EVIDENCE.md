@@ -827,3 +827,135 @@ of 100 per area, so related entries stay together.
   detection entries in `detection_tables.h` use them, and each language folder of the DVD
   is a game folder of its own.
 - **Used by:** detection (GType_CHINA).
+
+### E-0900 — China's generic zone handler 0x41f430: hover branch, click branch, press latch (2026-10-08)
+- **Source:** CHINE.EXE `0x41f430`; `0x414fb0` (mouse poll: 0x48f294 = left button down,
+  0x48f298 = right down; latch 0x48f29c cleared whenever the left button is up);
+  `0x415370` (zone under the hot point into 0x48f27c, -1 when none or disabled);
+  `0x406530` call order (0x414fb0, 0x415270, 0x403640, 0x415370, then the scene).
+- **Shows:** the handler first clears the hover label. No zone (index -1) or a disabled
+  zone: nothing else (the cursor stays as 0x415270 chose it). If the latch is set or the
+  left button is up, it is a hover frame: the index is reset to -1 (the place sees no
+  click) and the cursor is set by type: 0 sprite 8 in a warp, 12 otherwise; 1 sprite 8;
+  2 and 3 sprite 9; 4 sprite 10 with empty hands, else the held object's cursor; 6 sprite
+  14 with empty hands, else the held object's cursor; 7 label set (text), cursor
+  untouched; 8 with empty hands label set (title) and sprite 15, holding something
+  nothing; 9 sprite 16; others (5) the default cursor 0x415230. If the button is down and
+  the latch clear, it is the press frame: types 0, 2, 3, 4, 5 set the latch and, in a
+  warp, turn to the cursor's top-left (0x417500), zoom by the zone's arg (0x417400), then
+  set the view angles to the zone's alpha/beta when alpha >= 0.0 (0x450268); type 6 sets
+  the latch only; type 8 with empty hands opens documentation entry <key> (0x40c5a0),
+  re-enters the place (0x41f170) and returns; all other types return with nothing done
+  and no latch (so the place sees a type 7/9 zone index on every frame the button stays
+  down). After types 0..6: a non-zero target is a goto (0x41f190, returns 1); otherwise
+  the index stays in 0x48f27c for the place's own code. Zone lookups use the hot point
+  (E-0901); the turn uses the cursor's top-left.
+- **Used by:** spec/china-zones.md (Hover, Click and transitions).
+
+### E-0901 — China's cursor sprites, hot points and default cursor (2026-10-08)
+- **Source:** CHINE.EXE `MyMouse.cpp` init `0x414d20` (loads the 18 names at 0x45d1d0
+  through the SPR loader 0x41f760, zeroes each sprite's hot-point fields +0x0c/+0x10, then
+  gives sprite 13 the hot point (1, 45)); `0x415440` (hot point = top-left + hot field, or
+  + half the sprite size on an axis whose field is 0); `0x4151a0` (set cursor by index),
+  `0x4150e0` (set cursor by sprite; in still mode the top-left moves by the size change);
+  `0x414fb0` (top-left clamped to 0..640-w, 0..480-h; starts at 320, 240); `0x415270`
+  (default cursor per frame), `0x415230` (held object's cursor, or sprite 11); `0x415340`
+  (cursor drawn at its top-left); corpus `DATA/SPRITES/CURSEURS/*.SPR`,
+  `DATA/SPRITES/OBJETS/*.SPR` headers.
+- **Shows:** table: 0 tri270, 1 tri90, 2 tri0, 3 tri180, 4 tri315, 5 tri45, 6 tri135,
+  7 tri225, 8 doigt, 9 voir, 10 prendre, 11 ptroug, 12 doigt, 13 inter, 14 util,
+  15 interrog, 16 bouche, 17 pointact (`.spr`). The files' own hot fields are discarded,
+  so every cursor's hot point is its centre (w/2, h/2), except inter (1, 45). Default
+  cursor each frame in a warp, from the top-left (x, y): x < 100: y < 100 sprite 4,
+  y > 380 sprite 7, else 0; x > 540: y < 100 sprite 5, y > 380 sprite 6, else 1;
+  otherwise y < 100 sprite 2, y > 380 sprite 3, else the held object's cursor (empty
+  hands: sprite 11). In a still: the held object's cursor or sprite 11. Object cursors
+  keep their file hot fields: all 34 `R_*.SPR` are 30x30 with hot 0, 0 (so centre),
+  `C_*.SPR` 36x36 hot 1, 1.
+- **Used by:** spec/china-zones.md (Hover).
+
+### E-0902 — China's hover label: position, box and font (2026-10-08)
+- **Source:** CHINE.EXE `0x4106e0` (store key and text, capture the cursor top-left),
+  `0x4106a0` (offsets 20, 20), `0x4107c0` (place and clip), `0x410880` (draw), `0x4082a0`
+  (box blend), `0x410600` (LABELS.TXT lookup, key lower-cased in place; used by both the
+  type 7 and type 8 creators); `0x406530` (0x4107c0 runs after the warp render only, not
+  in still mode); corpus: 95 label keys used, 4 not in LABELS.TXT (`edicule`, `poesie`,
+  `vase`, `vase_spf`); 35 doc keys, all in LABELS.TXT and Fichetxt.txt.
+- **Shows:** text = the zone's looked-up string (type 7 label text, type 8 entry title),
+  measured with font slot 0. x = cursor x + 20, or 638 - width when x + width + 2 would
+  reach 640; y = cursor y + 20; nothing drawn unless y + 20 < 479. A box 15 rows by
+  width + 1 at (x - 2, y - 2) is blended halfway towards (10, 10, 10) in 5-bit units (on
+  a 565 screen the red and green terms miss their shift, so those channels just halve:
+  original quirk), then the text in slot 0, black at (x + 1, y + 1) and white 0xFFFF at
+  (x, y). Missing keys show "ACCES LEGENDE INCONNU" (labels) or "ACCES BASE
+  DOCUMENTAIRE INCONNU" (docs).
+- **Used by:** spec/china-zones.md (Hover).
+
+### E-0903 — China's click transition, goto and cross-fade (2026-10-08)
+- **Source:** CHINE.EXE `0x41f430`, `0x41f190` (goto: current = proc, entry pending,
+  display mode 0, zone index -1, `0x403640`, music by name), `0x41f170` (goto current),
+  `0x402d50` (warp: load, mode 1, cross-fade flag 0x48f284 = 1), `0x406530` (mode 0 draws
+  nothing; mode 1 with the flag set and the skip flag 0x48f1ec clear: copy the front
+  screen, render the new view into a second buffer, then loop 0x404e80 + flip until it
+  returns 0), `0x404e80` (counter 0x48f198 += 16 per call, t = min(counter, 256); returns
+  0 and resets at >= 0x130; disassembly 0x405300..0x405317), `0x406880` (0x48f1ec = 1
+  after the interface screen), `0x417230` (render clears the flag); corpus
+  (`china_places.py`): zone arg 0 in all 608 resolved type-0 and all 23 type-2 creations
+  (one type-0 call unresolved by the dumper), type 4 forces 0; 93 of 609 type-0 zones
+  carry angles.
+- **Shows:** press on a go/look/take zone in a warp: 32-frame turn (E-0606), zoomIn(arg),
+  which is zoomIn(0) in all data (no zoom frames, only the hfov reset), alpha/beta from
+  the zone when alpha >= 0 (only type 0 can carry them; types 2 and 4 store -1), goto.
+  On the next tick the target's entry loads its warp and that frame draws the cross-fade:
+  19 frames; frame k (1..19) writes every other column (odd columns on odd k, even on
+  even k) as old - (old - new) x min(16k, 256) / 256 per colour channel into the back
+  buffer, the other columns keeping the previous frame, so frame 16 finishes the even
+  columns and 17 the odd ones; then normal frames. Music is ticked between frames; no
+  timer. Skipped once after returning from the interface screen.
+- **Used by:** spec/china-zones.md (Click and transitions).
+
+### E-0904 — China's zone creators: argument lists and visit-mode rules (2026-10-08)
+- **Source:** CHINE.EXE `0x403060`, `0x4030a0`, `0x403290`, `0x4032f0`, `0x403100`,
+  `0x403210`, `0x4031b0`, `0x403590`, `0x4035d0`, `0x4202e0`, `0x420330`; record layout
+  rect[4], disabled, type, target, arg, alpha (float), beta (float).
+- **Shows:** go(rect, disabled, target proc, arg, alpha double, beta double); look(rect,
+  disabled, target, arg); take(rect, disabled, target); use(rect, disabled);
+  label(rect, disabled, key); doc(rect, disabled, key); talk(rect, disabled); alpha and
+  beta are -1 for all but go. In visit mode (variable 0 != 0) look, take, use and talk
+  are created disabled; a label is created disabled outside visit mode and as given in
+  it; go and doc ignore the mode. Enable(i) clears the disabled flag unless visit mode is
+  on and the zone is use, label or talk (then nothing changes); disable(i) sets it. Add
+  copies the rect and zeroes the rest; past 40 zones the add is ignored.
+- **Used by:** spec/china-zones.md (Zones, Place API).
+
+### E-0905 — China's object table and object API (2026-10-08)
+- **Source:** CHINE.EXE table 0x45d5c0 (36 records of 48 bytes, record 35 empty; read
+  from the en-iso CHINE.EXE); `Object.cpp` loader `0x417a30` (c_ and r_ sprites required,
+  i_ optional, suffix `.spr` 0x45e1d0; held = 36 at the end), `0x417c90` (free),
+  `0x417e70` (reset: state 0, slot -1), `0x417ce0`/`0x417d40` (save/load each object's
+  state and slot), `0x417df0` (cursor sprite = +0x14), `0x417e50`/`0x417e60` (held object
+  0x45d5b8, 36 = none), `0x417e10`/`0x417e30` (replace the +0x2c / +0x20 strings),
+  `0x403440`, `0x403480`, `0x4034f0`, `0x4150e0`.
+- **Shows:** record: +0 index, +4 name, +8 `c_` file (loaded to +0x10), +0x0c `r_` file
+  (loaded to +0x14: the hand cursor), +0x18 `i_` file (loaded to +0x1c; objects 0..18
+  only), +0x20 a document key (`lboites`, `origine`, ...; 0..18 only), +0x24 state,
+  +0x28 slot (-1), +0x2c a key (the name again). To inventory: only from state 0, to 2.
+  To cursor: unless already 1 or 2: the held object (if any) goes to 2, this one to 1,
+  becomes held and its r_ sprite the cursor. Destroy: drops it from the hand if held,
+  state 3, clears 0x4ffa24. The zone handler never changes object state: a take zone only
+  turns and goes; the place's code moves objects.
+- **Used by:** spec/china-zones.md (Objects).
+
+### E-0906 — China's stills, videos and screen fade (2026-10-08)
+- **Source:** CHINE.EXE `0x402e20` (still: mode 2), `0x415410` (still hit test: hot point
+  in screen coordinates, no projection), `0x406530` (mode 2 draws the still and the
+  cursor, no label), `0x402cf0` (pause music 0x412bb0, play `<Hnm dir><name>.hns` with
+  the HNS player 0x4146c0, resume 0x412bd0), `0x4146c0` (stops on Escape or the left
+  button), `0x403860` (blend the current screen to black with 0x404e80 until done);
+  corpus: of 87 procedures that show a still and load no warp, 54 have a go zone across
+  the full width at the bottom (left 0, right 639, bottom 479, top 398..460).
+- **Shows:** close-ups are places in still mode with zones in screen pixels {top, left,
+  bottom, right}; the usual way back is a bottom-strip go zone to the place (finger
+  cursor 12), sometimes target 0 with the place's code choosing. Videos block, are
+  skippable by Escape or a left click, and pause the music.
+- **Used by:** spec/china-zones.md (Place API).

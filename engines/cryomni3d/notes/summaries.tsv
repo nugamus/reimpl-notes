@@ -2,13 +2,13 @@ program	address	name	summary	evidence
 CHINE.EXE	00402cf0	ScriptApi::playVideo	Play a video DATA/HNM/<name>.HNS	E-0703
 CHINE.EXE	00402d50	Main::setWarp	Loads warp <L>:\Chine\Data\warp\<name>, mode warp, cross-fade flag	E-0507
 CHINE.EXE	00402e20	Main::setImage	Shows a still by stem: tga, hnm, CD Images, CD Loc; mode still	E-0510
-CHINE.EXE	00403060	ScriptApi::addGoZone	Add a go zone (type 0): disabled flag, target proc, arg, alpha, beta	E-0702
-CHINE.EXE	004030a0	ScriptApi::addLookZone	Add a look zone (type 2), disabled in visit mode	E-0702
-CHINE.EXE	00403100	ScriptApi::addLabelZone	Add a label zone (type 7, LABELS.TXT key), active only in visit mode	E-0702
-CHINE.EXE	004031b0	ScriptApi::addTalkZone	Add a talk zone (type 9), disabled in visit mode	E-0702
-CHINE.EXE	00403210	ScriptApi::addDocZone	Add a documentation zone (type 8, Fichetxt.txt key)	E-0702
-CHINE.EXE	00403290	ScriptApi::addTakeZone	Add a take zone (type 4), disabled in visit mode	E-0702
-CHINE.EXE	004032f0	ScriptApi::addUseZone	Add a use zone (type 6), disabled in visit mode	E-0702
+CHINE.EXE	00403060	ScriptApi::zoneGo	Adds a go zone (type 0): rect, disabled, target, arg, alpha, beta	E-0904
+CHINE.EXE	004030a0	ScriptApi::zoneLook	Adds a look zone (type 2): rect, disabled, target, arg; disabled in visit mode	E-0904
+CHINE.EXE	00403100	ScriptApi::zoneLabel	Adds a label zone (type 7) with its LABELS.TXT text; enabled only in visit mode	E-0904
+CHINE.EXE	004031b0	ScriptApi::zoneTalk	Adds a talk zone (type 9): rect, disabled; disabled in visit mode	E-0904
+CHINE.EXE	00403210	ScriptApi::zoneDoc	Adds a documentation zone (type 8) with its title from LABELS.TXT	E-0904
+CHINE.EXE	00403290	ScriptApi::zoneTake	Adds a take zone (type 4): rect, disabled, target; disabled in visit mode	E-0904
+CHINE.EXE	004032f0	ScriptApi::zoneUse	Adds a use zone (type 6): rect, disabled; disabled in visit mode	E-0904
 CHINE.EXE	00403350	ScriptApi::dialogue	Voice-only dialogue line	E-0703
 CHINE.EXE	00403380	Dial::playDialogue	Waits for sound channel 3, then plays a lip-sync dialogue	E-0504
 CHINE.EXE	004033c0	ScriptApi::setVar	Set game variable by index	E-0703
@@ -19,9 +19,10 @@ CHINE.EXE	00403440	ScriptApi::objToInventory	Put object in inventory	E-0703
 CHINE.EXE	00403480	ScriptApi::objToCursor	Make object the held cursor	E-0703
 CHINE.EXE	004034f0	ScriptApi::objDestroy	Destroy object (drop from hand)	E-0703
 CHINE.EXE	00403580	ScriptApi::getVar	Get game variable by index	E-0703
-CHINE.EXE	00403590	ScriptApi::enableZone	Enable a zone by index (use/label/talk stay off in visit mode)	E-0702
-CHINE.EXE	004035d0	ScriptApi::disableZone	Disable a zone by index	E-0702
+CHINE.EXE	00403590	ScriptApi::zoneEnable	Enables a zone, except use/label/talk zones in visit mode	E-0904
+CHINE.EXE	004035d0	ScriptApi::zoneDisable	Disables a zone	E-0904
 CHINE.EXE	004035f0	ScriptApi::puzzle	Start a puzzle by number (0x405ed0)	E-0703
+CHINE.EXE	00403860	ScriptApi::fadeToBlack	Fades the screen to black with the cross-fade step	E-0906
 CHINE.EXE	00403a10	MyWarp::setAngles	Sets warp view alpha and beta	E-0507
 CHINE.EXE	00403b10	credits::run	Credits: pages of CREDITS.TXT lines every 5 s, # headings coloured, // page breaks	E-0205
 CHINE.EXE	00403eb0	Dial::findBlock	Lowercases a block id and finds its block; fin gives none; unknown fails init	E-0200
@@ -29,6 +30,7 @@ CHINE.EXE	00404080	Dial::load	Loads dial.txt, parses it, resolves GOTOs, allocat
 CHINE.EXE	00404150	Dial::resolveGotos	Replaces every block's GOTO target name by its block (fin = none)	E-0200
 CHINE.EXE	00404190	Dial::parse	Parses DIAL.TXT blocks #id# <text> GOTO target, max 700, comments, strict order	E-0200
 CHINE.EXE	00404710	Dial::runDialogue	Lip-sync dialogue player: voice wav, two speakers' SYNC face loops, subtitles if enabled	E-0504
+CHINE.EXE	00404e80	Gfx::crossFadeStep	Cross-fade step: counter+=16, blends every other column old->new by min(counter,256)/256; returns 0 after 19 steps	E-0903
 CHINE.EXE	004053b0	Main::boot	Boot: single-instance mapping, module inits in order, chine.cfg, logo/intro/ANJGEN41 dialogue/itb, menu music	E-0500
 CHINE.EXE	004056c0	Main::resetGlobals	Resets option and state globals to defaults (speed 2, subtitles 1, music 1)	E-0501
 CHINE.EXE	00405740	Main::showLoading	Loading screen: still Load and text Chargement en cours... (font slot 3, white)	E-0504
@@ -42,6 +44,7 @@ CHINE.EXE	00406880	Main::handleKeys	Per-frame keys: fps, debug keys, Space inter
 CHINE.EXE	00406d20	Main::scanSaveSlots	Marks which of the 12 save files exist	E-0505
 CHINE.EXE	00406de0	Interface::loadMenu	Loads the main menu: fondtitr background and roug_n/blc_n bullet sprites	E-0505
 CHINE.EXE	00407140	Interface::mainMenu	Main menu screen: 8 bullets with labels, hover, enable rules; returns the choice	E-0505
+CHINE.EXE	004082a0	Gfx::blendRect	Blends a screen rectangle halfway towards an RGB colour (or 1/8 mode)	E-0902
 CHINE.EXE	00409670	Interface::countDollars	Counts $ characters in a string	E-0204
 CHINE.EXE	0040a5b0	Interface::zeroLineEnds	Turns each CR outside <...> and the byte after it into NUL (runs one byte past)	E-0202
 CHINE.EXE	0040a5f0	Interface::loadDoc	Parses Fichetxt.txt themes, fiches, captions, links and tables	E-0204
@@ -49,6 +52,11 @@ CHINE.EXE	0040b3e0	Interface::loadIndex	Builds the documentation index rows -C- 
 CHINE.EXE	00410280	Label::load	Loads labels.txt, parses it, lowercases the ids	E-0201
 CHINE.EXE	00410300	Label::parse	Parses LABELS.TXT #id# <text> pairs (text multi-line), comments, max 450	E-0201
 CHINE.EXE	00410570	Label::lowercaseIds	Lowercases every label id	E-0201
+CHINE.EXE	00410600	Label::find	Looks up a LABELS.TXT key (lower-cased in place); returns the text or 0	E-0902
+CHINE.EXE	004106a0	Label::initOffsets	Sets the hover label offsets to 20,20	E-0902
+CHINE.EXE	004106e0	Label::setHover	Sets the hover label (key, text) and captures the cursor top-left; null clears it	E-0902
+CHINE.EXE	004107c0	Label::drawHover	Places the hover label at cursor+20, clipped to the screen, and draws it	E-0902
+CHINE.EXE	00410880	Label::drawBox	Draws a label: darkened box, black shadow text at +1,+1, white text, font slot 0	E-0902
 CHINE.EXE	004114b0	load::readAutoSave	Reads DataSaved_game<n>.sav: vars, objects, place, view, minutes; goes to the place	E-0208
 CHINE.EXE	004115b0	load::writeAutoSave	Writes DataSaved_game<slot+1>.sav (slot 0..11)	E-0208
 CHINE.EXE	004116b0	load::readNamedSave	Reads DataSaved<name>.sav and goes to the saved place	E-0208
@@ -75,10 +83,17 @@ CHINE.EXE	004138b0	MyFont::charWidth	Glyph advance + 1 (control chars as '?')	E-
 CHINE.EXE	00413900	MyFont::stringWidth	Width of a string's last line	E-0801
 CHINE.EXE	00413940	MyFont::stringHeight	Max glyph height of a string; reads glyph c+32 (original bug)	E-0801
 CHINE.EXE	004146c0	Main::playHns	Plays an HNS video full screen; Escape or left click stops; returns 1 if skipped	E-0504
-CHINE.EXE	00414fb0	MyMouse::update	Updates cursor position from DirectInput relative motion, clamped to the screen; button states	E-0605
-CHINE.EXE	004151a0	MyMouse::setCursor	Set mouse cursor by index into the sprite list 0x45d1d0	E-0702
-CHINE.EXE	004153c0	MyWarp::hitTest	Maps the cursor hot point through the warp and searches the place zones	E-0604
-CHINE.EXE	00415440	MyMouse::getHotPoint	Cursor hot point: top-left plus sprite hot-spot offset or half the sprite size	E-0604
+CHINE.EXE	00414d20	MyMouse::init	Mouse init: loads the 18 cursor sprites of table 0x45d1d0, zeroes their hot fields, inter gets (1,45)	E-0901
+CHINE.EXE	00414fb0	MyMouse::poll	Polls DirectInput mouse: moves and clamps cursor top-left, left/right button flags, clears the press latch on release	E-0900
+CHINE.EXE	004150e0	MyMouse::setCursorSprite	Sets the cursor to a given sprite (held object); in still mode shifts the top-left by the size change	E-0901
+CHINE.EXE	004151a0	MyMouse::setCursor	Sets the cursor sprite by table index; in still mode shifts the top-left by the size change	E-0901
+CHINE.EXE	00415230	MyMouse::setDefaultCursor	Default cursor: the held object's r_ sprite, or sprite 11 ptroug with empty hands	E-0901
+CHINE.EXE	00415270	MyMouse::updateCursor	Per-frame cursor: edge arrows in a warp from the top-left (bands 100/540, 100/380), else the default cursor	E-0901
+CHINE.EXE	00415340	MyMouse::draw	Draws the cursor sprite at its top-left	E-0901
+CHINE.EXE	00415370	MyMouse::updateHotspot	Finds the enabled zone under the cursor hot point (warp or still) into the clicked-zone index	E-0900
+CHINE.EXE	004153c0	MyMouse::zoneInWarp	Zone under the cursor in a warp: hot point through screenToImage then zone search	E-0900
+CHINE.EXE	00415410	MyMouse::zoneInStill	Zone under the cursor in a still: hot point in screen pixels, zone search	E-0906
+CHINE.EXE	00415440	MyMouse::hotPoint	Cursor hot point: top-left plus the sprite hot field, or half the sprite size when the field is 0	E-0901
 CHINE.EXE	00415570	MyScreen::init	Screen init: 640x480 16-bit DirectDraw mode	E-0503
 CHINE.EXE	00415900	MyScreen::flip	Present the back buffer (calls the DirectDraw flip with 0: BltFast, no vsync)	E-0804
 CHINE.EXE	00415a20	MyScreen::drawDebugInfo	Debug overlay: fps, zone, context, WRP_Alpha/x, WRP_Beta/y, video mode, memory	E-0602
@@ -91,14 +106,20 @@ CHINE.EXE	00416d60	MyWarp::loadWarp	Loads a warp (HNM6 single frame at 0x44, or 
 CHINE.EXE	004170a0	MyWarp::updateView	Edge scrolling of the warp view with velocity and 0.8 decay	E-0509
 CHINE.EXE	00417400	MyWarp::zoomIn	Zoom transition: n frames re-initialising the warp with hfov dropping 1 deg per frame, then restores 75.137	E-0606
 CHINE.EXE	00417500	MyWarp::turnToPoint	Animates the view 32 frames toward the point (x,y) at 20% per frame, focal 416 px	E-0606
-CHINE.EXE	00417ce0	Object::readSave	Reads two dwords per object entry (36) from a save	E-0208
-CHINE.EXE	00417d40	Object::writeSave	Writes two dwords per object entry (36) to a save	E-0208
+CHINE.EXE	00417a30	Object::init	Loads every object's c_, r_ (required) and i_ (optional) sprites; hands empty	E-0905
+CHINE.EXE	00417ce0	Object::save	Saves each object's state and slot	E-0905
+CHINE.EXE	00417d40	Object::load	Loads each object's state and slot	E-0905
 CHINE.EXE	00417da0	Objects::state	Object state get (0 initial,1 cursor,2 inventory,3 destroyed)	E-0703
 CHINE.EXE	00417dc0	Objects::setState	Object state set	E-0703
+CHINE.EXE	00417df0	Object::cursorSprite	Object's hand-cursor sprite (r_)	E-0905
+CHINE.EXE	00417e50	Object::held	Held object index (36 = none)	E-0905
+CHINE.EXE	00417e60	Object::setHeld	Sets the held object index	E-0905
+CHINE.EXE	00417e70	Object::reset	Resets all objects: state 0, slot -1	E-0905
+CHINE.EXE	0041f170	Scene::reenter	Re-enters the current place (goto current)	E-0903
 CHINE.EXE	0041f190	Main::setScene	Sets the current scene handler and switches music by scene	E-0506
 CHINE.EXE	0041f380	Main::runScene	Calls the scene handler: 3 on entry, then 0 each frame	E-0508
 CHINE.EXE	0041f3c0	Script::currentPlaceName	Copies the current place's name (or the default) into a buffer	E-0208
-CHINE.EXE	0041f430	Script::defaultZoneHandler	Generic zone handler: hover sets cursor per zone type; click on go/look/take zones turns view, sets angles, goes to target; else leaves zone index for the place	E-0702
+CHINE.EXE	0041f430	Zones::handleDefault	Generic zone handler: hover cursor/label by zone type, or on a fresh left press turn, set angles and goto the zone target	E-0900
 CHINE.EXE	0041f680	Script::find	Find a place procedure by name starting from Script_Start (0x436db0)	E-0700
 CHINE.EXE	0041f6a0	Script::findByName	Find a place procedure by name: walk the list via msg 1 comparing msg 2 names (max 5000)	E-0700
 CHINE.EXE	0041f760	Main::loadSprite	Loads a .spr sprite (TGA-like header, key colour, x, y, 16-bit pixels)	E-0505

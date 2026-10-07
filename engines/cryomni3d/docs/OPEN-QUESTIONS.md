@@ -182,3 +182,23 @@ Entry format:
 - **Blocks:** the Load button stays disabled in the boot slice.
 - **Status:** open (implementation order). Decided: ScummVM saves come with the state
   slice; the original's `.sav` layout is read for import later.
+
+### Q-0900 — China: four label keys missing from LABELS.TXT
+- **Context:** zones use the label keys `edicule`, `poesie`, `vase`, `vase_spf`, which
+  the en-iso LABELS.TXT lacks, so the original shows "ACCES LEGENDE INCONNU" on hover
+  (E-0902).
+- **Status:** open: check the other editions' LABELS.TXT; if all lack them, an original
+  bug (hide the label).
+
+### Q-0901 — China: cursor and object sprite lookup order
+- **Context:** the SPR loader 0x41f760 tries several `%s%s%s` paths (`sprites\`, `misc\`)
+  before opening; cursors live in DATA/SPRITES/CURSEURS, objects in DATA/SPRITES/OBJETS.
+  The exact order and the CD/local split were not traced (E-0901).
+- **Status:** open; the engine can search the data tree by file name.
+
+### Q-0902 — China: inventory, documentation screen and the `c_`/`i_` sprites
+- **Context:** the zone handler uses only the `r_` sprite (hand cursor). Where `c_`
+  (36x36) and `i_` are drawn, what the slot field +0x28 means, and what the right button
+  (0x48f298) does in play were not traced (E-0905). The documentation opener 0x40c5a0 is
+  also unspecced.
+- **Status:** open; next lead: callers of 0x417de0 and the inventory screen 0x40efd0.
