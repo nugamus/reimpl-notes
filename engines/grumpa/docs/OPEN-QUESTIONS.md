@@ -691,3 +691,8 @@ The spawner sets it to 1 on spawn (E-0408), the death's hide timer to 0 (or 1 fo
 that stay, E-1433). No reader found yet; the engine can ignore it until one is. Next lead: a
 byte search for `78 04 00 00` displacements in the decrypted dump (the linear disassembly
 desyncs).
+
+### Q-1611 note (2026-10-07, E-1850) — the reset rectangle also blocks clicks
+The body rectangle `+0x148` is reset to (−1, −1, 0, 0) when it spans the screen's width or the
+camera is within 100 of the character; the click rules test the same rectangle, so a character
+that close to the camera cannot be clicked. The engine follows this; not a regression.
