@@ -1,0 +1,8 @@
+description = "Scene 105's rolling barrels (E-1684): tunna_A..C (contact flags 0x11) loop down the stairs; standing in tunna_A's path Grumpa is hit (3rd list, c10 op 51(10): Life 99 -> 89). The 8th list (pirate rat 30, Life -10) needs a rat in the path; the spawned rats engage but stay on the upper level here"
+snaps = ["barrels.png"]
+timeout = 120
+args = ["-d1"]
+
+[keys]
+random_seed = "1"
+grumpa_vm = "1;ticks 5;go 104;ticks 5;go 105;ticks 30;placexyz 195 -500 112;ticks 5;where;slot 30 1;slot 8 2;ticks 600;where;slot 30 1;slot 31 1;slot 32 1;slot 8 2;snap {out}/barrels.png"
