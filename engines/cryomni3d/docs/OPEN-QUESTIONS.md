@@ -230,3 +230,12 @@ Entry format:
   0x411e60 and the menu. The slide-in animation (0x40f070 first loop), the button
   images and which button is which were not traced. Overlaps Q-0902.
 - **Status:** open; next lead: 0x40ff30, 0x40f9e0, 0x40fb10 and the rect table.
+
+### Q-1000 — The music cross-fade between tracks
+- **Context:** E-0206: the music volume moves by 10 per tick (0..127) when the track
+  changes; the engine switches tracks at once.
+- **What we checked:** only the evidence entry; the exact fade sequence (out then in, or
+  both at once) and its tick rate are not traced.
+- **Blocks:** nothing; a small audible difference at area changes.
+- **Status:** open. Decided: switch at once until the fade is traced, because the
+  original's tick has no time base either (E-0804).

@@ -1,0 +1,6 @@
+description = "China: save in pne150, go back to pne140, load: pne150 at the saved angles again (ScummVM save of E-0208's state)"
+snaps = ["loaded.png"]
+timeout = 60
+domain = "china"
+[keys]
+dev_input = "2500:key 27;5500:key 27;8500:key 27;11000:move 230 230;12000:click 230 230;13000:move 320 240;14100:angles 3.13 0;14500:zone 0;15500:click;19000:move 320 240;19500:save 1;20000:goto pne140;23000:load 1;27000:snap {out}/loaded.png;27500:quit"

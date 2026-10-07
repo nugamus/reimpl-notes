@@ -138,6 +138,10 @@ class Gen:
             return f"(g.objectState({self.obj(a[0])}) == 3 ? 1 : 0)"
         if fn == "puzzle":
             return f"g.puzzle({', '.join(self.expr(x) for x in a)})"
+        if fn == "obj_in_inventory":
+            return f"(g.objectState({self.obj(a[0])}) == 2 ? 1 : 0)"
+        if fn == "key_down":
+            return f"(g.keyDown({self.expr(a[0])}) ? 1 : 0)"
         if fn == "time_ms":
             return "(int32)g.timeMs()"
         return f"g.unknownCall({addr or fn}{''.join(', ' + self.expr(x) for x in a)})"
@@ -184,9 +188,9 @@ class Gen:
             return f"g.zoneTalk({rect(a[0])}, {e(a[1])})"
         if fn in ("zone_enable", "zone_disable"):
             return f"g.{'zoneEnable' if fn == 'zone_enable' else 'zoneDisable'}({e(a[0])})"
-        if fn in ("warp", "image", "goto", "minutes_add", "sound_ambient", "sound_wait", "dialogue"):
+        if fn in ("warp", "image", "goto", "minutes_add", "sound_queue", "sound_wait", "dialogue"):
             m = {"warp": "warp", "image": "image", "goto": "gotoPlace", "minutes_add": "minutesAdd",
-                 "sound_ambient": "soundQueue", "sound_wait": "soundPlayWait", "dialogue": "voice"}[fn]
+                 "sound_queue": "soundQueue", "sound_wait": "soundPlayWait", "dialogue": "voice"}[fn]
             return f"g.{m}({cstr(a[0])})"
         if fn == "video_hns":
             return f"g.video({cstr(a[0])})"
@@ -202,6 +206,11 @@ class Gen:
             return f"g.{m}({self.obj(a[0])})"
         if fn == "interface_screen":
             return "g.interfaceScreen()"
+        if fn == "epilogue":
+            return "g.epilogue()"
+        if fn in ("obj_set_label", "obj_set_examine"):
+            m = "objectSetLabel" if fn == "obj_set_label" else "objectSetExamine"
+            return f"g.{m}({self.obj(a[0])}, {cstr(a[1])})"
         return self.call_expr(fn, a, addr)
 
     def stmts(self, st: list, depth: int) -> list[str]:
