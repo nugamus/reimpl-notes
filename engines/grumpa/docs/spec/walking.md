@@ -3,7 +3,7 @@
 How the player's character moves: the mouse steering of actor 3, the character's clip queue
 and root motion, the walk mesh (`CFXFloor`), the scene links (`CFXToScene`) and the proximity
 gate. Format: `docs/formats/README.md` (`.scn`, `.amb`). Evidence: E-0705, E-0800..E-0804,
-E-0810..E-0818, E-0830, E-0831. Open: Q-0800, Q-0805..Q-0807, Q-0810, Q-0811. Engine: `walk.cpp`, `character.cpp`.
+E-0810..E-0818, E-0830, E-0831, E-1850. Open: Q-0800, Q-0806, Q-0807, Q-0810, Q-0811. Engine: `walk.cpp`, `character.cpp`.
 
 ## Controls (E-0810, E-0811)
 
@@ -27,13 +27,19 @@ characters', E-0603), in order:
 
 1. The character's floor type 0..4 is a **view number**: the first time after entry it selects
    that view at once; a later change sends (185, 30, type), the faded view change.
-2. **Turn**: `turn = mouse angle − (yaw − view yaw) − π`, where the mouse angle is the angle of
-   the screen vector from the character's screen point to the cursor (`π ± acos` of one of its
-   normalized components, negated when the cursor is to the right; Q-0805) and the view yaw is
-   the yaw of the view matrix's forward vector. Read geometrically: the character heads where
-   the cursor lies on screen, "up" being the camera's forward direction on the floor. Where
-   the character's screen point is computed is not read (Q-0805). The 16 walking-arrow
-   cursors (kinds 9..24) follow the angle.
+2. **Turn** (E-0812, E-0817, E-1850): with d = cursor − the character's screen point (pixels,
+   y down) and the view matrix V as given to the device (row-vector layout, `_31` = row 3
+   column 1), `turn = atan2(V._31, −V._33) − atan2(d.x, d.y) − yaw`, wrapped to [−π, π] by the
+   request. The first term is the view yaw, computed once when the view is selected (from the
+   matrix's third row, not its forward column: for a camera with yaw only it equals the camera's
+   heading + π, which the second term cancels; a pitched camera skews it toward the x axis, as
+   in the original). The **screen point** is the centre of the body clip mesh's screen
+   rectangle (its 8-corner box projected) from the character's latest draw:
+   ((left + right) / 2, (top + bottom) / 2), C integer division. The rectangle is reset to
+   (−1, −1, 0, 0), so the point to (0, 0), when it spans the screen (left < 1 and right > 799)
+   or when −(V._41, V._42, V._43) is within 100 units of the character's position. There is no
+   turn lock: every request turns. The 16 walking-arrow cursors (kinds 9..24) follow the
+   mouse angle π − atan2(d.x, d.y).
 3. Shift with the left button held: a run request.
 4. When the cursor is more than 20 px from the character's screen point: a turn-only request
    (−1). So a standing character turns to face the cursor too.
@@ -83,7 +89,8 @@ tick). Request −1 stops there; any other clears the queue and pushes, by the c
 4. **Floor**: the move goes through `CFXFloor::Move` with the character's radius `[0x28c]`.
    This runs every animation tick, idle too (a zero move still pushes off the walls and
    settles y, E-0830). The result is undone (the old position kept) when it leaves the mesh, climbs more than 20
-   (80 on a platform), or lands on a floor type above 18 whose blocking flag is set.
+   (80 on a platform), or lands on a floor type above 18 whose blocking flag is set. A climb
+   that is too high also sets the next move to 2 units straight backwards (E-1850).
 
 ## The walk mesh, `CFXFloor` (E-0800..E-0803)
 

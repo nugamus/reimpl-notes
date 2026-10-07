@@ -3378,3 +3378,36 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   so nothing draws the cursor over the film.
 - **Method:** decompile dump (grep for `ShowCursor`), with E-1720 and E-1806.
 - **Confidence:** proven (static).
+
+### E-1850 — The steering formula: screen point = body rect centre, view yaw from the view matrix's third row, no turn lock
+- **Binary/file:** `GRUMPA_NOCD.EXE` `CFXView::SelectView` `0x45ae00` (`0x45aed8..0x45afc2`),
+  `CFXMouse::UpdateAngle` `0x445360`, `PlayerControl::GetScreenPoint` `0x446a30`,
+  `CFXCharacter::Draw` `0x4226a0` (tail `0x422e00..0x422f20`), `CFXMesh::GetScreenRect`
+  `0x415350`, `CFXCharacter::Update` `0x421a60` (the step test), byte search for `dc 04 00 00`.
+- **Evidence:** 1) **View yaw** `+0xdf4` (set only when a view is selected): copy the view's
+  0x40-byte matrix (the one given to SetTransform(VIEW), vtable `+0x2c` with 2), zero its
+  translation (`0x43d940`), transform (0, 0, 1) (`0x43da00`, row-vector: the result is the
+  third row `_31, _32, _33`); L = √(_31² + _33²); `+0xddc/+0xde0/+0xde4` = (−_31/L, 0, −_33/L);
+  acos(−_33/L) (`0x45afa2`), negated when −_31/L > 0 (`0x45afb3` `TEST AH,0x41`/`FCHS`). So
+  view yaw = atan2(_31, −_33). `+0xde8..+0xdf0` = −(_41, _42, _43). 2) **Mouse angle**
+  (re-read of E-0817): d = cursor − point (ints → floats), `+0x150` = |d|, acos of the
+  normalized d.y, negated when raw d.x > 0 (`0x4453e6`), + π (`0x49081c`); so mouse angle ≡
+  π − atan2(dx, dy). With E-0812's turn = mouse − (yaw − viewYaw) − π:
+  **turn ≡ atan2(_31, −_33) − atan2(dx, dy) − yaw** (wrapped to [−π, π] by the request, E-0813).
+  3) **Screen point**: `0x446a30` copies the held character's `+0x158/+0x15c` (actor table
+  `0x4b9bc4[actor3 +0x298]`). `CFXCharacter::Draw` writes them (no other character writer in the dumps), every draw, after the body
+  clip mesh is drawn: RECT `+0x148` = that mesh's screen rectangle (`0x415350` returns mesh
+  `+0x124`, the projected 8-corner box, as for items in E-0900); set to (−1, −1, 0, 0) when left < 1
+  and right > 799, or when |(−_41, −_42, −_43 of the view) − position `+0x16c`| < 1.0 × 100
+  (`0x490460`, `0x4904a4`); then x = (left + right) / 2, y = (top + bottom) / 2 in C integer
+  division (so (0, 0) after a reset). The mouse reads the point of the latest draw. 4) **Turn lock `+0x4dc`**: the only writes in the program are the ctor's 0
+  (`0x41cde2`) and the decrement in Request (`0x41fef0`, only when nonzero); no `LEA` of the
+  field in character code (the other hits are the item's RECT `+0x4dc` at `0x43b9a7..` and
+  stack slots). It is always 0: every request turns. 5) **`SetForwardDelta(−2.0)`**
+  (`0x4219f0`): move delta `+0x294/+0x298/+0x29c` = (−2 sin yaw, 0, −2 cos yaw), called after
+  the position is restored when the step climbed more than 20 (off a platform, `+0x454` = −1)
+  or 80: the next tick's floor move pushes the character 2 units backwards.
+- **Method:** disassembly (`disasm_range.py`), decompile, byte search in the NOCD program;
+  floats read from the CD exe's `.rdata` (0x49045c 0.0, 0x490460 1.0, 0x4904a4 100,
+  0x49081c π).
+- **Confidence:** proven (static). Resolves Q-0805.

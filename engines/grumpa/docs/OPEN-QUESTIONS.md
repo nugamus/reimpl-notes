@@ -416,7 +416,7 @@ stands in for walking to the item (`inventory.cpp` update). Restore it with the 
   at `0x445360`) is not read; nor the setter of the turn lock `+0x4dc` and what
   `FUN_004219f0(−2.0)` does (the bump on a too-high step).
 - **Blocks:** the exact steering direction toward the cursor.
-- **Status:** open
+- **Status:** resolved (E-1850)
 
 ### Q-0806 — Combat: the stance, attacks and the hit test
 - **Context:** E-0811/E-0812: Ctrl = stance; left = random attack slot 0x12..0x14, right =
@@ -450,6 +450,17 @@ Actor 3's update reads the character's `+0x450`: types 0..4 select the camera vi
 Still open: the turn lock `+0x4dc` setter, `FUN_004219f0(-2.0)`, and where the character's
 screen point `+0x158/+0x15c` is written (not in Draw `0x4226a0`; likely through a pointer
 with the hover RECT `+0x148`).
+
+### Q-0805 RESOLVED (2026-10-07, E-1850) — the steering formula
+turn = atan2(V._31, −V._33) − atan2(d.x, d.y) − yaw; the screen point is the centre of the
+body clip mesh's screen rectangle `+0x148` written by `CFXCharacter::Draw`; the turn lock
+`+0x4dc` is never set (always 0); `SetForwardDelta(−2.0)` pushes 2 units backwards after a
+too-high step. Spec: `walking.md`.
+
+### Q-1611 update (2026-10-07, E-1850) — the rectangle `+0x148`'s writer
+`CFXCharacter::Draw` copies the body clip mesh's screen rectangle (no attachments, no shadow),
+reset to (−1, −1, 0, 0) when it spans the screen width or the view's −translation is within
+100 units of the character. The click broadcast question stays open.
 
 ### Q-0810 — Walking on platforms
 - **Context:** E-0802/E-0803: `CFXFloor::Move` first tests the active 0x1a actors of its

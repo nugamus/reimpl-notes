@@ -12,7 +12,7 @@ GRUMPA_NOCD.EXE	004106c0	CFXActorFactory::CreateFromATXFile	Creates an actor fro
 GRUMPA.EXE	00410cb0	WinMain::WndProc	Window procedure: mouse/Esc to actors unless a film plays (0x4ba724); Space and graph events 1/2 stop the film; 0x8003/0x8004 set/clear the flag	E-1806
 GRUMPA.EXE	00415140	CFXAMesh::CFXAMesh	CFXAMesh constructor (0x150 B), current frame +0x11c = 0	E-1700
 GRUMPA.EXE	00415310	CFXAMesh::GetVertex	Copy 32-byte vertex idx of the current frame	E-1700
-GRUMPA.EXE	00415350	CFXAMesh::GetBounds	Mesh: refresh and return its bounds at +0x124	E-1612
+GRUMPA.EXE	00415350	CFXMesh::GetScreenRect	Return the mesh's screen rectangle +0x124 (projected bounding box of its last draw)	E-1850
 GRUMPA.EXE	004157d0	CFXAMesh::CreateFromFile	Static .ANB mesh load: per-UV-slot vertex buffer (pos, normal, uv) per frame, index buffer of UV indices over all sections	E-1700
 GRUMPA.EXE	00416680	CFXAMesh::Advance	Advance the mesh frame by the tick divisor, wrapping at the frame count	E-1700
 GRUMPA.EXE	004166e0	CFXAMesh::Draw	Draw the mesh's current frame (DrawIndexedPrimitive FVF 0x112)	E-1700
@@ -111,22 +111,27 @@ GRUMPA.EXE	0043d840	CFXMatrix::Multiply	4x4 matrix product out = A*B	E-1700
 GRUMPA.EXE	0043d8c0	CFXMatrix::SetRotation	Matrix object: rotation from (pitch, yaw, roll) vector via YawPitchRoll	E-1700
 GRUMPA.EXE	0043d8e0	CFXMatrix::SetScale	Matrix object: set diagonal scale (x,y,z)	E-1612
 GRUMPA.EXE	0043d910	CFXMatrix::SetTranslation	Matrix object: set translation row	E-1700
+GRUMPA.EXE	0043d940	CFXMatrix::ClearTranslation	Matrix object: zero the translation row (_41.._43)	E-1850
 GRUMPA.EXE	0043d960	CFXMatrix::Set	Matrix object: rotation then translation	E-1700
 GRUMPA.EXE	0043d990	CFXMatrix::Identity	Matrix object: set identity	E-1700
+GRUMPA.EXE	0043da00	CFXMatrix::TransformPoint	Matrix object: transform point (x,y,z) by the row-vector matrix at +0x104 (with translation)	E-1850
 GRUMPA.EXE	00442d40	CFXGame::LoadSlot	Load slot: ops 25/36, empty Current, copy Player<n> into it, reload globals, LoadScene(scene, 0)	E-1540
 GRUMPA.EXE	00444930	CFXMouse::CFXMouse	mouse actor ctor: kind, held item, timers -1	E-1720
 GRUMPA.EXE	00444b60	CFXMouse::Load	mouse load: 4 ints, 8 named pictures into slots 1..8, arrow1_..arrow16_ into 9..24, colour key	E-1720
-GRUMPA.EXE	00445360	CFXMouse::UpdateAngle	mouse actor: cursor distance and angle from the player's screen point	E-0812
+GRUMPA.EXE	00445360	CFXMouse::UpdateAngle	mouse angle +0x154 = pi - atan2(dx,dy) of cursor minus the character's screen point (acos of normalized dy, negated for dx>0); |d| in +0x150; walk-arrow cursor kind follows	E-1850
 GRUMPA.EXE	00445440	CFXMouse::Update	mouse update: State = kind (walk arrows 9..24 as 1), hover timer restore, picture step, glitter countdown, auto-drop after click	E-1800
 GRUMPA.EXE	00445570	CFXMouse::Draw	mouse draw: slot[kind] (kind 0 = held item icon) top-left at mouse; itemglitter at -16,-16 while timer	E-1720
 GRUMPA.EXE	00446130	CFXMouse::SetKind	mouse: set kind unless 0	E-1721
 GRUMPA.EXE	00446150	CFXMouse::HoldItem	mouse: hold item n (kind 0, item State 6) or -1 (kind 9)	E-1721
 GRUMPA.EXE	004461a0	CFXMouse::HoverKind	mouse: hover kind for 8 updates, saves previous kind; ignored while holding	E-1721
 GRUMPA.EXE	004461e0	CFXMouse::GetPoint	mouse: pointer to the mouse point +0x158	E-1774
+GRUMPA.EXE	004461f0	PlayerControl::SetPoint158	Set +0x158/+0x15c to (x, y); no callers or vtable slot found	E-1850
 GRUMPA.EXE	00446210	CFXMouse::OnMessage	mouse message: 2 show, 3 hide, 0x1a cursor to player, 0x23 drop held -> kind 9	E-1721
 GRUMPA.EXE	00446330	CFXMouse::Glitter	mouse: show itemglitter overlay for 10 updates	E-1720
 GRUMPA.EXE	00446340	CFXMouse::ClearGlitter	mouse: clear itemglitter overlay	E-1720
 GRUMPA.EXE	00446a00	PlayerControl::IsCharacterPresent	Actor 3: held character present (IsPresent)	E-1684
+GRUMPA.EXE	00446a30	PlayerControl::GetScreenPoint	Copy the held character's screen point +0x158/+0x15c into +0x13c and return it	E-1850
+GRUMPA.EXE	00446ac0	PlayerControl::GetPosition	Copy the held character's position +0x16c into +0x150 and return it	E-1850
 GRUMPA.EXE	00446b10	PlayerControl::GetSphere	Actor 3: copies the held character's body sphere and returns it	E-1684
 GRUMPA.EXE	00446ba0	PlayerControl::DoCommand	player controller DoCommand: mouse button flags, clip requests, forwards to character	E-0811
 GRUMPA.EXE	00446db0	PlayerControl::HitTest	player swing hit test: chars of actors 91..94 within 140 (3D), facing dot < -0.8, damage = own slot 2	E-1401
@@ -183,4 +188,5 @@ GRUMPA.EXE	00455ff0	CFXTexture::CreateFromFile	Texture load from file (+ optiona
 GRUMPA.EXE	00456920	CFXTexture::Bind	Bind texture: SetMaterial; if 32-bit image alpha blend SRCALPHA/INVSRCALPHA, stage0 alpha = texture; SetTexture(0)	E-1612
 GRUMPA.EXE	004569f0	CFXTexture::Unbind	Unbind texture: alpha blend off if 32-bit, SetTexture(0,null)	E-1612
 GRUMPA.EXE	0045ad40	CFXView::DoCommand	CFXView DoCommand: 87 sets +0xdcc=2 (full background redraw)	E-1806
+GRUMPA.EXE	0045ae00	CFXView::SelectView	Select view i: SetTransform view/projection from the per-view matrices; view yaw +0xdf4 = atan2(_31,-_33) of the view matrix's third row; +0xde8 = -translation; broadcasts 0x1a	E-1850
 GRUMPA.EXE	0047c9f0	CRT::_CIacos	CRT acos (_CIacos)	E-1700
