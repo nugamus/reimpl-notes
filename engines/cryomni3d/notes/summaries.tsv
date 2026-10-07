@@ -23,6 +23,11 @@ CHINE.EXE	00403590	ScriptApi::enableZone	Enable a zone by index (use/label/talk 
 CHINE.EXE	004035d0	ScriptApi::disableZone	Disable a zone by index	E-0702
 CHINE.EXE	004035f0	ScriptApi::puzzle	Start a puzzle by number (0x405ed0)	E-0703
 CHINE.EXE	00403a10	MyWarp::setAngles	Sets warp view alpha and beta	E-0507
+CHINE.EXE	00403b10	credits::run	Credits: pages of CREDITS.TXT lines every 5 s, # headings coloured, // page breaks	E-0205
+CHINE.EXE	00403eb0	Dial::findBlock	Lowercases a block id and finds its block; fin gives none; unknown fails init	E-0200
+CHINE.EXE	00404080	Dial::load	Loads dial.txt, parses it, resolves GOTOs, allocates two 0x96000 buffers	E-0200
+CHINE.EXE	00404150	Dial::resolveGotos	Replaces every block's GOTO target name by its block (fin = none)	E-0200
+CHINE.EXE	00404190	Dial::parse	Parses DIAL.TXT blocks #id# <text> GOTO target, max 700, comments, strict order	E-0200
 CHINE.EXE	00404710	Dial::runDialogue	Lip-sync dialogue player: voice wav, two speakers' SYNC face loops, subtitles if enabled	E-0504
 CHINE.EXE	004053b0	Main::boot	Boot: single-instance mapping, module inits in order, chine.cfg, logo/intro/ANJGEN41 dialogue/itb, menu music	E-0500
 CHINE.EXE	004056c0	Main::resetGlobals	Resets option and state globals to defaults (speed 2, subtitles 1, music 1)	E-0501
@@ -37,8 +42,28 @@ CHINE.EXE	00406880	Main::handleKeys	Per-frame keys: fps, debug keys, Space inter
 CHINE.EXE	00406d20	Main::scanSaveSlots	Marks which of the 12 save files exist	E-0505
 CHINE.EXE	00406de0	Interface::loadMenu	Loads the main menu: fondtitr background and roug_n/blc_n bullet sprites	E-0505
 CHINE.EXE	00407140	Interface::mainMenu	Main menu screen: 8 bullets with labels, hover, enable rules; returns the choice	E-0505
+CHINE.EXE	00409670	Interface::countDollars	Counts $ characters in a string	E-0204
+CHINE.EXE	0040a5b0	Interface::zeroLineEnds	Turns each CR outside <...> and the byte after it into NUL (runs one byte past)	E-0202
+CHINE.EXE	0040a5f0	Interface::loadDoc	Parses Fichetxt.txt themes, fiches, captions, links and tables	E-0204
+CHINE.EXE	0040b3e0	Interface::loadIndex	Builds the documentation index rows -C- and id/text from Liste.txt	E-0203
+CHINE.EXE	00410280	Label::load	Loads labels.txt, parses it, lowercases the ids	E-0201
+CHINE.EXE	00410300	Label::parse	Parses LABELS.TXT #id# <text> pairs (text multi-line), comments, max 450	E-0201
+CHINE.EXE	00410570	Label::lowercaseIds	Lowercases every label id	E-0201
+CHINE.EXE	004114b0	load::readAutoSave	Reads DataSaved_game<n>.sav: vars, objects, place, view, minutes; goes to the place	E-0208
+CHINE.EXE	004115b0	load::writeAutoSave	Writes DataSaved_game<slot+1>.sav (slot 0..11)	E-0208
+CHINE.EXE	004116b0	load::readNamedSave	Reads DataSaved<name>.sav and goes to the saved place	E-0208
+CHINE.EXE	004117b0	load::writeNamedSave	Writes DataSaved<name>.sav	E-0208
 CHINE.EXE	004118a0	Main::WinMain	WinMain: boot, fonts, game loop, shutdown; exits silently when another instance runs	E-0500
+CHINE.EXE	00411900	Minutes::parse	Scans MINUTES.TXT for #id# <text> entries into 50 slots, no checks	E-0202
+CHINE.EXE	004119f0	Minutes::load	Loads Minutes.txt, zeroes line ends, parses it once	E-0202
 CHINE.EXE	00411d80	Minutes::add	Add a MINUTES.TXT key to the notebook	E-0703
+CHINE.EXE	00412510	Minutes::readSave	Reads the held minutes: count, then length + id each	E-0208
+CHINE.EXE	004125c0	Minutes::writeSave	Writes the held minutes: count, then length + id each	E-0208
+CHINE.EXE	00412710	Music::setName	Stores the next music file path	E-0206
+CHINE.EXE	00412740	Music::update	Music state machine: fades, opens the .zik, streams 22050 Hz 16-bit stereo PCM looping	E-0206
+CHINE.EXE	00412b90	Music::start	Starts the stored music (fade in) or switches with a fade out	E-0206
+CHINE.EXE	00412bd0	Music::resume	Restarts the loaded music buffer at volume 0 or starts the stored one	E-0206
+CHINE.EXE	00413200	MyFile::loadWhole	Reads a whole file into a new buffer, returns buffer and size	E-0200
 CHINE.EXE	004146c0	Main::playHns	Plays an HNS video full screen; Escape or left click stops; returns 1 if skipped	E-0504
 CHINE.EXE	00414fb0	MyMouse::update	Updates cursor position from DirectInput relative motion, clamped to the screen; button states	E-0605
 CHINE.EXE	004151a0	MyMouse::setCursor	Set mouse cursor by index into the sprite list 0x45d1d0	E-0702
@@ -46,24 +71,33 @@ CHINE.EXE	004153c0	MyWarp::hitTest	Maps the cursor hot point through the warp an
 CHINE.EXE	00415440	MyMouse::getHotPoint	Cursor hot point: top-left plus sprite hot-spot offset or half the sprite size	E-0604
 CHINE.EXE	00415570	MyScreen::init	Screen init: 640x480 16-bit DirectDraw mode	E-0503
 CHINE.EXE	00415a20	MyScreen::drawDebugInfo	Debug overlay: fps, zone, context, WRP_Alpha/x, WRP_Beta/y, video mode, memory	E-0602
+CHINE.EXE	00415dc0	MySound::playBuffer	Creates a DirectSound buffer on a channel from PCM data, rate, bits, channels, volume, loop	E-0206
 CHINE.EXE	00416ca0	MyWarp::init	Warp init: projection 75.137/50.0, zero view angles, 2048x768x2 warp buffer	E-0503
 CHINE.EXE	00416d60	MyWarp::loadWarp	Loads a warp (HNM6 single frame at 0x44, or TGA fallback) into the warp buffer, then setView	E-0600
 CHINE.EXE	004170a0	MyWarp::updateView	Edge scrolling of the warp view with velocity and 0.8 decay	E-0509
 CHINE.EXE	00417400	MyWarp::zoomIn	Zoom transition: n frames re-initialising the warp with hfov dropping 1 deg per frame, then restores 75.137	E-0606
 CHINE.EXE	00417500	MyWarp::turnToPoint	Animates the view 32 frames toward the point (x,y) at 20% per frame, focal 416 px	E-0606
+CHINE.EXE	00417ce0	Object::readSave	Reads two dwords per object entry (36) from a save	E-0208
+CHINE.EXE	00417d40	Object::writeSave	Writes two dwords per object entry (36) to a save	E-0208
 CHINE.EXE	00417da0	Objects::state	Object state get (0 initial,1 cursor,2 inventory,3 destroyed)	E-0703
 CHINE.EXE	00417dc0	Objects::setState	Object state set	E-0703
 CHINE.EXE	0041f190	Main::setScene	Sets the current scene handler and switches music by scene	E-0506
 CHINE.EXE	0041f380	Main::runScene	Calls the scene handler: 3 on entry, then 0 each frame	E-0508
+CHINE.EXE	0041f3c0	Script::currentPlaceName	Copies the current place's name (or the default) into a buffer	E-0208
 CHINE.EXE	0041f430	Script::defaultZoneHandler	Generic zone handler: hover sets cursor per zone type; click on go/look/take zones turns view, sets angles, goes to target; else leaves zone index for the place	E-0702
 CHINE.EXE	0041f680	Script::find	Find a place procedure by name starting from Script_Start (0x436db0)	E-0700
 CHINE.EXE	0041f6a0	Script::findByName	Find a place procedure by name: walk the list via msg 1 comparing msg 2 names (max 5000)	E-0700
 CHINE.EXE	0041f760	Main::loadSprite	Loads a .spr sprite (TGA-like header, key colour, x, y, 16-bit pixels)	E-0505
+CHINE.EXE	0041fcc0	Main::musicPath	Builds the DataMusic path	E-0206
+CHINE.EXE	0041fd40	Main::savedPath	Builds the DataSaved path	E-0208
 CHINE.EXE	0041fd70	Main::cdHnmPath	CD path of the Hnm\ video folder	E-0504
+CHINE.EXE	0041fdb0	Main::locPath	Builds the data path with Loc appended	E-0200
 CHINE.EXE	0041ff30	Main::cdDataPath	Formats the CD data root <L>:\Chine\Data\	E-0502
 CHINE.EXE	0041ff50	Main::checkCd	CD check for disk N: scans drives for disk%d.dat, shows cd prompt until found	E-0502
 CHINE.EXE	0041ffb0	Main::findCdDrive	Finds the drive letter c..z holding \Chine\Data\disk%d.dat	E-0502
 CHINE.EXE	00420020	Main::cdPrompt	Insert-CD prompt: shows still cd, Escape aborts, Space waits 4 s and returns	E-0502
+CHINE.EXE	00420120	Vars::read	Reads the 227 variable dwords of a save	E-0208
+CHINE.EXE	00420170	Vars::write	Writes the 227 variable dwords of a save	E-0208
 CHINE.EXE	004201c0	Vars::get	Variable table get (0x45eec4, 12-byte entries)	E-0703
 CHINE.EXE	004201d0	Vars::set	Variable table set	E-0703
 CHINE.EXE	00420260	Vars::debugPrint	Debug: print the variable table	E-0703

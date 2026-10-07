@@ -593,3 +593,144 @@ of 100 per area, so related entries stay together.
   pne140` and its disassembly 0x431050..0x43142b.
 - **Shows:** the worked example in `games/china/docs/places.md` (zones, conditions, clicks).
 - **Used by:** `games/china/docs/places.md`.
+
+### E-0200 — China's LOC text files: loading, encoding, and DIAL.TXT's grammar (2026-10-07)
+- **Source:** CHINE.EXE: the six loaders build the path `<data path>Loc\<name>`
+  (0x41fdb0 appends "Loc\" 0x45ee60) and read the whole file into one buffer (0x413200:
+  open, size, alloc, read); `Dial::load` 0x404080 ("dial.txt"), `Dial::parse` 0x404190,
+  `Dial::resolveGotos` 0x404150, `Dial::findBlock` 0x403eb0 ("fin" 0x45bffc, CRT tolower
+  0x444050), "goto"/"GOTO" 0x45c048/0x45c040, error "Dialogue init Failure." with Dial.cpp
+  lines 0xeb..0x171; corpus `DATA/LOC/*`, `loctext.py`.
+- **Shows:** all six files are Windows-1252 text with CR LF line ends and no NUL; bytes
+  >= 0x80 are accented Latin-1 letters, except one 0x82 in DIAL.TXT line 1549
+  ("Douairi" 0x82 "re": code page 850's é, a slip; Windows-1252 shows a low quote).
+  DIAL.TXT: blocks `#id#` `<text>` `GOTO target`, in that order only (any other order or
+  byte fails, Dial.cpp line 0x171); between tokens spaces, tabs, CR, LF and comments (`/`
+  to the next CR). Id and text may not contain CR/LF (lines 0xf8, 0x128). After `GOTO`
+  (case-insensitive) the reader skips one more byte and any spaces; the target runs to
+  the line end. At most 700 blocks (lines 0x106, 0x15d). Ids and targets are lowercased;
+  after parsing every target is replaced by its block, `fin` meaning "end of dialogue",
+  an unknown target failing init (line 0x9b). The 12-byte block record is {id, text,
+  next}. Corpus: 694 blocks, 181 end in `fin`, every target resolves, no comments.
+- **Used by:** formats/README.md "LOC text files"; `loctext.py`.
+
+### E-0201 — LABELS.TXT: `#id#` `<text>` pairs, comments, 450 at most (2026-10-07)
+- **Source:** CHINE.EXE `Label::load` 0x410280 ("labels.txt"), `Label::parse` 0x410300
+  (errors "Labels Init Failure." Label.cpp 0x62..0x98), `Label::lowercaseIds` 0x410570;
+  corpus LABELS.TXT.
+- **Shows:** pairs `#id#` then `<text>`, strictly alternating (two ids or two texts in a
+  row fail); whitespace and `/` comments between them; the id may not hold CR/LF, the
+  text may span lines (it ends at the first `>`). A pair written with no whitespace
+  between `#id#` and `<` also fails: both tokens are taken in one pass and the pass's
+  end state is compared with the previous pass's. At most 450 (0x1c2) labels; ids
+  lowercased. Corpus: 415 labels, ids unique, 23 comment lines (`/ -----`, `//LÉGENDES`).
+- **Used by:** formats/README.md "LOC text files"; `loctext.py`.
+
+### E-0202 — MINUTES.TXT: `#id#` `<text>` entries found by scanning (2026-10-07)
+- **Source:** CHINE.EXE `Minutes::load` 0x4119f0 ("Minutes.txt"), `Interface::zeroLineEnds`
+  0x40a5b0, `Minutes::parse` 0x411900 (entries {id, text} at 0x500cf8, count 0x500f04);
+  corpus MINUTES.TXT.
+- **Shows:** 0x40a5b0 first turns every CR outside `<...>`, and the byte after it, into
+  NUL (its loop runs to `i <= size`, one byte past the buffer). The parser then repeats:
+  scan to `#`, skip the `#` run, the id runs to the next `#`, scan to `<`, the text runs
+  to `>` (line breaks allowed). No comments, no error checks; it resumes from the text's
+  start, so a `#` inside a text would start an entry. At the buffer end it records one
+  more entry past the end before stopping (count = entries + 1). 50 slots
+  (0x500cf8..0x500e88), no bound check. Corpus: 45 entries.
+- **Used by:** formats/README.md "LOC text files"; `loctext.py`.
+
+### E-0203 — LISTE.TXT: the documentation index, grouped by letter (2026-10-07)
+- **Source:** CHINE.EXE `Interface::loadIndex` 0x40b3e0 ("Liste.txt", "-%c-" 0x45c788,
+  "%s/%s" 0x45c780, 100-byte rows at 0x48f738, count 0x4ff9a0); disassembly
+  0x40b492..0x40b4da (the `%c` is the byte right after the `#` run); corpus LISTE.TXT.
+- **Shows:** after 0x40a5b0, a loop: scan to `#`, skip the `#` run, remember the next
+  byte C, scan to the next `#`. If that is `##`, nothing is built (a `##name##` line).
+  Otherwise a header row `-C-` is written, then entries until the next `##`: `#id#`, scan
+  to `<`, text to `>`, row `id/text`. So `##A` makes the group header `-A-`; after a
+  `##name##` section line the next group's C is the NUL left by the line end, giving the
+  row "-" (the string stops at the NUL); the section's `<title>` is never read. Text
+  outside `#id#` pairs is passed over. Corpus: 23 letter lines, 3 sections, 119 entries,
+  one orphan `<The Imperial House (Neiwufu)>` (line 195, no id): 140 rows, 21 headers.
+- **Used by:** formats/README.md "LOC text files"; `loctext.py`.
+
+### E-0204 — Fichetxt.txt: themes, fiches, captions, links, tables (2026-10-07)
+- **Source:** CHINE.EXE `Interface::loadDoc` 0x40a5f0 ("Fichetxt.txt", French error texts
+  0x45c4c4..0x45c758 "Label de thème manquant ...", "Doc Init Failure." Interface.cpp
+  0x93c..0xaab), `Interface::countDollars` 0x409670, "<>" 0x45c76c; corpus Fichetxt.txt.
+- **Shows:** after 0x40a5b0: themes `##label##` `<title>` (exactly two `#`, else error
+  0x949), each holding fiches and closed by `###`. A fiche: `#label#` (one `#`),
+  `<title>`, then `!tga!` (scan to `!`, error on `<`). With a picture name: `<caption>`
+  `<text>`, then up to 10 `$link$` (fiche labels); the count of `$` in the text / 2 must
+  equal the number of links (error 0xaab). Without one (`!!`): a table of rows `<a>` `<b>`
+  (b exactly `<>` = none), each followed by up to 10 links, kept in a separate store (20
+  rows, 0x418-byte records at 0x4ce060). A fiche ends at `##`. Theme records are 0xc8c
+  bytes at 0x494558 ({label, title, count, 50 fiches of 0x40 bytes: label, title,
+  caption, text, tga, links[10], link count}). The link-count variable is not reset for
+  table fiches, so a table fiche right after a picture fiche with links would fail (not
+  the case in the corpus). The scans between tokens pass over stray bytes: the corpus has
+  a `,` after `$fiche 23$` and a repeated `!089!` line (7 bytes). Corpus: 8 themes, 122
+  fiches (120 with a picture, 2 tables, 32 rows, at most 19), 363 links, at most 22
+  fiches in a theme.
+- **Used by:** formats/README.md "LOC text files"; `loctext.py`.
+
+### E-0205 — CREDITS.TXT: pages of lines, `#` headings, `//` page breaks (2026-10-07)
+- **Source:** CHINE.EXE `credits::run` 0x403b10 ("credits.txt" 0x45bff0; colours 0xfb20
+  and 0xffff; 30-entry line table; 5000 ms timer test); corpus CREDITS.TXT.
+- **Shows:** after 0x40a5b0 (line ends become NUL), one page every 5 s: lines until a
+  line whose first or second byte is `/`; a line starting `#` is a heading (drawn in
+  RGB565 0xfb20, others 0xffff), each line centred on x = 320, 20 px apart, the block
+  centred on y = 240. After the break all `/` and NUL bytes are skipped (blank lines
+  after `//` vanish). The `##` line is read as a heading with no text; the end test
+  compares the byte after the line scan (always NUL) with `#`, so it never fires and the
+  credits end only when the scan passes the buffer end. Up to 30 lines a page. Corpus: 22
+  pages, 215 lines (53 headings), at most 25 lines a page.
+- **Used by:** formats/README.md "LOC text files"; `loctext.py`.
+
+### E-0206 — ZIK music: headerless 22050 Hz 16-bit stereo PCM, looped whole (2026-10-07)
+- **Source:** CHINE.EXE `Music::update` 0x412740 (opens the name set by `Music::setName`
+  0x412710, reads the first 0x80000 bytes, calls 0x415dc0 with rate 0x5622, bits 0x10,
+  channels 2, loop 1; refills 0x4000-byte pieces of the 512 KiB ring; at the file end
+  seeks to 0 (0x438c79) and keeps reading); 0x421990 builds a PCM WAVEFORMATEX (tag 1)
+  from those values; `Script::gotoPlace` 0x41f190 picks the file by the place's first
+  three letters (table 0x45ed10: PNE AIE AIO CTP CGC Allee; CPC LGE SPF Bureaux1; LGA BPI
+  ESP NWF BAN BDA Bureaux2; PDC Concub; JIX Jardins; CTH CHS SHS SalleHS) + ".zik"
+  0x45ee0c in `Data\Music\`; volume 0..127 fades by 10 a tick; corpus 6 files.
+- **Shows:** no header and no loop points: the whole file is the loop. All 6 sizes are
+  multiples of 4; read as LE 16-bit stereo the signal is smooth (mean |delta| 450..1050),
+  shifted by one byte it is noise (about 21800). Lengths 55.2..77.3 s; 0..154 leading
+  zero bytes. The Cryo APC decoder (0x43750d) is not used for music.
+- **Used by:** formats/README.md "ZIK"; `zik.py`, `zik.ksy`.
+
+### E-0207 — chine.cfg field 4 is the save mode: 1 automatic, 0 manual (2026-10-07)
+- **Source:** CHINE.EXE options screen 0x40e630 (the fourth button's value names are the
+  labels `auto` 0x45c934 / `manu` 0x45c92c indexed by the in-memory flag 0x48f238; the
+  second and third use `non`/`oui` 0x45c940/0x45c93c); LABELS.TXT `#save#` "Save : ",
+  `#auto#` "Automatic", `#manu#` "Manual"; menu dispatcher 0x406360 (flag 0: the emblem
+  chooser 0x410da0; flag 1: the plain screens 0x41e930 "Fondlod" and 0x41e090 "Fondsvg");
+  0x41f190 calls the automatic save 0x4115b0 after each place change.
+- **Shows:** adds to E-0501: field 4 = 1 means automatic saving (flag 0: one save per
+  player emblem, rewritten on every place change), 0 means manual (named) saves. Fields
+  2 and 3: 1 = yes. Defaults with no file (0x4056c0): flag 0 (automatic) but field 4 = 0,
+  so writing the file without touching that button stores "manual". Corpus file: normal
+  speed, subtitles on, music on, manual. Answers Q-0500.
+- **Used by:** formats/README.md "chine.cfg"; `cfg.py`, `china_cfg.ksy`.
+
+### E-0208 — China's save file layout, from the code only (2026-10-07)
+- **Source:** CHINE.EXE automatic save write 0x4115b0 / read 0x4114b0 ("%s_game%d.sav"
+  0x45cd58 with `Data\Saved\` 0x45ee4c and slot + 1, slot 0x48f22c in 0..11), named save
+  write 0x4117b0 / read 0x4116b0 ("%s%s.sav" 0x45cd68; the name is typed on 0x41e090
+  from A-Z, 0-9 and space, up to 18), slot scan 0x406d20 (`_game1..12`); blocks in order:
+  0x420170/0x420120 (u32 at 0x45eec8 + 12k while < 0x45f96c: 227 dwords), 0x417d40/
+  0x417ce0 (two u32 at 0x45d5e4 + 0x30k while <= 0x45dca7: 36 pairs), the place name from
+  0x41f3c0 (256 bytes of a stack buffer), floats 0x53485c and 0x534844, 0x4125c0/0x412510
+  (u32 count 0x500e88, then per minute u32 strlen + the bytes of its 15-byte slot at
+  0x51e3c8 + 15k); after a read the game goes to the saved place (0x41f680, 0x41f190).
+- **Shows:** the layout in formats/README.md "Save games" and `china_sav.ksy`: 1464 bytes
+  + minutes. The variable table holds 220 named entries (MODE_VISITE, CHAPITRE, ...), 5
+  with an empty name, an id-0 terminator, and the 227th dword is padding after the table;
+  ids run 1..0xe1 except that 191 appears twice and 192 never. The object table has 35
+  entries (LISTE_BOITES .. CLE_JARRE); the 36th pair is the 8 bytes after it. The place
+  name's bytes after its NUL are stack leftovers. Minute ids are written without NUL and
+  read into slots that are not cleared first, and the count is not checked against the
+  50 slots. No save exists in the corpus: nothing here is checked against a real file.
+- **Used by:** formats/README.md "Save games"; `sav.py`, `china_sav.ksy`.

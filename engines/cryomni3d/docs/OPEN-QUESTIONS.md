@@ -124,3 +124,25 @@ Entry format:
   `games/china/docs/places.md`).
 - **Blocks:** writing every place's spec mechanically.
 - **Status:** open. Next: follow the conditional jumps (cmp/test + jcc) into a tree.
+
+### Q-0200 — What are the two saved dwords of each China object entry?
+- **Context:** E-0208: the save keeps the first two dwords (`unk_0`, initially 0, and
+  `unk_4`, initially -1) of each 0x30-byte entry of the object table at 0x45d5e4.
+- **What we checked:** the save routines 0x417d40/0x417ce0 and the initial table only.
+- **Blocks:** naming the fields in `china_sav.ksy`; restoring the inventory from a save.
+- **Status:** open. Next: the Object.cpp functions (0x417a30..0x417e90) that write them.
+
+### Q-0201 — Which of China's saved view floats is yaw and which pitch?
+- **Context:** E-0208: the save stores 0x53485c then 0x534844, the two arguments of
+  `Warp::setView` 0x441df0; Q-0501 asks for the warp angle units.
+- **What we checked:** the save code and MyWarp::updateView 0x4170a0 (both updated there).
+- **Blocks:** naming `view_0`/`view_1` in `china_sav.ksy`.
+- **Status:** open. Next: 0x441df0, together with Q-0501.
+
+### Q-0202 — How does China show the index rows and the table fiches' second column?
+- **Context:** E-0203: LISTE.TXT gives rows `-C-`, `-` and `id/text`; E-0204: a table row
+  keeps its second column as a pointer at the `<` (never cut at `>`), or none for `<>`.
+- **What we checked:** the two loaders only, not the drawing code (0x4095a0 and the
+  documentation screens).
+- **Blocks:** drawing the documentation screens faithfully.
+- **Status:** open.
