@@ -1,0 +1,8 @@
+description = "Scene 13's bananas (E-1684): banana_1/2 (contact flags 8, target mesh 713) touch the spheres of grumpa_up_ladder (713) while Grumpa climbs; their 6th list hides them and drops banan_*_faller, whose end list puts the banana item in the scene"
+snaps = ["bananas.png"]
+timeout = 120
+args = ["-d2"]
+
+[keys]
+random_seed = "1"
+grumpa_vm = "1;ticks 5;go 13;ticks 30;items;op 713 500 0 0;ticks 300;items;snap {out}/bananas.png"
