@@ -118,6 +118,23 @@ ms, ticks left). Running and direction start at 0, so nothing moves until the ac
   sections in order, at the position of the vertex that uv index's corner names. With flag bit
   1 the player's body sphere touching one runs the third list (once per touch with `once`).
   The air bubbles (Air +10) and scene 90's rolling stones (Life −22, then op 15) use it.
+  The full test (E-1684), only while contact tests are on (op 14/15): for each sphere in
+  order, the kinds by flag bit, in this order; the first one that runs a list ends the update:
+  - bit 1: the player's (actor 3's) character → 3rd list (`+0x14c`);
+  - bit 2: the follower's (actor 4's) character, or fighter 95's when there is no actor 4 →
+    4th list (`+0x15c`);
+  - bit 8: the spheres of the mesh named in the file (`+0x228`; it must be active and have
+    its own tests on) → 6th list (`+0x18c`);
+  - bit 0x10: the characters held by fighters 91, 92, 93, 94, in that order → 8th list
+    (`+0x16c`, "the fighters' contact list"); bit 4 is never tested.
+  Each kind has its own latch (bit 0x10: one per fighter) when `once` = 1: a hit with the
+  latch set passes on to the next kind; a miss clears it. Latches are per mesh, so on a
+  mesh with several spheres a later sphere's miss re-arms a touch the first still has. With
+  `once` = 0 a touch runs its list every update. Character-id filters (`+0x220`, `+0x224`)
+  are never loaded (−1). The 5th list (`+0x17c`) is never run. In the data: bit 0x10 in 27
+  (ants vs the crocodile boss), 105 (barrels vs the pirate rat) and 33 (the falling stone);
+  bit 8 in 9 (boulder → snake 716) and 13 (bananas → 713); bit 2 only on meshes without
+  spheres (1, 3, 211), so it never fires.
 - **scene status**: active, visible, latch, playing, running, direction, frame and autoplay are
   kept; autoplay is kept as 0, so a revisited scene does not autoplay again (E-0602).
 

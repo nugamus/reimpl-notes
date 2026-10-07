@@ -83,6 +83,7 @@ is that scene, or when a command brings it there:
 | 0x2c / 0x2d | becomes the player's / the follower's character (Roles) |
 | 0x37 | passed on to actor 4: the follower lets go |
 | 0x46 | a rider form splits (Mounts) |
+| 0xe / 0xf | nothing: no case in the character's handler (on a 0x1a mesh they switch its contact tests on / off, `scene.md`); scene 27's ant list and timer 920 send them to the crocodile 47 to no effect (E-1684) |
 
 ## Roles: the player and the follower (E-0816, E-1220..E-1224, E-1530)
 

@@ -62,6 +62,7 @@ GRUMPA.EXE	0042afc0	CFXCutScene::Play	Play: broadcast 96, DirectShow graph on Mo
 GRUMPA.EXE	0042b2c0	CFXCutScene::Stop	Stop: stop graph, black back surface, msg 0x8004, release, resume factory, run end list, op 1 to actor 3, op 87 to 602	E-1806
 GRUMPA.EXE	0042b3e0	CFXCutScene::RunEndList	Push every command of the end list +0x248 with its conditions, then op 1 to actor 3	E-1806
 GRUMPA.EXE	0042f980	CFXFighter::CFXFighter	Fighter ctor: type 0x1c, held char/target -1, companion flag 1	E-1430
+GRUMPA.EXE	0042fb50	CFXFighter::IsCharacterPresent	Fighter: held character present (IsPresent)	E-1684
 GRUMPA.EXE	0042fb80	CFXFighter::GetOrientation	Copy held character orientation to +0x144	E-1430
 GRUMPA.EXE	0042fbd0	CFXFighter::GetPosition	Copy held character position to +0x150	E-1430
 GRUMPA.EXE	0042fc20	CFXFighter::GetSphere	Copy held character sphere block to +0x15c	E-1430
@@ -96,6 +97,7 @@ GRUMPA.EXE	00435080	CFXFollower::Update	every 2nd update copies the character's 
 GRUMPA.EXE	004350d0	CFXFollower::OnSceneEntry	places follower 20 behind the player (unless skipped), resets char to idle, sets home	E-1222
 GRUMPA.EXE	004351e0	CFXFollower::Serialize	atx: id, character (sets its role 2); save: active, visible, pos, orient, character	E-1220
 GRUMPA.EXE	00435430	CFXFollower::StepAlongYaw	moves +0x150 by arg along yaw (sin, 0, cos)	E-1222
+GRUMPA.EXE	004354d0	CFXFollower::GetCharacter	Getter: follower's held character id +0x290	E-1684
 GRUMPA.EXE	00435690	CFXCharacter::ReloadSharedTextures	Reload the shared textures (message 0x8002); names Spalsch.tga (missing) so Shadow/effect are not reloaded	E-1612
 GRUMPA.EXE	00435a00	CFXCharacter::LoadSharedMeshes	Loads the four shared meshes once: waterripple, watersplasch, Shadow, effect (.ANB) into the table at 0x4ba74c	E-1660
 GRUMPA_NOCD.EXE	00437d00	CFXInventory::DoCommand	Inventory panel: handles commands sent to actor 90 (open/close on right click, take, give)	E-0504
@@ -124,6 +126,8 @@ GRUMPA.EXE	004461e0	CFXMouse::GetPoint	mouse: pointer to the mouse point +0x158	
 GRUMPA.EXE	00446210	CFXMouse::OnMessage	mouse message: 2 show, 3 hide, 0x1a cursor to player, 0x23 drop held -> kind 9	E-1721
 GRUMPA.EXE	00446330	CFXMouse::Glitter	mouse: show itemglitter overlay for 10 updates	E-1720
 GRUMPA.EXE	00446340	CFXMouse::ClearGlitter	mouse: clear itemglitter overlay	E-1720
+GRUMPA.EXE	00446a00	PlayerControl::IsCharacterPresent	Actor 3: held character present (IsPresent)	E-1684
+GRUMPA.EXE	00446b10	PlayerControl::GetSphere	Actor 3: copies the held character's body sphere and returns it	E-1684
 GRUMPA.EXE	00446ba0	PlayerControl::DoCommand	player controller DoCommand: mouse button flags, clip requests, forwards to character	E-0811
 GRUMPA.EXE	00446db0	PlayerControl::HitTest	player swing hit test: chars of actors 91..94 within 140 (3D), facing dot < -0.8, damage = own slot 2	E-1401
 GRUMPA.EXE	00446f70	PlayerControl::Update	player controller update: steer angle, keys Ctrl/Space/Shift/Backspace, view by floor type	E-0812
@@ -162,6 +166,7 @@ GRUMPA.EXE	0044ed10	CFXSprite::Play	sprite: play (request flag, reset frame by m
 GRUMPA.EXE	0044ed80	CFXSprite::Stop	sprite: stop (clear play request)	E-1773
 GRUMPA.EXE	0044ed90	CFXSprite::CreateFromFile	sprite: create from <base>0000.. frames while files exist (<=100)	E-1720
 GRUMPA.EXE	0044fc60	CFXStaticCharacter::CFXStaticCharacter	Ctor of the 0x1a mesh actor; contact tests on (+0x1e0=1), running/direction/counter 0	E-1681
+GRUMPA.EXE	00450f30	CFXStaticCharacter::DoCommand	Mesh DoCommand: 0x34 unlatch, 0xd latch off, 2/3 visible, 0xb/0xc active, 0xe/0xf contact tests on/off (+1e0), 0x17 entry, 500/501	E-1684
 GRUMPA.EXE	004512a0	CFXStaticCharacter::RunPlayerContactList	Run player-contact list +14c (file list 3)	E-1807
 GRUMPA.EXE	00451580	CFXStaticCharacter::RunActor4ContactList	Run actor-4 contact list +15c (file list 4)	E-1807
 GRUMPA.EXE	00451860	CFXStaticCharacter::RunNamedContactList	Run named-actor contact list +18c (file list 6)	E-1807
@@ -170,9 +175,10 @@ GRUMPA.EXE	00451e20	CFXStaticCharacter::RunEndList	Run end-of-animation list +19
 GRUMPA.EXE	00452100	CFXStaticCharacter::Serialize	Serialize: load reads 8 command lists in order +12c,+13c,+14c,+15c,+17c,+18c,+19c,+16c	E-1807
 GRUMPA.EXE	004536e0	CFXStaticCharacter::GetMesh	0x1a static character: returns its mesh object (+0x1b0)	E-1600
 GRUMPA.EXE	00453990	CFXStaticCharacter::GetFrame	0x1a static character: returns current frame (+0x1c0)	E-1600
-GRUMPA.EXE	004539a0	CFXStaticCharacter::TestContacts	Contact spheres ride a vertex of the current frame (pair = vertex, radius); tests by +1bc bits 1/2/8/0x10 (player, actor4/held, +228 actor, fighters), runs lists +14c/+15c/+18c/+16c once per contact when +1e4=1	E-1681
+GRUMPA.EXE	004539a0	CFXStaticCharacter::TestContacts	Contact spheres ride frame vertices; per sphere tests bits 1 player->list3, 2 actor4/95 char->list4, 8 mesh +228 spheres->list6, 0x10 fighters 91..94->list8; first run ends update; per-kind once latches	E-1684
 GRUMPA.EXE	004540c0	CFXStaticCharacter::RunForwardEndList	Run forward-end list +12c (file list 1)	E-1807
 GRUMPA.EXE	004543a0	CFXStaticCharacter::RunBackwardEndList	Run backward-end list +13c (file list 2)	E-1807
+GRUMPA.EXE	004546f0	CFXStaticCharacter::GetContactSpheres	Returns the contact-sphere vector, or an empty one when contact tests are off (+1e0)	E-1684
 GRUMPA.EXE	00455ff0	CFXTexture::CreateFromFile	Texture load from file (+ optional .tma material)	E-1612
 GRUMPA.EXE	00456920	CFXTexture::Bind	Bind texture: SetMaterial; if 32-bit image alpha blend SRCALPHA/INVSRCALPHA, stage0 alpha = texture; SetTexture(0)	E-1612
 GRUMPA.EXE	004569f0	CFXTexture::Unbind	Unbind texture: alpha blend off if 32-bit, SetTexture(0,null)	E-1612

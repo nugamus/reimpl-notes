@@ -3327,3 +3327,43 @@ Ranges: survey, disc and protection E-0001..E-0004; formats E-0005..E-0099.
   rolls, Life 99 → 77 → 55, hud 51(22) from each stone's third list).
 - **Confidence:** proven for the index space (indices above the position count exist); the
   hit verified in the engine.
+
+### E-1684 — The 0x1a contact test's four kinds (bits 1, 2, 8, 0x10), their lists and latches; ops 14/15 on a character do nothing
+- **Binary/file:** contact test `FUN_004539a0` (dump `notes/decomp/all/004539a0_*.c`),
+  mesh DoCommand `0x450f30` (vtable `0x490910` slot +0x18; no Ghidra function, read from the
+  disassembly of `build/grumpa-import/GRUMPA_NOCD.EXE`, jump table `0x4511e4`), Serialize
+  `FUN_00452100` (u32 run `+0x1b4,+0x1b8,+0x1bc,+0x1e4,+0x21c,+0x228,+0x1d0,…`), ctor
+  `FUN_0044fc60` (`+0x220 = +0x224 = −1`), `FUN_004546f0`, `FUN_00446a00/446b10`,
+  `FUN_004354d0`, `FUN_0042fb50/42fc20`, `CFXCharacter::DoCommand` `0x41e0d0`; corpus
+  sweep of every `t_1a` record (`Scenes/*.abi`, `Actors/*.abi`).
+- **Evidence:** with `+0x1e0` = 1, for each sphere in order, the test tries bit 1, 2, 8, 0x10;
+  the first hit that runs a list ends the update (returns 1). A hit whose latch is already 1
+  falls through to the next kind; a miss clears that latch (only when `once` `+0x1e4` = 1;
+  with `once` = 0 a hit runs its list every update). Latches are per mesh, not per sphere.
+  - bit 1: actor 3's held character (present) body sphere → list 3 `+0x14c`, latch `+0x234`,
+    filter `+0x220` (player's held id must equal it; never loaded, −1 = none).
+  - bit 2: actor 4's held character (`+0x290`), or when actor 4 is absent actor 95's
+    (`FUN_00430b40`) → body sphere → list 4 `+0x15c`, latch `+0x238`, filter `+0x224`
+    (never loaded, −1).
+  - bit 4: not tested anywhere in the function.
+  - bit 8: the actor whose id is `+0x228` (file field 6), a 0x1a mesh that must be active
+    (`+0x10c` = 1); each of *its* spheres (none when its own `+0x1e0` ≠ 1) against this one →
+    list 6 `+0x18c`, latch `+0x23c`, `+0x254` = index of the other's sphere that hit (a miss
+    by that index clears the latch).
+  - bit 0x10: the held characters of fighters 91, 92, 93, 94 (`DAT_004b9bc4 +0x16c..+0x178`,
+    each present) body spheres, in that order, no id filter → list 8 `+0x16c`, latches
+    `+0x240/+0x244/+0x248/+0x24c` one per fighter.
+  Mesh DoCommand: 0x34 clears latch `+0x250`; while latched all else is ignored; 0/1, 2/3
+  `+0x110`, 0xb/0xc `+0x10c`, 0xd inactive+invisible+latch, **0xe `+0x1e0` = 1, 0xf
+  `+0x1e0` = 0**, 0x17 entry, 0x56, 0x5c, 500, 501. `CFXCharacter::DoCommand`'s switch below
+  0x38 has no case 0xe or 0xf and no default: **ops 14 and 15 sent to a character do
+  nothing** (scene 27's `c47.15` and timer 920's `c47.14` are no-ops).
+  Corpus (`+0x1bc` of 260 meshes): 1 ×232 (47 with spheres: bubbles 51/55/56/57/58/71/118,
+  4 back*_hugg, 9 snake2CCW, 10 Snake_A, 31 worm_A..G, 50 charkfen01, 81/82/83 hajfena, 90
+  rolling stones, 100 SA..SH (once 0), 102 ratbeard_wait; 185 without spheres), 0x11 ×12
+  (27 myra 712..720: lists 3 (2 cmds) and 8 (5); 105 tunna_A..C: lists 3 and 8), 3 ×6 (1, 3,
+  211: no spheres, never fire), 8 ×3 (9 boulderB_fall → 716, 13 banan_1/2 → 713), 0x10 ×1 (33
+  Stone_Falling, 10 spheres, lists 3, 4, 7, 8 filled), 0 ×6.
+- **Method:** decompile + disassembly; corpus sweep (`t_1a` fields, 18-u32 block index 2 =
+  `+0x1bc`, 3 = `+0x1e4`, 5 = `+0x228`).
+- **Confidence:** proven (static + corpus)
