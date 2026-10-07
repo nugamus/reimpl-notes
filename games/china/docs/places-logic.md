@@ -19,8 +19,8 @@ tail of code between branches (or chose a call argument by a jump), the tail is 
 in each branch; a zone created under a condition prints as `zone ?` (as do the zones
 after it, whose index then depends on the condition).
 
-270 procedures, in list order; 266
-without unknown calls; unknown callees: 0x403520, 0x403540, 0x403560, 0x405aa0, 0x414c70;
+270 procedures, in list order; 270
+without unknown calls; unknown callees: none;
 0 unmodelled instructions; 0 procedures
 not of the entry/event shape.
 
@@ -782,9 +782,9 @@ event:
     screen effect
     video fin
     screen effect
-    call 0x405aa0()
-    [0x48f200] = 0
-    [0x48f1fc] = 1
+    epilogue
+    display_mode = 0
+    end_of_play = 1
 ```
 
 ## trone
@@ -2988,8 +2988,8 @@ event:
   if CHAPITRE == 14 and not VAR_LETTRE_REVELEE: enable zone 2
   if zone == 2 and held(LETTRE_VIERGE):
     set VAR_LETTRE_REVELEE = 1
-    call 0x403540(14, 4595792)
-    call 0x403560(14, 4578956)
+    obj_set_label(LETTRE_VIERGE, LETTRE_REVELEE)
+    obj_set_examine(LETTRE_VIERGE, rebus)
     goto lvierge
     return
   if (not not_initial(LETTRE_VIERGE) and not DQRD4211 and CHAPITRE == 14) or (var220 == 1 and not DQRD4321 and CHAPITRE > 14):
@@ -4268,7 +4268,7 @@ event:
     enable zone 3
   if not Venant_de_GO and ((GO == 1 and not Aide Go 1) or GO >= 2): enable zone 3
   if CHAPITRE == 6 and ANXI2211 and not MWED2131: enable zone 3
-  if zone == 7 and not call 0x403520(27): to inventory CURE_DENTS
+  if zone == 7 and not in_inventory(CURE_DENTS): to inventory CURE_DENTS
   on zone 3:
     if CHAPITRE == 1 and not Premiere_entree_ESP and not MWED1011:
       dialogue MWED1011 (J201MWE, J201ANJ)
@@ -5072,11 +5072,11 @@ entry:
   zones reset
   image fight
   zone 0: use [187,238,475,395]
-  [0x530bf8] = time_ms()
+  fight_start_ms = time_ms()
 event:
   default zone handling (return if it acted)
   esi = time_ms()
-  if ([0x48f2a0] == 0 and [0x48f298] != 0) or call 0x414c70(57): interface screen &[esp+8]
+  if (right_button_latch == 0 and right_button_down != 0) or key_down(57): interface screen &[esp+8]
   on zone 0:
     if held(MARTEAU):
       video DAMH503
@@ -5102,7 +5102,7 @@ event:
       video DAMH502g
       goto bdaw100
       return
-  if esi - [0x530bf8] > 3000:
+  if esi - fight_start_ms > 3000:
     video DAMH505
     set FIGHTED = 0
     view 1.6, 0
@@ -5149,7 +5149,7 @@ event:
       return
     if not DAMH501:
       video DAMH501
-      [0x48f2a4] = 1
+      no_autosave_next_goto = 1
       goto fight2
       return
 ```
@@ -5914,7 +5914,7 @@ entry:
   warp jixw210
   if CHAPITRE >= 13 and CHAPITRE <= 15: enable zone 1
   if CHAPITRE > 13 or VAR_Venant_de_PUZZLE4: enable zone 0
-  if CHAPITRE == 13: [0x48f2a8] = (not VAR_Venant_de_PUZZLE4)
+  if CHAPITRE == 13: puzzle_mode = (not VAR_Venant_de_PUZZLE4)
 event:
   default zone handling (return if it acted)
   on zone 0:
@@ -5998,7 +5998,7 @@ event:
       note MINJI411
       goto puzzle42
       return
-    [0x48f2a8] = 1
+    puzzle_mode = 1
 ```
 
 ## puzzle41

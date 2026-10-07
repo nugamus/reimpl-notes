@@ -1012,3 +1012,122 @@ of 100 per area, so related entries stay together.
 - **Shows:** each place's entry and event part as structured pseudo-code; `--json` gives
   the same as statement trees for code generation. Answers Q-0702.
 - **Used by:** `games/china/docs/places.md`, `games/china/docs/places-logic.md`.
+
+### E-0950 — China's place sounds: a two-entry queue on sound channel 3 (2026-10-08)
+- **Source:** CHINE.EXE 0x4037e0 (queue), 0x403640 (pump, run every frame, E-0508),
+  0x4039a0 (play and wait), 0x4039f0 (stop), 0x416020 (channel busy), 0x415f90 (channel
+  stop), 0x415f60 (slot loop flag), 0x415d30 (slot -> channel), 0x41fe30 (`<L>:\Chine\Data\`
+  + `Loc\` + `Voices\` 0x45ee70), 0x41fc80 (`<L>:\Chine\Data\` + `Sound\` 0x45ee30),
+  `%s%s.wav` 0x45bfb8; queue at 0x48ce00 (two entries of 0x104 bytes: name, then state at
+  +0x100), index 0x48cdf8, loop marker 0x48cf04; corpus DATA/SOUND 25 WAVs.
+- **Shows:** queue(name): pump first; if channel 3 is still playing, the call is dropped;
+  else the name goes into entry 0 (index 1 folds back to 0) unless that entry is already
+  pending. Pump (only when channel 3 is idle): free the previous sound, play the pending
+  entry from `Loc\Voices\<name>.wav`, else `Sound\<name>.wav` (a missing file drops the
+  entry silently), on channel 3 through buffer slot 3, once (state 2 would loop, but no
+  code stores 2: no place sound loops), then advance the index and clear the entry.
+  Volume is the slot's default (not set here). play-wait(name): wait for channel 3 to be
+  idle, queue, pump, then busy-wait until channel 3 ends (no frames drawn, no input).
+  stop: stop channel 3 and clear the loop marker; Escape in the frame loop calls it (E-0508).
+- **Used by:** spec/china-zones.md Sounds; `china_places.py` names.
+
+### E-0951 — China's voice-only line (`dialogue` 0x403350) (2026-10-08)
+- **Source:** CHINE.EXE 0x403350, 0x404d00, 0x403eb0 (DIAL.TXT block, E-0200), 0x40e2b0
+  (subtitle band), 0x408510 (zero a rectangle), 0x40df40 (word wrap), 0x4136d0, 0x4133f0
+  (E-0801/E-0802), 0x412c30/0x412c40 (music state 6/3), 0x412740 (state 6 lowers the music
+  volume by 1 per tick down to 20; state 3 raises it by 10 per tick to 127, E-0206).
+- **Shows:** waits for channel 3 (place sounds) to end, then finds the DIAL.TXT block;
+  redraws the current display once and flips; sets the music to "duck". For each block of
+  the GOTO chain: play `Loc\Voices\<id>.wav` (22050 Hz mono 16-bit, corpus) on channel 1;
+  draw the warp view and the block's text as a subtitle (no subtitle-option test here);
+  flip; busy-wait until the voice ends or Escape (DIK 1) is down (Escape ends only the
+  current block; held, it skips the rest); next block until `fin`. Then music back to
+  state 3. The music tick does not run inside this loop, so the duck has no audible
+  effect until the line is over (quirk). A missing WAV returns 3 (error).
+  Subtitle band (0x40e2b0, shared with E-0952 and the endings): text wrapped to 630 px in
+  font slot 1 into n lines; a black band of n x 15 + 10 rows across the full width at the
+  bottom (top = 480 - band); line i in white 0xFFFF at x 5, y top + 5 + 15 i; a line
+  containing `$` is drawn from after the `$`.
+- **Used by:** spec/china-zones.md Dialogues.
+
+### E-0952 — China's lip-sync dialogue (`sync_video` 0x403380) (2026-10-08)
+- **Source:** CHINE.EXE 0x403380, 0x404710, 0x404c60 (face frame), 0x4046b0 (loads one
+  HNM), `%s%s%d.hnm` 0x45c050 under `<L>:\Chine\Data\Sync\` (0x41fdf0); speaker tables
+  0x48f078 (A) and 0x48f104 (B), loaded flags 0x48f100/0x48f18c, frame counters 0x48f0fc;
+  subtitle option 0x48f228; timer 0x416c90 (E-0804); DirectSound position 0x421cd0;
+  corpus `SYNC/<stem>0..3.HNM` are HNM6 640x480.
+- **Shows:** call (block, stemA, stemB): wait for channel 3 to end; load the four face
+  loops `Sync\<stem><k>.hnm`, k = 0..3, of each named speaker (a failed load marks that
+  speaker as "no face": its frames are black). Speaker of a block: A if the block id's
+  first 3 letters equal the first block's, else B (A is assumed to speak first). Music to
+  "duck" (E-0951), and here the music tick runs. Per block: wait for channel 1 idle, play
+  `Loc\Voices\<id>.wav` on channel 1, then until the voice ends or its play position is
+  within 22070 bytes (0.5 s) of the end: read the play position, average 5 samples 11025
+  bytes (0.25 s) ahead of it; |average| < 1024 picks loop 3 (mouth shut), else loop
+  rand()%3 (0..2), re-drawn if the same loop as last time was picked once already (0 ->
+  1 or 2, 1 -> 0 or 2, 2 -> 0 or 1; only counters 0 and 1 are reset, so 2 may repeat
+  more). Loop 3 is shown only if 88200 bytes (2 s) passed since it was last shown in this
+  block; any 0..2 pick plays 7 frames at no less than 51 ms each: per frame the music tick,
+  Escape (stop the voice and end the whole dialogue), the next frame of that speaker's
+  current loop (one frame counter per speaker, wrapping at 7, decoded as a delta over the
+  speaker's previous frame even across loops), copied full screen 640x480 (black if no
+  face), subtitle band if the subtitle option is on, flip. No other input; the mouse and
+  zones are not handled. Then the next block of the GOTO chain until `fin`; wait for
+  channel 1 to end; music to state 3; free the faces. Nothing of the place is drawn: the
+  face fills the screen.
+- **Used by:** spec/china-zones.md Dialogues; E-0504.
+
+### E-0953 — China's puzzle call (`puzzle(n, m)` 0x4035f0) (2026-10-08)
+- **Source:** CHINE.EXE 0x4035f0, 0x405ed0 (switch), 0x406040, 0x4060e0, 0x406160,
+  0x4061e0, 0x406260, 0x4062e0; init/run/close triples per source file (`F:\Chine\Sources\
+  Puzzle*.cpp` asserts): Penjing 0x41c520/0x41cda0/0x41cd20, Boudha 0x41a3b0/0x41a6e0/
+  0x41a660, Sceaux 0x41d020/0x41d630/0x41d540, GO 0x41b5d0, Puzzle4 0x417e90/0x4189bc/
+  0x41887e, Horloge 0x41bd30, Boutons 0x41a8f0, Bombe 0x4192c0/0x419830/0x4197d0; exits of
+  run checked in 0x4189bc and 0x419830; result 0x48f280, context {done 0x48f1b0, result
+  0x48f1b4}, puzzle-mode flag 0x48f2a8, fatal flag 0x48f28c.
+- **Shows:** puzzle(n, m): a held object goes back to the inventory (state 2, hands
+  empty); puzzle mode set; run puzzle n to completion (blocking, its own loop); puzzle
+  mode cleared; returns 0x48f280. n: 1 Penjing (also any n outside 2..8), 2 Bouddha,
+  3 Sceaux, 4 Go, 5 Puzzle4, 6 Horloge, 7 Boutons (folder Porte), 8 Bombe. m is used only
+  by 3 (Sceaux): passed to its run and preset as its result. A run ends by setting done
+  and a result (Puzzle4 and Bombe: 1 solved, 0 left by Escape), after re-entering the
+  current place (0x41f170) so the place's entry part runs again. Only when done is set
+  is 0x48f280 updated; on an init/run error the old value is returned and the fatal flag
+  is set.
+- **Used by:** spec/china-zones.md Puzzles.
+
+### E-0954 — China's remaining place callees and raw stores (2026-10-08)
+- **Source:** CHINE.EXE 0x403520 (state == 2), 0x403540 -> 0x417e10 (object +0x2c),
+  0x403560 -> 0x417e30 (object +0x20), 0x414c70 (DirectInput key state, DIK codes: 1
+  Escape, 0x39 Space), 0x405aa0, 0x41f190 (goto: autosave 0x4115b0 unless visit mode or
+  0x48f2a4), 0x405e60 (display by 0x48f200: 1 warp, 2 still), 0x4064e0/0x406360 (0x48f1fc
+  ends the game loop), 0x414fb0 (0x48f298 = right button down, 0x48f2a0 cleared on
+  release), 0x406880; object table values at 0x45d5c0 (object 0: +0x20 `lboites`, +0x2c
+  `LISTE_BOITES`; 14: `lvierge`, `LETTRE_VIERGE`); `lvierge` place: the call pair
+  (14, `LETTRE_REVELEE` 0x462050) and (14, `rebus` 0x45de8c).
+- **Shows:** 0x403520(o) = object o is in the inventory. 0x403540(o, s) sets the object's
+  label key (+0x2c, the LABELS.TXT name shown for it); 0x403560(o, s) sets its examine
+  place (+0x20, the place procedure name opened for it, e.g. `lvierge`). 0x414c70(k) = key
+  k down. 0x405aa0 (end of shs240) = the epilogue: four stills, each with a LABELS.TXT text
+  in the subtitle band (E-0951): ANJFR000 + FIN_ANJING, GEN_DAFR + FIN_DAMING, CONCUFR0 +
+  FIN_SHOUXIU, JONGFR00 + FIN_PRINCE; each stays 10 s or until Escape (then waits for its
+  release); music ticks meanwhile. Stores: [0x48f200] = display mode (0 none, 1 warp,
+  2 still); [0x48f1fc] = 1 ends play, then credits (E-0508); [0x48f2a4] = 1 skips the
+  autosave of the next goto (fight -> fight2); [0x48f2a8] = puzzle mode (also set by
+  jixw210); [0x530bf8] = the fight's start time; in `fight`, "right button pressed with its
+  latch clear, or Space" opens the interface screen, as in the frame loop.
+- **Used by:** spec/china-zones.md Place API; `china_places.py`.
+
+### E-0955 — China's interface screen entry (0x40efd0), outline (2026-10-08)
+- **Source:** CHINE.EXE 0x406880 (Space held: wait for release; or right button with its
+  latch clear), 0x40efd0, 0x40f070 (2413 bytes), 0x40ff30, 0x40f9e0, 0x40fb10; 0x4013e0,
+  0x410030 (`loc\voices\`), 0x411e60; rects 0x4ffa14, 0x4ffafc, 0x4ffa34, 0x4ff9bc; slot
+  row y 0x1b5..0x1db (437..475), slots 0x26 (38) px wide up to x 0x259 (601).
+- **Shows:** modal; redraws the current display, keeps a copy of the frame (640x480 16-bit)
+  and runs its own loop over it (music ticks, cursor drawn): an inventory row of object
+  slots at the bottom (hover shows the object's label text in font 3 at y 415; click takes
+  it as the cursor or puts the held one back), plus buttons tested by rects (one disabled
+  in puzzle mode). It ends on Space, a right click, or a button; some buttons re-enter the
+  current place (0x41f170) or go to the menu (the returned value, E-0508); afterwards the
+  next warp draw skips its cross-fade (E-0903). Details not traced: Q-0902, Q-0953.
+- **Used by:** spec/china-zones.md Interface screen (summary).

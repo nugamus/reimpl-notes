@@ -58,8 +58,8 @@ API = {
     0x4035D0: ("zone_disable", "i"),
     0x402CF0: ("video_hns", "s"),
     0x402E20: ("image", "s"),
-    0x403350: ("dialogue", "s"),
-    0x403380: ("sync_video", "sss"),
+    0x403350: ("dialogue", "s"),           # voice-only DIAL chain, E-0951
+    0x403380: ("sync_video", "sss"),       # lip-sync dialogue, E-0952
     0x4033C0: ("var_set", "vi"),
     0x403580: ("var_get", "v"),
     0x4033E0: ("obj_is_destroyed", "o"),
@@ -68,8 +68,13 @@ API = {
     0x403440: ("obj_to_inventory", "o"),
     0x403480: ("obj_to_cursor", "o"),
     0x4034F0: ("obj_destroy", "o"),
-    0x4035F0: ("puzzle", "ii"),
-    0x4037E0: ("sound_ambient", "s"),
+    0x4035F0: ("puzzle", "ii"),            # E-0953
+    0x403520: ("obj_in_inventory", "o"),   # E-0954
+    0x403540: ("obj_set_label", "os"),
+    0x403560: ("obj_set_examine", "os"),
+    0x405AA0: ("epilogue", ""),
+    0x414C70: ("key_down", "i"),
+    0x4037E0: ("sound_queue", "s"),        # E-0950
     0x4039A0: ("sound_wait", "s"),
     0x4039F0: ("sound_stop", ""),
     0x403860: ("screen_effect", ""),
@@ -84,10 +89,14 @@ ZONE_ADDERS = {"zone_goto": "go", "zone_type2": "look", "zone_take": "take",
                "zone_type6": "use", "zone_label": "label", "zone_doc": "doc",
                "zone_type9": "talk"}
 TESTS = {"obj_is_destroyed": "destroyed", "obj_not_initial": "not_initial",
-         "obj_is_cursor": "held"}
+         "obj_is_cursor": "held", "obj_in_inventory": "in_inventory"}
 INV = {"==": "!=", "!=": "==", "<": ">=", ">=": "<", ">": "<=", "<=": ">"}
 JCC = {"je": "==", "jne": "!=", "jl": "<", "jge": ">=", "jg": ">", "jle": "<="}
 EXIT = "exit"
+# raw globals places read or write (E-0954)
+MEM = {0x48F200: "display_mode", 0x48F1FC: "end_of_play", 0x48F2A4: "no_autosave_next_goto",
+       0x48F2A8: "puzzle_mode", 0x48F2A0: "right_button_latch", 0x48F298: "right_button_down",
+       0x530BF8: "fight_start_ms"}
 
 
 class Exe:
@@ -646,7 +655,7 @@ def ex(e) -> str:
     if "msg" in e:
         return "msg"
     if "mem" in e:
-        return f"[{e['mem']}]"
+        return MEM.get(int(e["mem"], 16), f"[{e['mem']}]")
     if "reg" in e:
         return e["reg"]
     if "stackaddr" in e:
@@ -690,7 +699,7 @@ class Text:
         if op == "return":
             return "return" if s["value"] in (0, None) else f"return {ex(s['value'])}"
         if op == "store":
-            dst = "zone" if s["addr"] == f"0x{ZONE_INDEX:x}" else f"[{s['addr']}]"
+            dst = "zone" if s["addr"] == f"0x{ZONE_INDEX:x}" else MEM.get(int(s["addr"], 16), f"[{s['addr']}]")
             return f"{dst} = {ex(s['value'])}"
         if op == "let":
             return f"{s['reg']} = {ex(s['value'])}"
@@ -723,7 +732,7 @@ class Text:
             return "default zone handling"
         simple = {"warp": "warp", "video_hns": "video", "image": "image",
                   "dialogue": "voice", "minutes_add": "note", "goto": "goto",
-                  "sound_ambient": "sound queue", "sound_wait": "sound play-wait",
+                  "sound_queue": "sound queue", "sound_wait": "sound play-wait",
                   "obj_to_inventory": "to inventory", "obj_to_cursor": "to cursor",
                   "obj_destroy": "destroy", "interface_screen": "interface screen"}
         if fn in simple and len(a) <= 1:
@@ -738,7 +747,7 @@ class Text:
             return f"puzzle({', '.join(map(ex, a))})"
         if fn in ("zone_enable", "zone_disable"):
             return f"{fn[5:]} zone {', '.join(map(ex, a))}"
-        if fn in ("sound_stop", "screen_effect"):
+        if fn in ("sound_stop", "screen_effect", "epilogue"):
             return fn.replace("_", " ")
         name = fn if not fn.startswith("0x") else "call " + fn
         return f"{name}({', '.join(map(ex, a))})"

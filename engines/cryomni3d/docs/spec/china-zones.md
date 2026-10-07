@@ -128,6 +128,22 @@ Calls a procedure makes (E-0703; arguments E-0904, E-0905, E-0906):
 | goto(proc) | Click and transitions above |
 | screen fade | blend the current screen to black with the cross-fade step (19 frames) |
 | zone handler | Hover and Click above; returns 1 when it went somewhere |
+| sound queue(name) / play-wait(name) / stop | Sounds below (E-0950) |
+| voice(block) | voice-only DIAL.TXT chain over the place, Dialogues below (E-0951) |
+| dialogue(block, stemA, stemB) | lip-sync dialogue, full-screen faces, Dialogues below (E-0952) |
+| puzzle(n, m) | run puzzle n, blocking; returns its result, Puzzles below (E-0953) |
+| in inventory(o) | object o's state is 2 (E-0954) |
+| set label(o, key) | object o's LABELS.TXT name key (+0x2c) becomes key (E-0954) |
+| set examine place(o, name) | object o's examine place (+0x20, a place procedure name) becomes name (E-0954) |
+| key down(k) | DirectInput key k is down (1 Escape, 0x39 Space) (E-0954) |
+| epilogue | the ending stills, Endings below (E-0954) |
+| interface screen | Interface screen below (E-0955) |
+| time ms | milliseconds from the performance counter (E-0804) |
+
+Raw stores some places make (E-0954): display mode (0x48f200; 0 none, 1 warp, 2 still),
+end of play (0x48f1fc = 1, then credits), "no autosave on the next goto" (0x48f2a4, the
+fight), puzzle mode (0x48f2a8, jixw210), the fight's start time (0x530bf8). Every goto
+writes the autosave unless visit mode is on or that flag is set.
 
 Close-ups (E-0906): a look zone goes to a procedure that shows a still and adds its own
 zones in screen pixels. The way back is usually a go zone across the whole bottom of the
@@ -159,3 +175,82 @@ target is the place it came from, with the finger cursor; otherwise the code dec
   place's code tests the zone index and calls to-inventory or to-cursor itself, usually
   with a video or line (e.g. `obj_to_inventory(INDICE_CACHETS)` in cpc410's event part).
 - Saves store each object's state and slot (E-0905, E-0208).
+
+## Sounds
+
+Place sounds play on one channel (3) through a two-entry queue (E-0950):
+
+- queue(name): if channel 3 is busy the call is dropped; otherwise the name is stored as
+  pending (if nothing is pending). Non-blocking.
+- Every frame (and at the start of queue), when channel 3 is idle the pending name is
+  played once from `DATA/LOC/VOICES/<name>.WAV`, else `DATA/SOUND/<name>.WAV`; a missing
+  file is dropped silently. Nothing loops. Volume: Q-0952.
+- play-wait(name): wait for channel 3, play, wait until it ends; blocks with no drawing
+  and no input.
+- stop: stop channel 3 at once. Escape during play does the same (E-0508).
+- Voice lines and dialogues first wait for channel 3 to end (E-0951, E-0952).
+
+## Dialogues
+
+Both kinds walk a DIAL.TXT block and its `GOTO` chain to `fin`, one voice file per block,
+`DATA/LOC/VOICES/<block id>.WAV` (22050 Hz mono 16-bit), on voice channel 1.
+
+Voice line, `voice(block)` (E-0951): the place stays on screen. Per block: start the
+voice, draw the warp view with the block's text in the subtitle band (always, whatever the
+subtitle option), flip, wait for the voice to end. Escape ends the current block (held, it
+skips the rest). No other input. The music is set to duck (lower by 1 per tick to 20) and
+back (raise by 10 per tick to 127) around it; the music does not tick meanwhile.
+
+Lip-sync dialogue, `dialogue(block, stemA, stemB)` (E-0952): blocking, full screen.
+- Faces: `DATA/SYNC/<stem><k>.HNM`, k = 0, 1, 2 talking loops, 3 mouth shut; HNM6
+  640x480, 7 frames each, drawn at (0, 0) over the whole screen. A speaker whose files
+  fail to load shows black. stemA speaks the blocks whose id starts with the same 3
+  letters as the first block's; stemB the others. Only the speaking face is shown.
+- Lip sync from the voice amplitude: while the voice plays (until 0.5 s before its end),
+  look 0.25 s ahead of the play position, average 5 samples; below 1024 = shut (loop 3,
+  shown at most every 2 s), else a random talking loop (0..2), not the same one twice in
+  a row (loop 2 excepted after its first repeat, a quirk). A talking loop plays 7 frames at
+  51 ms or more each; the frame counter is per speaker and continues across loops.
+- Per frame: music tick (the duck works here), Escape stops the voice and ends the whole
+  dialogue, face frame, subtitle band only if the subtitle option is on, flip. No mouse.
+- At the end it waits for the voice, restores the music and frees the faces; the place
+  redraws on the next frame.
+
+Subtitle band (E-0951): the text wrapped to 630 px in font slot 1; n lines give a black
+band n x 15 + 10 rows high across the bottom of the screen; line i white at x 5,
+y = 480 - band + 5 + 15 i. A line with a `$` is drawn from after it.
+
+## Puzzles (entry and exit only)
+
+puzzle(n, m) (E-0953): a held object returns to the inventory; puzzle mode is set; the
+puzzle runs to its end in its own loop (blocking); puzzle mode clears; the call returns
+the puzzle's result (1 solved, 0 left). Leaving re-enters the current place, so its entry
+part runs again. On an error the previous result is returned. m matters only for Sceaux
+(Q-0950). Each puzzle's own exits: Q-0951.
+
+| n | Puzzle | Source | Data folder |
+|---:|---|---|---|
+| 1 (and any other) | Penjing | PuzzlePenjing.cpp | PUZZLES/PENJING |
+| 2 | Bouddha | PuzzleBoudha.cpp | PUZZLES/BOUDDHA |
+| 3 | Sceaux (seals), takes m | PuzzleSceaux.cpp | PUZZLES/SCEAUX |
+| 4 | Go | PuzzleGO.cpp | PUZZLES/PUZZLEGO |
+| 5 | Puzzle4 | Puzzle4.cpp | PUZZLES/PUZZLE4 |
+| 6 | Horloge (clock) | PuzzleHorloge.cpp | PUZZLES/HORLOGE |
+| 7 | Boutons (door buttons) | PuzzleBoutons.cpp | PUZZLES/PORTE |
+| 8 | Bombe | PuzzleBombe.cpp | PUZZLES/BOMBE |
+
+## Endings
+
+The epilogue (end of `shs240`, E-0954): four stills in turn, ANJFR000, GEN_DAFR,
+CONCUFR0, JONGFR00, each with its LABELS.TXT text (FIN_ANJING, FIN_DAMING, FIN_SHOUXIU,
+FIN_PRINCE) in the subtitle band, 10 s each or until Escape (then until it is released).
+Then the display is set to none and play ends with the credits.
+
+## Interface screen (summary)
+
+Opened by Space (after its release) or a right click (the button's latch clear), from the
+frame loop or from the `fight` place (E-0508, E-0955). Modal, over a copy of the current
+frame: an inventory row of 38 px slots at y 437..475 (hover: the object's label text;
+click: take it as the cursor or put the held one back) and buttons (one disabled in
+puzzle mode) whose screens are not yet identified (some re-enter the place, one returns
+to the menu). Space or a right click closes it; the next warp draw skips its cross-fade. Details: Q-0902, Q-0953.

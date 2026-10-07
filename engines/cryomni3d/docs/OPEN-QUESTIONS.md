@@ -204,3 +204,29 @@ Entry format:
   (0x48f298) does in play were not traced (E-0905). The documentation opener 0x40c5a0 is
   also unspecced.
 - **Status:** open; next lead: callers of 0x417de0 and the inventory screen 0x40efd0.
+
+### Q-0950 — China: what `m` means for the Sceaux puzzle (puzzle 3)
+- **Context:** `puzzle(3, 0)` and `puzzle(3, 1)` both occur; m is passed to the Sceaux run
+  0x41d630 and preset as its result (E-0953). Its meaning inside the puzzle (which seal
+  set, or a mode) was not traced.
+- **Status:** open; next lead: uses of the second argument in 0x41d630.
+
+### Q-0951 — China: each puzzle's own exits and result values
+- **Context:** the run functions of Puzzle4 (0x4189bc) and Bombe (0x419830) were checked
+  (1 solved, 0 Escape); Penjing, Bouddha, Sceaux, Go, Horloge, Boutons were assumed to
+  follow the same done/result shape from their identical dispatchers (E-0953).
+- **Status:** open; spec each puzzle in its own section when the engine implements it.
+
+### Q-0952 — China: sound channel volumes
+- **Context:** place sounds (channel 3) and voices (channel 1) play at the buffer slot's
+  stored volume (0x52ad80 + slot x 0x1c), which the place API does not set (E-0950); the
+  value written at load (0x416120) and any option scaling were not traced.
+- **Status:** open; play at full volume meanwhile.
+
+### Q-0953 — China: the interface screen in full
+- **Context:** E-0955 outlines it: the copy of the frame, the inventory row (y 437..475,
+  38 px slots), the hover label, and four button rects (0x4ffa14, 0x4ffafc, 0x4ffa34,
+  0x4ff9bc) leading to 0x4013e0, 0x410030 (`loc\voices\`, likely the notes replay),
+  0x411e60 and the menu. The slide-in animation (0x40f070 first loop), the button
+  images and which button is which were not traced. Overlaps Q-0902.
+- **Status:** open; next lead: 0x40ff30, 0x40f9e0, 0x40fb10 and the rect table.

@@ -18,11 +18,18 @@ CHINE.EXE	00403420	ScriptApi::objHeld	Object is the held cursor	E-0703
 CHINE.EXE	00403440	ScriptApi::objToInventory	Put object in inventory	E-0703
 CHINE.EXE	00403480	ScriptApi::objToCursor	Make object the held cursor	E-0703
 CHINE.EXE	004034f0	ScriptApi::objDestroy	Destroy object (drop from hand)	E-0703
+CHINE.EXE	00403520	ScriptApi::objInInventory	Object is in the inventory (state 2)	E-0954
+CHINE.EXE	00403540	ScriptApi::objSetLabel	Set an object's label key (+0x2c)	E-0954
+CHINE.EXE	00403560	ScriptApi::objSetExamine	Set an object's examine place name (+0x20)	E-0954
 CHINE.EXE	00403580	ScriptApi::getVar	Get game variable by index	E-0703
 CHINE.EXE	00403590	ScriptApi::zoneEnable	Enables a zone, except use/label/talk zones in visit mode	E-0904
 CHINE.EXE	004035d0	ScriptApi::zoneDisable	Disables a zone	E-0904
 CHINE.EXE	004035f0	ScriptApi::puzzle	Start a puzzle by number (0x405ed0)	E-0703
+CHINE.EXE	00403640	Sound::pump	Sound pump: when channel 3 is idle, play the pending queued WAV once (Voices, else Sound)	E-0950
+CHINE.EXE	004037e0	ScriptApi::soundQueue	Queue a place sound on channel 3 (dropped if the channel is busy)	E-0950
 CHINE.EXE	00403860	ScriptApi::fadeToBlack	Fades the screen to black with the cross-fade step	E-0906
+CHINE.EXE	004039a0	ScriptApi::soundPlayWait	Play a place sound on channel 3 and busy-wait for its end	E-0950
+CHINE.EXE	004039f0	ScriptApi::soundStop	Stop channel 3 (place sounds)	E-0950
 CHINE.EXE	00403a10	MyWarp::setAngles	Sets warp view alpha and beta	E-0507
 CHINE.EXE	00403b10	credits::run	Credits: pages of CREDITS.TXT lines every 5 s, # headings coloured, // page breaks	E-0205
 CHINE.EXE	00403eb0	Dial::findBlock	Lowercases a block id and finds its block; fin gives none; unknown fails init	E-0200
@@ -30,6 +37,8 @@ CHINE.EXE	00404080	Dial::load	Loads dial.txt, parses it, resolves GOTOs, allocat
 CHINE.EXE	00404150	Dial::resolveGotos	Replaces every block's GOTO target name by its block (fin = none)	E-0200
 CHINE.EXE	00404190	Dial::parse	Parses DIAL.TXT blocks #id# <text> GOTO target, max 700, comments, strict order	E-0200
 CHINE.EXE	00404710	Dial::runDialogue	Lip-sync dialogue player: voice wav, two speakers' SYNC face loops, subtitles if enabled	E-0504
+CHINE.EXE	00404c60	Dial::drawFace	Decode the next frame of a speaker's face loop to the screen (counter wraps at 7)	E-0952
+CHINE.EXE	00404d00	Dial::playVoiceLine	Voice-only DIAL chain: per block play the voice, draw warp + subtitle, wait (Escape skips block)	E-0951
 CHINE.EXE	00404e80	Gfx::crossFadeStep	Cross-fade step: counter+=16, blends every other column old->new by min(counter,256)/256; returns 0 after 19 steps	E-0903
 CHINE.EXE	004053b0	Main::boot	Boot: single-instance mapping, module inits in order, chine.cfg, logo/intro/ANJGEN41 dialogue/itb, menu music	E-0500
 CHINE.EXE	004056c0	Main::resetGlobals	Resets option and state globals to defaults (speed 2, subtitles 1, music 1)	E-0501
@@ -37,6 +46,8 @@ CHINE.EXE	00405740	Main::showLoading	Loading screen: still Load and text Chargem
 CHINE.EXE	004057b0	Music::startMenuMusic	Starts menu music Allee.zik (local Data\Music then CD), if music option on	E-0504
 CHINE.EXE	00405870	Main::readConfig	Reads chine.cfg: speed, subtitles, music, save-mode field	E-0501
 CHINE.EXE	004059f0	Main::writeConfig	Writes chine.cfg (four uint32 options)	E-0501
+CHINE.EXE	00405aa0	Main::epilogue	Epilogue: four ending stills with LABELS texts, 10 s each or Escape	E-0954
+CHINE.EXE	00405ed0	Puzzle::run	Puzzle dispatch by number: init, run, close; result to 0x48f280	E-0953
 CHINE.EXE	00406360	Main::menuDispatch	Menu dispatcher: new game, load, resume, save, visit, quit	E-0506
 CHINE.EXE	004064e0	Main::run	Game: menu, then frames until menu or quit, then credits	E-0508
 CHINE.EXE	00406530	Main::frame	One game frame: input, script, warp or still draw, cursor, flip	E-0508
@@ -45,10 +56,13 @@ CHINE.EXE	00406d20	Main::scanSaveSlots	Marks which of the 12 save files exist	E-
 CHINE.EXE	00406de0	Interface::loadMenu	Loads the main menu: fondtitr background and roug_n/blc_n bullet sprites	E-0505
 CHINE.EXE	00407140	Interface::mainMenu	Main menu screen: 8 bullets with labels, hover, enable rules; returns the choice	E-0505
 CHINE.EXE	004082a0	Gfx::blendRect	Blends a screen rectangle halfway towards an RGB colour (or 1/8 mode)	E-0902
+CHINE.EXE	00408510	Gfx::clearRect	Fill a rectangle of the 640-wide 16-bit screen with zero	E-0951
 CHINE.EXE	00409670	Interface::countDollars	Counts $ characters in a string	E-0204
 CHINE.EXE	0040a5b0	Interface::zeroLineEnds	Turns each CR outside <...> and the byte after it into NUL (runs one byte past)	E-0202
 CHINE.EXE	0040a5f0	Interface::loadDoc	Parses Fichetxt.txt themes, fiches, captions, links and tables	E-0204
 CHINE.EXE	0040b3e0	Interface::loadIndex	Builds the documentation index rows -C- and id/text from Liste.txt	E-0203
+CHINE.EXE	0040e2b0	Dial::drawSubtitle	Subtitle band: wrap to 630 px, black band n*15+10 at the bottom, white lines at x 5	E-0951
+CHINE.EXE	0040efd0	Interface::open	Interface screen: copy the frame, run the inventory/buttons screen	E-0955
 CHINE.EXE	00410280	Label::load	Loads labels.txt, parses it, lowercases the ids	E-0201
 CHINE.EXE	00410300	Label::parse	Parses LABELS.TXT #id# <text> pairs (text multi-line), comments, max 450	E-0201
 CHINE.EXE	00410570	Label::lowercaseIds	Lowercases every label id	E-0201
@@ -71,6 +85,8 @@ CHINE.EXE	00412710	Music::setName	Stores the next music file path	E-0206
 CHINE.EXE	00412740	Music::update	Music state machine: fades, opens the .zik, streams 22050 Hz 16-bit stereo PCM looping	E-0206
 CHINE.EXE	00412b90	Music::start	Starts the stored music (fade in) or switches with a fade out	E-0206
 CHINE.EXE	00412bd0	Music::resume	Restarts the loaded music buffer at volume 0 or starts the stored one	E-0206
+CHINE.EXE	00412c30	Music::duck	Music state 6: duck (volume -1 per tick to 20)	E-0951
+CHINE.EXE	00412c40	Music::unduck	Music state 3: back up (volume +10 per tick to 127)	E-0951
 CHINE.EXE	00413200	MyFile::loadWhole	Reads a whole file into a new buffer, returns buffer and size	E-0200
 CHINE.EXE	00413300	MyFont::loadAll	Load all fonts: font01..font09, font10, font11 .crf into slots 0..10; fatal on failure	E-0800
 CHINE.EXE	004133f0	MyFont::setColor	Set text colour (RGB565 constant, converted to 555 on a 15-bit screen)	E-0802
@@ -83,6 +99,7 @@ CHINE.EXE	004138b0	MyFont::charWidth	Glyph advance + 1 (control chars as '?')	E-
 CHINE.EXE	00413900	MyFont::stringWidth	Width of a string's last line	E-0801
 CHINE.EXE	00413940	MyFont::stringHeight	Max glyph height of a string; reads glyph c+32 (original bug)	E-0801
 CHINE.EXE	004146c0	Main::playHns	Plays an HNS video full screen; Escape or left click stops; returns 1 if skipped	E-0504
+CHINE.EXE	00414c70	MyKeyboard::keyDown	DirectInput key is down (DIK code)	E-0954
 CHINE.EXE	00414d20	MyMouse::init	Mouse init: loads the 18 cursor sprites of table 0x45d1d0, zeroes their hot fields, inter gets (1,45)	E-0901
 CHINE.EXE	00414fb0	MyMouse::poll	Polls DirectInput mouse: moves and clamps cursor top-left, left/right button flags, clears the press latch on release	E-0900
 CHINE.EXE	004150e0	MyMouse::setCursorSprite	Sets the cursor to a given sprite (held object); in still mode shifts the top-left by the size change	E-0901
@@ -98,9 +115,12 @@ CHINE.EXE	00415570	MyScreen::init	Screen init: 640x480 16-bit DirectDraw mode	E-
 CHINE.EXE	00415900	MyScreen::flip	Present the back buffer (calls the DirectDraw flip with 0: BltFast, no vsync)	E-0804
 CHINE.EXE	00415a20	MyScreen::drawDebugInfo	Debug overlay: fps, zone, context, WRP_Alpha/x, WRP_Beta/y, video mode, memory	E-0602
 CHINE.EXE	00415dc0	MySound::playBuffer	Creates a DirectSound buffer on a channel from PCM data, rate, bits, channels, volume, loop	E-0206
+CHINE.EXE	00415f90	Sound::stop	Stop a sound channel	E-0950
+CHINE.EXE	00416020	Sound::isPlaying	Sound channel is playing	E-0950
 CHINE.EXE	00416510	MyTga::load	Load a TGA into the warp buffer, converting 555/24-bit to the screen format	E-0803
 CHINE.EXE	004169c0	MyTga::bgr24to555	Convert 24-bit BGR pixels to 555	E-0803
 CHINE.EXE	00416a10	MyTga::bgr24to565	Convert 24-bit BGR pixels to 565	E-0803
+CHINE.EXE	00416c90	ScriptApi::timeMs	Milliseconds now (wraps Timer::nowMs)	E-0954
 CHINE.EXE	00416ca0	MyWarp::init	Warp init: projection 75.137/50.0, zero view angles, 2048x768x2 warp buffer	E-0503
 CHINE.EXE	00416d60	MyWarp::loadWarp	Loads a warp (HNM6 single frame at 0x44, or TGA fallback) into the warp buffer, then setView	E-0600
 CHINE.EXE	004170a0	MyWarp::updateView	Edge scrolling of the warp view with velocity and 0.8 decay	E-0509
