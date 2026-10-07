@@ -123,7 +123,9 @@ Entry format:
   if/else, so a place's logic must still be read from its listing (done for pne140 in
   `games/china/docs/places.md`).
 - **Blocks:** writing every place's spec mechanically.
-- **Status:** open. Next: follow the conditional jumps (cmp/test + jcc) into a tree.
+- **Status:** RESOLVED (2026-10-08) — the dumper now rebuilds each procedure's if/else,
+  `and`/`or` conditions and early returns from the machine code (E-0710, E-0711); every
+  place's logic is in `games/china/docs/places-logic.md` (E-0712).
 
 ### Q-0200 — What are the two saved dwords of each China object entry?
 - **Context:** E-0208: the save keeps the first two dwords (`unk_0`, initially 0, and

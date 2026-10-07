@@ -959,3 +959,56 @@ of 100 per area, so related entries stay together.
   cursor 12), sometimes target 0 with the place's code choosing. Videos block, are
   skippable by Escape or a left click, and pause the music.
 - **Used by:** spec/china-zones.md (Place API).
+
+### E-0710 — China's place procedures are loop-free MSVC code of a few shapes (2026-10-08)
+- **Source:** CHINE.EXE .text 0x421f00..0x436e20, all 270 procedures disassembled by
+  `engines/cryomni3d/tools/china_places.py` (capstone): no backward jump; branches only
+  `je/jne/jl/jle/jg/jge` after `cmp eax, n` (1,169), `test eax, eax` (661),
+  `cmp dword ptr [0x48f27c], n` (96) or `test al, n` (4, `soupir`); call arguments only
+  pushed immediates or `push eax`; other register use: `inc eax` (var + 1, 7), `or al, n`
+  (bit set, 4), `sete al` + `mov byte ptr [0x48f2a8], al` (`jixw210`),
+  `mov dword ptr [0x48f27c], -1` (clear the clicked zone, `bpiw202`, `jixw121`),
+  `push esi`/`mov esi, eax`/`sub esi, [0x530bf8]` (`fight`: a timer from 0x416c90, E-0804),
+  `lea eax, [esp+8]` passed to the interface screen 0x40efd0 (`fight`, E-0508). Every
+  procedure dispatches msg with `cmp eax, 1/2/3` and enters its entry part right after
+  `cmp eax, 3; jne <event>`. The compiler shares code tails between branches (a jump into
+  another branch's identical `push ...; call` sequence, e.g. `aie600b` 0x42b795 ->
+  0x42babf, `registre` 0x424692 -> 0x4246d9, `pdc170` 0x42f38e) and threads jumps past
+  tests it knows fail (`aie600b` 0x42b8a9).
+- **Shows:** a procedure is fully described by its calls, the values they test and an
+  acyclic branch graph; the dumper executes it symbolically (pushes, eax/esi, flags),
+  duplicates shared tails per path, and models every instruction met (0 left unmodelled).
+- **Used by:** `china_places.py`, `games/china/docs/places.md`.
+
+### E-0711 — China's place procedures rebuilt as if/else with and/or conditions (2026-10-08)
+- **Source:** `uv run engines/cryomni3d/tools/china_places.py --selftest`: chains of
+  branches sharing one exit fold into `and`/`or` conditions (MSVC's short-circuit
+  layout); if/else is rebuilt from post-dominators, with returns other than the
+  procedure's main one (and tails ending in them) treated as early returns. Checked by
+  walking the instruction graph and the rebuilt tree side by side with random values for
+  every tested expression: identical call sequences in 162,000 runs over all 270
+  procedures (both parts); a deliberately broken rebuild fails 26 procedures. pne140
+  (0x431050) comes out as the worked example of places.md (E-0705): the zone 1/2 enable
+  test `(CHAPITRE == 1 and not XNED1011 and not GICD1011 and not GIDD1011) or (CHAPITRE
+  == 9 and ENED3111 == 1 and not GICD3111 and not GIDD3111)` (0x431178..0x4311e9), the
+  same test per guard under `on zone 1` / `on zone 2`, and `on zone 3: view 1.58, 0; if
+  MODE_VISITE == 1: goto pne210` (0x4313f5..0x431426). Also checked by hand against the
+  disassembly: table11 (close-up, use zones), meuble1 (signed range tests), registre and
+  aie600b (shared tails, jump threading), fight (timer, unknown calls), soupir (bit
+  tests), jixw121 (zone cleared then retested), jixw210 (`sete`), go1/espw101 (puzzle
+  result, var + 1), shs240 (ending), bpiw202 (23 zones), victime, Script_Start (entry
+  that returns, so its event part never runs on entry).
+- **Shows:** the structure printed by the dumper is the procedure's control flow.
+  Limits: shared tails are printed once per branch (9 procedures print more calls than
+  the code holds: pdc010, pdc170, aie600b, lgaw101, table14, espw102, fight, registre,
+  soupir); zones created under a condition print as `zone ?` (jixw120, 2 zones);
+  callees with no meaning yet print as `call 0x<addr>`: 0x403520, 0x403540, 0x403560,
+  0x405aa0, 0x414c70 (4 procedures); 266 procedures have none.
+- **Used by:** `china_places.py`, `games/china/docs/places-logic.md`.
+
+### E-0712 — China's place logic, all 270 procedures (2026-10-08)
+- **Source:** `uv run engines/cryomni3d/tools/china_places.py --md >
+  games/china/docs/places-logic.md` (from the EN ISO CHINE.EXE; E-0710, E-0711).
+- **Shows:** each place's entry and event part as structured pseudo-code; `--json` gives
+  the same as statement trees for code generation. Answers Q-0702.
+- **Used by:** `games/china/docs/places.md`, `games/china/docs/places-logic.md`.

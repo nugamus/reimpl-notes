@@ -9,10 +9,11 @@ comes from the dumper:
     uv run engines/cryomni3d/tools/china_places.py            # every place
     uv run engines/cryomni3d/tools/china_places.py pne140     # one place
 
-The dumper prints, per procedure, its entry part and event part as a sequence of API calls
-with decoded arguments (rects, strings, procedure names, variable and object names, angles)
-and the clicked-zone tests (`zone == n ?`). It does not yet rebuild the if/else structure
-of the variable tests (Q-0702).
+The dumper prints, per procedure, its entry part and event part as structured
+pseudo-code: every call with decoded arguments (rects, strings, procedure names, variable
+and object names, angles) under the if/else and `and`/`or` conditions rebuilt from the
+machine code (E-0710, E-0711; `--json` gives the same as statement trees). The output for
+all 270 procedures is `games/china/docs/places-logic.md` (generated, E-0712).
 
 ## Place procedures (E-0700)
 
