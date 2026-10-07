@@ -734,3 +734,73 @@ of 100 per area, so related entries stay together.
   read into slots that are not cleared first, and the count is not checked against the
   50 slots. No save exists in the corpus: nothing here is checked against a real file.
 - **Used by:** formats/README.md "Save games"; `sav.py`, `china_sav.ksy`.
+
+### E-0800 — China's fonts: eleven CRF files into slots 0..10 (2026-10-08)
+- **Source:** CHINE.EXE 0x413300 (MyFont load all: `font0%d.crf` for n = 1..9, then
+  `font%d.crf` for n = 10..11, each into slot n-1; any failure is the `Font load Failure.`
+  assert, lines 0x76/0x81), 0x413420 (load one: path = data folder + `Fontes\` + name, whole
+  file read by 0x4135d0; byte-swaps the BE u16 at file +0x0c and +0x0e (line height), then
+  walks glyph records from file +0x30, byte-swapping their five u16 and storing a pointer
+  per character 0x20..0xFF until the file ends), table base 0x51eba4, 0xe0 pointers (0x380
+  bytes) per slot, pointer for character c of slot s at index s*0xe0 + c; the file pointer
+  sits at index 0x1f of the slot.
+- **Shows:** slot n-1 = `DATA/FONTES/FONT0n.CRF` (FONT01 = slot 0 .. FONT11 = slot 10).
+  Side effect of the stride: slot s's pointer for 0xFF is slot s+1's index 0x1f, which the
+  next load overwrites with that file's buffer, so character 0xFF of fonts 0..9 draws
+  garbage (original quirk; no use of 0xFF found).
+- **Used by:** spec/china-boot.md Text and colours.
+
+### E-0801 — China's glyph drawing, text drawing and measuring (2026-10-08)
+- **Source:** CHINE.EXE 0x413750 (draw one glyph), 0x4136d0 (draw string: args dest, y, x,
+  text, font slot), 0x4138b0 (glyph advance), 0x413900 (string width), 0x413940 (string
+  height; disassembly checked: `mov ecx,[ecx*4+0x51ec24]` = pointer index c+32), global
+  0x45cffc = 1 in the EN-ISO exe data and never written, pitch global 0x48f25c, 0x1e0 = 480.
+- **Shows:** glyph record = u16 h, u16 w, s16 off_x, s16 off_y, u16 advance, h*w bytes (as
+  `crf.ksy`). A character < 0x20 is drawn as '?'; a missing glyph draws nothing and advances
+  0. Top-left = (x + off_x, y + off_y + font line height (+0x0e) - 2), each clamped to >= 0
+  (the glyph shifts, it is not cut); rows from 480 down are cut; columns are not clipped.
+  Every non-zero bitmap byte is written as the current colour (one 16-bit store); zero bytes
+  are left alone (mode 0x45cffc = 1; the other mode, never reached, writes 0xffff there). No
+  shadow, no outline, no blending. Advance = advance + 1. String: 0x0a returns x to the start
+  and adds the height of the space glyph (slot's 0x20 h) to y; 0x0d and other control bytes
+  are skipped. Width = sum of (advance + 1) on the last line. Height = max glyph h, but it
+  reads glyph c+32 (original bug), so it is only approximate.
+- **Used by:** spec/china-boot.md Text and colours.
+
+### E-0802 — China's text colour is given in RGB565 and converted for a 555 screen (2026-10-08)
+- **Source:** CHINE.EXE 0x4133f0 (set colour: if pixel-format global 0x48f270 == 15,
+  keeps bits 0..4 and puts (c >> 1) & 0x7fe0 above them; stores into 0x45d00c, initial
+  value 0xffff in the exe data); callers in 0x407140 pass 0xffff / 0x7020 / 0x9a73; 0x405740
+  sets 0xffff then draws `Chargement en cours...` with slot 3 at y 200, x 50; 0x407140 draws
+  the menu labels with slot 1 (measures them with slot 0).
+- **Shows:** constants are R5G6B5: 0xffff white, 0x7020 = (14, 1, 0) = RGB (115, 4, 0) dark
+  red, 0x9a73 = (19, 19, 19) = RGB (156, 77, 156) greyish mauve. Menu labels use
+  FONT02.CRF, the loading text FONT04.CRF in white.
+- **Used by:** spec/china-boot.md Text and colours, Main menu.
+
+### E-0803 — China's pixels are converted to the display format at load time (2026-10-08)
+- **Source:** CHINE.EXE 0x416510 (MyTga load: 16-bit TGA read raw, then if 0x48f270 == 16
+  0x4200f0 turns X1R5G5B5 into R5G6B5 (low 5 bits kept, the rest shifted left 1, green low
+  bit 0); 24-bit TGA via 0x4169c0 (to 555) or 0x416a10 (to 565), else `TGA load Failure.`);
+  0x416ca0 (MyWarp init: 0x48f270 == 15 selects HNM set-up 0x438ffa -> 0x4393d4, else
+  0x438ff0 -> 0x439330, which fills the HNM decoder's colour tables with R<<11, G<<5 (6-bit),
+  B for 565, or the 555 equivalent), and the warp shading tables 0x442590 / 0x442610.
+- **Shows:** the game's canonical pixel format is whatever the screen is (555 or 565); every
+  image, video and constant is converted to it once (images when loaded, HNM inside the
+  decoder, colours in 0x4133f0). Files: TGA/SPR are X1R5G5B5; constants are R5G6B5. An
+  engine on a 565 surface converts 555 file pixels and uses constants as they are.
+- **Used by:** spec/china-boot.md Text and colours.
+
+### E-0804 — China's frames are not paced: no timer wait, no vsync (2026-10-08)
+- **Source:** CHINE.EXE 0x4064e0 / 0x406530 (no wait call in the loop); 0x415900 (MyScreen
+  flip) calls 0x421200 with 0; 0x421200 full-screen with argument 0: retries
+  IDirectDrawSurface::BltFast (vtable +0x1c, flags 0) of the back buffer to the primary until
+  it succeeds (restoring surfaces on DDERR_SURFACELOST 0x887601c2); only a non-zero argument
+  takes GetFlipStatus + Flip(DDFLIP_WAIT); windowed uses Blt with SRCCOPY. 0x406880 reads
+  0x416c90 (QueryPerformanceCounter in ms, 0x4419c9) only to compute 1000 / frame time for
+  the frame-rate display; 0x4170a0 and 0x417230 use no time. 0x438110 (Cryo timeSetEvent
+  timer) has no callers; MyTimer 0x416bb0 only creates the timer object.
+- **Shows:** the warp view runs as fast as the machine draws; edge-scroll velocity (E-0509)
+  is per frame, so the turning speed depended on the PC. The original has no frame rate to
+  copy (Q-0800).
+- **Used by:** spec/china-boot.md Main loop.

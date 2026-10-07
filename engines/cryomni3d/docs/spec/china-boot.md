@@ -86,7 +86,38 @@ menu again, or quit is chosen, which shows the credits and ends (E-0508). One fr
    view update (cursor-edge scrolling, below), warp render, labels, debug overlays,
    cursor, then flip (E-0508).
 
+Frames are not paced: no timer wait and no vsync (the flip is a plain back-to-front blit),
+so the original ran as fast as the PC drew, and the per-frame edge scrolling below turned
+at the machine's speed. Our rate is a choice (E-0804, Q-0800).
+
 Edge scrolling (E-0509): with the cursor centre (x, y), dx = 100 - x left of 100,
 540 - x right of 540; dy = y - 100 above 100, y - 380 below 380. With s = 5 - speed:
 alpha velocity += dx / (1250 s), beta velocity += dy / (1500 s); the angles advance by the
 velocities, then both decay by x0.8 each frame. Beta is clamped, alpha wraps (Q-0501).
+
+## Text and colours
+
+Fonts (E-0800): eleven slots, slot n-1 = `DATA/FONTES/FONT0n.CRF` (FONT01 = slot 0 ..
+FONT11 = slot 10), loaded at start-up; any missing file is fatal. CRF layout in
+`docs/formats/` (`crf.ksy`). Character 0xFF of slots 0..9 is unusable (E-0800).
+
+Drawing a string (E-0801), given slot, colour, top y and left x:
+- 0x0A: x back to the start, y += height of the slot's space glyph. 0x0D and other bytes
+  below 0x20 are skipped.
+- A glyph's top-left is (x + off_x, y + off_y + font line height - 2), each clamped to 0;
+  rows from 480 down are cut, columns are not.
+- Each non-zero bitmap byte becomes one pixel in the current colour; zero bytes are
+  transparent. No shadow, outline or blending.
+- x advances by the glyph's advance + 1. String width = sum of (advance + 1) over the last
+  line. The string-height measure reads the wrong glyph (character + 32), so the menu's
+  hit rectangles are slightly off (original bug).
+
+Colours (E-0802, E-0803): the screen is 15-bit (555) or 16-bit (565) and every pixel is
+converted to it once, when loaded: TGA/SPR files are X1R5G5B5, HNM is decoded straight to
+the screen format, and colour constants are R5G6B5 (converted down for a 555 screen). So on
+a 565 surface: constants as they are, file pixels 555 -> 565. Initial text colour 0xFFFF.
+
+| Use | Slot (file) | Colour |
+|---|---|---|
+| Main-menu labels (measured with slot 0) | 1 (FONT02) | 0xFFFF hovered, 0x7020 = RGB (115, 4, 0) enabled, 0x9A73 = RGB (156, 77, 156) disabled |
+| `Chargement en cours...` at x 50, y 200 | 3 (FONT04) | 0xFFFF |

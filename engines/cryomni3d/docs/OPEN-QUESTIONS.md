@@ -146,3 +146,12 @@ Entry format:
   documentation screens).
 - **Blocks:** drawing the documentation screens faithfully.
 - **Status:** open.
+
+### Q-0800 — What frame rate should China's warp view run at?
+- **Context:** E-0804: the original never waits (BltFast, no vsync, no timer), so frame rate
+  and with it the edge-scroll turning speed (E-0509, per frame) were the machine's speed.
+- **What we checked:** main loop, flip, timer functions.
+- **Blocks:** matching turning speed. Safe reading: cap at a fixed rate typical of the
+  period hardware (a choice, not a fact); a longplay video's turning speed could settle it
+  (`tools/longplay.py`).
+- **Status:** open.
