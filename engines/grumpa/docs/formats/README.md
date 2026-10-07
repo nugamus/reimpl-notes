@@ -27,6 +27,12 @@ at `CFXActorFactory`, which loads `.atx`/`.abi` actors, `.scn` scenes, `.fxi` su
 | `.amb` | 588 | binary mesh | `CFXAMeshEx::CreateFromFile` | `amb.py` | E-0013 | done (`u32 count` + count×(pos+normal)) |
 | `.anb` | 939 | binary mesh | `CFXAMeshEx` / `FUN_004157d0` | `anb.py` | E-0014, E-0600 | done (939/939: geometry, UVs, F frames; unread tail in 522) |
 
+Kaitai specs (`*.ksy`, checked by `uv run tools/ksy_check.py grumpa`, every byte consumed):
+`fxi.ksy` 316/316, `amb.ksy` 588/588, `anb.ksy` 939/939 (frames 1..F-1 and the unread tail
+are one opaque `anim_and_tail`, Kaitai cannot sum the section vertex counts), `scn.ksy`
+110/110, `abi.ksy` 118/118 (113 scene/actor files plus the 5 `Save/Current` ones; a
+0..7-byte tail is `record.tail`).
+
 ## `.anb` — animated mesh (E-0014, E-0600)
 
 ```
