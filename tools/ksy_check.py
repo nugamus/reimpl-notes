@@ -7,7 +7,8 @@
 Compiles every `engines/<engine>/docs/formats/*.ksy` with the Kaitai Struct compiler
 (third_party/kaitai, Java) into `build/ksy/<engine>/`, then parses the corpus files whose
 extension the spec declares (`meta: file-extension`) with the generated parser and checks
-each one is read to its last byte. One line per spec: compiled or not, files parsed,
+each one is read to its last byte; `meta: -games: [a, b]` limits the corpus to those game
+folders (a format other games of the engine vary). One line per spec: compiled or not, files parsed,
 failures (first few named).
 
     uv run tools/ksy_check.py ring              # one engine
@@ -30,12 +31,14 @@ GAMES = {l.split()[0]: l.split()[1:] for l in (REPO / "tools" / "engines.txt").r
          if l.strip() and not l.startswith("#")}
 
 
-def meta(ksy: Path) -> tuple[str, list[str]]:
+def meta(ksy: Path) -> tuple[str, list[str], list[str]]:
     text = ksy.read_text(encoding="utf-8")
     ident = re.search(r"^\s*id:\s*(\S+)", text, re.M).group(1)
     m = re.search(r"file-extension:\s*(\[[^\]]*\]|\S+)", text)
     exts = re.findall(r"[\w.]+", m.group(1)) if m else []
-    return ident, [e.lower().lstrip(".") for e in exts]
+    g = re.search(r"^\s*-games:\s*(\[[^\]]*\]|\S+)", text, re.M)
+    games = re.findall(r"[\w-]+", g.group(1)) if g else []
+    return ident, [e.lower().lstrip(".") for e in exts], games
 
 
 def compile_all(engine: str, specs: list[Path]) -> tuple[Path, str]:
@@ -58,7 +61,7 @@ def check(engine: str, only: str | None, max_files: int) -> int:
     corpus = [REPO / "games" / g / "discs" for g in GAMES.get(engine, [])]
     bad = 0
     for ksy in specs:
-        ident, exts = meta(ksy)
+        ident, exts, games = meta(ksy)
         mod_path = out / f"{ident}.py"
         if not mod_path.exists():
             lines = log.splitlines()
@@ -79,7 +82,8 @@ def check(engine: str, only: str | None, max_files: int) -> int:
         if not exts:
             print(f"ok   {engine}/{ksy.stem}: compiles (no file-extension in meta, corpus not checked)")
             continue
-        files = [f for root in corpus if root.exists() for f in root.rglob("*")
+        roots = [REPO / "games" / g / "discs" for g in games] if games else corpus
+        files = [f for root in roots if root.exists() for f in root.rglob("*")
                  if f.is_file() and f.suffix.lower().lstrip(".") in exts]
         if max_files:
             files = files[:max_files]

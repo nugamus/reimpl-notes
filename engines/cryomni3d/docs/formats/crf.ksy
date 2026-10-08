@@ -2,6 +2,7 @@ meta:
   id: cryo_crf
   title: Cryo font (*.CRF), China and Versailles
   file-extension: crf
+  -games: [china, versailles]
   endian: be
 doc: |
   The layout upstream ScummVM engines/cryomni3d/fonts/cryofont.cpp reads for Versailles.
