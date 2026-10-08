@@ -1,0 +1,6 @@
+description = "China: new game in pne140; Space opens the interface bar (slide-in, inventory with MANDAT1); hover label; take MANDAT1 by its slot; the notebook shows MIN001; Space closes the bar"
+snaps = ["bar.png", "hover.png", "held.png", "notebook.png", "closed.png"]
+timeout = 90
+domain = "china"
+[keys]
+dev_input = "2500:key 27;5500:key 27;8500:key 27;9500:key 27;11000:move 230 230;12000:click 230 230;14500:move 320 240;15000:key 32;17000:snap {out}/bar.png;17200:move 130 455;18000:snap {out}/hover.png;18200:click 130 455;19000:move 400 455;19500:snap {out}/held.png;19700:move 615 438;19900:click 615 438;21500:snap {out}/notebook.png;21700:move 45 447;21900:click 45 447;22500:move 400 455;22700:key 32;22800:move 320 240;24500:snap {out}/closed.png;25000:quit"

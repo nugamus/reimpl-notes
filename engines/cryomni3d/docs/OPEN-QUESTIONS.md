@@ -378,3 +378,11 @@ shown beside or under it when the row is hovered (E-1305).
 - **Context:** E-1305: called with (300, y, 630, 400, text, white, font 1, 1); probably
   Text::drawBox with link support (the chronology rows' text has no links in the corpus?).
 - **Status:** open; engine: draw like Text::drawBox.
+
+### Q-1104 / Q-1101 / Q-1100 — update (2026-10-08, interface bar implemented)
+- Notebook timer: 0x416c90 is a millisecond counter (E-0804), so the hover scroll steps one line
+  per 10 ms; at our 25 frames/s that is one line per frame.
+- Q-1104: decided font 1, black, 15-px lines (as the documents, E-1103) because nothing else is
+  known; the snap shows the text between the background's bullets at x 180.
+- Q-1101: decided to stop the voice handle on leaving a document (the original's channel 3).
+- Q-1100: the compass click only logs a warning; the map is not implemented.
