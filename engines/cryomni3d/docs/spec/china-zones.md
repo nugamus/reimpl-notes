@@ -253,4 +253,4 @@ frame loop or from the `fight` place (E-0508, E-0955). Modal, over a copy of the
 frame: an inventory row of 38 px slots at y 437..475 (hover: the object's label text;
 click: take it as the cursor or put the held one back) and buttons (one disabled in
 puzzle mode) whose screens are not yet identified (some re-enter the place, one returns
-to the menu). Space or a right click closes it; the next warp draw skips its cross-fade. Details: Q-0902, Q-0953.
+to the menu). Space or a right click closes it; the next warp draw skips its cross-fade. Full spec: china-interface.md (E-1100..E-1106).

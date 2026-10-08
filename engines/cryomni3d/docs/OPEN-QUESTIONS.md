@@ -239,3 +239,36 @@ Entry format:
 - **Blocks:** nothing; a small audible difference at area changes.
 - **Status:** open. Decided: switch at once until the fade is traced, because the
   original's tick has no time base either (E-0804).
+
+### Q-1100 — China: the map's hot spot table and the `ico_bat` button
+- **Context:** E-1105: table 0x45af38 (9 dwords: rect, label, type, place/fiche) is not
+  dumped; the travel conditions on variables 0, 0x18, 0x19, 0xcc, 0x7c for the places at
+  0x45be00/0x45bde8/0x45bdf8; what 0x403040 and 0x401fb0 (`ico_bat`) do.
+- **Status:** open; next lead: dump the table from the exe, decompile 0x401fb0.
+
+### Q-1101 — China: document text for objects 14..18, and channel 3
+- **Context:** E-1103: the text box table has 14 entries; objects 14..18 would read the
+  following strings as a box (only matters if LABELS.TXT has their key). 0x415f90(3)
+  after reading is probably a sound stop.
+- **Status:** open; next lead: LABELS.TXT keys for lvierge/rebus etc.; 0x415f90.
+
+### Q-1102 — China: the documentation base screens
+- **Context:** E-1106: entry points and images known; the contents screen 0x4085d0 and
+  the fiche screen 0x40c5a0 (6311 bytes: themes, links, scrolling, index) not traced.
+- **Status:** open; next lead: 0x4085d0, then 0x40c5a0, 0x40de50, 0x40c100.
+
+### Q-1103 — China: puzzle sprites drawn under the bar
+- **Context:** E-1101: 0x40fb10 first draws a list 0x4ff9e8 (count 0x4ffa28); 0x41d630
+  resets the count. Who fills it was not traced.
+- **Status:** open.
+
+### Q-1104 — China: notebook text drawing
+- **Context:** E-1104: font, colour and line spacing of 0x411df0 and the wrapping of
+  0x412330 not read.
+- **Status:** open.
+
+### Q-0953 / Q-0902 / Q-0100 — update (2026-10-08)
+- Q-0953 answered by spec/china-interface.md (E-1100..E-1105); what remains is in
+  Q-1100..Q-1104. Q-0902: `c_` is the slot picture, `i_` the cursor over the eye, slot
+  +0x28 the inventory slot (E-1102); the documentation base is Q-1102. Q-0100: SPR
+  `unk_16`/`unk_1a` are the sprite's screen x/y (E-1101).

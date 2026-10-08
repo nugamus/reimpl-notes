@@ -1131,3 +1131,79 @@ of 100 per area, so related entries stay together.
   current place (0x41f170) or go to the menu (the returned value, E-0508); afterwards the
   next warp draw skips its cross-fade (E-0903). Details not traced: Q-0902, Q-0953.
 - **Used by:** spec/china-zones.md Interface screen (summary).
+
+### E-1100 — China's interface bar: open, slide, close, right latch (2026-10-08)
+- **Source:** CHINE.EXE 0x40efd0 (frame copy 0x96000 bytes, band buffer 0x14500 = 65
+  rows), 0x40f9e0 (copies rows from offset 0x81b00 = row 415, 0xa280 pixels blended
+  halfway towards [0x45c9a0] = 0x39ca in 16-bit mode, [0x45c9a4] = 0x1cea in 15-bit),
+  0x40f070 (first loop: screen offset 0x95b00 down to > 0x81b00 by 0x1400, sprite shift
+  1,5,..,61; close test `local_208 || exit || key 0x39 || (held && y < 400 && was > 400)
+  || (!0x48f2a0 && 0x48f298)`; slide-out 0x14000 down by 0x1400 to 0, skipped when the
+  map travelled; `*result = 0` on the spiral), 0x414fb0 (the only store to 0x48f2a0 is
+  `mov [0x48f2a0], ebx` with ebx 0, at 0x4150a3; byte search finds no other write),
+  0x406880 (Space release wait, then `0x48f1ec = 1`), 0x419830 and 0x41d630 (open from
+  puzzles; leave when the result is 0; 0x41d630 only while object 0x15 is not owned).
+- **Shows:** the interface is a 65-row blended bar at y 415..479 sliding in over 16
+  frames and out over 17; its close conditions; the right latch is never set.
+- **Used by:** spec/china-interface.md Opening and closing.
+
+### E-1101 — China's bar sprites place themselves (2026-10-08)
+- **Source:** CHINE.EXE 0x40ec80 (loads `oeil`, `bouss`, `cadres`, `bnote`, `spirsort`
+  `.spr`; rect = sprite +8 (y), +6 (x), height, width), 0x40fb10 (draws each at (x,
+  y - shift + 65); compass only if !0x48f2a8 and 0x48f200 == 1; notebook only if
+  variable 0 clear; spiral unless 0x48f2a8 and place name != `jixw210` 0x45cac8);
+  corpus en-iso `DATA/INVENT/*.SPR` image IDs: oeil 26x26 (72,442), bouss 26x23
+  (603,450), cadres 477x36 (111,437), bnote 26x24 (603,426), spirsort 26x26 (11,442).
+- **Shows:** SPR `unk_16`/`unk_1a` are the sprite's screen x/y (cadres at x 111 = the
+  code's first slot x 0x6f, y 437 = the slot row); the bar layout.
+- **Used by:** spec/china-interface.md Layout; formats README (SPR, Q-0100).
+
+### E-1102 — China's inventory row (2026-10-08)
+- **Source:** CHINE.EXE 0x40ff30 (10 slots 0x4ffb18, objects 0x4ffa60..0x4ffaec; slot
+  rebuild), 0x40f070 slot loop (x 0x6f + 0x31*i < mx < +0x26, 0x1b5 < my < 0x1db; take /
+  put / swap; cursor 0x24 = empty and cursor 11), hover loop (centre 0x82 + 0x31*i ±
+  0x13; 0x4136d0(screen, 0x19f, 3, label(+0x2c), 0); lines 0x412c50 (y 0x1ac, x 3 to
+  centre) and 0x412cb0 (x centre, y 0x1ac..0x1b5), colour 0xf520), 0x40fb10 (c_ sprite
+  +0x10 at (0x6f + 0x31*i, 0x1f6 - shift)), eye hover (cursor +0x1c when +0x18 set).
+- **Shows:** ten fixed slots, take/put/swap, label with leader line, `i_` = eye cursor.
+- **Used by:** spec/china-interface.md Inventory.
+
+### E-1103 — China's document reading (2026-10-08)
+- **Source:** CHINE.EXE 0x40f070 (eye click: base path + `Images\` + object +0x20 ->
+  0x402e20), 0x410030 (`loc\voices\` + key on channel 10 unless object index 1; loop
+  until left press: still copy 0x48f214, text 0x410600(+0x20) via 0x40e120 with box
+  0x45c9a8 + 16*held, colour 0, font 1; then restore, 0x415f90(3)), then back in
+  0x40f070: object to first free slot, state 2, cursor 11, 0x41f170; table read from the
+  en-iso CHINE.EXE: 14 boxes, then the sprite-name strings at 0x45ca88.
+- **Shows:** how a document is shown and read; only objects 0..13 have a text box.
+- **Used by:** spec/china-interface.md Documents.
+
+### E-1104 — China's notebook (minutes) screen (2026-10-08)
+- **Source:** CHINE.EXE `Minutes::0x411ac0` (`Fond` still via 0x402e20; `som_spir`,
+  `i_sprinv`, `fl_basr`, `fl_hautr`, `fl_basj`, `fl_hautj` .spr; string refs by
+  disassembly), 0x411e60 (keys 0x51e3c8 x15 bytes, count 0x500e88, 0x411cc0 lookup,
+  0x412330(text, 400, 0); first line max(0, n-22); 0x411df0(screen, first, 22, 180, 80);
+  arrows step when 0x416c90 advanced 10; exit on click in the som_spir rect or key 1);
+  corpus positions: som_spir (21,435), fl_hautr (138,54), fl_basr (138,405).
+- **Shows:** the notebook layout, content order, scrolling and exit.
+- **Used by:** spec/china-interface.md Notebook.
+
+### E-1105 — China's map (2026-10-08)
+- **Source:** CHINE.EXE `carte::0x401000` (petiplan 0x3e940 = 267x480x2, granplan
+  0x1fb450 = 846x1228x2; cadre, point, ico_bat, spirs .spr), 0x4013e0 (window 0x175 x
+  0x1e0 from granplan at offsets 0x48cce4/0x48cbf0; small map 0x10b wide at x 0x175;
+  scroll formulas (mx-0x1b3)*0x34e/0x10b and (my-0x4f)*0x4cc/0x187 clamped to 0x1d9 and
+  0x2eb; hot spot table 0x45af38..0x45bcf8 step 36 bytes; travel: 0x41f680, 0x403040,
+  0x41f190, result 1; type 8: 0x40c5a0 then 0x41f170; label 0x4136d0(screen, 0x1a9,
+  0x17c, ...); rects 0x48cc64 exit and 0x48cbfc -> 0x401fb0); corpus ico_bat (587,449),
+  spirs (387,449), GRANPLAN 846x1228, PETIPLAN 267x480.
+- **Shows:** the map's layout, scrolling and that it travels to places.
+- **Used by:** spec/china-interface.md Map.
+
+### E-1106 — China's documentation base entries (2026-10-08)
+- **Source:** CHINE.EXE callers of 0x40c5a0: 0x4013e0, 0x4085d0, 0x41f430; 0x4085d0
+  called by the main menu 0x407140 and calling 0x407b20 (`fond_som`, `som_*`, `fl_*`,
+  `ico_indx`, `i_indinv`, `i_sprinv`); 0x40b7e0 (eight `fond*` backgrounds), 0x40b8e0
+  (`fl_*`, `ico_*` sprites); no call from 0x40f070.
+- **Shows:** where the documentation base is entered and which images it loads.
+- **Used by:** spec/china-interface.md Documentation base.

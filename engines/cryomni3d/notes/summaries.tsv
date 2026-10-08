@@ -1,4 +1,6 @@
 program	address	name	summary	evidence
+CHINE.EXE	00401000	carte::load	Loads the map images petiplan/granplan and the cadre, point, ico_bat, spirs sprites	E-1105
+CHINE.EXE	004013e0	carte::run	Map screen: scrolling big map, small map, hot spots travel or open the documentation base	E-1105
 CHINE.EXE	00402cf0	ScriptApi::playVideo	Play a video DATA/HNM/<name>.HNS	E-0703
 CHINE.EXE	00402d50	Main::setWarp	Loads warp <L>:\Chine\Data\warp\<name>, mode warp, cross-fade flag	E-0507
 CHINE.EXE	00402e20	Main::setImage	Shows a still by stem: tga, hnm, CD Images, CD Loc; mode still	E-0510
@@ -55,14 +57,22 @@ CHINE.EXE	00406880	Main::handleKeys	Per-frame keys: fps, debug keys, Space inter
 CHINE.EXE	00406d20	Main::scanSaveSlots	Marks which of the 12 save files exist	E-0505
 CHINE.EXE	00406de0	Interface::loadMenu	Loads the main menu: fondtitr background and roug_n/blc_n bullet sprites	E-0505
 CHINE.EXE	00407140	Interface::mainMenu	Main menu screen: 8 bullets with labels, hover, enable rules; returns the choice	E-0505
+CHINE.EXE	00407b20	Interface::loadContents	Loads the documentation contents screen: fond_som and the som_/fl_/ico_indx sprites	E-1106
 CHINE.EXE	004082a0	Gfx::blendRect	Blends a screen rectangle halfway towards an RGB colour (or 1/8 mode)	E-0902
 CHINE.EXE	00408510	Gfx::clearRect	Fill a rectangle of the 640-wide 16-bit screen with zero	E-0951
 CHINE.EXE	00409670	Interface::countDollars	Counts $ characters in a string	E-0204
 CHINE.EXE	0040a5b0	Interface::zeroLineEnds	Turns each CR outside <...> and the byte after it into NUL (runs one byte past)	E-0202
 CHINE.EXE	0040a5f0	Interface::loadDoc	Parses Fichetxt.txt themes, fiches, captions, links and tables	E-0204
 CHINE.EXE	0040b3e0	Interface::loadIndex	Builds the documentation index rows -C- and id/text from Liste.txt	E-0203
+CHINE.EXE	0040e120	Text::drawBox	Draws wrapped text in a box, 15-px lines, given colour and font	E-1103
 CHINE.EXE	0040e2b0	Dial::drawSubtitle	Subtitle band: wrap to 630 px, black band n*15+10 at the bottom, white lines at x 5	E-0951
-CHINE.EXE	0040efd0	Interface::open	Interface screen: copy the frame, run the inventory/buttons screen	E-0955
+CHINE.EXE	0040ec80	Interface::loadBar	Loads the bar sprites oeil, bouss, cadres, bnote, spirsort with their rects; empties the slots	E-1101
+CHINE.EXE	0040efd0	Interface::open	Interface bar entry: copies the frame, rebuilds slots, runs the bar; result 0 when the exit spiral was used	E-1100
+CHINE.EXE	0040f070	Interface::barLoop	Interface bar loop: slide-in, slot take/put/swap, eye, compass, notebook, spiral, hover label, close and slide-out	E-1100
+CHINE.EXE	0040f9e0	Interface::makeBand	Copies rows 415..479 and blends them halfway towards a dark colour (the bar band)	E-1100
+CHINE.EXE	0040fb10	Interface::drawBar	Draws the bar sprites (puzzle list, frames, slot objects, notebook, compass, spiral, eye) shifted by the slide	E-1101
+CHINE.EXE	0040ff30	Interface::rebuildSlots	Rebuilds the 10 inventory slots from object states and slots; finds the held object	E-1102
+CHINE.EXE	00410030	Interface::readDocument	Reads a document: voice loc/voices/<key>, its text in a per-object box over the still, until a click	E-1103
 CHINE.EXE	00410280	Label::load	Loads labels.txt, parses it, lowercases the ids	E-0201
 CHINE.EXE	00410300	Label::parse	Parses LABELS.TXT #id# <text> pairs (text multi-line), comments, max 450	E-0201
 CHINE.EXE	00410570	Label::lowercaseIds	Lowercases every label id	E-0201
@@ -78,7 +88,9 @@ CHINE.EXE	004117b0	load::writeNamedSave	Writes DataSaved<name>.sav	E-0208
 CHINE.EXE	004118a0	Main::WinMain	WinMain: boot, fonts, game loop, shutdown; exits silently when another instance runs	E-0500
 CHINE.EXE	00411900	Minutes::parse	Scans MINUTES.TXT for #id# <text> entries into 50 slots, no checks	E-0202
 CHINE.EXE	004119f0	Minutes::load	Loads Minutes.txt, zeroes line ends, parses it once	E-0202
+CHINE.EXE	00411ac0	Minutes::loadScreen	Loads the notebook background Fond and its exit and arrow sprites	E-1104
 CHINE.EXE	00411d80	Minutes::add	Add a MINUTES.TXT key to the notebook	E-0703
+CHINE.EXE	00411e60	Minutes::show	Notebook screen: held minutes texts wrapped, 22 lines, arrow scrolling, exit or Escape	E-1104
 CHINE.EXE	00412510	Minutes::readSave	Reads the held minutes: count, then length + id each	E-0208
 CHINE.EXE	004125c0	Minutes::writeSave	Writes the held minutes: count, then length + id each	E-0208
 CHINE.EXE	00412710	Music::setName	Stores the next music file path	E-0206
@@ -101,10 +113,10 @@ CHINE.EXE	00413940	MyFont::stringHeight	Max glyph height of a string; reads glyp
 CHINE.EXE	004146c0	Main::playHns	Plays an HNS video full screen; Escape or left click stops; returns 1 if skipped	E-0504
 CHINE.EXE	00414c70	MyKeyboard::keyDown	DirectInput key is down (DIK code)	E-0954
 CHINE.EXE	00414d20	MyMouse::init	Mouse init: loads the 18 cursor sprites of table 0x45d1d0, zeroes their hot fields, inter gets (1,45)	E-0901
-CHINE.EXE	00414fb0	MyMouse::poll	Polls DirectInput mouse: moves and clamps cursor top-left, left/right button flags, clears the press latch on release	E-0900
+CHINE.EXE	00414fb0	Input::pollMouse	Polls the mouse: position, left/right down, clears the left and right latches on release	E-1100
 CHINE.EXE	004150e0	MyMouse::setCursorSprite	Sets the cursor to a given sprite (held object); in still mode shifts the top-left by the size change	E-0901
 CHINE.EXE	004151a0	MyMouse::setCursor	Sets the cursor sprite by table index; in still mode shifts the top-left by the size change	E-0901
-CHINE.EXE	00415230	MyMouse::setDefaultCursor	Default cursor: the held object's r_ sprite, or sprite 11 ptroug with empty hands	E-0901
+CHINE.EXE	00415230	Input::resetCursor	Sets the cursor to the held object's sprite or the default cursor 11	E-1100
 CHINE.EXE	00415270	MyMouse::updateCursor	Per-frame cursor: edge arrows in a warp from the top-left (bands 100/540, 100/380), else the default cursor	E-0901
 CHINE.EXE	00415340	MyMouse::draw	Draws the cursor sprite at its top-left	E-0901
 CHINE.EXE	00415370	MyMouse::updateHotspot	Finds the enabled zone under the cursor hot point (warp or still) into the clicked-zone index	E-0900
