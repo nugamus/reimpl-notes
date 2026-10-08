@@ -76,6 +76,22 @@ def num(v) -> str:
     return str(v)
 
 
+# The original's globals a few places read or write directly (E-0954), as engine calls
+MEM_READ = {
+    0x48F298: "(g.rightButtonDown() ? 1 : 0)",
+    0x48F2A0: "(g.rightButtonLatched() ? 1 : 0)",
+    0x530BF8: "g.fightStart()",
+}
+MEM_WRITE = {
+    0x48F200: "g.clearDisplay()",
+    0x48F1FC: "g.endPlay()",
+    0x48F27C: "g.clearClickedZone()",
+    0x48F2A4: "g.skipNextAutosave()",
+    0x48F2A8: "g.setPuzzleMode({})",
+    0x530BF8: "g.setFightStart({})",
+}
+
+
 class Gen:
     def __init__(self, variables: dict[str, int], objects: dict[str, int]):
         self.vars, self.objs = variables, objects
@@ -114,7 +130,7 @@ class Gen:
         if "zone" in v:
             return "g.clickedZone()"
         if "mem" in v:
-            return f"g.mem({v['mem']})"
+            return MEM_READ[int(v["mem"], 16)]
         if "cond" in v:
             return f"({self.cond(v['cond'])} ? 1 : 0)"
         if "op" in v:
@@ -122,9 +138,7 @@ class Gen:
         if "call" in v:
             return self.call_expr(v["call"], v.get("args", []), v.get("addr"))
         if "reg" in v:  # a register kept across calls (only `fight`, set by a `let`)
-            return "g.mem(0)"
-        if "stackaddr" in v:
-            return "0"
+            return f"local_{v['reg']}"
         raise ValueError(f"expression {v}")
 
     def call_expr(self, fn: str, a: list, addr) -> str:
@@ -143,7 +157,7 @@ class Gen:
         if fn == "key_down":
             return f"(g.keyDown({self.expr(a[0])}) ? 1 : 0)"
         if fn == "time_ms":
-            return "(int32)g.timeMs()"
+            return "g.timeMs()"
         return f"g.unknownCall({addr or fn}{''.join(', ' + self.expr(x) for x in a)})"
 
     def cond(self, c) -> str:
@@ -204,7 +218,7 @@ class Gen:
             m = {"obj_to_inventory": "objectToInventory", "obj_to_cursor": "objectToCursor",
                  "obj_destroy": "objectDestroy"}[fn]
             return f"g.{m}({self.obj(a[0])})"
-        if fn == "interface_screen":
+        if fn == "interface_screen":  # its argument is a stack address the screen fills in
             return "g.interfaceScreen()"
         if fn == "epilogue":
             return "g.epilogue()"
@@ -223,9 +237,9 @@ class Gen:
             elif op == "return":
                 out.append(f"{pad}return;")
             elif op == "store":
-                out.append(f"{pad}g.setMem({s['addr']}, {self.expr(s['value'])});")
+                out.append(f"{pad}{MEM_WRITE[int(s['addr'], 16)].format(self.expr(s['value']))};")
             elif op == "let":
-                out.append(f"{pad}g.setMem(0, {self.expr(s['value'])}); // {s['reg']}")
+                out.append(f"{pad}const uint32 local_{s['reg']} = {self.expr(s['value'])};")
             elif op == "if":
                 out.append(f"{pad}if ({self.cond(s['cond'])}) {{")
                 out += self.stmts(s["then"], depth + 1)
