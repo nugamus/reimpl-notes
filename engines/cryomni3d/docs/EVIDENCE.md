@@ -1207,3 +1207,100 @@ of 100 per area, so related entries stay together.
   (`fl_*`, `ico_*` sprites); no call from 0x40f070.
 - **Shows:** where the documentation base is entered and which images it loads.
 - **Used by:** spec/china-interface.md Documentation base.
+
+### E-1200 — China: puzzle frame shared by Penjing, Bouddha, Sceaux, Go (2026-10-08)
+- **Source:** CHINE.EXE (EN ISO) init/run/close of the four puzzles (E-1201..E-1204);
+  helpers 0x416120 (load a WAV into sound channel 0..19), 0x415d30 (play a channel),
+  0x416020 (channel playing), 0x405320 (message pump), 0x41fac0 (key-colour blit at x, y),
+  0x414c70 (DirectInput key down), 0x41f170 (re-enter place), 0x420340 (point in rect).
+- **Shows:** each init allocates 0x96000 bytes, loads its WAV(s), `setImage`s the TGA and
+  copies the screen; sprite records take x = sprite+0xc, y = sprite+0x10 (from the SPR id,
+  E-0505), rect y1,x1,y2,x2 from sprite height (+6) and width (+4). Each run: pump, music,
+  mouse; one click per press (latch 0x48f29c); copy, draw, cursor, flip; win test after
+  the flip; else Escape (DIK 1) leaves; both end with 0x41f170 and {done 1, result}.
+  Clicks test rects regardless of visibility.
+- **Used by:** games/china/docs/puzzles.md Common frame.
+
+### E-1201 — China: Penjing puzzle (2026-10-08)
+- **Source:** 0x41c520 (sprite pushes `Hiro_spr.spr`/`HIRONDELLE` .. `Bich_spr.spr`/
+  `BICHE`, alternately into tables 0x52ca80 (flag 1) and 0x52cbd0 (flag 0), stride 0x1c),
+  0x41cda0 (click flips flag 0x52ca94+0x1c*i on the first sprite's rect; hover label;
+  win test at 0x41cf9b.. on the twelve flags), 0x41cd20 close. Corpus: SPR positions of
+  PUZZLES/PENJING.
+- **Shows:** 12 slots of two animals; win = the twelve zodiac animals (flags 0,0,1,1,0,0,
+  1,0,1,0,1,1 for slots 0..11), which is a consistency check on the reading.
+- **Used by:** games/china/docs/puzzles.md 1 Penjing.
+
+### E-1202 — China: Bouddha puzzle (2026-10-08)
+- **Source:** 0x41a3b0 (`B1_spr`,`B2_spr` table 0x52bb90, `R1..R3_spr` table 0x52bbd0,
+  stride 0x18, flags 1), 0x41a6e0 (toggle on click; flags 0x52bbc0 armed, 0x52bbc4
+  cleared computed at 0x41a85c..0x41a8c0), 0x41a660 close.
+- **Shows:** armed is sticky (set when B hidden and all R shown, cleared when a B is
+  shown); win = armed and all R hidden.
+- **Used by:** games/china/docs/puzzles.md 2 Bouddha.
+
+### E-1203 — China: Sceaux puzzle and its m (2026-10-08)
+- **Source:** 0x41d020 (tables stride 0x1c: EMPR 0x52cd40, EMPRF 0x52cd94, SCEAU 0x52cde8
+  (+0x14 shown 1, +0x18 held 0), DEBRILL 0x52ce3c, DEMAT 0x52ce90, OMBRE 0x52cee8;
+  TAMPONS 0x52cd20), 0x41d630 (m: `fond`/`fond2` at 0x41d68b..0x41d6c6, target table
+  0x52cd44 + m*0x54; step array on the stack; 1000 ms DEBRILL loop with object 0x15
+  set held at 0x4ffa24; clicks only if 0x417e50 returns 36; pairings at 0x41dae7..
+  0x41db8b; win at 0x41ddbd (m 0) and the m 1 test; Space 0x39 / right click to 0x40efd0
+  only if m = 0 and 0x403520(0x15) false), 0x41d540 close. Callers: places-logic
+  `spfw101` puzzle(3, 0), `arbre3` puzzle(3, 1).
+- **Shows:** m selects background and target row and the CIRE/interface behaviour;
+  solution left<-middle, middle<-right, right<-left; no Escape; m = 1 cannot be left.
+- **Used by:** games/china/docs/puzzles.md 3 Sceaux; answers Q-0950.
+
+### E-1204 — China: Go puzzle (2026-10-08)
+- **Source:** 0x41b5d0 (`Bout%d` = 5r+5-c into 0x52bff8; `Barre%d` = 4r+4-c into
+  0x52be18; `Barre%d` = 37+r-4c into 0x52c258; stride 0x18, flags 0), 0x41b990 (toggle,
+  wait while channel 0 plays, bars from point pairs, win at 0x41bc5a.. on all 25 point
+  flags), 0x41b920 close. Corpus: BOUT/BARRE positions confirm bars lie between their
+  points (BARRE4 186,176 between BOUT5 and BOUT4; BARRE37 183,191 between BOUT5, BOUT10).
+- **Shows:** 5x5 board; win = exactly points 2,6,7,8,11,12,13,17,22 (index 5r+c).
+- **Used by:** games/china/docs/puzzles.md 4 Go.
+
+### E-1250 — China's Puzzle4: label rings, sprite rings, the four-element order (2026-10-08)
+- **Source:** CHINE.EXE (EN ISO) 0x417e90 (init: `puzzle4a/b.wav` slots 0/1, `fond`,
+  `mask.raw`, `%s%s%c%s` with '8'-i for `direct`/`animaux`/`couleur`, ciel..lune2, the 24
+  LABELS.TXT keys at 0x418665..0x418785), 0x41880e (sound 0, ring of 8 label pointers
+  shifted up by one), 0x4189bc (run: mask - 0xe7 hover label; presses; phase test of
+  the three entry-7 flags; `Puzzle4\` + `puzenter` at 0x41912e..0x419169; the soleil,
+  lune, mer, ciel step chain; Escape 0x414c70(1)), 0x41887e (free); corpus SPR headers
+  (`DATA/PUZZLES/PUZZLE4`), MASK.RAW values 231..255.
+- **Shows:** everything in games/china/docs/puzzles.md section 5 (start entry 3 per ring,
+  solution entry 7 = files 1, the phase 2 order, return 1 without a video).
+- **Used by:** games/china/docs/puzzles.md 5 Puzzle4.
+
+### E-1251 — China's clock puzzle: four hands dragged over a mask, solution 6/9/10/8 (2026-10-08)
+- **Source:** CHINE.EXE 0x41bd30 (init: `clicaig.wav`, `hrlgfnd`, `mask.raw`,
+  `%s%s%s%d%s` "aig" + zero pad + a/b/d for 1..12 and c for 1..30, stored in reverse
+  order; initial flags 0x52c78c, 0x52c90c, 0x52ca14, 0x52c574), 0x41c1d0 (run: grab by
+  pixel hit while held, drag by mask value with +1 wrap, click sound on change, solved
+  flags 0x52c664, 0x52c7bc, 0x52c894, 0x52c99c only when not dragging, video `puzhorlo`
+  at 0x41c4f6, Escape), 0x41c140 (free), 0x41fc20 (pixel hit test); corpus SPR
+  headers, MASK.RAW values 0..54.
+- **Shows:** games/china/docs/puzzles.md section 6.
+- **Used by:** games/china/docs/puzzles.md 6 Horloge.
+
+### E-1252 — China's door puzzle: three six-word columns, solution APPOSER x3 (2026-10-08)
+- **Source:** CHINE.EXE 0x41a8f0 (init: `bouton1a.wav` twice, `porte`, 18 sprites with
+  LABELS.TXT keys, entries of 0x1c bytes, initial flags 0x52bc64, 0x52bd44, 0x52bd7c),
+  0x41b0a0 (run: rect hits 0x420340, entry i -> i-1 with 0 -> 5, hover labels, solved
+  when the three entry-0 flags are set, video `puzporte` at 0x41b5a2, Escape), 0x41b010
+  (free); corpus SPR headers (`DATA/PUZZLES/PORTE`).
+- **Shows:** games/china/docs/puzzles.md section 7.
+- **Used by:** games/china/docs/puzzles.md 7 Boutons.
+
+### E-1253 — China's bomb: a 17-step click sequence, two game-over videos (2026-10-08)
+- **Source:** CHINE.EXE 0x4192c0 (init: sound slots 2..8 coussin, tvis, pese, clang,
+  clic, metal, tuyau; `Trone`; 15 SPR click shapes), 0x419830 (run: hover labels
+  AIGUILLE/POISON, cursors 10/14 via 0x41a390 (empty hands only) and 11, the step tests
+  at 0x419a55..0x41a23b with backgrounds Bombe1..Bombe37, held-object tests 0x14, 0x16,
+  0x19 via 0x417e50, videos gamover1 (0x419ebd, 0x419f9f, 0x41a03c, 0x41a0d8, 0x41a174)
+  and gamover2 (0x419dfb, 0x419e8e); right click or Space -> interface 0x40efd0; exit
+  returns a held object to the inventory 0x417dc0(obj, 2)), 0x4197d0 (free; frees only
+  0x52bb50..0x52bb74); corpus `DATA/PUZZLES/BOMBE` (no TUYAU.WAV).
+- **Shows:** games/china/docs/puzzles.md section 8.
+- **Used by:** games/china/docs/puzzles.md 8 Bombe.

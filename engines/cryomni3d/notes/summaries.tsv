@@ -42,6 +42,7 @@ CHINE.EXE	00404710	Dial::runDialogue	Lip-sync dialogue player: voice wav, two sp
 CHINE.EXE	00404c60	Dial::drawFace	Decode the next frame of a speaker's face loop to the screen (counter wraps at 7)	E-0952
 CHINE.EXE	00404d00	Dial::playVoiceLine	Voice-only DIAL chain: per block play the voice, draw warp + subtitle, wait (Escape skips block)	E-0951
 CHINE.EXE	00404e80	Gfx::crossFadeStep	Cross-fade step: counter+=16, blends every other column old->new by min(counter,256)/256; returns 0 after 19 steps	E-0903
+CHINE.EXE	00405320	Main::pumpMessages	Pumps pending window messages	E-1200
 CHINE.EXE	004053b0	Main::boot	Boot: single-instance mapping, module inits in order, chine.cfg, logo/intro/ANJGEN41 dialogue/itb, menu music	E-0500
 CHINE.EXE	004056c0	Main::resetGlobals	Resets option and state globals to defaults (speed 2, subtitles 1, music 1)	E-0501
 CHINE.EXE	00405740	Main::showLoading	Loading screen: still Load and text Chargement en cours... (font slot 3, white)	E-0504
@@ -126,9 +127,11 @@ CHINE.EXE	00415440	MyMouse::hotPoint	Cursor hot point: top-left plus the sprite 
 CHINE.EXE	00415570	MyScreen::init	Screen init: 640x480 16-bit DirectDraw mode	E-0503
 CHINE.EXE	00415900	MyScreen::flip	Present the back buffer (calls the DirectDraw flip with 0: BltFast, no vsync)	E-0804
 CHINE.EXE	00415a20	MyScreen::drawDebugInfo	Debug overlay: fps, zone, context, WRP_Alpha/x, WRP_Beta/y, video mode, memory	E-0602
+CHINE.EXE	00415d30	Sound::play	Plays sound channel n	E-1200
 CHINE.EXE	00415dc0	MySound::playBuffer	Creates a DirectSound buffer on a channel from PCM data, rate, bits, channels, volume, loop	E-0206
 CHINE.EXE	00415f90	Sound::stop	Stop a sound channel	E-0950
 CHINE.EXE	00416020	Sound::isPlaying	Sound channel is playing	E-0950
+CHINE.EXE	00416120	Sound::load	Loads a WAV file into sound channel n (0..19)	E-1200
 CHINE.EXE	00416510	MyTga::load	Load a TGA into the warp buffer, converting 555/24-bit to the screen format	E-0803
 CHINE.EXE	004169c0	MyTga::bgr24to555	Convert 24-bit BGR pixels to 555	E-0803
 CHINE.EXE	00416a10	MyTga::bgr24to565	Convert 24-bit BGR pixels to 565	E-0803
@@ -147,6 +150,32 @@ CHINE.EXE	00417df0	Object::cursorSprite	Object's hand-cursor sprite (r_)	E-0905
 CHINE.EXE	00417e50	Object::held	Held object index (36 = none)	E-0905
 CHINE.EXE	00417e60	Object::setHeld	Sets the held object index	E-0905
 CHINE.EXE	00417e70	Object::reset	Resets all objects: state 0, slot -1	E-0905
+CHINE.EXE	00417e90	Puzzle4::init	Puzzle4: loads sounds, fond, mask, three 8-sprite rings, sun/moon/sea/sky sprites and the 24 ring labels	E-1250
+CHINE.EXE	0041880e	Puzzle4::rotateRing	Puzzle4: plays sound 0 and shifts one 8-entry label ring up by one	E-1250
+CHINE.EXE	0041887e	Puzzle4::free	Puzzle4: frees sounds, sprites and the saved background	E-1250
+CHINE.EXE	004189bc	Puzzle4::run	Puzzle4 loop: ring labels by mask, ring sprites cycle, phase 2 element order, Escape	E-1250
+CHINE.EXE	004192c0	PuzzleBombe::init	Bomb puzzle: loads 7 sounds, Trone and 15 click-shape sprites	E-1253
+CHINE.EXE	004197d0	PuzzleBombe::free	Bomb puzzle: frees sprites (only the first ten), background, sounds	E-1253
+CHINE.EXE	00419830	PuzzleBombe::run	Bomb puzzle loop: 17-step click sequence with held-object tests, game-over videos, interface on right click	E-1253
+CHINE.EXE	0041a390	PuzzleBombe::hoverCursor	Sets a cursor sprite only when the hands are empty	E-1253
+CHINE.EXE	0041a3b0	PuzzleBoudha::init	Bouddha init: BOUDDHA.TGA, bouddhaa.wav, sprites B1,B2,R1..R3 all shown	E-1202
+CHINE.EXE	0041a660	PuzzleBoudha::close	Bouddha close: frees sprites, sounds, buffer	E-1202
+CHINE.EXE	0041a6e0	PuzzleBoudha::run	Bouddha run: click toggles a piece; win when B hidden after all R shown, then all R hidden; Escape leaves	E-1202
+CHINE.EXE	0041a8f0	PuzzleBoutons::init	Door puzzle: loads bouton1a, porte, three columns of six word sprites with labels	E-1252
+CHINE.EXE	0041b010	PuzzleBoutons::free	Door puzzle: frees sprites and background	E-1252
+CHINE.EXE	0041b0a0	PuzzleBoutons::run	Door puzzle loop: click cycles a column, hover labels, solved when all show APPOSER, video puzporte	E-1252
+CHINE.EXE	0041b5d0	PuzzleGO::init	Go init: GO1.TGA, go1a/go1b.wav, 25 Bout stones and 40 Barre bars of a 5x5 board	E-1204
+CHINE.EXE	0041b920	PuzzleGO::close	Go close: frees sprites, sounds, buffer	E-1204
+CHINE.EXE	0041b990	PuzzleGO::run	Go run: click toggles a stone, bars join placed neighbours, win on a 9-stone cross pattern; Escape leaves	E-1204
+CHINE.EXE	0041bd30	PuzzleHorloge::init	Clock puzzle: loads clicaig, hrlgfnd, mask and the four hand sprite sets (12/12/12/30)	E-1251
+CHINE.EXE	0041c140	PuzzleHorloge::free	Clock puzzle: frees sprites, background, sounds	E-1251
+CHINE.EXE	0041c1d0	PuzzleHorloge::run	Clock puzzle loop: grab a hand, drag by mask value, solved at 6/9/10/8, video puzhorlo	E-1251
+CHINE.EXE	0041c520	PuzzlePenjing::init	Penjing init: loads PENJING.TGA, penjinga.wav, 24 animal sprites in 12 two-animal slots with labels	E-1201
+CHINE.EXE	0041cd20	PuzzlePenjing::close	Penjing close: frees sounds, sprites, buffer; clears done	E-1201
+CHINE.EXE	0041cda0	PuzzlePenjing::run	Penjing run: click flips a slot's animal, hover label, win on the 12 zodiac animals, Escape leaves	E-1201
+CHINE.EXE	0041d020	PuzzleSceaux::init	Sceaux init: tmpn.wav, tampons, per seal sceau/ombre/demat/debrill/empr/emprF sprites	E-1203
+CHINE.EXE	0041d540	PuzzleSceaux::close	Sceaux close: frees sprites, sounds, buffer	E-1203
+CHINE.EXE	0041d630	PuzzleSceaux::run	Sceaux run(m): seal steps raise/pick/ink/stamp, m picks fond/fond2 and target row; m 0 gives CIRE and allows interface	E-1203
 CHINE.EXE	0041f170	Scene::reenter	Re-enters the current place (goto current)	E-0903
 CHINE.EXE	0041f190	Main::setScene	Sets the current scene handler and switches music by scene	E-0506
 CHINE.EXE	0041f380	Main::runScene	Calls the scene handler: 3 on entry, then 0 each frame	E-0508
@@ -155,6 +184,8 @@ CHINE.EXE	0041f430	Zones::handleDefault	Generic zone handler: hover cursor/label
 CHINE.EXE	0041f680	Script::find	Find a place procedure by name starting from Script_Start (0x436db0)	E-0700
 CHINE.EXE	0041f6a0	Script::findByName	Find a place procedure by name: walk the list via msg 1 comparing msg 2 names (max 5000)	E-0700
 CHINE.EXE	0041f760	Main::loadSprite	Loads a .spr sprite (TGA-like header, key colour, x, y, 16-bit pixels)	E-0505
+CHINE.EXE	0041fac0	Main::drawSprite	Blits a sprite at x, y into a 16-bit buffer, key colour transparent, clipped	E-1200
+CHINE.EXE	0041fc20	Sprite::hitPixel	Point inside the sprite and its pixel is not the key colour	E-1251
 CHINE.EXE	0041fcc0	Main::musicPath	Builds the DataMusic path	E-0206
 CHINE.EXE	0041fd40	Main::savedPath	Builds the DataSaved path	E-0208
 CHINE.EXE	0041fd70	Main::cdHnmPath	CD path of the Hnm\ video folder	E-0504
@@ -171,7 +202,7 @@ CHINE.EXE	004201d0	Vars::set	Variable table set	E-0703
 CHINE.EXE	00420260	Vars::debugPrint	Debug: print the variable table	E-0703
 CHINE.EXE	004202e0	Zones::add	Append a zone record (40 bytes at 0x5305b0) from a 16-byte rect; max 40	E-0701
 CHINE.EXE	00420330	Zones::reset	Clear the zone list (count 0x5305a8 = 0)	E-0701
-CHINE.EXE	00420340	Main::pointInRect	Point-in-rectangle test (rect stored y1,x1,y2,x2)	E-0505
+CHINE.EXE	00420340	Rect::contains	Point in an inclusive rectangle (top, left, bottom, right)	E-1252
 CHINE.EXE	00420370	Zones::find	Linear search of the current zone list (40-byte records) for a point; returns index or -1	E-0604
 CHINE.EXE	00420460	Zones::get	Zone record by index	E-0701
 CHINE.EXE	00421200	DDraw::flip	DirectDraw present: arg 0 -> BltFast retry loop, else Flip(WAIT); windowed Blt	E-0804

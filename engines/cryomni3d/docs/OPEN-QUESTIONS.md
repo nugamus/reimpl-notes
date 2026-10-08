@@ -209,7 +209,8 @@ Entry format:
 - **Context:** `puzzle(3, 0)` and `puzzle(3, 1)` both occur; m is passed to the Sceaux run
   0x41d630 and preset as its result (E-0953). Its meaning inside the puzzle (which seal
   set, or a mode) was not traced.
-- **Status:** open; next lead: uses of the second argument in 0x41d630.
+- **Status:** resolved (E-1203): m 0 = FOND + EMPR targets, CIRE handed over, interface
+  allowed; m 1 = FOND2 + EMPRxF targets, no exit (Q-1200). games/china/docs/puzzles.md.
 
 ### Q-0951 — China: each puzzle's own exits and result values
 - **Context:** the run functions of Puzzle4 (0x4189bc) and Bombe (0x419830) were checked
