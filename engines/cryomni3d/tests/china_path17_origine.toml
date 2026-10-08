@@ -1,0 +1,9 @@
+description = "Critical path step 29b (walkthrough.md), from path16's save (slot 16, in pdcw171): look zone 0 -> boite31, take zone 1 -> boite32, with TOURNEVIS in hand use zone 1 -> boite331, take zone 0 -> ORIGINAUX (origine), go zone 0 plays ANJORG21, video ORGH221, pdc179 (voice CPRD2111, videos), note MINPD219, LISTE_BOITES destroyed, ANXP2211, CHAPITRE 6, back in pdc170 (played in full). Saved to slot 17."
+snaps = ["after.png"]
+timeout = 150
+domain = "china"
+saves_from = "china_path16_xpr"
+export_saves = true
+args = ["--save-slot=16"]
+[keys]
+dev_input = "3000:zone 0;3300:click;5000:zone 1;5300:click;7000:hold 20;7300:zone 1;7600:click;9500:zone 0;9800:click;11500:zone 0;11800:click;12500:move 320 240;15000:await pdc170;16000:where;16500:snap {out}/after.png;16700:save 17;17500:quit"

@@ -1,0 +1,9 @@
+description = "Critical path steps 20-21 (walkthrough.md), from path10's save (slot 10, in go20): take zone 0 -> CONFES2 (confess2), go zone 0 -> go21, take zone 0 -> INDIC2 (indice2), go zone 0 -> espw101 (note MINES209); zone 1 -> espw201; with CONFES2 in hand doc zone 2 plays ANMW2111. Saved to slot 11."
+snaps = ["after.png"]
+timeout = 120
+domain = "china"
+saves_from = "china_path10_go"
+export_saves = true
+args = ["--save-slot=10"]
+[keys]
+dev_input = "3000:zone 0;3300:click;5000:zone 0;5300:click;7000:zone 0;7300:click;9000:zone 0;9300:click;11000:where;13000:face 1;13300:click;15500:hold 4;15800:face 2;16100:click;18100:key 27;20500:move 320 240;21000:where;21500:snap {out}/after.png;21700:save 11;22500:quit"

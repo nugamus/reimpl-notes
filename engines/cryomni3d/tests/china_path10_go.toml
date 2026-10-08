@@ -1,0 +1,9 @@
+description = "Critical path step 19 (walkthrough.md), from path9's save (slot 9): espw201 zone 0 -> espw101; look zone 10 opens puzzle 4 (Go), solved with the nine stones: CONFES1 and INDIC1 destroyed, CHAPITRE 5, still go20. Saved to slot 10."
+snaps = ["go20.png"]
+timeout = 120
+domain = "china"
+saves_from = "china_path9_esp"
+export_saves = true
+args = ["--save-slot=9"]
+[keys]
+dev_input = "3000:face 0;3300:click;5500:face 10;5800:click;8000:click 276 173;8800:click 332 195;9600:click 287 205;10400:click 242 214;11200:click 345 229;12000:click 299 238;12800:click 252 249;13600:click 311 276;14400:click 325 315;17000:move 320 240;17500:where;18000:snap {out}/go20.png;18200:save 10;19000:quit"

@@ -1,0 +1,9 @@
+description = "Critical path step 22 (walkthrough.md), from path11's save (slot 11): teleported to cpc120, zone 5 -> bpiw101, zone 2 -> bpiw201; with CONFES2 in hand doc zone 17 plays ANXI2111 and XPID2112, note MINBP211. Saved to slot 12."
+snaps = ["after.png"]
+timeout = 120
+domain = "china"
+saves_from = "china_path11_confes2"
+export_saves = true
+args = ["--save-slot=11"]
+[keys]
+dev_input = "3000:goto cpc120;4500:face 5;4800:click;7000:face 2;7300:click;9500:hold 4;9800:face 17;10100:click;12100:key 27;14100:key 27;16500:move 320 240;17000:where;17500:snap {out}/after.png;17700:save 12;18500:quit"

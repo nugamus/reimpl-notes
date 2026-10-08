@@ -1,0 +1,9 @@
+description = "Critical path steps 30-31 (walkthrough.md), from path17's save (slot 17, CHAPITRE 6): teleported to cpc120 -> bpiw101 -> bpiw201; with ORIGINAUX in hand doc zone 17 plays ANXI2211 (note MINBP221); teleported to cpc230 -> espw101 -> espw201; talk zone 3 plays MWED2131. Saved to slot 18."
+snaps = ["after.png"]
+timeout = 150
+domain = "china"
+saves_from = "china_path17_origine"
+export_saves = true
+args = ["--save-slot=17"]
+[keys]
+dev_input = "3000:goto cpc120;4500:face 5;4800:click;5500:await bpiw101;6000:face 2;6300:click;7000:await bpiw201;7500:hold 1;7800:face 17;8100:click;10100:key 27;10600:await bpiw201;11000:goto cpc230;12500:face 5;12800:click;13500:await espw101;14000:face 1;14300:click;15000:await espw201;15500:face 3;15800:click;17800:key 27;18300:await espw201;19000:where;19500:snap {out}/after.png;19700:save 18;20500:quit"

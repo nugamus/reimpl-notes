@@ -1,0 +1,9 @@
+description = "Critical path steps 32-33 (walkthrough.md), from path18's save (slot 18, in espw201 with ORIGINAUX in hand): doc zone 2 -> table; take zone 2 (PINCEAU_ESP in hand) -> table10; use zone 2 wets the brush; use zone 1 -> table11; use zone 2: CHAPITRE 8, note MINES299, video ideo, table14; go zone 0 -> espw201, whose entry plays MWED3011. Saved to slot 19."
+snaps = ["table14.png", "after.png"]
+timeout = 150
+domain = "china"
+saves_from = "china_path18_originaux"
+export_saves = true
+args = ["--save-slot=18"]
+[keys]
+dev_input = "3000:face 2;3300:click;4000:await table;4500:zone 2;4800:click;5500:await table10;6000:zone 2;6300:click;7500:zone 1;7800:click;8500:await table11;9000:zone 2;9300:click;10000:await table14;10500:snap {out}/table14.png;11000:zone 0;11300:click;13300:key 27;13800:await espw201;14500:where;15000:snap {out}/after.png;15200:save 19;16000:quit"

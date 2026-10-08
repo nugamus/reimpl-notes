@@ -1,0 +1,9 @@
+description = "Critical path steps 36-37 (walkthrough.md), from path20's save (slot 20, in bouton20): take zone 0 -> CONFES3 (confess3), go zone 0 -> bouton21, take zone 0 -> INDIC3 and CHAPITRE 9 (indice3), go zone 0 plays poch301, GDCD3011, poch302 (notes MINGC301, MINGC302) and returns to cgc310; teleported to cpc230 -> espw101 -> espw201; with CONFES3 in hand doc zone 2 plays ANMW3111. Saved to slot 21."
+snaps = ["after.png"]
+timeout = 200
+domain = "china"
+saves_from = "china_path20_door"
+export_saves = true
+args = ["--save-slot=20"]
+[keys]
+dev_input = "3000:zone 0;3300:click;4000:await confess3;4500:zone 0;4800:click;5500:await bouton21;6000:zone 0;6300:click;7000:await indice3;7500:zone 0;7800:click;9000:await cgc310;9500:goto cpc230;11000:face 5;11300:click;12000:await espw101;12500:face 1;12800:click;13500:await espw201;14000:hold 5;14300:face 2;14600:click;16600:key 27;17100:await espw201;17500:where;18000:snap {out}/after.png;18200:save 21;19000:quit"

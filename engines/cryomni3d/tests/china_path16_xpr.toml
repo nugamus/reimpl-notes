@@ -1,0 +1,9 @@
+description = "Critical path steps 28-29a (walkthrough.md), from path15's save (slot 15): teleported to pdc140, zone 3 -> pdc170; talk zone 2 plays XPRD2111; with LISTE_BOITES in hand doc zone 1 plays ANXP215A, video ORGH211, pdc178 (voice XPRD2161, videos ORGH212, ORGH211) and arrives at pdcw171 (played in full). Saved to slot 16."
+snaps = ["pdcw171.png"]
+timeout = 150
+domain = "china"
+saves_from = "china_path15_pdc"
+export_saves = true
+args = ["--save-slot=15"]
+[keys]
+dev_input = "3000:goto pdc140;4500:face 3;4800:click;7000:face 2;7300:click;9300:key 27;11500:hold 0;11800:face 1;12100:click;15000:await pdcw171;16000:move 320 240;16500:where;17000:snap {out}/pdcw171.png;17200:save 16;18000:quit"

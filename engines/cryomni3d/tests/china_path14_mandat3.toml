@@ -1,0 +1,9 @@
+description = "Critical path step 25 (walkthrough.md), from path13 save (slot 13): teleported to cpc120, zone 5 -> bpiw101, zone 2 -> bpiw201; with LISTE_BOITES in hand doc zone 17 plays ANXI2131 and XPID2132, note MINBP212, MANDAT2 destroyed and MANDAT3 to the inventory. Saved to slot 14."
+snaps = ["after.png"]
+timeout = 120
+domain = "china"
+saves_from = "china_path13_registre"
+export_saves = true
+args = ["--save-slot=13"]
+[keys]
+dev_input = "3000:goto cpc120;4500:face 5;4800:click;7000:face 2;7300:click;9500:hold 0;9800:face 17;10100:click;12100:key 27;14100:key 27;16500:move 320 240;17000:where;17500:snap {out}/after.png;17700:save 14;18500:quit"

@@ -1,0 +1,9 @@
+description = "Critical path steps 17-18 (walkthrough.md), from path8's save (slot 8, CHAPITRE 4): teleported to cpc230, zone 5 -> espw101, zone 1 -> espw201; with INDIC1 in hand doc zone 2 plays ANMW2031 and PRND2011. Saved to slot 9."
+snaps = ["espw201.png", "after.png"]
+timeout = 120
+domain = "china"
+saves_from = "china_path8_lgaw"
+export_saves = true
+args = ["--save-slot=8"]
+[keys]
+dev_input = "3000:goto cpc230;4500:face 5;4800:click;7000:face 1;7300:click;9500:snap {out}/espw201.png;9700:hold 7;10000:face 2;10300:click;12300:key 27;14300:key 27;17300:move 320 240;18000:where;18500:snap {out}/after.png;18700:save 9;20000:quit"

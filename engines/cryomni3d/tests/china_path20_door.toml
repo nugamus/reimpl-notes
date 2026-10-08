@@ -1,0 +1,9 @@
+description = "Critical path steps 34-35 and the door puzzle (walkthrough.md), from path19's save (slot 19, CHAPITRE 8): teleported to cgc150, zone 2 -> cgc310; look zone 4 -> porte, look zone 1 -> porte1; BURIN on use zone 1 -> porte2; MARTEAU on use zone 1 -> bouton1; take zone 0 opens puzzle 7 (Boutons), solved (2 presses on column 1, 4 on column 2), video puzporte: INDIC2 and CONFES2 destroyed, still bouton20. Saved to slot 20."
+snaps = ["bouton20.png"]
+timeout = 150
+domain = "china"
+saves_from = "china_path19_table"
+export_saves = true
+args = ["--save-slot=19"]
+[keys]
+dev_input = "3000:goto cgc150;4500:face 2;4800:click;5500:await cgc310;6000:face 4;6300:click;7000:await porte;7500:zone 1;7800:click;8500:await porte1;9000:hold 24;9300:zone 1;9600:click;10300:await porte2;10800:hold 25;11100:zone 1;11400:click;12100:await bouton1;12600:zone 0;12900:click;14500:click 236 255;14900:click 235 254;15300:click 323 254;15700:click 324 254;16100:click 324 253;16500:click 324 253;17000:await bouton20;17500:where;18000:snap {out}/bouton20.png;18200:save 20;19000:quit"

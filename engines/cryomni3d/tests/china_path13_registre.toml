@@ -1,0 +1,9 @@
+description = "Critical path steps 23-24 (walkthrough.md), from path12's save (slot 12): teleported to cgc110, zone 1 -> nwfw101, zone 2 -> banw111; look zone 2 -> registre, take zone 1 -> cahiers (note MINNW211, PDC_ouvert), take zone 1 -> lboites, go zone 0 -> LISTE_BOITES to the inventory, back in banw111. Saved to slot 13."
+snaps = ["after.png"]
+timeout = 120
+domain = "china"
+saves_from = "china_path12_office2"
+export_saves = true
+args = ["--save-slot=12"]
+[keys]
+dev_input = "3000:goto cgc110;4500:face 1;4800:click;7000:face 2;7300:click;9500:face 2;9800:click;12000:zone 1;12300:click;14000:zone 1;14300:click;16000:zone 0;16300:click;18500:move 320 240;19000:where;19500:snap {out}/after.png;19700:save 13;20500:quit"
