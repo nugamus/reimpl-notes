@@ -393,3 +393,18 @@ shown beside or under it when the row is hovered (E-1305).
   place's code, like a use zone, because the place code tests the index once per press
   and a held button must not repeat the action every frame. Revisit if a trace shows the
   original repeating.
+
+### Q-1352 — China: line ends inside a fiche's text, and the table fiche's first selected row
+- **Context:** spec/china-documentation.md gives the word wrap (font 1, 280 px, justified)
+  but not what a line end inside `<text>` does; it says a hovered row with a `<b>` becomes
+  selected, not which row is selected when the fiche opens.
+- **Next:** read the wrap in 0x40c100 for CR/LF handling and the table init in 0x40bfe0.
+- **Status:** open; engine: a line end is a space in picture fiches and a line break in the
+  special fiche and table 1's `<b>` (Text::drawBox); no row is selected at first.
+
+### Q-1353 — China: LISTE.TXT letter groups without entries
+- **Context:** E-0203 says each `##C` writes a header `-C-` and then its entries; the corpus
+  has 23 letter lines and 3 sections, yet E-0203 counts only 21 header rows in 140. The
+  five letters with no entry (`##K`, `##N`, `##Q`, `##U`, `##V`) give no header in that count.
+- **Status:** engine: a header row only when an entry follows, which gives the 140 rows of
+  E-0203; confirm against 0x40b3e0 when convenient.
