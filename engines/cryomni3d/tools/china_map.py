@@ -9,7 +9,8 @@
   8 documentation, 7 label only), pointer to {place name, view angle float}, unk_8.
 - the `ico_bat` building list (0x402590): label key and the small-map point it scrolls to.
 
-Usage: china_map.py [--selftest]
+Usage: china_map.py [--selftest | --cpp OUT.h]
+  --cpp writes the tables as the engine's china/map_tables.h (regenerate, never edit).
 """
 from __future__ import annotations
 
@@ -47,8 +48,61 @@ def tables(e: Exe):
     return short, full, hot, bat, [e.cstr(s) for s in SPECIAL]
 
 
+GPL = """/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+"""
+
+
+def cpp(short, full, hot, bat) -> str:
+    out = [GPL, "// China's map tables (spec/china-interface.md Map, E-1150..E-1152), included by map.cpp.",
+           "// Generated from the game's data tables; regenerate rather than edit.", "",
+           "#ifndef CRYOMNI3D_CHINA_MAP_TABLES_H", "#define CRYOMNI3D_CHINA_MAP_TABLES_H", "",
+           "namespace CryOmni3D {", "namespace China {", "",
+           "// You are here: place name prefix (3 letters) or full name, point on petiplan",
+           "struct MapPoint {", "	const char *place;", "	int16 x, y;", "};", "",
+           "static const MapPoint kMapPrefixPoints[] = {"]
+    out += ['	{ "%s", %d, %d },' % r for r in short]
+    out += ["};", "", "static const MapPoint kMapPlacePoints[] = {"]
+    out += ['	{ "%s", %d, %d },' % r for r in full]
+    out += ["};", "", "// Hot spots on granplan (inclusive rectangles); type 0 travel, 7 label, 8 documentation",
+            "struct MapSpot {", "	int16 top, left, bottom, right;", "	const char *key;", "	byte type;",
+            "	const char *place; // type 0: the travel target", "	float alpha;", "};", "",
+            "static const MapSpot kMapSpots[] = {"]
+    for h in hot:
+        place, ang = (('"%s"' % h[6][0]), "%.3ff" % h[6][1]) if h[6] else ("nullptr", "0.f")
+        out.append('	{ %d, %d, %d, %d, "%s", %d, %s, %s },' % (*h[:6], place, ang))
+    out += ["};", "", "// The building list (ico_bat), bottom row first: label key, point on the screen",
+            "static const MapPoint kMapBuildings[] = {"]
+    out += ['	{ "%s", %d, %d },' % b for b in bat]
+    out += ["};", "", "} // End of namespace China", "} // End of namespace CryOmni3D", "", "#endif", ""]
+    return "\n".join(out)
+
+
 def main() -> int:
     short, full, hot, bat, special = tables(Exe(EXE.read_bytes()))
+    if "--cpp" in sys.argv:
+        path = sys.argv[sys.argv.index("--cpp") + 1]
+        open(path, "w", encoding="utf-8", newline="\n").write(cpp(short, full, hot, bat))
+        print(f"wrote {path}: {len(short)} prefixes, {len(full)} places, {len(hot)} spots, {len(bat)} buildings")
+        return 0
     if "--selftest" in sys.argv:
         assert len(short) == 14 and short[0] == ("shs", 132, 205)
         assert len(full) == 122 and full[0] == ("pne310", 96, 105)
