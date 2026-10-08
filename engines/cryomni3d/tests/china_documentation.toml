@@ -1,0 +1,6 @@
+description = "China: the main menu's documentation opens the contents; theme 'The civilisation' lists its fiches; fiche 4 opens the viewer; a link leads to fiche 87; Escape returns to the contents with the theme still open; the index button opens the index panel"
+snaps = ["contents.png", "theme.png", "viewer.png", "link.png", "back.png", "index.png"]
+timeout = 60
+domain = "china"
+[keys]
+dev_input = "2500:key 27;5500:key 27;8500:key 27;9500:key 27;11000:move 310 380;11500:click 310 380;13000:snap {out}/contents.png;13200:move 110 42;13500:click 110 42;14500:snap {out}/theme.png;14700:move 290 82;15000:click 290 82;16500:snap {out}/viewer.png;17000:move 450 111;17500:click 450 111;19000:snap {out}/link.png;19500:key 27;21000:snap {out}/back.png;21500:move 605 448;21800:click 605 448;23000:snap {out}/index.png;23500:quit"
