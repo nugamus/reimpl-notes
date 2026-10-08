@@ -57,7 +57,9 @@ def link_tree(src: Path, dst: Path) -> None:
 
 def main(engine: str, name: str, pattern: str, runs: int, asan: bool) -> int:
     ini = scenario.load_ini(REPO / "engines" / engine / "tools" / "scummvm.ini")
-    domain = next(s for s in ini.sections() if s != "scummvm")
+    import tomllib
+    sc = tomllib.loads((REPO / "engines" / engine / "tests" / f"{name}.toml").read_text(encoding="utf-8"))
+    domain = sc.get("domain") or next(s for s in ini.sections() if s != "scummvm")
     game = Path(ini[domain]["path"])
     targets = sorted(game.glob(pattern))
     if not targets:
