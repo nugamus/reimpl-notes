@@ -272,3 +272,34 @@ Entry format:
   Q-1100..Q-1104. Q-0902: `c_` is the slot picture, `i_` the cursor over the eye, slot
   +0x28 the inventory slot (E-1102); the documentation base is Q-1102. Q-0100: SPR
   `unk_16`/`unk_1a` are the sprite's screen x/y (E-1101).
+
+### Q-1200 — China: Sceaux puzzle with m = 1 (arbre3) has no exit, and m = 0 can lock
+The run loop 0x41d630 ends only on a win or when the interface screen clears its run
+flag, and the interface is reachable only with m = 0 while CIRE is not in the inventory
+(E-1203). With m = 1 the player cannot leave unsolved; with m = 0, once CIRE is in the
+inventory and another object is held, clicks are ignored and the interface is closed off.
+Open: is this intended (a trace of the original at arbre3) or a softlock to fix
+(possible-bug)? Next lead: which interface buttons clear the flag (Q-0953).
+
+### Q-1250 — China: Puzzle4's phase 2 draw reads a third row
+- **Context:** 0x4189bc draws phase 2 over rows 0..2 of the soleil/lune/mer/ciel table
+  (0x52ba30, rows of 0x60 bytes) but only rows 0 (plain) and 1 (`...2`) exist; row 2
+  reads 0x52baf0.. (flags at 0x52bb04 + j*0x18). If that memory is zero nothing extra is
+  drawn. Engine: draw two rows.
+- **Status:** open (not traced).
+
+### Q-1251 — China: the bomb's sound slot 8 `tuyau.wav` is missing from the disc
+- **Context:** 0x4192c0 loads `Bombe\tuyau.wav` into slot 8, played at step 11 (grandt
+  with the screwdriver). No TUYAU.WAV in the EN ISO's `DATA/PUZZLES/BOMBE`; other
+  editions not checked. Probably silent in the original. Engine: skip a missing sound.
+- **Status:** open.
+
+### Q-1001 — The credits screen's background, font and skipping; what follows the end of play
+- **Context:** E-0205 gives the credits' pages, colours, centring and 5 s timer; E-0954
+  gives the end of play (`shs240` sets it after the epilogue).
+- **What we checked:** E-0205 and E-0954 only; the background, the font slot, any key
+  that skips a page, and whether the game returns to the menu or exits after the
+  end-of-play credits are not traced.
+- **Blocks:** exact look of the credits.
+- **Status:** open. Decided: black background, font slot 1, Escape skips a page, and the
+  menu follows the end-of-play credits, because a ScummVM game should not quit by itself.

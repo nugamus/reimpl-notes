@@ -1,0 +1,6 @@
+description = "China: Leave the game from the menu shows the credits (E-0205), first and second page"
+snaps = ["page1.png", "page2.png"]
+timeout = 60
+domain = "china"
+[keys]
+dev_input = "2500:key 27;5500:key 27;8500:key 27;9500:key 27;11000:move 325 425;12000:click 325 425;13500:snap {out}/page1.png;18700:snap {out}/page2.png;19000:quit"
