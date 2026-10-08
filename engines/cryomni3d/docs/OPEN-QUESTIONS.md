@@ -386,3 +386,10 @@ shown beside or under it when the row is hovered (E-1305).
   known; the snap shows the text between the background's bullets at x 180.
 - Q-1101: decided to stop the voice handle on leaving a document (the original's channel 3).
 - Q-1100: the compass click only logs a warning; the map is not implemented.
+
+### Q-1303 — Q-1302 decided: a documentation zone clicked while holding an object
+- **Context:** Q-1302 (the walkthrough needs it at pdc170 and five other places).
+- **Status:** decided: the click sets the press latch and leaves the zone index for the
+  place's code, like a use zone, because the place code tests the index once per press
+  and a held button must not repeat the action every frame. Revisit if a trace shows the
+  original repeating.
