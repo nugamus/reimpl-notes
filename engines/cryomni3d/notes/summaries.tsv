@@ -135,6 +135,8 @@ CHINE.EXE	00412bb0	Music::stop	Stops music (channel 2) and marks it stopped	E-11
 CHINE.EXE	00412bd0	Music::resume	Restarts the loaded music buffer at volume 0 or starts the stored one	E-0206
 CHINE.EXE	00412c30	Music::duck	Music state 6: duck (volume -1 per tick to 20)	E-0951
 CHINE.EXE	00412c40	Music::unduck	Music state 3: back up (volume +10 per tick to 127)	E-0951
+CHINE.EXE	00412e20	Error::clear	Clears the fatal-error record (message, file, line, id, fatal flag 0x48f28c)	E-0956
+CHINE.EXE	00412e50	Error::showFatal	Formats the fatal-error record (message, file, line, optional id) into a message box text and shows it	E-0956
 CHINE.EXE	00413200	MyFile::loadWhole	Reads a whole file into a new buffer, returns buffer and size	E-0200
 CHINE.EXE	00413300	MyFont::loadAll	Load all fonts: font01..font09, font10, font11 .crf into slots 0..10; fatal on failure	E-0800
 CHINE.EXE	004133f0	MyFont::setColor	Set text colour (RGB565 constant, converted to 555 on a 15-bit screen)	E-0802

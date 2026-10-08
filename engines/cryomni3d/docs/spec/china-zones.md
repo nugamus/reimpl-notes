@@ -199,7 +199,10 @@ Voice line, `voice(block)` (E-0951): the place stays on screen. Per block: start
 voice, draw the warp view with the block's text in the subtitle band (always, whatever the
 subtitle option), flip, wait for the voice to end. Escape ends the current block (held, it
 skips the rest). No other input. The music is set to duck (lower by 1 per tick to 20) and
-back (raise by 10 per tick to 127) around it; the music does not tick meanwhile.
+back (raise by 10 per tick to 127) around it; the music does not tick meanwhile. A block id
+missing from DIAL.TXT (both kinds) plays nothing and returns at once, even if the WAV
+exists: `victime`'s `voice("victime")` and `jixw120`'s `dialogue("ANJIX41", ...)` (a slip
+for `ANJJIX41`) are silent in every edition (E-0956).
 
 Lip-sync dialogue, `dialogue(block, stemA, stemB)` (E-0952): blocking, full screen.
 - Faces: `DATA/SYNC/<stem><k>.HNM`, k = 0, 1, 2 talking loops, 3 mouth shut; HNM6

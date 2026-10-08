@@ -1453,3 +1453,26 @@ of 100 per area, so related entries stay together.
   top-left point, as puzzles 1-4 do (E-1200); the hover label is placed from the same
   top-left.
 - **Used by:** games/china/docs/puzzles.md Puzzles 5-8: common behaviour.
+
+### E-0956 — China: a DIAL.TXT block id that is not found plays nothing (2026-10-09)
+- **Source:** CHINE.EXE `Dial::findBlock` 0x403eb0 (no match after the 700-entry table:
+  fills the error record "Dialogue init Failure." Dial.cpp line 0x9b, unless the fatal
+  flag 0x48f28c is set, and returns 3); voice line 0x404d00 (findBlock is its first step:
+  on failure it returns at once, before the redraw, the duck, the WAV and the subtitle);
+  lip-sync 0x404710 (loads both speakers' face HNMs first, then findBlock; on failure
+  returns 3 without playing or freeing them); the error record is shown (0x412e50) only
+  by WinMain 0x4118a0 when `run` fails and by setWarp/setImage on their own errors, and
+  the place procedures drop the return of `dialogue` 0x403350 / `playDialogue` 0x403380.
+  Corpus: every quoted id of the 52 call sites of the two functions in the decompile dump
+  (with their string addresses read from CHINE.EXE) checked against the block ids of all
+  nine DIAL.TXT files (EN ISO, FR CD, DVD DE/FR/IT/NL/SP/SW/US).
+- **Shows:** an unknown block id is a silent no-op: after the wait for channel 3, no voice
+  (even when `VOICES/<id>.WAV` exists), no subtitle, no screen change, no wait; the place
+  procedure goes on with its next step. Two call sites are in that case, in every
+  edition: `victime` 0x422880 `voice("victime")` (VICTIME.WAV exists, it is the
+  LISTE_VICTIMES document's voice, E-1103; block absent) and `jixw120` 0x422ac0, the
+  second of its three lip-sync lines, `dialogue("ANJIX41", "ANJ" stem 0x461518, none)`:
+  DIAL.TXT and VOICES have `ANJJIX41` ("Four in one day! ..."), so the id is a slip and
+  that line is never heard in the original (the faces it loads leak until the next
+  dialogue reloads them). All other ids resolve.
+- **Used by:** spec/china-zones.md Dialogues.
