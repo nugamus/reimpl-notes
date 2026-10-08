@@ -1,0 +1,9 @@
+description = "Critical path steps 7-8 (walkthrough.md), from path3's save (slot 3): aie600b go zone 5 plays jixh007 to jixw111, go zone 0 plays jixh111 to jixw121 (videos ended by Escape); talk zone 1 plays ANID1011 and ANID1121: CHAPITRE 2, CLE_WANG and POSTHUME to the inventory, note MINJI109. Saved to slot 4."
+snaps = ["jixw121.png", "after.png"]
+timeout = 120
+domain = "china"
+saves_from = "china_path3_gate"
+export_saves = true
+args = ["--save-slot=3"]
+[keys]
+dev_input = "3000:face 5;3300:click;5800:key 27;8000:face 0;8300:click;10800:key 27;13000:snap {out}/jixw121.png;13200:face 1;13500:click;15500:key 27;17500:key 27;19500:move 320 240;20500:where;21000:snap {out}/after.png;21200:save 4;22000:quit"

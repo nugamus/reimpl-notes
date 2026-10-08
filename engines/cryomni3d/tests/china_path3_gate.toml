@@ -1,0 +1,9 @@
+description = "Critical path steps 5-6 (walkthrough.md), from path2's save (slot 2): teleported to aie500, zone 1 -> aie600b; talk zone 0 plays EGJD1011; with MANDAT2 in hand use zone 4 plays EGJD1041 and opens the garden gate (JIXW111_ouvert). Saved to slot 3 for path4."
+snaps = ["aie600b.png", "after.png"]
+timeout = 120
+domain = "china"
+saves_from = "china_path2_office"
+export_saves = true
+args = ["--save-slot=2"]
+[keys]
+dev_input = "3000:goto aie500;4500:face 1;4800:click;7000:snap {out}/aie600b.png;7200:face 0;7500:click;9500:key 27;11500:hold 31;12000:face 4;12300:click;14300:key 27;16300:move 320 240;17000:where;17500:snap {out}/after.png;17700:save 3;18500:quit"

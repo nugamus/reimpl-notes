@@ -1,0 +1,9 @@
+description = "Critical path step 4 (walkthrough.md), from path1's save (slot 1): teleported to cpc120, cpc120 zone 5 -> bpiw101, zone 2 -> the office bpiw201; talk zone 19 plays ANXI1011 and XPID1012 (ended by Escape), note MINBP101, MANDAT1 destroyed and MANDAT2 to the inventory. Saved to slot 2 for path3."
+snaps = ["office.png", "after.png"]
+timeout = 120
+domain = "china"
+saves_from = "china_path1_library"
+export_saves = true
+args = ["--save-slot=1"]
+[keys]
+dev_input = "3000:goto cpc120;4500:face 5;4800:click;7000:face 2;7300:click;9500:snap {out}/office.png;9700:face 19;10000:click;12000:key 27;14000:key 27;16000:key 27;18000:move 320 240;19000:where;19500:snap {out}/after.png;19700:save 2;20500:quit"

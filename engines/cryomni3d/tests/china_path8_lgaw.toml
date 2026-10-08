@@ -1,0 +1,9 @@
+description = "Critical path steps 15-16 (walkthrough.md), from path7's save (slot 7, in bouddha2): take zone 0 -> CONFES1 (confess1), go zone 0 -> bouddha3, take zone 0 -> INDIC1 (indice1), go zone 0 -> lgaw101 (note MINPN201); leaving by go zone 0 plays GDCD2011, video PNEH202 and arrives in pne150 (note MINPN202). Saved to slot 8."
+snaps = ["pne150.png"]
+timeout = 120
+domain = "china"
+saves_from = "china_path7_bouddha"
+export_saves = true
+args = ["--save-slot=7"]
+[keys]
+dev_input = "3000:zone 0;3300:click;5000:zone 0;5300:click;7000:zone 0;7300:click;9000:zone 0;9300:click;11500:face 0;11800:click;14500:key 27;17500:key 27;20500:move 320 240;21000:where;21500:snap {out}/pne150.png;21700:save 8;22500:quit"

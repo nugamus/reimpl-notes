@@ -1,0 +1,9 @@
+description = "Critical path steps 13-14 (walkthrough.md), from path6's save (slot 6, in meuble2): with CLE_WANG in hand use zone 5 -> meuble5; take zone 1 opens puzzle 2 (Bouddha), solved by B1, B2, R1, R2, R3: CHAPITRE 4, POSTHUME destroyed, still bouddha2. Saved to slot 7."
+snaps = ["bouddha.png", "bouddha2.png"]
+timeout = 120
+domain = "china"
+saves_from = "china_path6_tools"
+export_saves = true
+args = ["--save-slot=6"]
+[keys]
+dev_input = "3000:hold 26;3500:zone 5;3800:click;6000:zone 1;6300:click;8500:snap {out}/bouddha.png;8700:click 280 405;9100:click 359 405;9500:click 242 406;9900:click 319 405;10300:click 395 406;12500:move 320 240;13000:where;13500:snap {out}/bouddha2.png;13700:save 7;14500:quit"

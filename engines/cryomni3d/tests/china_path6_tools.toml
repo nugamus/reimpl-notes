@@ -1,0 +1,9 @@
+description = "Critical path steps 11-12 (walkthrough.md), from path5's save (slot 5, in meuble2): take zone 3 -> meuble30, take zone 1 -> MARTEAU (meuble31), go zone 0 -> meuble2; take zone 4 -> meuble40, take zone 1 -> BURIN (meuble41), take zone 1 -> TOURNEVIS (meuble43), go zone 0 -> meuble2. Saved to slot 6."
+snaps = ["meuble2.png"]
+timeout = 120
+domain = "china"
+saves_from = "china_path5_cabinet"
+export_saves = true
+args = ["--save-slot=5"]
+[keys]
+dev_input = "3000:zone 3;3300:click;5000:zone 1;5300:click;7000:zone 0;7300:click;9000:zone 4;9300:click;11000:zone 1;11300:click;13000:zone 1;13300:click;15000:zone 0;15300:click;17000:move 320 240;17500:where;18000:snap {out}/meuble2.png;18200:save 6;19000:quit"

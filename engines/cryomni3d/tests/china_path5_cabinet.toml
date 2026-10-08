@@ -1,0 +1,9 @@
+description = "Critical path steps 9-10 (walkthrough.md), from path4's save (slot 4, CHAPITRE 2): teleported to pne150, zone 2 -> lgaw101; talk zone 6 twice plays ANXN1111 then ANXN1121; look zone 2 (enabled by VAR_ANID1121) -> the cabinet meuble1, take zone 1 -> meuble2. Saved to slot 5."
+snaps = ["meuble2.png"]
+timeout = 120
+domain = "china"
+saves_from = "china_path4_garden"
+export_saves = true
+args = ["--save-slot=4"]
+[keys]
+dev_input = "3000:goto pne150;4500:face 2;4800:click;7000:face 6;7300:click;9300:key 27;11300:face 6;11600:click;13600:key 27;15600:face 2;15900:click;18000:zone 1;18300:click;20500:move 320 240;21000:where;21500:snap {out}/meuble2.png;21700:save 5;22500:quit"
