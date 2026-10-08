@@ -1,0 +1,6 @@
+description = "China: the menu's Options opens the options screen over the menu background; a click on the speed line steps normal -> rapide, a click on subtitles and on music turns them off (the menu music stops); Retour goes back to the menu, whose Load entry is enabled by the manual save mode"
+snaps = ["options.png", "changed.png", "menu.png"]
+timeout = 90
+domain = "china"
+[keys]
+dev_input = "2500:key 27;5500:key 27;8500:key 27;9500:key 27;11000:move 330 400;12000:click 330 400;13500:move 600 100;14000:snap {out}/options.png;14200:click 300 260;14600:click 300 285;15000:click 300 310;15400:move 600 100;16000:snap {out}/changed.png;16200:click 300 460;17000:move 600 100;17500:snap {out}/menu.png;17800:quit"

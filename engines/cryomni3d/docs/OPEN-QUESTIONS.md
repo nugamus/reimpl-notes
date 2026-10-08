@@ -413,3 +413,8 @@ shown beside or under it when the row is hovered (E-1305).
 - **Context:** E-1151 gives the hover label's place (0x4136d0, y 0x1a9, x 0x17c) and E-1152
   the building list's row height (font height + 5), but neither records the font slot.
 - **Status:** open; engine: font 0, as the bar's object label (E-1102).
+
+### Q-1155 — China: the options screen's font
+- **Context:** E-1153 draws the lines with 0x4136d0 and measures the label for the value's x,
+  but the font slot is not recorded; the menu draws in slot 1 and measures in slot 0 (E-0801).
+- **Status:** open; engine: slot 1 for drawing and measuring.
