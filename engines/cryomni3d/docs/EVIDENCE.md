@@ -1426,3 +1426,15 @@ of 100 per area, so related entries stay together.
   0x4ce070 + (row * 13 + link) * 4. Corpus: `!!` fiches are `fiche 2` and `fiche 3`.
 - **Shows:** how the two tables are shown and selected (spec "Table fiche").
 - **Used by:** spec/china-documentation.md.
+
+### E-1107 — China's object label keys and document keys (2026-10-08)
+- **Source:** CHINE.EXE object table 0x45d5c0 (36 records of 48 bytes, E-0905): the
+  pointer at +0x2c (LABELS.TXT key) and at +0x20 (document key) of each record; the
+  strings they point to lie at file offsets 0x5c680..0x5cb94 (string listing in E-0006).
+- **Shows:** label keys, objects 0..34: LISTE_BOITES ORIGINAUX POSTHUME CONFES1..4
+  INDIC1..4 LISTE_VICTIMES PROCLA EDI LETTRE_VIERGE REBU PLBOMB INDICE_CACHETS
+  INDICE_CACHETS2 SCEAUX TOURNEVIS CIRE RUYI PINCEAU BURIN MARTEAU CLE_WANG CURE_DENTS
+  PINCEAU_ESP PIECES MANDAT1..4 CLE_JARRE. Document keys, objects 0..18: lboites origine
+  posthum confess1..4 indice1..4 victime proclam edit lvierge rebus plbombe cachet1
+  cachet2 (the still and voice names the eye opens, E-1103).
+- **Used by:** spec/china-interface.md Documents; the engine's object tables.

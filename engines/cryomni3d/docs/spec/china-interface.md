@@ -304,3 +304,18 @@ data from Fichetxt.txt and Liste.txt (E-0203, E-0204). Full behaviour of both sc
 There are no save or menu buttons on the bar; saving and the menu are reached by Escape
 in the frame loop (E-0508). The exit spiral puts any held object back in the first free
 slot, empties the hand and closes the bar with result 0 (E-1100).
+
+## Object names and document keys
+
+Each object's inventory label is the LABELS.TXT text for its key, and objects 0..18 have
+a document key, the still and voice the eye opens (E-1107):
+
+| Objects | Label keys | Document keys |
+|---|---|---|
+| 0..6 | LISTE_BOITES, ORIGINAUX, POSTHUME, CONFES1..4 | lboites, origine, posthum, confess1..4 |
+| 7..13 | INDIC1..4, LISTE_VICTIMES, PROCLA, EDI | indice1..4, victime, proclam, edit |
+| 14..18 | LETTRE_VIERGE, REBU, PLBOMB, INDICE_CACHETS, INDICE_CACHETS2 | lvierge, rebus, plbombe, cachet1, cachet2 |
+| 19..34 | SCEAUX, TOURNEVIS, CIRE, RUYI, PINCEAU, BURIN, MARTEAU, CLE_WANG, CURE_DENTS, PINCEAU_ESP, PIECES, MANDAT1..4, CLE_JARRE | none |
+
+Places can change an object's label key and document key while playing (`obj_set_label`,
+`obj_set_examine`, E-0954); saves keep the changed keys.
