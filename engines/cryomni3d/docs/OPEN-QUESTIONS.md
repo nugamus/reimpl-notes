@@ -245,7 +245,7 @@ Entry format:
 - **Context:** E-1105: table 0x45af38 (9 dwords: rect, label, type, place/fiche) is not
   dumped; the travel conditions on variables 0, 0x18, 0x19, 0xcc, 0x7c for the places at
   0x45be00/0x45bde8/0x45bdf8; what 0x403040 and 0x401fb0 (`ico_bat`) do.
-- **Status:** open; next lead: dump the table from the exe, decompile 0x401fb0.
+- **Status:** resolved (E-1150..E-1152, see "Q-1100 resolution").
 
 ### Q-1101 — China: document text for objects 14..18, and channel 3
 - **Context:** E-1103: the text box table has 14 entries; objects 14..18 would read the
@@ -304,3 +304,25 @@ Open: is this intended (a trace of the original at arbre3) or a softlock to fix
 - **Blocks:** exact look of the credits.
 - **Status:** open. Decided: black background, font slot 1, Escape skips a page, and the
   menu follows the end-of-play credits, because a ScummVM game should not quit by itself.
+
+### Q-1100 resolution (2026-10-08)
+- Q-1100 is resolved by E-1150..E-1152 (tables dumped by `tools/china_map.py`, travel
+  conditions, `ico_bat` building list).
+
+### Q-1150 — China: length of the building list's rise animation
+- **Context:** E-1152: as decompiled, 0x401fb0's opening loop runs (font height + 5) * n
+  frames, each 4 rows higher, which would copy past the list image once it is fully up.
+  Either the decompile misreads the bound or the original overruns.
+- **Status:** open; engine: rise 4 px per frame until the whole list shows; next lead:
+  read the loop's disassembly at 0x401fb0.
+
+### Q-1151 — China: the four sprites the options screen loads
+- **Context:** E-1153: 0x40de50 builds four names with "%s%s" and loads them with
+  0x41f760; the screen never draws them, and only the Escape exit frees them (0x40def0).
+- **Status:** open, harmless; next lead: the call's arguments in the disassembly.
+
+### Q-1152 — China: map hot spot field `unk_8` and game variable 0
+- **Context:** E-1150: dword 8 is 18 for CHS/SHS/SHM/SHP, 10 for SPF, 6 for PDC, else 0;
+  not read by the map. Variable 0 non-zero lifts all travel conditions (E-1151); what sets
+  it is not traced (visit mode?).
+- **Status:** open; next lead: xrefs to 0x45af58, writers of variable 0.

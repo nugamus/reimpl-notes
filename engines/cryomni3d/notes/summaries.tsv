@@ -1,9 +1,13 @@
 program	address	name	summary	evidence
 CHINE.EXE	00401000	carte::load	Loads the map images petiplan/granplan and the cadre, point, ico_bat, spirs sprites	E-1105
 CHINE.EXE	004013e0	carte::run	Map screen: scrolling big map, small map, hot spots travel or open the documentation base	E-1105
+CHINE.EXE	00401fb0	carte::buildingList	Map building list (ico_bat): rises a pre-rendered list of ten buildings; a click on a row scrolls the map to that building	E-1152
+CHINE.EXE	00402590	carte::initBuildings	Map start: renders the building list image (labels, widths) and sets each building's small-map point	E-1152
+CHINE.EXE	00402920	carte::initLabels	Fills each map hot spot's label text from its LABELS.TXT key (or ' pas de label ')	E-1150
 CHINE.EXE	00402cf0	ScriptApi::playVideo	Play a video DATA/HNM/<name>.HNS	E-0703
 CHINE.EXE	00402d50	Main::setWarp	Loads warp <L>:\Chine\Data\warp\<name>, mode warp, cross-fade flag	E-0507
 CHINE.EXE	00402e20	Main::setImage	Shows a still by stem: tga, hnm, CD Images, CD Loc; mode still	E-0510
+CHINE.EXE	00403040	Warp::setAngles	Sets the warp view angles alpha and beta (0x53485c, 0x534844)	E-1151
 CHINE.EXE	00403060	ScriptApi::zoneGo	Adds a go zone (type 0): rect, disabled, target, arg, alpha, beta	E-0904
 CHINE.EXE	004030a0	ScriptApi::zoneLook	Adds a look zone (type 2): rect, disabled, target, arg; disabled in visit mode	E-0904
 CHINE.EXE	00403100	ScriptApi::zoneLabel	Adds a label zone (type 7) with its LABELS.TXT text; enabled only in visit mode	E-0904
@@ -48,10 +52,11 @@ CHINE.EXE	004056c0	Main::resetGlobals	Resets option and state globals to default
 CHINE.EXE	00405740	Main::showLoading	Loading screen: still Load and text Chargement en cours... (font slot 3, white)	E-0504
 CHINE.EXE	004057b0	Music::startMenuMusic	Starts menu music Allee.zik (local Data\Music then CD), if music option on	E-0504
 CHINE.EXE	00405870	Main::readConfig	Reads chine.cfg: speed, subtitles, music, save-mode field	E-0501
+CHINE.EXE	00405950	Main::shutdown	Shutdown: writes chine.cfg then releases music, saves and the map	E-1153
 CHINE.EXE	004059f0	Main::writeConfig	Writes chine.cfg (four uint32 options)	E-0501
 CHINE.EXE	00405aa0	Main::epilogue	Epilogue: four ending stills with LABELS texts, 10 s each or Escape	E-0954
 CHINE.EXE	00405ed0	Puzzle::run	Puzzle dispatch by number: init, run, close; result to 0x48f280	E-0953
-CHINE.EXE	00406360	Main::menuDispatch	Menu dispatcher: new game, load, resume, save, visit, quit	E-0506
+CHINE.EXE	00406360	Main::menuDispatch	Menu dispatcher: new game, load, resume, save, visit; sets the game-in-progress flag 0x48f1f8	E-1153
 CHINE.EXE	004064e0	Main::run	Game: menu, then frames until menu or quit, then credits	E-0508
 CHINE.EXE	00406530	Main::frame	One game frame: input, script, warp or still draw, cursor, flip	E-0508
 CHINE.EXE	00406880	Main::handleKeys	Per-frame keys: fps, debug keys, Space interface, Escape	E-0508
@@ -65,8 +70,11 @@ CHINE.EXE	00409670	Interface::countDollars	Counts $ characters in a string	E-020
 CHINE.EXE	0040a5b0	Interface::zeroLineEnds	Turns each CR outside <...> and the byte after it into NUL (runs one byte past)	E-0202
 CHINE.EXE	0040a5f0	Interface::loadDoc	Parses Fichetxt.txt themes, fiches, captions, links and tables	E-0204
 CHINE.EXE	0040b3e0	Interface::loadIndex	Builds the documentation index rows -C- and id/text from Liste.txt	E-0203
+CHINE.EXE	0040de50	Options::load	Options screen entry: builds a path and loads four sprites it never draws	E-1153
+CHINE.EXE	0040def0	Options::free	Frees the options screen's sprites	E-1153
 CHINE.EXE	0040e120	Text::drawBox	Draws wrapped text in a box, 15-px lines, given colour and font	E-1103
 CHINE.EXE	0040e2b0	Dial::drawSubtitle	Subtitle band: wrap to 630 px, black band n*15+10 at the bottom, white lines at x 5	E-0951
+CHINE.EXE	0040e630	Options::run	Options screen: speed, subtitles, music, save mode lines and retour; toggles in memory	E-1153
 CHINE.EXE	0040ec80	Interface::loadBar	Loads the bar sprites oeil, bouss, cadres, bnote, spirsort with their rects; empties the slots	E-1101
 CHINE.EXE	0040efd0	Interface::open	Interface bar entry: copies the frame, rebuilds slots, runs the bar; result 0 when the exit spiral was used	E-1100
 CHINE.EXE	0040f070	Interface::barLoop	Interface bar loop: slide-in, slot take/put/swap, eye, compass, notebook, spiral, hover label, close and slide-out	E-1100
@@ -97,6 +105,7 @@ CHINE.EXE	004125c0	Minutes::writeSave	Writes the held minutes: count, then lengt
 CHINE.EXE	00412710	Music::setName	Stores the next music file path	E-0206
 CHINE.EXE	00412740	Music::update	Music state machine: fades, opens the .zik, streams 22050 Hz 16-bit stereo PCM looping	E-0206
 CHINE.EXE	00412b90	Music::start	Starts the stored music (fade in) or switches with a fade out	E-0206
+CHINE.EXE	00412bb0	Music::stop	Stops music (channel 2) and marks it stopped	E-1153
 CHINE.EXE	00412bd0	Music::resume	Restarts the loaded music buffer at volume 0 or starts the stored one	E-0206
 CHINE.EXE	00412c30	Music::duck	Music state 6: duck (volume -1 per tick to 20)	E-0951
 CHINE.EXE	00412c40	Music::unduck	Music state 3: back up (volume +10 per tick to 127)	E-0951

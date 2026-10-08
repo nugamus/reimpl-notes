@@ -1304,3 +1304,57 @@ of 100 per area, so related entries stay together.
   0x52bb50..0x52bb74); corpus `DATA/PUZZLES/BOMBE` (no TUYAU.WAV).
 - **Shows:** games/china/docs/puzzles.md section 8.
 - **Used by:** games/china/docs/puzzles.md 8 Bombe.
+
+### E-1150 — China's map tables: you-are-here positions and hot spots (2026-10-08)
+- **Source:** CHINE.EXE `carte::run` 0x4013e0 (prefix loop over 0x452040..0x452eb0 step
+  0x108 comparing three bytes, x at +0x100 plus 0x175, y at +0x104; then exact-name loop
+  over 0x452fb8 step 0x108 until an empty name, overriding; hot spot loops over
+  0x45af38 step 36 comparing dwords 0..3 as top, left, bottom, right minus the scroll
+  offsets 0x48cbf0/0x48cce4; point drawn at x-2, y-2 by 0x41fac0); 0x402920 (fills dword 4
+  of records below 0x45bca4 with `Label::find(dword 5)` or " pas de label " 0x45bedc);
+  dumper `tools/china_map.py --selftest`: 14 prefix records, 122 full-name records, 95 hot
+  spots (13 type 0 with a target, the rest 7 or 8), 10 buildings.
+- **Shows:** the map's data tables as listed in spec/china-interface.md Map. The two words
+  after the last hot spot (0x45bc94..0x45bcdb) are key strings that the travel and hover
+  loops also scan (bounds 0x45bcf8/0x45bce8); their rect values (> 4 million) never match.
+- **Used by:** spec/china-interface.md Map; Q-1100 (resolved).
+
+### E-1151 — China's map: travel conditions, cursors, clicks (2026-10-08)
+- **Source:** CHINE.EXE 0x4013e0: setCursor(0xb) each frame, then for the hovered spot
+  setCursor(8) only on the travel-allowed path, 0xf for type 8, 0xb for type 7; click loop:
+  type 0 spot, `Vars::get(0)` non-zero skips the checks; else strcmp target with 0x45be00
+  `cpc600` (needs get(0x19) or get(0x18)), 0x45bdf8 `ctp330` (get(0xcc)), 0x45bde8
+  `pdc010` (get(0x7c)); allowed: `Script::find` 0x41f680, 0x403040(angle float, 0) (sets the
+  view angles 0x53485c/0x534844), 0x41f190, *out = 1, leave; a type-8 spot under the click
+  stores its index, then after the flip 0x40c5a0(key) and 0x41f170, loop continues;
+  rect 0x48cc64 (spirs) leaves with *out = 0; rect 0x48cbfc (ico_bat) runs 0x401fb0 after
+  the flip; label at 0x4136d0(screen, y 0x1a9, x 0x17c); no keyboard test in the loop.
+- **Shows:** what hovering and clicking each hot spot type does and the three gated places.
+- **Used by:** spec/china-interface.md Map.
+
+### E-1152 — China's map: the building list (`ico_bat`) (2026-10-08)
+- **Source:** CHINE.EXE 0x402590 (map start: font height + 5 rows, keys 0x45bdd4 SHS,
+  0x45bde0 ESP, 0x45bdc4 PNE, 0x45bdbc SPF, 0x45bdb8 JIX, 0x45bd84 PPF, 0x45bdc0 CPC,
+  0x45bddc BPI, 0x45bdc8 POC, 0x45bde4 NWF with points (0x1fa,0xfc) (0x208,0x9d)
+  (0x1d4,0x87) (0x1fa,0x5f) (0x205,0x4f) (0x21b,100) (0x1fa,0x8c) (0x1e7,0x96) (0x1fa,0x9d)
+  (0x1d6,0xa5); count stops at the first missing label; width rounded up to 4; image
+  filled 0xffff, labels in 0x7000 at x 5, row (n-1-i)); 0x401fb0 (rise from row 0x1b8 by 4
+  rows per frame at x 0x1f5 - w/2, width w + 10; hover rect x 0x1f5-w/2 .. w/2+0x1ff;
+  hovered row filled 0x7000, label white at 0x1fa - w/2; a click sets the point from the
+  table and the scroll offsets by the E-1105 formulas, then closes; closing lowers 4 rows
+  per frame).
+- **Shows:** the `ico_bat` button's behaviour (Q-1100's last part).
+- **Used by:** spec/china-interface.md Map.
+
+### E-1153 — China's options screen (2026-10-08)
+- **Source:** CHINE.EXE 0x40e630 (rects at 0x48f2b8 step 24 bytes: top 0xfa + 0x19*i,
+  left 0x118, bottom top + 0x17, right 0x118 + widths; `retour` rect 0x1c2, 0x118, 0x1db;
+  click 0: speed 0x48f258 = (v+1) % 5; 1: subtitles 0x48f228 toggled; 2: music 0x48f264
+  toggled then 0x412bb0 / 0x412bd0; 3 (skipped when 0x48f1f8 != 0): 0x48f238 toggled and
+  0x48f21c = (0x48f238 == 0); 4: return 0; background copied from 0x48f558 (loaded by
+  `Interface::loadMenu` 0x406de0); colours 0x7020 / 0xffff / 0x9a73; text at
+  ((i+10)*25, 0x118), values at x 0x118 + label width; Escape (`MyKeyboard::keyDown(1)`)
+  -> 0x40def0 then return 0); 0x406360 (0x48f1f8 = 1 after new game, load, save; 0 after
+  visit); 0x405950 (shutdown) -> 0x4059f0 writes 0x48f258, 0x48f228, 0x48f264, 0x48f21c.
+- **Shows:** the options screen's layout and behaviour; chine.cfg is written at shutdown.
+- **Used by:** spec/china-boot.md Options screen.

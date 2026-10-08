@@ -54,9 +54,35 @@ Normal bullet `ROUG_n.SPR`, hovered `BLC_n.SPR` (same position); SPR layout in E
 Hit area: the bullet rectangle grown right by the label's width and down by its height.
 Hovered: `BLC_n` and white label (0xffff); otherwise `ROUG_n` and the label in 0x7020
 (enabled) or 0x9a73 (disabled). Bullets 6 and 7 reuse sprite 6, moved (+20, +25) per step
-(E-0505). Save files are `Data\Saved\<name>_game<1..12>.sav` (E-0505). The options screen
-has four buttons: panorama speed (very slow .. very fast, cycling), subtitles, music,
-`save` (E-0501).
+(E-0505). Save files are `Data\Saved\<name>_game<1..12>.sav` (E-0505). The options screen:
+see Options screen (E-1153).
+
+## Options screen
+
+Menu entry 6 runs 0x40e630 (E-1153, labels E-0207):
+- Background: the main menu's `FONDTITR` image as the menu last drew it, copied every
+  frame; no bullets. Text in the menu font; colours: hovered 0xffff, else 0x7020; a
+  disabled line 0x9a73.
+- Five lines, each `<label><value>` with the value drawn right after the label's width:
+
+| # | Label key (English) | y | Values (key, by index) | A click |
+|---|---|---|---|---|
+| 0 | `omni3D` | 250 | `tres_lent`, `lent`, `normal`, `rapide`, `tres_rapide` | speed = (speed + 1) mod 5 |
+| 1 | `sous_titre` | 275 | `non`, `oui` | subtitles toggled |
+| 2 | `musique` | 300 | `non`, `oui` | music toggled; off stops the music (0x412bb0), on resumes it (0x412bd0) |
+| 3 | `save` | 325 | `auto`, `manu` (index = the in-memory flag 0x48f238) | flag toggled; disabled (grey, no hover, no click) while a game is in progress |
+| 4 | `retour` | 450 | none | back to the menu |
+
+- All lines start at x 280. Hit rect of lines 0..3: top y, left 280, bottom y + 23, right
+  280 + label width + value width (recomputed every frame); `retour`: 450..475 by 280 ..
+  280 + its width. Hover flags are updated before the frame is drawn, so the colour
+  follows the cursor; a click acts once per press (the shared click latch 0x48f29c).
+- "A game is in progress" (0x48f1f8): set by new game, load and save from the menu,
+  cleared by visit (0x406360).
+- Leaving: `retour` or Escape returns to the menu (Escape also frees the four sprites the
+  screen loads on entry; Q-1151). Nothing is written then: the options live in memory and
+  `chine.cfg` is written only at shutdown (0x405950 -> 0x4059f0): speed, subtitles,
+  music, then field 4 = (flag 0x48f238 == 0) (E-0501, E-1153).
 
 ## New game
 
