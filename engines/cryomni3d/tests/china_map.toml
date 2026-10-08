@@ -1,0 +1,6 @@
+description = "China: new game in pne140; Space opens the bar, the compass opens the map scrolled to the you-are-here point; hovering the PNE spot shows its label; the building list rises and picking its bottom row (SHS) scrolls the big map; the spiral goes back to the bar; the map again, a click on the NWF spot travels to cgc110"
+snaps = ["map.png", "hover.png", "buildings.png", "picked.png", "travelled.png"]
+timeout = 90
+domain = "china"
+[keys]
+dev_input = "2500:key 27;5500:key 27;8500:key 27;9500:key 27;11000:move 230 230;12000:click 230 230;14500:move 320 240;15000:key 32;16500:click 616 461;18000:snap {out}/map.png;18200:move 200 250;18800:snap {out}/hover.png;19000:click 606 460;21500:snap {out}/buildings.png;21700:click 506 431;25000:snap {out}/picked.png;25200:click 400 462;26200:click 616 461;27200:move 195 309;27500:click 195 309;31000:snap {out}/travelled.png;31200:where;31500:quit"

@@ -408,3 +408,8 @@ shown beside or under it when the row is hovered (E-1305).
   five letters with no entry (`##K`, `##N`, `##Q`, `##U`, `##V`) give no header in that count.
 - **Status:** engine: a header row only when an entry follows, which gives the 140 rows of
   E-0203; confirm against 0x40b3e0 when convenient.
+
+### Q-1154 — China: the map's fonts
+- **Context:** E-1151 gives the hover label's place (0x4136d0, y 0x1a9, x 0x17c) and E-1152
+  the building list's row height (font height + 5), but neither records the font slot.
+- **Status:** open; engine: font 0, as the bar's object label (E-1102).
