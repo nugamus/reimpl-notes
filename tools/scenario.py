@@ -138,8 +138,11 @@ def run(engine: str, path: Path, update: bool) -> bool:
                                   errors="replace")
             status = f"exit {proc.returncode}"
             (logdir / "run.log").write_text(proc.stdout + proc.stderr, encoding="utf-8")
-        except subprocess.TimeoutExpired:
+        except subprocess.TimeoutExpired as e:
             status = "timed out"
+            # Keep what the run printed before it was killed: where it got stuck
+            text = lambda b: b.decode("utf-8", "replace") if isinstance(b, bytes) else (b or "")
+            (logdir / "run.log").write_text(text(e.stdout) + text(e.stderr), encoding="utf-8")
         took = time.time() - start
         if not OPTS["asan"] and not OPTS["coverage"] and status == "exit 0":  # timings of normal runs only
             with (REPO / "logs" / "perf.tsv").open("a", encoding="utf-8") as f:

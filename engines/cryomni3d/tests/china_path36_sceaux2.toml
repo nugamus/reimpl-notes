@@ -1,0 +1,9 @@
+description = "Critical path step 65 (walkthrough.md), from path35's save (slot 35): teleported to pdc162, look zone 6 -> arbre1; take zone 1 -> arbre2; CLE_JARRE on use zone 1 plays arbre -> arbre3; take zone 0 opens puzzle 3 (Sceaux, m = 1), solved: CLE_JARRE, LETTRE_VIERGE, INDICE_CACHETS2 destroyed, SCEAUX to the inventory, note MINPD429, pdc162. Saved to slot 36."
+snaps = ["after.png"]
+timeout = 200
+domain = "china"
+saves_from = "china_path35_jarre"
+export_saves = true
+args = ["--save-slot=35"]
+[keys]
+dev_input = "3000:goto pdc162;4500:face 6;4800:click;5500:await arbre1;6000:zone 1;6300:click;7000:await arbre2;7500:hold 34;7800:zone 1;8100:click;8800:await arbre3;9300:zone 0;9600:click;10300:await puzzle;10800:click 255 106;11200:click 255 106;11600:click 255 106;12000:click 559 102;12400:click 150 435;12800:click 255 106;13200:click 417 107;13600:click 417 107;14000:click 417 107;14400:click 559 102;14800:click 316 435;15200:click 417 107;15600:click 89 101;16000:click 89 101;16400:click 89 101;16800:click 559 102;17200:click 472 435;18000:await pdc162;18500:where;19000:snap {out}/after.png;19200:save 36;20000:quit"

@@ -1,0 +1,9 @@
+description = "Critical path steps 69-70 (walkthrough.md), from path37's save (slot 37, CHAPITRE 15, in pdcw522): take zone 2 opens puzzle 1 (Penjing), solved with slots 0, 1, 4, 5, 7, 9: CHAPITRE 17, penjing2; take zone 0 -> PROCLA (proclam); go zone 0 plays cqrh501, ANCQ5011, MPID5011, MPID5015, PDCH501 (note MINPD501) and arrives in bpiw202 (played in full). Saved to slot 38."
+snaps = ["after.png"]
+timeout = 300
+domain = "china"
+saves_from = "china_path37_cqr"
+export_saves = true
+args = ["--save-slot=37"]
+[keys]
+dev_input = "3000:face 2;3300:click;4000:await puzzle;4500:click 185 323;4900:click 183 403;5300:click 251 288;5700:click 251 375;6100:click 337 311;6500:click 431 183;7500:await penjing2;8000:zone 0;8300:click;9000:await proclam;9500:zone 0;9800:click;10500:await bpiw202;11000:where;11500:snap {out}/after.png;11700:save 38;12500:quit"

@@ -1,0 +1,9 @@
+description = "Critical path steps 71-72 (walkthrough.md), from path38's save (slot 38, CHAPITRE 17, in bpiw202): MARTEAU in hand; teleported to cgc110, zone 1 -> nwfw100; go zone 3 plays DAMH501 -> fight2 -> fight; within 3 s the hammer on use zone 0 plays DAMH503, ANDA5111, DAMH502a, DAMH502g, ANJDAM61 (note MINNW501) and arrives in bdaw100 (played in full). Saved to slot 39."
+snaps = ["after.png"]
+timeout = 300
+domain = "china"
+saves_from = "china_path38_penjing"
+export_saves = true
+args = ["--save-slot=38"]
+[keys]
+dev_input = "3000:hold 25;3300:goto cgc110;4800:face 1;5100:click;5800:await nwfw100;6300:face 3;6600:click;7300:await fight;7350:zone 0;7400:click;8000:await bdaw100;8500:where;9000:snap {out}/after.png;9200:save 39;10000:quit"

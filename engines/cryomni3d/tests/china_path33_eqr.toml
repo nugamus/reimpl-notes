@@ -1,0 +1,9 @@
+description = "Critical path steps 58-59 (walkthrough.md), from path32's save (slot 32, CHAPITRE 13, in pdc010): zone 3 -> pdc112, zone 4 -> pdc162; talk zone 9 plays ANEQ4111, PDCH401, pdc175 (EQRD4131, DQRD4131, PDCH402, EQRD4141), note MINPD411, back in pdc162; teleported to cgc110, go zone 1 plays NWFH431, XQRD4091, MPID4191, NWFH401: CHAPITRE 14, LISTE_VICTIMES destroyed, arriving in bpiw202 (played in full). Saved to slot 33."
+snaps = ["after.png"]
+timeout = 400
+domain = "china"
+saves_from = "china_path32_confes4"
+export_saves = true
+args = ["--save-slot=32"]
+[keys]
+dev_input = "3000:face 3;3300:click;4000:await pdc112;4500:face 4;4800:click;5500:await pdc162;6000:face 9;6300:click;7000:await pdc162;7500:goto cgc110;9000:face 1;9300:click;10000:await bpiw202;10500:where;11000:snap {out}/after.png;11200:save 33;12000:quit"

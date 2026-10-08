@@ -1,0 +1,9 @@
+description = "Critical path steps 63-64 (walkthrough.md), from path34's save (slot 34, in pdcw512 with LETTRE_VIERGE in hand): use zone 2 reveals the letter (lvierge, sound jingfind, note MINPD423, rebus); go zone 0 -> pdcw512; teleported to pdc122, look zone 2 -> jarre2; take zone 1 -> pierre2; BURIN on use zone 2 -> pierre21; take zone 0 -> CLE_JARRE (note MINPD425, pierre22); go zone 0 -> pdc122. Saved to slot 35."
+snaps = ["after.png"]
+timeout = 200
+domain = "china"
+saves_from = "china_path34_lettre"
+export_saves = true
+args = ["--save-slot=34"]
+[keys]
+dev_input = "3000:face 2;3300:click;4000:await rebus;4500:zone 0;4800:click;5500:await pdcw512;6000:goto pdc122;7500:face 2;7800:click;8500:await jarre2;9000:zone 1;9300:click;10000:await pierre2;10500:hold 24;10800:zone 2;11100:click;11800:await pierre21;12300:zone 0;12600:click;13300:await pierre22;13800:zone 0;14100:click;14800:await pdc122;15300:where;15800:snap {out}/after.png;16000:save 35;16800:quit"

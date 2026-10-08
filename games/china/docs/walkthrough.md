@@ -338,7 +338,8 @@ procedure stores 3, 7, 11 or 16 (tests such as `>= 16` or `< 11` fall between) (
     inventory, note MINPD429, `pdc162` ([pdc162](places-logic.md#pdc162),
     [arbre1](places-logic.md#arbre1), [arbre2](places-logic.md#arbre2),
     [arbre3](places-logic.md#arbre3)). The puzzle cannot be left unsolved (Q-1200).
-66. To `bpiw202`: the route of step 59 to `cgc110`, then `cgc110 1*`. Hold SCEAUX, doc
+66. To `bpiw202`: reach `cpc120`, then `cpc120 5* > bpiw102 2` (at CHAPITRE 14 `cgc110 1*`
+    leads to nwfw102, not bpiw202; [cgc110](places-logic.md#cgc110)). Hold SCEAUX, doc
     zone 18 -> dialogues ANMI4311, MPID4312, SCEAUX destroyed, note MINBP431, ANMI4311,
     **CHAPITRE = 15** ([bpiw202](places-logic.md#bpiw202)).
 

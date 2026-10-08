@@ -1,0 +1,9 @@
+description = "Critical path step 73 (walkthrough.md), from path39's save (slot 39, in bdaw100): take zone 2 opens puzzle 6 (Horloge); the four hands dragged to 6, 9, 10, 8 plays puzhorlo: CHAPITRE 18, horloge2; take zone 0 -> PLBOMB (plbombe), go zone 0 -> horloge3, take zone 0 -> EDI (edit), go zone 0 -> bdaw100 (note MINNW510). Saved to slot 40."
+snaps = ["after.png"]
+timeout = 300
+domain = "china"
+saves_from = "china_path39_fight"
+export_saves = true
+args = ["--save-slot=39"]
+[keys]
+dev_input = "3000:face 2;3300:click;4000:await puzzle;4500:down 330 237;4800:move 357 255;5100:up;5400:down 363 219;5700:move 309 239;6000:up;6300:down 396 322;6600:move 358 317;6900:up;7200:down 297 312;7500:move 318 300;7800:up;8500:await horloge2;9000:zone 0;9300:click;10000:await plbombe;10500:zone 0;10800:click;11500:await horloge3;12000:zone 0;12300:click;13000:await edit;13500:zone 0;13800:click;14500:await bdaw100;15000:where;15500:snap {out}/after.png;15700:save 40;16500:quit"

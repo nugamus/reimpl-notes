@@ -1,0 +1,8 @@
+description = "Critical path steps 74-75 (walkthrough.md), from path40's save (slot 40, CHAPITRE 18): teleported to shs140, zone 0 -> shs240; take zone 8 (the throne) opens puzzle 8 (Bombe); TOURNEVIS put in hand (dev hold, standing in for the bar), the bomb taken apart step by step; solved: fade, video fin (snapped), the epilogue (its first still, ANJING, snapped)."
+snaps = ["fin.png", "epilogue.png"]
+timeout = 300
+domain = "china"
+saves_from = "china_path40_horloge"
+args = ["--save-slot=40"]
+[keys]
+dev_input = "3000:goto shs140;4500:face 0;4800:click;5500:await shs240;6000:face 8;6300:click;7000:await puzzle;7500:hold 20;7800:click 391 336;8300:click 363 274;8800:click 387 320;9300:click 290 304;9800:click 157 319;10300:click 403 257;10800:click 35 35;11300:click 409 251;11800:click 355 119;12300:click 391 158;12800:click 391 158;13300:click 362 168;13800:click 462 317;14300:click 490 294;14800:click 413 230;15300:click 419 238;15800:click 35 35;16000:move 320 240;60000:snap {out}/fin.png;120000:snap {out}/epilogue.png;120500:quit"

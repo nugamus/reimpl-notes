@@ -1,0 +1,9 @@
+description = "Critical path steps 66-68 (walkthrough.md), from path36's save (slot 36): teleported to cpc120, zone 5 -> bpiw102, zone 2 -> bpiw202; with SCEAUX in hand doc zone 18 plays ANMI4311, MPID4312: CHAPITRE 15; teleported to pdc010, zone 3 -> pdc112, zone 4 -> pdc162; talk zone 9 plays EQRD4311, PDCH401, pdc177 (C520 and C510 open); zone 10 -> pdcw512, zone 1 -> pdcw522; talk zone 0 plays CQRD4311 (all in full). Saved to slot 37."
+snaps = ["after.png"]
+timeout = 300
+domain = "china"
+saves_from = "china_path36_sceaux2"
+export_saves = true
+args = ["--save-slot=36"]
+[keys]
+dev_input = "3000:goto cpc120;4500:face 5;4800:click;5500:await bpiw102;6000:face 2;6300:click;6900:await bpiw202;6000:hold 19;6300:face 18;6600:click;7300:await bpiw202;7800:goto pdc010;9300:face 3;9600:click;10300:await pdc112;10800:face 4;11100:click;11800:await pdc162;12300:face 9;12600:click;13300:await pdc162;13800:face 10;14100:click;14800:await pdcw512;15300:face 1;15600:click;16300:await pdcw522;16800:face 0;17100:click;17800:await pdcw522;18300:where;18800:snap {out}/after.png;19000:save 37;19800:quit"
