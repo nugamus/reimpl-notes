@@ -1438,3 +1438,18 @@ of 100 per area, so related entries stay together.
   posthum confess1..4 indice1..4 victime proclam edit lvierge rebus plbombe cachet1
   cachet2 (the still and voice names the eye opens, E-1103).
 - **Used by:** spec/china-interface.md Documents; the engine's object tables.
+
+### E-1254 — China's puzzles 5-8 hit-test at the cursor's top-left, not its hot point (2026-10-08)
+- **Source:** CHINE.EXE run loops 0x4189bc (Puzzle4), 0x41c1d0 (Horloge), 0x41b0a0
+  (Boutons), 0x419830 (Bombe): each copies the point to test from 0x48f208 (x) and
+  0x48f210 (y), the cursor top-left that 0x414fb0 updates and 0x415340 draws the cursor
+  at; none calls the hot-point helper 0x415440 (which adds the sprite hot field or half
+  the size). Puzzle4 indexes `mask.raw` at y*640+x and passes the point to 0x41fc20 and
+  0x420340; Horloge indexes its mask at y*640+x and calls 0x41fc20; Boutons calls
+  0x420340; Bombe calls 0x41fc20. Hover labels: Puzzle4, Boutons and Bombe set the label
+  with 0x4106e0 (which stores the same 0x48f208/0x48f210 top-left at 0x500a60/0x500a64)
+  and draw it with 0x4107c0 (offset from that top-left, E-0902); Horloge sets no label.
+- **Shows:** all four puzzles test masks, pixel hits and rect hits at the cursor's
+  top-left point, as puzzles 1-4 do (E-1200); the hover label is placed from the same
+  top-left.
+- **Used by:** games/china/docs/puzzles.md Puzzles 5-8: common behaviour.

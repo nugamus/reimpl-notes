@@ -143,7 +143,7 @@ Init 0x41b5d0, run 0x41b990, close 0x41b920 (E-1204).
   (2,1) (2,2) (2,3); (3,2); (4,2), i.e. stones BOUT3, BOUT7..9, BOUT12..14, BOUT18,
   BOUT23 (bars follow by themselves). Result 1; Escape: result 0.
 
-## Puzzles 5-8: common behaviour (E-1250..E-1253)
+## Puzzles 5-8: common behaviour (E-1250..E-1254)
 
 Each of these puzzles runs its own blocking frame loop over a 640x480 16-bit
 background; files are under `DATA/PUZZLES/<folder>/`. Sprites are SPR files drawn at the
@@ -152,7 +152,9 @@ sprite and the pixel there is not the key colour (0x41fc20; its bottom test acce
 y = top + height, one row too many); "rect hit" = inside the sprite rectangle
 (0x420340). A press = the left button going down (the press latch, E-0900). Escape =
 DirectInput key 1 down (0x414c70). Every exit re-enters the current place (0x41f170)
-and returns the result (1 solved, 0 left).
+and returns the result (1 solved, 0 left). Masks, pixel hits and rect hits all use the
+cursor's top-left point (not its hot point), and hover labels (Puzzle4, Boutons, Bombe;
+Horloge has none) are placed from that top-left as elsewhere (E-1254).
 
 ## 5 Puzzle4 (Puzzle4.cpp, folder PUZZLE4) (E-1250)
 
