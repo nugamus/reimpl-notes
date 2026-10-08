@@ -1,0 +1,6 @@
+description = "China: in pne140 at step 1, talking to the left guard plays GICD1011 (faces, voice, subtitles); afterwards both talk zones are off and the view is back"
+snaps = ["after.png"]
+timeout = 90
+domain = "china"
+[keys]
+dev_input = "2500:key 27;5500:key 27;8500:key 27;9500:key 27;11000:move 230 230;12000:click 230 230;13000:move 320 240;14100:angles 1.68 -0.2;14500:zone 1;15500:click;40000:move 320 240;41000:snap {out}/after.png;41100:where;41500:quit"
