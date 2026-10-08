@@ -90,7 +90,7 @@ after it into NUL (0x40a5b0), then scan for delimiters.
 - **MINUTES.TXT** (the inquiry notes, 45; 50 slots): `#id#` `<text>` found by scanning,
   text may span lines; no comments.
 - **LISTE.TXT** (documentation index, 119 entries): `##C` starts the group of letter C
-  (row `-C-`); `#id#` `<text>` gives row `id/text` (id = a Fichetxt fiche label); a
+  (row `-C-`); `#id#` `<text>` gives row `text/id` (id = a Fichetxt fiche label; E-1301); a
   `##name##` + `<title>` line is skipped and the group after it gets the header `-`;
   `<text>` with no id is ignored (one in the corpus).
 - **Fichetxt.txt** (documentation, 8 themes, 122 fiches): `##theme##` `<title>`, fiches,

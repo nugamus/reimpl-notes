@@ -296,7 +296,8 @@ Not reachable from the bar itself. Entered from the main menu's documentation en
 `ico_indx`, highlights `i_indinv`/`i_sprinv`), from documentation zones (0x41f430
 type 8, E-0903) and from map type-8 spots; the fiche screen 0x40c5a0 uses one of eight
 backgrounds `fondbeig..fondviol` (0x40b7e0) and the `ico_*`/`fl_*` sprites (0x40b8e0);
-data from Fichetxt.txt and Liste.txt (E-0203, E-0204). Behaviour: Q-1102 (E-1106).
+data from Fichetxt.txt and Liste.txt (E-0203, E-0204). Full behaviour of both screens:
+[china-documentation.md](china-documentation.md) (E-1300..E-1305).
 
 ## Other buttons
 

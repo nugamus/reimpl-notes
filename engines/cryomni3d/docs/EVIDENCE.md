@@ -1358,3 +1358,71 @@ of 100 per area, so related entries stay together.
   visit); 0x405950 (shutdown) -> 0x4059f0 writes 0x48f258, 0x48f228, 0x48f264, 0x48f21c.
 - **Shows:** the options screen's layout and behaviour; chine.cfg is written at shutdown.
 - **Used by:** spec/china-boot.md Options screen.
+
+### E-1300 — China: documentation contents screen (2026-10-08)
+- **Source:** CHINE.EXE (EN ISO) 0x4085d0 (contents loop), 0x407b20 (sprite pushes
+  0x407b83..0x407db1: fond_som, som_ying..som_lieu, som_spir, fl_hajau, fl_bajau, fl_hablc,
+  fl_bablc, ico_indx, i_indinv, i_sprinv), 0x407ed0 (fiche title rectangles, 15 px, x + 0xdc),
+  0x407ff0 (list moved up to end by 480), 0x407f90 (index row rectangles y 65..378 step 15,
+  x 0x280 - W), 0x4095a0 (W = widest row text before `/`, font 10), 0x408020 (panel tint:
+  (c + t) >> 1 mode 0, >> 3 mode 1), 0x408570 (panel copy), 0x441a4e (busy wait, 10 ms per
+  arrow step), keys DIK 0x13/0x22/0x30 with 0x19/0x18, 0x1e; loop ends on DIK 1 or a press on
+  som_spir, return 0; a fiche press calls 0x407df0, 0x40c5a0(label), 0x407b20.
+- **Shows:** the contents screen layout, theme toggling, fiche list, index panel and
+  scrolling, exit (spec/china-documentation.md "Contents screen", "Entry and exit").
+- **Used by:** spec/china-documentation.md.
+
+### E-1301 — China: LISTE.TXT rows are `text/label`, not `label/text` (supersedes part of E-0203) (2026-10-08)
+- **Source:** CHINE.EXE 0x40b56c..0x40b578: `push edx; push eax; push 0x45c780 ("%s/%s");
+  push row` with eax = the `<text>` start and edx = the `#label#`; readers 0x4085d0 and
+  0x40c5a0 draw the bytes before `/` and open the fiche named by the bytes after it.
+  Corpus: no LISTE `<text>` contains `/`.
+- **Shows:** an index row holds the shown text first and the fiche label after `/`.
+- **Used by:** spec/china-documentation.md "Contents screen"; formats/README.md LISTE.TXT.
+
+### E-1302 — China: fiche viewer loop, arrows and history (2026-10-08)
+- **Source:** CHINE.EXE 0x40c5a0: label lookup 0x40bf10 (theme, case-insensitive) and
+  0x40bea0 (fiche), failure 0x40bc80 + return 3; sprites 0x40b8e0 (push order 0x40b941..
+  0x40bc4f); background 0x40b7e0 (pushes 0x40b7fd..0x40b8ac fondbeig..fondviol by theme
+  0..7); history array 0x4cdd58 (50 slots, write index 0x4ff994, current 0x4ff998, end
+  0x4ff99c, 0x31/0x32 limits; the write at index 50 precedes the restart); presses on the
+  rectangles of ce034 (fl_drrou, next if < count - 1), ce04c (fl_gcrou, previous if > 0),
+  ce01c (fl_bajau, forward), ce004 (fl_hajau, back), 4ff97c (ico_spir, leave), 4ff944
+  (ico_indx toggle; any other press closes the index); cursor 0xb each frame, 8 over a
+  link; link hover title at 0x4136d0(0x1b3, 0x163) colour 0x7020 font 10; loop ends on
+  DIK 1, return 0.
+- **Shows:** viewer navigation, history ring and exits (spec "Fiche viewer").
+- **Used by:** spec/china-documentation.md.
+
+### E-1303 — China: fiche picture, caption and title placement (2026-10-08)
+- **Source:** CHINE.EXE 0x40a540 / 0x40a4d0 (disassembly: box 10,50..340,380; x search
+  from 11, y from 51; > 0x14a gives -1), 0x40c100 (0x416800 blit at x, y; "Image trop
+  large"/"Image trop haute" 0x45c90c/0x45c8f8 at 100,100 font 0; title font 3 at y 10,
+  x 0x140 - width/2; caption 0x40e580 + 0x40df40 width w or 0x14a if w < 0xa5, font 8,
+  0x4094c0 lines +10 px at x (10 if w < 0xa5), y + h + 1; "speciale" 0x45c920 → 0x40e120
+  boxes (100,150,600,400) and (200,150,600,400) font 1); path 0x41fef0 = data path +
+  "Interf\" + name + ".tga" (0x45bf9c). Corpus: 184 INTERF TGAs; every fiche picture has
+  one side exactly 330, none larger.
+- **Shows:** x = 176 - ceil(w/2), y = 216 - ceil(h/2) (solved from the loops), caption and
+  title rules.
+- **Used by:** spec/china-documentation.md "Page".
+
+### E-1304 — China: fiche text layout and link hot spots (2026-10-08)
+- **Source:** CHINE.EXE 0x40c100 → 0x40e580, 0x4096d0 (wrap at 0x118), 0x409610 (cut a
+  trailing space), 0x4099f0(screen, 0x15e, 0x3c, lines, 0x118): font 1, line step 0xf,
+  `$` words colour 0x7020 else 0xffff; 0x4098a0 justification (spare = 0x118 - width
+  without `$`, spread over the spaces, only when lines i+1 and i+2 exist); 0x409530 /
+  0x409560 link rectangles (top y - 2, height 13, word width) in 0x4cdb80 records of
+  {link number, top, left, bottom, right}, 10 records; 0x409510 clears them.
+- **Shows:** text column at x 350, y 60, 280 px, no paging; link drawing and hit areas.
+- **Used by:** spec/china-documentation.md "Page".
+
+### E-1305 — China: table fiches (2026-10-08)
+- **Source:** CHINE.EXE 0x40c5a0 (rows' rectangles y 0x34 + 20i .. 0x3f + 20i, x 0x32 ..
+  0x32 + width font 1; hover selects a row whose `<b>` is set, flag 0x48f348), 0x40bfe0
+  (rows font 1 at x 0x32, y 0x32 + 20i, selected white else 0x7020; table 0 → 0x409f20(300,
+  y, 0x276, 400, b, white, 1, 1); table 1 → 0x40e120(width(a) + 0x3c, y, 0x276, 0x1e0, b,
+  white, 1)); 0x40bf80 (table index by label); links of the selected row at
+  0x4ce070 + (row * 13 + link) * 4. Corpus: `!!` fiches are `fiche 2` and `fiche 3`.
+- **Shows:** how the two tables are shown and selected (spec "Table fiche").
+- **Used by:** spec/china-documentation.md.

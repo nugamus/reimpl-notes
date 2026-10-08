@@ -64,12 +64,38 @@ CHINE.EXE	00406d20	Main::scanSaveSlots	Marks which of the 12 save files exist	E-
 CHINE.EXE	00406de0	Interface::loadMenu	Loads the main menu: fondtitr background and roug_n/blc_n bullet sprites	E-0505
 CHINE.EXE	00407140	Interface::mainMenu	Main menu screen: 8 bullets with labels, hover, enable rules; returns the choice	E-0505
 CHINE.EXE	00407b20	Interface::loadContents	Loads the documentation contents screen: fond_som and the som_/fl_/ico_indx sprites	E-1106
+CHINE.EXE	00407df0	Interface::freeContents	Frees the contents screen sprites and buffers	E-1300
+CHINE.EXE	00407ed0	Interface::layoutFicheList	Computes hot rectangles of the open theme's fiche titles (15 px rows at icon x+220)	E-1300
+CHINE.EXE	00407f90	Interface::layoutIndexRows	Computes hot rectangles of the 20 visible index rows from a scroll position	E-1300
+CHINE.EXE	00407ff0	Interface::clampListTop	Moves a list start up so count*15 rows end by y 480	E-1300
+CHINE.EXE	00408020	Interface::tintPanel	Builds the tinted index panel from a screen rectangle: (channel+tint)/2 or /8	E-1300
 CHINE.EXE	004082a0	Gfx::blendRect	Blends a screen rectangle halfway towards an RGB colour (or 1/8 mode)	E-0902
 CHINE.EXE	00408510	Gfx::clearRect	Fill a rectangle of the 640-wide 16-bit screen with zero	E-0951
+CHINE.EXE	00408570	Interface::blitPanel	Copies a saved panel back onto the screen buffer	E-1300
+CHINE.EXE	004085d0	Interface::docContents	Documentation contents screen: theme icons toggle fiche lists, index panel, exit spiral; opens fiches	E-1300
+CHINE.EXE	004094c0	Interface::drawCaption	Draws caption lines in font 8, 10 px apart	E-1303
+CHINE.EXE	00409510	Interface::clearLinks	Clears the 10 link rectangles	E-1304
+CHINE.EXE	00409530	Interface::linkRectStart	Starts a link rectangle (top y-2, left x)	E-1304
+CHINE.EXE	00409560	Interface::linkRectEnd	Ends a link rectangle (13 px high, word width)	E-1304
+CHINE.EXE	004095a0	Interface::indexWidth	Widest index row text (part before /) in font 10	E-1300
+CHINE.EXE	00409610	Interface::trimLines	Cuts a trailing space from each wrapped line	E-1304
 CHINE.EXE	00409670	Interface::countDollars	Counts $ characters in a string	E-0204
+CHINE.EXE	00409690	Interface::clearLines	Empties the wrapped line buffers	E-1304
+CHINE.EXE	004098a0	Interface::justifyLine	Extra pixels per space to justify a text line to the column width	E-1304
+CHINE.EXE	004099f0	Interface::drawFicheText	Draws justified fiche text in font 1, links in 0x7020, records link rectangles	E-1304
+CHINE.EXE	0040a4d0	Interface::pictureY	Picture y centred in box 50..380 (-1 if taller than 330)	E-1303
+CHINE.EXE	0040a540	Interface::pictureX	Picture x centred in box 10..340 (-1 if wider than 330)	E-1303
 CHINE.EXE	0040a5b0	Interface::zeroLineEnds	Turns each CR outside <...> and the byte after it into NUL (runs one byte past)	E-0202
 CHINE.EXE	0040a5f0	Interface::loadDoc	Parses Fichetxt.txt themes, fiches, captions, links and tables	E-0204
 CHINE.EXE	0040b3e0	Interface::loadIndex	Builds the documentation index rows -C- and id/text from Liste.txt	E-0203
+CHINE.EXE	0040b7e0	Interface::loadFicheBackground	Loads the fiche background for a theme (fondbeig..fondviol by theme 0..7) and keeps a copy	E-1302
+CHINE.EXE	0040b8e0	Interface::loadFicheSprites	Loads the fiche viewer sprites (arrows, exit, index, theme badges)	E-1302
+CHINE.EXE	0040bea0	Interface::findFiche	Fiche index of a label within its theme, or -1	E-1302
+CHINE.EXE	0040bf10	Interface::findTheme	Theme index of a fiche label (case-insensitive), or -1	E-1302
+CHINE.EXE	0040bf80	Interface::findTable	Table index of a table fiche label	E-1305
+CHINE.EXE	0040bfe0	Interface::drawTable	Draws a table fiche: rows, the selected row's second column	E-1305
+CHINE.EXE	0040c100	Interface::drawFichePage	Draws a fiche page: background, arrows, exit, badge, title, picture, caption, text with links	E-1303
+CHINE.EXE	0040c5a0	Interface::ficheViewer	Fiche viewer: draws a fiche, links, tables, theme and history arrows, index panel; returns on exit/Escape	E-1302
 CHINE.EXE	0040de50	Options::load	Options screen entry: builds a path and loads four sprites it never draws	E-1153
 CHINE.EXE	0040def0	Options::free	Frees the options screen's sprites	E-1153
 CHINE.EXE	0040e120	Text::drawBox	Draws wrapped text in a box, 15-px lines, given colour and font	E-1103
@@ -199,6 +225,7 @@ CHINE.EXE	0041fcc0	Main::musicPath	Builds the DataMusic path	E-0206
 CHINE.EXE	0041fd40	Main::savedPath	Builds the DataSaved path	E-0208
 CHINE.EXE	0041fd70	Main::cdHnmPath	CD path of the Hnm\ video folder	E-0504
 CHINE.EXE	0041fdb0	Main::locPath	Builds the data path with Loc appended	E-0200
+CHINE.EXE	0041fef0	Interface::interfPath	Builds the data path + Interf\ prefix	E-1303
 CHINE.EXE	0041ff30	Main::cdDataPath	Formats the CD data root <L>:\Chine\Data\	E-0502
 CHINE.EXE	0041ff50	Main::checkCd	CD check for disk N: scans drives for disk%d.dat, shows cd prompt until found	E-0502
 CHINE.EXE	0041ffb0	Main::findCdDrive	Finds the drive letter c..z holding \Chine\Data\disk%d.dat	E-0502
@@ -488,6 +515,7 @@ CHINE.EXE	00436db0	Place::Script_Start	Place procedure Script_Start: entry (zone
 CHINE.EXE	00439330	Hnm::initTables565	HNM decoder colour tables for 565	E-0803
 CHINE.EXE	004393d4	Hnm::initTables555	HNM decoder colour tables for 555	E-0803
 CHINE.EXE	004419c9	Timer::nowMs	Current time in ms from QueryPerformanceCounter	E-0804
+CHINE.EXE	00441a4e	CRT::busyWait	Busy-waits a number of milliseconds	E-1300
 CHINE.EXE	00441b80	Warp::screenToImage	Maps a screen point to warp image (x 0..2047, y = 767 - row) by bilinear blend of the grid	E-0604
 CHINE.EXE	00441c90	Warp::init	Builds the 31x21 projection tables (angles, hypotenuses, vertical coords) from hfov/vfov in degrees; same as upstream Omni3D init	E-0601
 CHINE.EXE	00441df0	Warp::setView	Clamps beta to 0.9*vfov, wraps alpha, fills the 31x41-point 16.16 image-coordinate grid; same as upstream updateImageCoords	E-0602

@@ -360,3 +360,21 @@ Open: is this intended (a trace of the original at arbre3) or a softlock to fix
 - **Open:** whether the press latch is set in that case (if not, the place sees the zone
   on every frame while the button is held, harmless for the once-only dialogues).
 - **Status:** open; the engine must leave the index (walkthrough steps 18, 21, 29, ...).
+
+### Q-1102 / Q-0202 — resolved (2026-10-08)
+Both screens are specified in spec/china-documentation.md (E-1300..E-1305). Index rows
+show the text before `/` and open the label after it (E-1301); a table row's `<b>` is
+shown beside or under it when the row is hovered (E-1305).
+
+### Q-1350 — China: fiche viewer theme badge position
+- **Context:** 0x40c100 draws ico_* at stored x, y plus per-theme offsets (E-1302); the
+  stored x, y (e.g. 0x48f334/0x48f338 for ico_ying) are written nowhere in the dump except
+  for ico_thei (from its sprite, 0x40c5a0). Zero would put badges near the top-left.
+- **Next:** find writes to 0x48f334, 0x4cdd0c, 0x4cde2c, 0x4ce894, 0x4ff60c, 0x4cde9c,
+  0x4cdf24 (data xrefs in Ghidra), or compare one frame of the original.
+- **Status:** open; engine: use each badge sprite's own position plus the offset.
+
+### Q-1351 — China: 0x409f20 (table 0's `<b>` box)
+- **Context:** E-1305: called with (300, y, 630, 400, text, white, font 1, 1); probably
+  Text::drawBox with link support (the chronology rows' text has no links in the corpus?).
+- **Status:** open; engine: draw like Text::drawBox.
