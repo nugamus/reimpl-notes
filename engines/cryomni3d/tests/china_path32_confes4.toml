@@ -1,0 +1,9 @@
+description = "Critical path steps 55b-57 (walkthrough.md), from path31's save (slot 31, in puzzle42): take zone 0 -> CONFES4 (confess4), go zone 0 -> puzzle43, take zone 0 -> INDIC4 (indice4), go zone 0 -> jixw210; zone 0 -> jixw132, which plays XPRD4101; teleported to jixw112, zone 0 -> aie600b, zone 2 -> pdc005, zone 0 -> pdc010; talk zone 1 -> pdc012 (EGCD4111, PDCH211, EGCD4131, PDCH212, EGCD4141) and back to pdc010 (played in full). Saved to slot 32."
+snaps = ["after.png"]
+timeout = 300
+domain = "china"
+saves_from = "china_path31_puzzle4"
+export_saves = true
+args = ["--save-slot=31"]
+[keys]
+dev_input = "3000:zone 0;3300:click;4000:await confess4;4500:zone 0;4800:click;5500:await puzzle43;6000:zone 0;6300:click;7000:await indice4;7500:zone 0;7800:click;8500:await jixw210;9000:face 0;9300:click;10000:await jixw132;10500:goto jixw112;12000:face 0;12300:click;13000:await aie600b;13500:face 2;13800:click;14500:await pdc005;15000:face 0;15300:click;16000:await pdc010;16500:face 1;16800:click;17500:await pdc010;18000:where;18500:snap {out}/after.png;18700:save 32;19500:quit"

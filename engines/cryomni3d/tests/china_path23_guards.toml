@@ -1,0 +1,9 @@
+description = "Critical path steps 40-42 (walkthrough.md), from path22's save (slot 22): teleported to pne110, zone 1 -> aio100; talk zone 6 plays GIAD3111; aio100 zone 2 -> aio200, zone 3 -> cpc110; talk zone 8 plays GIGD3111 (notes MINCP311, MINCP312); zone 1 -> cpc410; go zone 9: CHAPITRE 10, INDICE_CACHETS, video GRTH301, ANJGRT34, note MINCP319, arriving in bpiw201. Saved to slot 23."
+snaps = ["after.png"]
+timeout = 200
+domain = "china"
+saves_from = "china_path22_ene"
+export_saves = true
+args = ["--save-slot=22"]
+[keys]
+dev_input = "3000:goto pne110;4500:face 1;4800:click;5500:await aio100;6000:face 6;6300:click;8300:key 27;8800:await aio100;9300:face 2;9600:click;10300:await aio200;10800:face 3;11100:click;11800:await cpc110;12300:face 8;12600:click;14600:key 27;15100:await cpc110;15600:face 1;15900:click;16600:await cpc410;17100:face 9;17400:click;18500:await bpiw201;19000:where;19500:snap {out}/after.png;19700:save 23;20500:quit"

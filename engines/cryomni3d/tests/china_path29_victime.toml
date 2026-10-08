@@ -1,0 +1,9 @@
+description = "Critical path step 53 (walkthrough.md), from path28's save (slot 28, CHAPITRE 12, in aie600b): go zone 5 plays jixh007 -> jixw110; zone 1 -> jixw120; go zone 1 plays JIXH401, JIXH402, JIXH402b, ANEB4091, ANJIX41, EN1JIX41 -> victime: CHAPITRE 13, LISTE_VICTIMES, notes MINJI4090, MINJI409 -> jixw210 (all played in full). Saved to slot 29."
+snaps = ["after.png"]
+timeout = 300
+domain = "china"
+saves_from = "china_path28_lge"
+export_saves = true
+args = ["--save-slot=28"]
+[keys]
+dev_input = "3000:face 5;3300:click;4000:await jixw110;4500:face 1;4800:click;5500:await jixw120;6000:face 1;6300:click;7000:await jixw210;7500:where;8000:snap {out}/after.png;8200:save 29;9000:quit"

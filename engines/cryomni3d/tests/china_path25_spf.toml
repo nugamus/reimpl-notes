@@ -1,0 +1,9 @@
+description = "Critical path step 45 (walkthrough.md), from path24's save (slot 24, in aie500): go zone 7 -> ctp210; teleported to ctp330, zone 2 -> spfw101; talk zone 5 plays XPFD3211. Saved to slot 25."
+snaps = ["after.png"]
+timeout = 200
+domain = "china"
+saves_from = "china_path24_mandat4"
+export_saves = true
+args = ["--save-slot=24"]
+[keys]
+dev_input = "3000:face 7;3300:click;4000:await ctp210;4500:goto ctp330;6000:face 2;6300:click;7000:await spfw101;7500:face 5;7800:click;9800:key 27;10300:await spfw101;11000:where;11500:snap {out}/after.png;11700:save 25;12500:quit"

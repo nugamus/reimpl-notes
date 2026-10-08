@@ -1,0 +1,9 @@
+description = "Critical path step 55a (walkthrough.md), from path30's save (slot 30, in soupir2): take zone 0 opens puzzle 5 (Puzzle4): four presses on each ring, then sun, moon, sea, sky: INDIC3 and CONFES3 destroyed, video puzzl4, note MINJI411, still puzzle42. Saved to slot 31."
+snaps = ["puzzle42.png"]
+timeout = 120
+domain = "china"
+saves_from = "china_path30_soupir"
+export_saves = true
+args = ["--save-slot=30"]
+[keys]
+dev_input = "3000:zone 0;3300:click;4000:await puzzle;4500:click 336 363;4900:click 336 363;5300:click 336 363;5700:click 336 363;6100:click 335 328;6500:click 335 328;6900:click 335 328;7300:click 335 328;7700:click 329 295;8100:click 329 295;8500:click 324 295;8900:click 329 295;9900:click 182 326;10300:click 463 123;10700:click 445 343;11100:click 203 108;12000:await puzzle42;12500:where;13000:snap {out}/puzzle42.png;13200:save 31;14000:quit"

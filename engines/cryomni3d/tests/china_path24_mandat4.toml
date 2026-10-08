@@ -1,0 +1,9 @@
+description = "Critical path steps 43-44 (walkthrough.md), from path23's save (slot 23, CHAPITRE 10, in bpiw201): with INDICE_CACHETS in hand doc zone 17 plays XPID3122 (note MINBP319), MANDAT3 destroyed, MANDAT4 to the inventory; teleported to aie400, zone 1 -> aie500; with MANDAT4 in hand use zone 5 plays GITD3221 (entree_PPF, zone 7 enabled). Saved to slot 24."
+snaps = ["after.png"]
+timeout = 200
+domain = "china"
+saves_from = "china_path23_guards"
+export_saves = true
+args = ["--save-slot=23"]
+[keys]
+dev_input = "3000:hold 17;3300:face 17;3600:click;5600:key 27;6100:await bpiw201;6600:goto aie400;8000:face 1;8300:click;9000:await aie500;9500:hold 33;9800:face 5;10100:click;12100:key 27;12600:await aie500;13000:where;13500:snap {out}/after.png;13700:save 24;14500:quit"

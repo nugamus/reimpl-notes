@@ -1,0 +1,9 @@
+description = "Critical path steps 49-52 (walkthrough.md), from path27's save (slot 27): teleported to ctp210, zone 6 -> lgew100; take zone 2 -> coffre, take zone 1 -> cachwen1, BURIN on use zone 1 -> cachwen2, go zone 0: note MINLG401, CHAPITRE 12, lgew100; go zone 0 plays LGEH331 (note MINLG399) and stays, again -> ctp210; zone 4 -> aie500, zone 1 -> aie600b. Saved to slot 28."
+snaps = ["after.png"]
+timeout = 200
+domain = "china"
+saves_from = "china_path27_mpi"
+export_saves = true
+args = ["--save-slot=27"]
+[keys]
+dev_input = "3000:goto ctp210;4500:face 6;4800:click;5500:await lgew100;6000:face 2;6300:click;7000:await coffre;7500:zone 1;7800:click;8500:await cachwen1;9000:hold 24;9300:zone 1;9600:click;10300:await cachwen2;10800:zone 0;11100:click;11800:await lgew100;12300:face 0;12600:click;13300:await lgew100;13800:face 0;14100:click;14800:await ctp210;15300:face 4;15600:click;16300:await aie500;16800:face 1;17100:click;17800:await aie600b;18300:where;18800:snap {out}/after.png;19000:save 28;19800:quit"

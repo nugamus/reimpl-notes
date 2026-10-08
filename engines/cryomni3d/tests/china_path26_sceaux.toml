@@ -1,0 +1,9 @@
+description = "Critical path step 46 (walkthrough.md), from path25's save (slot 25, in spfw101): with INDICE_CACHETS in hand doc zone 3 plays SPFH320 and opens puzzle 3 (Sceaux, m = 0); the middle seal raised (flash) hands over CIRE, which goes to the last bar slot (right click, slot 9, Space); each seal raised, picked up, inked and stamped (middle on the left target, right on the middle, left on the right): EPFD3211, INDICE_CACHETS2, ANEF3221. Saved to slot 26."
+snaps = ["cire.png", "after.png"]
+timeout = 200
+domain = "china"
+saves_from = "china_path25_spf"
+export_saves = true
+args = ["--save-slot=25"]
+[keys]
+dev_input = "3000:hold 17;3300:face 3;3600:click;4300:await puzzle;5000:click 255 106;5400:click 255 106;7000:snap {out}/cire.png;7200:rclick 320 240;9000:click 571 456;9500:key 32;11000:click 255 106;11400:click 559 102;11800:click 147 335;12200:click 255 106;12600:click 417 107;13000:click 417 107;14600:click 417 107;15000:click 559 102;15400:click 313 335;15800:click 417 107;16200:click 89 101;16600:click 89 101;18200:click 89 101;18600:click 559 102;19000:click 469 335;20000:await spfw101;20500:where;21000:snap {out}/after.png;21200:save 26;22000:quit"

@@ -1,0 +1,9 @@
+description = "Critical path step 54 (walkthrough.md), from path29's save (slot 29, CHAPITRE 13, in jixw210): look zone 1 -> soupir; with TOURNEVIS in hand use zones 0, 1, 5 and 3 (crans 15) -> soupir2. Saved to slot 30."
+snaps = ["soupir2.png"]
+timeout = 120
+domain = "china"
+saves_from = "china_path29_victime"
+export_saves = true
+args = ["--save-slot=29"]
+[keys]
+dev_input = "3000:face 1;3300:click;4000:await soupir;4500:hold 20;4800:zone 0;5100:click;6000:zone 1;6300:click;7200:zone 5;7500:click;8400:zone 3;8700:click;9500:await soupir2;10000:where;10500:snap {out}/soupir2.png;10700:save 30;11500:quit"
