@@ -226,7 +226,8 @@ puzzle(n, m) (E-0953): a held object returns to the inventory; puzzle mode is se
 puzzle runs to its end in its own loop (blocking); puzzle mode clears; the call returns
 the puzzle's result (1 solved, 0 left). Leaving re-enters the current place, so its entry
 part runs again. On an error the previous result is returned. m matters only for Sceaux
-(Q-0950). Each puzzle's own exits: Q-0951.
+(variant: background and target row, E-1203). Each puzzle's own rules and exits:
+`games/china/docs/puzzles.md` (puzzles 1-4: E-1200..E-1204; others: Q-0951).
 
 | n | Puzzle | Source | Data folder |
 |---:|---|---|---|
