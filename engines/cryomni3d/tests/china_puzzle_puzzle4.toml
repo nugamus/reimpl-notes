@@ -1,0 +1,6 @@
+description = "China puzzle 5 Puzzle4: one press on a ring turns it (hover labels follow the mask); four presses on each of the three rings show the aligned picture, then the second picture's four switches in the order sun, moon, sea, sky solve it (result 1 in the log)"
+snaps = ["start.png", "rotated.png", "phase2.png", "almost.png", "after.png"]
+timeout = 90
+domain = "china"
+[keys]
+dev_input = "2500:key 27;5500:key 27;8500:key 27;9500:key 27;11000:move 230 230;12000:click 230 230;15000:puzzle 5 0;16500:snap {out}/start.png;16700:click 333 359;17100:snap {out}/rotated.png;17300:click 333 359;17700:click 333 359;18100:click 333 359;18500:click 332 324;18900:click 332 324;19300:click 332 324;19700:click 332 324;20100:click 326 291;20500:click 326 291;20900:click 321 291;21300:click 326 291;21700:snap {out}/phase2.png;22700:click 179 322;23100:click 460 119;23500:click 442 339;23900:snap {out}/almost.png;24100:click 200 104;26100:snap {out}/after.png;26500:quit"

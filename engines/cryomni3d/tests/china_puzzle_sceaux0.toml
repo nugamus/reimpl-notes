@@ -1,0 +1,6 @@
+description = "China puzzle 3 Sceaux, variant 0 (spfw101): two clicks on the left seal show its flash look, then CIRE is in the hand and a third click on the seal is ignored (the seal stays on its pedestal)"
+snaps = ["start.png", "flash.png", "cire.png"]
+timeout = 90
+domain = "china"
+[keys]
+dev_input = "2500:key 27;5500:key 27;8500:key 27;9500:key 27;11000:move 230 230;12000:click 230 230;15000:puzzle 3 0;16500:snap {out}/start.png;16700:click 89 101;17100:click 89 101;17600:snap {out}/flash.png;19400:click 89 101;19900:move 320 240;20500:snap {out}/cire.png;20900:quit"

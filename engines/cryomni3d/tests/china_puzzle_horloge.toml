@@ -1,0 +1,6 @@
+description = "China puzzle 6 Horloge: each of the four hands grabbed and dragged to its mask zone; with 6, 9, 10 and 8 set the clock plays puzhorlo (skipped by Escape; result 1 in the log) and the place comes back"
+snaps = ["start.png", "dragged.png", "after.png"]
+timeout = 90
+domain = "china"
+[keys]
+dev_input = "2500:key 27;5500:key 27;8500:key 27;9500:key 27;11000:move 230 230;12000:click 230 230;15000:puzzle 6 0;16500:snap {out}/start.png;16700:down 327 233;17000:move 354 251;17300:snap {out}/dragged.png;17400:up;17700:down 360 215;18000:move 306 235;18300:up;18600:down 393 318;18900:move 355 313;19200:up;19500:down 294 308;19800:move 315 296;20100:up;20400:key 27;22900:snap {out}/after.png;23000:quit"

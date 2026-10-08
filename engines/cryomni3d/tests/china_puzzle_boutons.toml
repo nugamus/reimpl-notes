@@ -1,0 +1,6 @@
+description = "China puzzle 7 Boutons: hovering the first column's symbol shows its label; two presses on column 1 and four on column 2 bring all three to APPOSER, the door plays puzporte (skipped by Escape; result 1 in the log) and the place comes back"
+snaps = ["start.png", "hover.png", "pressed.png", "after.png"]
+timeout = 90
+domain = "china"
+[keys]
+dev_input = "2500:key 27;5500:key 27;8500:key 27;9500:key 27;11000:move 230 230;12000:click 230 230;15000:puzzle 7 0;16500:snap {out}/start.png;16700:move 233 251;17300:snap {out}/hover.png;17500:click 233 251;17900:snap {out}/pressed.png;18100:click 232 250;18500:click 320 250;18900:click 321 250;19300:click 321 249;19700:click 321 249;20100:key 27;22600:snap {out}/after.png;22700:quit"

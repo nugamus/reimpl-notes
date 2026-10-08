@@ -1,0 +1,6 @@
+description = "China puzzle 3 Sceaux, variant 1 (arbre3): each seal raised (two clicks), picked up, inked on the pad and stamped (middle seal on the left target, right on the middle, left on the right); result 1 in the log"
+snaps = ["start.png", "held.png", "imprint.png", "after.png"]
+timeout = 90
+domain = "china"
+[keys]
+dev_input = "2500:key 27;5500:key 27;8500:key 27;9500:key 27;11000:move 230 230;12000:click 230 230;15000:puzzle 3 1;16500:snap {out}/start.png;16700:click 255 106;17100:click 255 106;17500:click 255 106;17900:snap {out}/held.png;18100:click 559 102;18500:click 150 435;18900:snap {out}/imprint.png;19100:click 255 106;19500:click 417 107;19900:click 417 107;20300:click 417 107;20700:click 559 102;21100:click 316 435;21500:click 417 107;21900:click 89 101;22300:click 89 101;22700:click 89 101;23100:click 559 102;23500:click 472 435;23900:move 320 240;25400:snap {out}/after.png;25800:quit"

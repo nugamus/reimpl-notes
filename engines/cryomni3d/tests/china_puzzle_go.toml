@@ -1,0 +1,6 @@
+description = "China puzzle 4 Go: eight of the nine stones placed (the bars between them shown), the ninth solves it (result 1 in the log) and the place comes back"
+snaps = ["start.png", "almost.png", "after.png"]
+timeout = 90
+domain = "china"
+[keys]
+dev_input = "2500:key 27;5500:key 27;8500:key 27;9500:key 27;11000:move 230 230;12000:click 230 230;15000:puzzle 4 0;16500:snap {out}/start.png;16700:click 276 173;17500:click 332 195;18300:click 287 205;19100:click 242 214;19900:click 345 229;20700:click 299 238;21500:click 252 249;22300:click 311 276;23100:snap {out}/almost.png;23300:click 325 315;25800:snap {out}/after.png;26200:quit"
