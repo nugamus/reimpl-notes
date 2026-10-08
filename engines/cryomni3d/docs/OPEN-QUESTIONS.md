@@ -326,3 +326,37 @@ Open: is this intended (a trace of the original at arbre3) or a softlock to fix
   not read by the map. Variable 0 non-zero lifts all travel conditions (E-1151); what sets
   it is not traced (visit mode?).
 - **Status:** open; next lead: xrefs to 0x45af58, writers of variable 0.
+
+### Q-1300 — China: does anything outside the place procedures write CHAPITRE?
+- **Context:** games/china/docs/walkthrough.md was derived from the 270 place procedures
+  only (E-0710..E-0712). They store CHAPITRE = 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 15,
+  17, 18 and never 3, 7, 11 or 16, though some tests read ranges across those values
+  (`>= 16`, `< 11`).
+- **Open:** whether other code (save loading, the interface bar, a puzzle) writes
+  variable 1; if not, the gaps are just unused story numbers.
+- **Status:** open; lead: xrefs to the variable setter 0x4033c0 with argument 1 outside
+  0x421f00..0x436e20.
+
+### Q-1301 — China: conditions on variables that nothing sets
+- **Context:** places-logic tests variables that no place sets: GCD3111 (cpc110),
+  GIG3111, GIHD3111 (cpc110), GIJ3111 (cpc210), GILD3111, GIKDIK11 (aie200), GISD3111,
+  GITD3111 (aie500), 3GIED11 (bpiw201), Cache_Wen (bpiw202), XPRD4111 (aie600b), PRND1011
+  (espw201), VAR_Venant_de_JIX111 (posthum, only set to 2 after testing 1). Most look like
+  slips for a neighbouring name (GIGD3111, GIED3111, ...). Effects: the CHAPITRE 9 talks
+  ANXI3151 (bpiw201) and ANMW3151 (espw201) can never play; cpc110's second guard
+  (zone 9) plays and sets GIGD3111 like the first; the rest only weaken guards' tests.
+- **Open:** confirm in the variable table that these are distinct entries and that no
+  non-place code sets them; then decide per case: original bug (lost dialogue, fix it) or
+  content cut on purpose (file a possible-bug if the signs do not settle it).
+- **Status:** open.
+
+### Q-1302 — China: a doc zone clicked with an object in hand
+- **Context:** china-zones.md (E-0900) says a doc zone (type 8) clicked while holding an
+  object does "nothing" in the handler. The critical path needs the place's code to see
+  that zone index: showing an object to a character is a click on a doc zone with it
+  (bpiw201 17/18/20, bpiw202 18/19/21, espw201 2, pdc170 1, spfw101 3/4, lgaw101 5); pdc170
+  zone 1 with LISTE_BOITES is the only way on at CHAPITRE 5. So the index must be left for
+  the place.
+- **Open:** whether the press latch is set in that case (if not, the place sees the zone
+  on every frame while the button is held, harmless for the once-only dialogues).
+- **Status:** open; the engine must leave the index (walkthrough steps 18, 21, 29, ...).
