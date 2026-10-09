@@ -3,4 +3,4 @@ snaps = ["start.png", "bhidden.png", "almost.png", "after.png"]
 timeout = 90
 domain = "china"
 [keys]
-dev_input = "2500:key 27;5500:key 27;8500:key 27;9500:key 27;11000:move 230 230;12000:click 230 230;15000:puzzle 2 0;16500:snap {out}/start.png;16700:click 280 405;17100:click 359 405;17500:snap {out}/bhidden.png;17700:click 242 406;18100:click 319 405;18500:snap {out}/almost.png;18700:click 395 406;20700:snap {out}/after.png;21100:quit"
+dev_input = "2500:key 27;5500:key 27;8500:key 27;9500:key 27;11000:move 230 230;12000:click 230 230;15000:puzzle 2 0;16500:snap {out}/start.png;16700:click 280 405;17100:click 359 405;17500:snap {out}/bhidden.png;17700:click 242 406;18100:click 319 405;18500:snap {out}/almost.png;18700:click 395 406;19000:move 320 240;20700:snap {out}/after.png;21100:quit"
