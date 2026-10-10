@@ -123,7 +123,9 @@ def run(engine: str, path: Path, update: bool) -> bool:
             ini.write(f, space_around_delimiters=False)
 
         dlls = "C:\\msys64\\clang64\\bin;" if OPTS["asan"] else "C:\\msys64\\ucrt64\\bin;"
+        # Silent unless watched: SDL's dummy driver still pulls the mixer, nothing reaches the device.
         env = dict(os.environ, SDL_WINDOW_NO_ACTIVATION_WHEN_SHOWN="1", PATH=dlls + os.environ.get("PATH", ""),
+                   **({} if OPTS["watch"] else {"SDL_AUDIODRIVER": "dummy"}),
                    ASAN_OPTIONS="detect_leaks=0:print_summary=1", UBSAN_OPTIONS="print_stacktrace=1")
         start = time.time()
         # A renamed copy, so killing it on a timeout can never hit the user's scummvm.exe.
