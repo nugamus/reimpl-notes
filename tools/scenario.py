@@ -131,6 +131,14 @@ def run(engine: str, path: Path, update: bool) -> bool:
         # A renamed copy, so killing it on a timeout can never hit the user's scummvm.exe.
         runner = tmp / f"scummvm-scenario-{engine}.exe"
         shutil.copy(exe, runner)
+        # The agent bridge's SDL shim in quiet mode (no client): hidden window that never takes
+        # focus, the player's mouse and keyboard ignored, the cursor never warped. Without focus
+        # ScummVM warps the mouse by its own event, so runs no longer depend on the real cursor.
+        shim = REPO.parent / "scummvm-agent-bridge" / "shim" / "out"
+        if not OPTS["asan"] and not OPTS["watch"] and (shim / "SDL2.dll").exists():
+            shutil.copy(shim / "SDL2.dll", tmp)
+            shutil.copy(shim / "SDL2_real.dll", tmp)
+            env["AGENT_BRIDGE_QUIET"] = "1"
         logdir = REPO / "engines" / engine / "tests" / "out" / name
         logdir.mkdir(parents=True, exist_ok=True)
         cov = ["-d1", "--debugflags=coverage"] if OPTS["coverage"] else []
