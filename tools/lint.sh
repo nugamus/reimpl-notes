@@ -50,10 +50,11 @@ while read -r sha subject; do
 	git log -1 --format=%B "$sha" | grep -qi '^Co-Authored-By: .*claude' && fail "$sha: AI listed as co-author"
 done < <(git log --format='%h %s' "origin/master..HEAD")
 
-# Harness code must stay in the DEV commit: the clean branch may not mention it.
+# Harness and agent-bridge adapter code stay in the DEV and BRIDGE commits: the clean
+# branch may not mention them.
 if git rev-parse -q --verify "$ENGINE" > /dev/null; then
-	git grep -nE '"dev_[a-z_]+"|\bdev[A-Z][A-Za-z]*\(' "$ENGINE" -- "$DIR" | head -5 |
-		while read -r l; do echo "HARD clean branch $l: harness code outside the DEV commit"; done | tee /tmp/lint-dev
+	git grep -nE '"(dev|agent)_[a-z_]+"|\b(dev|agent)[A-Z][A-Za-z]*\(' "$ENGINE" -- "$DIR" | head -5 |
+		while read -r l; do echo "HARD clean branch $l: harness or adapter code outside the DEV/BRIDGE commits"; done | tee /tmp/lint-dev
 	hard=$((hard + $(wc -l < /tmp/lint-dev)))
 fi
 

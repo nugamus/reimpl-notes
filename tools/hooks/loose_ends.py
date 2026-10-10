@@ -45,7 +45,7 @@ def findings() -> list[str]:
             out.append(f"{e}-dev has uncommitted changes in {wt}")
         new = [l for l in run(GIT, "cherry", e, f"{e}-dev", cwd=wt).splitlines() if l.startswith("+")]
         subjects = [run(GIT, "log", "-1", "--format=%s", l[2:], cwd=wt).strip() for l in new]
-        unpublished = [s for s in subjects if not s.startswith("DEV:")]
+        unpublished = [s for s in subjects if not s.startswith(("DEV:", "BRIDGE:"))]
         if unpublished:
             out.append(f"{e}-dev has {len(unpublished)} commit(s) not published (bash tools/publish.sh {e})")
     ci = run("gh", "run", "list", "-R", "nugamus/scummvm", "-L", "1", "--json", "conclusion,headSha",

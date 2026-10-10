@@ -1,6 +1,6 @@
 #!/bin/bash
 # tools/publish.sh <engine>: copies every commit on <engine>-dev that the clean branch <engine>
-# lacks (except DEV: commits) onto <engine>, pushes <engine> to the fork, copies the commits onto
+# lacks (except DEV: and BRIDGE: commits) onto <engine>, pushes <engine> to the fork, copies the commits onto
 # the fork's (linear) master, then rebases <engine>-dev on it so the dev branch is again "clean branch +
 # the DEV commit".
 # Refuses commits without an Assisted-by trailer (ScummVM AI-GUIDELINES.md).
@@ -14,7 +14,7 @@ g() { git -C "$REPO" "$@"; }
 picks=""
 for c in $(g cherry "$ENGINE" "$ENGINE-dev" | awk '$1 == "+" {print $2}'); do
 	subject=$(g log -1 --format=%s "$c")
-	case "$subject" in DEV:*) continue ;; esac
+	case "$subject" in DEV:* | BRIDGE:*) continue ;; esac
 	g log -1 --format=%B "$c" | grep -q '^Assisted-by: ' || { echo "no Assisted-by: $subject"; exit 1; }
 	picks="$picks $c"
 done

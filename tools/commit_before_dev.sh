@@ -1,6 +1,6 @@
 #!/bin/sh
 # Commit what is staged in the current ScummVM worktree (e.g. C:\scummvm-dev\grumpa), then
-# move the new commit below the DEV: commits at the tip of the branch (the development
+# move the new commit below the DEV: and BRIDGE: commits at the tip of the branch (the development
 # harness stays last). Run it from inside the worktree:
 #   bash <notes>/tools/commit_before_dev.sh <message-file>
 # Stops (and leaves the cherry-pick for you) if a DEV commit does not apply on top.
@@ -9,7 +9,7 @@ msg=$(realpath "$1")
 cd "$(git rev-parse --show-toplevel)"
 git commit -q -F "$msg"
 n=0
-while git log -1 --format=%s "HEAD~$((n + 1))" | grep -q '^DEV: '; do
+while git log -1 --format=%s "HEAD~$((n + 1))" | grep -qE '^(DEV|BRIDGE): '; do
 	n=$((n + 1))
 done
 [ "$n" -eq 0 ] && { git log --oneline -1; exit 0; }
