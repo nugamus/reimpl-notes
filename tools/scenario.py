@@ -31,7 +31,8 @@ Every run's output is kept in `engines/<engine>/tests/out/<name>/run.log` (cover
 grep read it). Options: `--asan` runs the AddressSanitizer + UBSan build (tools/build-asan.sh) instead
 and fails on any memory error or undefined behaviour it reports, with the first report in
 the summary; `--coverage` turns on the engines' `coverage` debug channel for
-tools/runcoverage.py; `--path DIR` replaces the game folder (the fuzzer uses it).
+tools/runcoverage.py; `--watch` plays the run in its window at real speed (grumpa_watch=20) and skips
+the comparisons and saves export; `--path DIR` replaces the game folder (the fuzzer uses it).
     grumpa_vm = "1;ticks 50;snap {out}/hut.png"
 """
 
@@ -50,7 +51,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 DEV = Path(os.environ.get("DEVROOT", "C:/scummvm-dev"))  # DEVROOT: a parallel agent's tree
-OPTS = {"asan": False, "path": None, "coverage": False}
+OPTS = {"asan": False, "path": None, "coverage": False, "watch": False}
 TOLERANCE = 16  # per-channel difference that counts as a changed pixel
 
 
@@ -113,6 +114,8 @@ def run(engine: str, path: Path, update: bool) -> bool:
                                "gfx_mode": sc.get("gfx_mode", "surfacesdl")})
         for k, v in sc.get("keys", {}).items():
             ini[domain][k] = str(v).replace("{out}", out.as_posix())
+        if OPTS["watch"]:
+            ini[domain][f"{engine}_watch"] = "20"
         if OPTS["path"]:
             ini[domain]["path"] = str(OPTS["path"])
         cfg = tmp / "scummvm.ini"
@@ -133,6 +136,8 @@ def run(engine: str, path: Path, update: bool) -> bool:
         timeout = sc.get("timeout", 60)
         if OPTS["asan"]:
             timeout *= 4
+        if OPTS["watch"]:
+            timeout *= 20
         try:
             proc = subprocess.run(cmd, env=env, cwd=tmp, timeout=timeout, capture_output=True, text=True,
                                   errors="replace")
@@ -144,6 +149,9 @@ def run(engine: str, path: Path, update: bool) -> bool:
             text = lambda b: b.decode("utf-8", "replace") if isinstance(b, bytes) else (b or "")
             (logdir / "run.log").write_text(text(e.stdout) + text(e.stderr), encoding="utf-8")
         took = time.time() - start
+        if OPTS["watch"]:
+            print(f"watched {engine}/{name} ({status}, {took:.0f}s)")
+            return status == "exit 0"
         if not OPTS["asan"] and not OPTS["coverage"] and status == "exit 0":  # timings of normal runs only
             with (REPO / "logs" / "perf.tsv").open("a", encoding="utf-8") as f:
                 f.write(f"{time.strftime('%Y-%m-%d %H:%M')}\t{engine}\t{name}\t{took:.2f}\n")
@@ -200,10 +208,11 @@ def main(argv: list[str]) -> int:
     update = "--update" in argv
     OPTS["asan"] = "--asan" in argv
     OPTS["coverage"] = "--coverage" in argv
+    OPTS["watch"] = "--watch" in argv
     if "--path" in argv:
         OPTS["path"] = argv[argv.index("--path") + 1]
         argv = argv[:argv.index("--path")] + argv[argv.index("--path") + 2:]
-    args = [a for a in argv if a not in ("--update", "--asan", "--coverage")]
+    args = [a for a in argv if a not in ("--update", "--asan", "--coverage", "--watch")]
     if not args:
         print(__doc__)
         return 2
